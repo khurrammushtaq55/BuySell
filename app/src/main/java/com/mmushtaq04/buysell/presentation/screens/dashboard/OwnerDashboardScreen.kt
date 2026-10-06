@@ -13,13 +13,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mmushtaq04.buysell.ui.theme.BuySellTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OwnerDashboardScreen(
-    onNavigateBack: () -> Unit,
+    onNavigateBack: () -> Unit = {},
     todaySalesCount: Int = 4,
     todaySalesTotalRs: Long = 185000,
     monthlyNetProfitRs: Long = 62000,
@@ -160,5 +162,13 @@ private fun DashboardMetricCard(
                 color = valueColor
             )
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun OwnerDashboardScreenPreview() {
+    BuySellTheme {
+        OwnerDashboardScreen()
     }
 }

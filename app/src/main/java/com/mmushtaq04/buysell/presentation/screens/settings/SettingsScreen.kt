@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -15,19 +16,30 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mmushtaq04.buysell.ui.theme.BuySellTheme
+import com.mmushtaq04.buysell.util.AppPinManager
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit = {}
 ) {
+    val context = LocalContext.current
     var selectedLanguage by remember { mutableStateOf("Roman Urdu / رومن اردو") }
     var expandedLanguageDropdown by remember { mutableStateOf(false) }
     var slowStockDaysText by remember { mutableStateOf("30") }
     var receiptFooterText by remember { mutableStateOf("Shukriya! Visit again.") }
+
+    var showPinDialog by remember { mutableStateOf(false) }
+    var pinInputText by remember { mutableStateOf("") }
+    var isPinActive by remember { mutableStateOf(runCatching { AppPinManager.isPinSet(context) }.getOrDefault(false)) }
 
     val languages = listOf(
         "Roman Urdu / رومن اردو",
@@ -39,6 +51,59 @@ fun SettingsScreen(
         "Arabic / العربية",
         "Chinese / 简体中文"
     )
+
+    if (showPinDialog) {
+        AlertDialog(
+            onDismissRequest = { showPinDialog = false },
+            title = { Text(if (isPinActive) "App PIN Lock Badlein / Khatam Karein" else "4-Digit PIN Set Karein") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("Cold start par app kholne ke liye 4 digit PIN:", fontSize = 14.sp)
+                    OutlinedTextField(
+                        value = pinInputText,
+                        onValueChange = { if (it.length <= 4 && it.all { char -> char.isDigit() }) pinInputText = it },
+                        label = { Text("4 Digit PIN") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+                        visualTransformation = PasswordVisualTransformation(),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        if (pinInputText.length == 4) {
+                            AppPinManager.savePin(context, pinInputText)
+                            isPinActive = true
+                            showPinDialog = false
+                            pinInputText = ""
+                        }
+                    },
+                    enabled = pinInputText.length == 4
+                ) {
+                    Text("PIN Set Karein")
+                }
+            },
+            dismissButton = {
+                if (isPinActive) {
+                    TextButton(
+                        onClick = {
+                            AppPinManager.clearPin(context)
+                            isPinActive = false
+                            showPinDialog = false
+                            pinInputText = ""
+                        }
+                    ) {
+                        Text("PIN Remove Karein", color = MaterialTheme.colorScheme.error)
+                    }
+                } else {
+                    TextButton(onClick = { showPinDialog = false }) {
+                        Text("Cancel")
+                    }
+                }
+            }
+        )
+    }
 
     Scaffold(
         topBar = {
@@ -138,8 +203,10 @@ fun SettingsScreen(
             SettingClickableRow(
                 icon = Icons.Default.Lock,
                 title = "App PIN Lock",
-                subtitle = "Set 4-digit PIN for cold start"
-            ) { }
+                subtitle = if (isPinActive) "4-Digit PIN Enabled ✓ (Tap to change/remove)" else "Set 4-digit PIN for cold start"
+            ) {
+                showPinDialog = true
+            }
 
             SettingClickableRow(
                 icon = Icons.Default.Download,
@@ -197,5 +264,13 @@ private fun SettingClickableRow(
                 Text(subtitle, fontSize = 12.sp, color = Color.Gray)
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun SettingsScreenPreview() {
+    BuySellTheme {
+        SettingsScreen()
     }
 }

@@ -1,6 +1,5 @@
 package com.mmushtaq04.buysell.presentation.screens.home
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -13,8 +12,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mmushtaq04.buysell.ui.theme.BuySellTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -23,12 +24,12 @@ fun HomeScreen(
     userRole: String = "Owner",
     todaySalesCount: Int = 3,
     todaySalesAmountPaisa: Long = 12500000L, // Rs 1,25,000
-    onNavigateToBuy: () -> Unit,
-    onNavigateToSell: () -> Unit,
-    onNavigateToExchange: () -> Unit,
-    onNavigateToStock: () -> Unit,
-    onNavigateToParties: () -> Unit,
-    onNavigateToSettings: () -> Unit
+    onNavigateToBuy: () -> Unit = {},
+    onNavigateToSell: () -> Unit = {},
+    onNavigateToExchange: () -> Unit = {},
+    onNavigateToStock: () -> Unit = {},
+    onNavigateToParties: () -> Unit = {},
+    onNavigateToSettings: () -> Unit = {}
 ) {
     Scaffold(
         topBar = {
@@ -144,7 +145,7 @@ fun HomeScreen(
                 )
             }
 
-            Divider()
+            HorizontalDivider()
 
             // Exchange Option
             Card(
@@ -228,5 +229,13 @@ private fun ActionCard(
                 )
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun HomeScreenPreview() {
+    BuySellTheme {
+        HomeScreen()
     }
 }

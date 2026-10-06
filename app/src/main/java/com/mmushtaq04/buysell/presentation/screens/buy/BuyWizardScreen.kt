@@ -12,14 +12,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mmushtaq04.buysell.ui.theme.BuySellTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BuyWizardScreen(
-    onNavigateBack: () -> Unit,
-    onSaveSuccess: () -> Unit
+    onNavigateBack: () -> Unit = {},
+    onSaveSuccess: () -> Unit = {}
 ) {
     var step by remember { mutableIntStateOf(1) }
 
@@ -366,5 +368,13 @@ private fun StepPaymentInfo(
                 modifier = Modifier.fillMaxWidth()
             )
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun BuyWizardScreenPreview() {
+    BuySellTheme {
+        BuyWizardScreen()
     }
 }

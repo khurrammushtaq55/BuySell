@@ -17,4 +17,5 @@ sealed class NavRoutes(val route: String) {
     object Settings : NavRoutes("settings")
     object OwnerDashboard : NavRoutes("owner_dashboard")
     object Help : NavRoutes("help")
+    object AppLock : NavRoutes("app_lock")
 }

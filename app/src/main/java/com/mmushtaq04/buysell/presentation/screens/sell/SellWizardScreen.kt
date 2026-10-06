@@ -12,29 +12,26 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mmushtaq04.buysell.ui.theme.BuySellTheme
 
 data class SimpleStockItem(val id: String, val title: String, val imei: String, val cost: Long)
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun SellWizardScreen(
-    onNavigateBack: () -> Unit,
-    onSaveSuccess: () -> Unit
+    stockList: List<SimpleStockItem> = emptyList(),
+    onNavigateBack: () -> Unit = {},
+    onSaveSuccess: () -> Unit = {}
 ) {
     var step by remember { mutableIntStateOf(1) }
-
-    // Dummy stock list for demonstration
-    val dummyStock = listOf(
-        SimpleStockItem("1", "Apple iPhone 15 Pro", "358912345678901", 210000),
-        SimpleStockItem("2", "Samsung Galaxy S24 Ultra", "351234567890123", 240000),
-        SimpleStockItem("3", "iPad Air 5th Gen", "SER987654321", 115000)
-    )
 
     var selectedItem by remember { mutableStateOf<SimpleStockItem?>(null) }
     var searchQuery by remember { mutableStateOf("") }
@@ -93,20 +90,39 @@ fun SellWizardScreen(
                             modifier = Modifier.fillMaxWidth()
                         )
 
-                        LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                            items(dummyStock.filter { it.title.contains(searchQuery, ignoreCase = true) || it.imei.contains(searchQuery) }) { item ->
-                                val isSelected = selectedItem?.id == item.id
-                                Card(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .clickable { selectedItem = item },
-                                    colors = CardDefaults.cardColors(
-                                        containerColor = if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant
-                                    )
-                                ) {
-                                    Column(modifier = Modifier.padding(16.dp)) {
-                                        Text(item.title, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                                        Text("IMEI: ${item.imei}", fontSize = 12.sp, color = Color.Gray)
+                        val filtered = stockList.filter {
+                            it.title.contains(searchQuery, ignoreCase = true) || it.imei.contains(searchQuery)
+                        }
+
+                        if (filtered.isEmpty()) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 32.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "Pehle stock mein phone hona chahiye — pehle khareedari record karein",
+                                    color = Color.Gray,
+                                    fontSize = 14.sp
+                                )
+                            }
+                        } else {
+                            LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                items(filtered) { item ->
+                                    val isSelected = selectedItem?.id == item.id
+                                    Card(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clickable { selectedItem = item },
+                                        colors = CardDefaults.cardColors(
+                                            containerColor = if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant
+                                        )
+                                    ) {
+                                        Column(modifier = Modifier.padding(16.dp)) {
+                                            Text(item.title, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                                            Text("IMEI: ${item.imei}", fontSize = 12.sp, color = Color.Gray)
+                                        }
                                     }
                                 }
                             }
@@ -248,5 +264,19 @@ fun SellWizardScreen(
                 )
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun SellWizardScreenPreview() {
+    val dummyStock = listOf(
+        SimpleStockItem("1", "Apple iPhone 15 Pro", "358912345678901", 210000),
+        SimpleStockItem("2", "Samsung Galaxy S24 Ultra", "351234567890123", 240000),
+        SimpleStockItem("3", "iPad Air 5th Gen", "SER987654321", 115000)
+    )
+
+    BuySellTheme {
+        SellWizardScreen(stockList = dummyStock)
     }
 }

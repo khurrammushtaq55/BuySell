@@ -1,6 +1,7 @@
 package com.mmushtaq04.buysell.presentation.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -9,19 +10,35 @@ import com.mmushtaq04.buysell.presentation.screens.buy.BuyWizardScreen
 import com.mmushtaq04.buysell.presentation.screens.dashboard.OwnerDashboardScreen
 import com.mmushtaq04.buysell.presentation.screens.help.HelpScreen
 import com.mmushtaq04.buysell.presentation.screens.home.HomeScreen
+import com.mmushtaq04.buysell.presentation.screens.lock.AppLockScreen
 import com.mmushtaq04.buysell.presentation.screens.party.PartyListScreen
 import com.mmushtaq04.buysell.presentation.screens.sell.SellWizardScreen
 import com.mmushtaq04.buysell.presentation.screens.settings.SettingsScreen
 import com.mmushtaq04.buysell.presentation.screens.stock.StockListScreen
+import com.mmushtaq04.buysell.util.AppPinManager
 
 @Composable
 fun AppNavigation(
     navController: NavHostController = rememberNavController()
 ) {
+    val context = LocalContext.current
+    val isPinSet = AppPinManager.isPinSet(context)
+    val startDest = if (isPinSet) NavRoutes.AppLock.route else NavRoutes.Home.route
+
     NavHost(
         navController = navController,
-        startDestination = NavRoutes.Home.route
+        startDestination = startDest
     ) {
+        composable(NavRoutes.AppLock.route) {
+            AppLockScreen(
+                onUnlockSuccess = {
+                    navController.navigate(NavRoutes.Home.route) {
+                        popUpTo(NavRoutes.AppLock.route) { inclusive = true }
+                    }
+                }
+            )
+        }
+
         composable(NavRoutes.Home.route) {
             HomeScreen(
                 onNavigateToBuy = { navController.navigate(NavRoutes.BuyWizard.route) },

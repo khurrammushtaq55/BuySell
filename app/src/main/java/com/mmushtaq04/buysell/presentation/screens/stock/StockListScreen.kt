@@ -14,8 +14,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mmushtaq04.buysell.ui.theme.BuySellTheme
 
 data class DisplayStock(
     val id: String,
@@ -30,19 +32,13 @@ data class DisplayStock(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StockListScreen(
-    onNavigateBack: () -> Unit,
-    onSelectItem: (String) -> Unit
+    stockItems: List<DisplayStock> = emptyList(),
+    onNavigateBack: () -> Unit = {},
+    onSelectItem: (String) -> Unit = {}
 ) {
     var searchQuery by remember { mutableStateOf("") }
 
-    val sampleItems = listOf(
-        DisplayStock("1", "Apple", "iPhone 15 Pro Max 256GB", "358912345678901", "Mobile", 1, "IN_STOCK"),
-        DisplayStock("2", "Samsung", "Galaxy S24 Ultra", "351234567890123", "Mobile", 1, "IN_STOCK"),
-        DisplayStock("3", "Apple", "iPad Air 5 64GB WiFi", "SER987654321", "Tablet", 1, "IN_STOCK"),
-        DisplayStock("4", "Anker", "20W Fast Charger", "N/A", "Accessories", 8, "IN_STOCK")
-    )
-
-    val filtered = sampleItems.filter {
+    val filtered = stockItems.filter {
         it.model.contains(searchQuery, ignoreCase = true) ||
                 it.brand.contains(searchQuery, ignoreCase = true) ||
                 it.imei.contains(searchQuery)
@@ -80,7 +76,11 @@ fun StockListScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("Koi stock item nahi mila", color = Color.Gray, fontSize = 16.sp)
+                    Text(
+                        text = "Abhi koi phone stock mein nahi — pehli khareedari add karein",
+                        color = Color.Gray,
+                        fontSize = 15.sp
+                    )
                 }
             } else {
                 LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -125,5 +125,19 @@ fun StockListScreen(
                 }
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun StockListScreenPreview() {
+    val sampleItems = listOf(
+        DisplayStock("1", "Apple", "iPhone 15 Pro Max 256GB", "358912345678901", "Mobile", 1, "IN_STOCK"),
+        DisplayStock("2", "Samsung", "Galaxy S24 Ultra", "351234567890123", "Mobile", 1, "IN_STOCK"),
+        DisplayStock("3", "Apple", "iPad Air 5 64GB WiFi", "SER987654321", "Tablet", 1, "IN_STOCK")
+    )
+
+    BuySellTheme {
+        StockListScreen(stockItems = sampleItems)
     }
 }
