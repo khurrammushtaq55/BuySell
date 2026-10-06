@@ -1,6 +1,7 @@
 package com.mmushtaq04.buysell.presentation.navigation
 
 sealed class NavRoutes(val route: String) {
+    object Login : NavRoutes("login")
     object ShopSetup : NavRoutes("shop_setup")
     object Home : NavRoutes("home")
     object BuyWizard : NavRoutes("buy_wizard")

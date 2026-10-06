@@ -29,7 +29,8 @@ import com.mmushtaq04.buysell.util.AppPinManager
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
-    onNavigateBack: () -> Unit = {}
+    onNavigateBack: () -> Unit = {},
+    onSignOutClick: () -> Unit = {}
 ) {
     val context = LocalContext.current
     var selectedLanguage by remember { mutableStateOf("Roman Urdu / رومن اردو") }
@@ -38,6 +39,7 @@ fun SettingsScreen(
     var receiptFooterText by remember { mutableStateOf("Shukriya! Visit again.") }
 
     var showPinDialog by remember { mutableStateOf(false) }
+    var showSignOutDialog by remember { mutableStateOf(false) }
     var pinInputText by remember { mutableStateOf("") }
     var isPinActive by remember { mutableStateOf(runCatching { AppPinManager.isPinSet(context) }.getOrDefault(false)) }
 
@@ -100,6 +102,30 @@ fun SettingsScreen(
                     TextButton(onClick = { showPinDialog = false }) {
                         Text("Cancel")
                     }
+                }
+            }
+        )
+    }
+
+    if (showSignOutDialog) {
+        AlertDialog(
+            onDismissRequest = { showSignOutDialog = false },
+            title = { Text("Sign Out Karein?", fontWeight = FontWeight.Bold) },
+            text = { Text("Kaya aap apni dukan ke account se logout karna chahte hain?", fontSize = 15.sp) },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showSignOutDialog = false
+                        onSignOutClick()
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                ) {
+                    Text("Logout Karein")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showSignOutDialog = false }) {
+                    Text("Cancel")
                 }
             }
         )
@@ -218,7 +244,9 @@ fun SettingsScreen(
                 icon = Icons.AutoMirrored.Filled.Logout,
                 title = "Sign Out",
                 subtitle = "Logout active session"
-            ) { }
+            ) {
+                showSignOutDialog = true
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 

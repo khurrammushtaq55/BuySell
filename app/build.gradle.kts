@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.google.services)
+    alias(libs.plugins.firebase.crashlytics)
 }
 
 android {
@@ -60,12 +62,17 @@ dependencies {
     // WorkManager
     implementation(libs.androidx.work.runtime.ktx)
 
-    // Firebase
+    // Firebase & Credential Manager
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth.ktx)
     implementation(libs.firebase.firestore.ktx)
     implementation(libs.firebase.storage.ktx)
     implementation(libs.firebase.messaging)
+    implementation(libs.firebase.crashlytics.ktx)
+    implementation(libs.play.services.auth)
+    implementation(libs.credentials.main)
+    implementation(libs.credentials.play)
+    implementation(libs.googleid.main)
 
     // Coil
     implementation(libs.coil.compose)

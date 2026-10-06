@@ -1,16 +1,20 @@
 package com.mmushtaq04.buysell.presentation.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.mmushtaq04.buysell.data.auth.FirebaseAuthManager
+import com.mmushtaq04.buysell.presentation.screens.auth.LoginScreen
 import com.mmushtaq04.buysell.presentation.screens.buy.BuyWizardScreen
 import com.mmushtaq04.buysell.presentation.screens.dashboard.OwnerDashboardScreen
 import com.mmushtaq04.buysell.presentation.screens.help.HelpScreen
 import com.mmushtaq04.buysell.presentation.screens.home.HomeScreen
 import com.mmushtaq04.buysell.presentation.screens.lock.AppLockScreen
+import com.mmushtaq04.buysell.presentation.screens.onboarding.ShopSetupScreen
 import com.mmushtaq04.buysell.presentation.screens.party.PartyListScreen
 import com.mmushtaq04.buysell.presentation.screens.sell.SellWizardScreen
 import com.mmushtaq04.buysell.presentation.screens.settings.SettingsScreen
@@ -22,13 +26,45 @@ fun AppNavigation(
     navController: NavHostController = rememberNavController()
 ) {
     val context = LocalContext.current
+    val authManager = remember { FirebaseAuthManager() }
+    val isUserLoggedIn = authManager.isUserLoggedIn
     val isPinSet = AppPinManager.isPinSet(context)
-    val startDest = if (isPinSet) NavRoutes.AppLock.route else NavRoutes.Home.route
+
+    val startDest = when {
+        !isUserLoggedIn -> NavRoutes.Login.route
+        isPinSet -> NavRoutes.AppLock.route
+        else -> NavRoutes.Home.route
+    }
 
     NavHost(
         navController = navController,
         startDestination = startDest
     ) {
+        composable(NavRoutes.Login.route) {
+            LoginScreen(
+                onGoogleSignInClick = {
+                    navController.navigate(NavRoutes.ShopSetup.route) {
+                        popUpTo(NavRoutes.Login.route) { inclusive = true }
+                    }
+                },
+                onEmailAuthSuccess = {
+                    navController.navigate(NavRoutes.ShopSetup.route) {
+                        popUpTo(NavRoutes.Login.route) { inclusive = true }
+                    }
+                }
+            )
+        }
+
+        composable(NavRoutes.ShopSetup.route) {
+            ShopSetupScreen(
+                onShopCreated = {
+                    navController.navigate(NavRoutes.Home.route) {
+                        popUpTo(NavRoutes.ShopSetup.route) { inclusive = true }
+                    }
+                }
+            )
+        }
+
         composable(NavRoutes.AppLock.route) {
             AppLockScreen(
                 onUnlockSuccess = {
@@ -80,7 +116,13 @@ fun AppNavigation(
 
         composable(NavRoutes.Settings.route) {
             SettingsScreen(
-                onNavigateBack = { navController.popBackStack() }
+                onNavigateBack = { navController.popBackStack() },
+                onSignOutClick = {
+                    authManager.signOut()
+                    navController.navigate(NavRoutes.Login.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
             )
         }
 

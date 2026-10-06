@@ -2,6 +2,7 @@ package com.mmushtaq04.buysell.data.auth
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.tasks.await
 
 class FirebaseAuthManager(
@@ -20,6 +21,12 @@ class FirebaseAuthManager(
 
     suspend fun createAccountWithEmail(email: String, password: String): Result<FirebaseUser?> = runCatching {
         val result = auth.createUserWithEmailAndPassword(email, password).await()
+        result.user
+    }
+
+    suspend fun signInWithGoogleCredential(idToken: String): Result<FirebaseUser?> = runCatching {
+        val credential = GoogleAuthProvider.getCredential(idToken, null)
+        val result = auth.signInWithCredential(credential).await()
         result.user
     }
 
