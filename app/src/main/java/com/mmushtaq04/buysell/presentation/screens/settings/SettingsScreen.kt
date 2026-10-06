@@ -23,12 +23,15 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mmushtaq04.buysell.data.local.entity.CategoryEntity
 import com.mmushtaq04.buysell.ui.theme.BuySellTheme
 import com.mmushtaq04.buysell.util.AppPinManager
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun SettingsScreen(
+    allCategories: List<CategoryEntity> = emptyList(),
+    onToggleCategory: (CategoryEntity) -> Unit = {},
     onNavigateBack: () -> Unit = {},
     onSignOutClick: () -> Unit = {}
 ) {
@@ -179,6 +182,33 @@ fun SettingsScreen(
                                 selectedLanguage = lang
                                 expandedLanguageDropdown = false
                             }
+                        )
+                    }
+                }
+            }
+
+            HorizontalDivider()
+
+            // Shop Categories Management
+            Text("Trading Categories (Check/Uncheck Karein):", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+            Text("Jin categories mein dukan deal karti hai, unhein select karein:", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+
+            if (allCategories.isNotEmpty()) {
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    allCategories.forEach { categoryItem ->
+                        FilterChip(
+                            selected = categoryItem.enabled,
+                            onClick = {
+                                onToggleCategory(categoryItem)
+                            },
+                            label = { Text(categoryItem.name, fontSize = 13.sp) },
+                            leadingIcon = if (categoryItem.enabled) {
+                                { Icon(Icons.Default.CheckCircle, contentDescription = null, modifier = Modifier.size(16.dp)) }
+                            } else null
                         )
                     }
                 }

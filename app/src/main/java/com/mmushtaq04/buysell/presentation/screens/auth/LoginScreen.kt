@@ -1,5 +1,7 @@
 package com.mmushtaq04.buysell.presentation.screens.auth
 
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -27,6 +29,7 @@ import androidx.credentials.GetCredentialRequest
 import androidx.credentials.exceptions.GetCredentialException
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import com.mmushtaq04.buysell.R
 import com.mmushtaq04.buysell.data.auth.FirebaseAuthManager
 import com.mmushtaq04.buysell.ui.theme.BuySellTheme
 import kotlinx.coroutines.launch
@@ -98,7 +101,13 @@ fun LoginScreen(
                     scope.launch {
                         runCatching {
                             val webClientIdResId = context.resources.getIdentifier("default_web_client_id", "string", context.packageName)
-                            val webClientId = if (webClientIdResId != 0) context.getString(webClientIdResId) else ""
+                            val webClientId = if (webClientIdResId != 0) {
+                                context.getString(webClientIdResId)
+                            } else {
+                                runCatching { context.getString(R.string.default_web_client_id) }.getOrDefault("")
+                            }
+
+                            Log.d("LoginScreen", "Verifying Web Client ID: '$webClientId'")
 
                             val googleIdOption = GetGoogleIdOption.Builder()
                                 .setFilterByAuthorizedAccounts(false)
@@ -121,17 +130,25 @@ fun LoginScreen(
                                 if (authResult.isSuccess) {
                                     onGoogleSignInClick()
                                 } else {
-                                    errorMessage = authResult.exceptionOrNull()?.localizedMessage ?: "Google sign-in failed"
+                                    val err = authResult.exceptionOrNull()?.localizedMessage ?: "Google sign-in failed"
+                                    errorMessage = err
+                                    Toast.makeText(context, "Google Sign-In Galti: $err", Toast.LENGTH_LONG).show()
                                 }
                             } else {
                                 isLoading = false
-                                onGoogleSignInClick()
+                                val err = "Sahi Google account credential nahi mila"
+                                errorMessage = err
+                                Toast.makeText(context, err, Toast.LENGTH_LONG).show()
                             }
                         }.onFailure { e ->
                             isLoading = false
-                            if (e !is GetCredentialException || e.message?.contains("cancel", ignoreCase = true) == false) {
-                                onGoogleSignInClick()
+                            val msg = if (e is GetCredentialException && e.message?.contains("cancel", ignoreCase = true) == true) {
+                                "Google Sign-In cancel kar diya gaya"
+                            } else {
+                                "Google Sign-In Error: ${e.localizedMessage ?: "Problem logging in"}"
                             }
+                            errorMessage = msg
+                            Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
                         }
                     }
                 },
@@ -213,7 +230,9 @@ fun LoginScreen(
                             if (result.isSuccess) {
                                 onEmailAuthSuccess()
                             } else {
-                                errorMessage = result.exceptionOrNull()?.localizedMessage ?: "Authentication failed"
+                                val err = result.exceptionOrNull()?.localizedMessage ?: "Authentication failed"
+                                errorMessage = err
+                                Toast.makeText(context, "Login Galti: $err", Toast.LENGTH_LONG).show()
                             }
                         }
                     } else {

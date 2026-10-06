@@ -22,11 +22,11 @@ import com.mmushtaq04.buysell.ui.theme.BuySellTheme
 @Composable
 fun OwnerDashboardScreen(
     onNavigateBack: () -> Unit = {},
-    todaySalesCount: Int = 4,
-    todaySalesTotalRs: Long = 185000,
-    monthlyNetProfitRs: Long = 62000,
-    capitalInStockRs: Long = 850000,
-    slowStockCount: Int = 2
+    todaySalesCount: Int = 0,
+    todaySalesTotalRs: Long = 0L,
+    monthlyNetProfitRs: Long = 0L,
+    capitalInStockRs: Long = 0L,
+    slowStockCount: Int = 0
 ) {
     var showHelpDialogTitle by remember { mutableStateOf<String?>(null) }
     var showHelpDialogMsg by remember { mutableStateOf<String?>(null) }
@@ -73,8 +73,8 @@ fun OwnerDashboardScreen(
             // Card 1: Today Sales
             DashboardMetricCard(
                 title = "Aaj ki sales",
-                value = "$todaySalesCount sales • Rs $todaySalesTotalRs",
-                valueColor = Color(0xFF2E7D32),
+                value = if (todaySalesCount > 0) "$todaySalesCount sales • Rs $todaySalesTotalRs" else "Abhi tak koi sale nahi hui (Rs 0)",
+                valueColor = if (todaySalesCount > 0) Color(0xFF2E7D32) else MaterialTheme.colorScheme.onSurfaceVariant,
                 helpTitle = "Aaj ki sales ka matlab?",
                 helpMsg = "Aaj subah se le kar ab tak jitni bhi mobile sales hui hain un ka kul jor.",
                 onHelpClick = { title, msg ->
@@ -112,7 +112,7 @@ fun OwnerDashboardScreen(
             // Card 4: Slow Stock Warning
             DashboardMetricCard(
                 title = "Slow Stock (30 din se zyada)",
-                value = "$slowStockCount phones abhi tak nahi bechay",
+                value = if (slowStockCount > 0) "$slowStockCount phones abhi tak nahi bechay" else "Koi slow stock nahi ✓",
                 valueColor = if (slowStockCount > 0) Color(0xFFD32F2F) else Color(0xFF2E7D32),
                 helpTitle = "Slow Stock kya hai?",
                 helpMsg = "Jo mobile phones 30 din se zyada shop mein paday hain aur bechay nahi gaye.",
@@ -169,6 +169,12 @@ private fun DashboardMetricCard(
 @Composable
 fun OwnerDashboardScreenPreview() {
     BuySellTheme {
-        OwnerDashboardScreen()
+        OwnerDashboardScreen(
+            todaySalesCount = 4,
+            todaySalesTotalRs = 185000,
+            monthlyNetProfitRs = 62000,
+            capitalInStockRs = 850000,
+            slowStockCount = 2
+        )
     }
 }

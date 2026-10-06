@@ -20,10 +20,10 @@ import com.mmushtaq04.buysell.ui.theme.BuySellTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    shopName: String = "Hafeez Center Mobile",
+    shopName: String = "Mera Buy/Sell Store",
     userRole: String = "Owner",
-    todaySalesCount: Int = 3,
-    todaySalesAmountPaisa: Long = 12500000L, // Rs 1,25,000
+    todaySalesCount: Int = 0,
+    todaySalesAmountPaisa: Long = 0L,
     onNavigateToBuy: () -> Unit = {},
     onNavigateToSell: () -> Unit = {},
     onNavigateToExchange: () -> Unit = {},
@@ -75,16 +75,16 @@ fun HomeScreen(
                     Column {
                         Text(text = "Aaj ki sales", fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Text(
-                            text = "$todaySalesCount sales • Rs ${todaySalesAmountPaisa / 100}",
-                            fontSize = 20.sp,
+                            text = if (todaySalesCount > 0) "$todaySalesCount sales • Rs ${todaySalesAmountPaisa / 100}" else "Abhi tak koi sale nahi hui (Rs 0)",
+                            fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF2E7D32)
+                            color = if (todaySalesCount > 0) Color(0xFF2E7D32) else MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                     Icon(
                         imageVector = Icons.Default.TrendingUp,
                         contentDescription = null,
-                        tint = Color(0xFF2E7D32),
+                        tint = if (todaySalesCount > 0) Color(0xFF2E7D32) else Color.Gray,
                         modifier = Modifier.size(32.dp)
                     )
                 }
@@ -236,6 +236,9 @@ private fun ActionCard(
 @Composable
 fun HomeScreenPreview() {
     BuySellTheme {
-        HomeScreen()
+        HomeScreen(
+            todaySalesCount = 3,
+            todaySalesAmountPaisa = 12500000L
+        )
     }
 }

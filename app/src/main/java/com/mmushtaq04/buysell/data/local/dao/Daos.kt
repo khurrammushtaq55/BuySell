@@ -14,6 +14,21 @@ data class PartyBalanceDto(
 )
 
 @Dao
+interface UserDao {
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertUser(user: UserEntity)
+
+    @Query("SELECT * FROM users WHERE id = :userId LIMIT 1")
+    suspend fun getUserById(userId: String): UserEntity?
+
+    @Query("SELECT * FROM users LIMIT 1")
+    suspend fun getPrimaryUser(): UserEntity?
+
+    @Query("SELECT * FROM users LIMIT 1")
+    fun observePrimaryUser(): Flow<UserEntity?>
+}
+
+@Dao
 interface ShopDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertShop(shop: ShopEntity)
@@ -30,8 +45,17 @@ interface CategoryDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCategories(categories: List<CategoryEntity>)
 
+    @Update
+    suspend fun updateCategory(category: CategoryEntity)
+
     @Query("SELECT * FROM categories WHERE shop_id = :shopId AND enabled = 1 AND deleted_at IS NULL ORDER BY sort_order ASC")
     fun observeCategories(shopId: String): Flow<List<CategoryEntity>>
+
+    @Query("SELECT * FROM categories WHERE shop_id = :shopId AND deleted_at IS NULL ORDER BY sort_order ASC")
+    fun observeAllCategories(shopId: String): Flow<List<CategoryEntity>>
+
+    @Query("SELECT * FROM categories WHERE shop_id = :shopId AND enabled = 1 AND deleted_at IS NULL ORDER BY sort_order ASC")
+    suspend fun getEnabledCategories(shopId: String): List<CategoryEntity>
 
     @Query("SELECT * FROM categories WHERE shop_id = :shopId AND deleted_at IS NULL")
     suspend fun getCategories(shopId: String): List<CategoryEntity>
@@ -180,6 +204,26 @@ interface TxnDao {
 
     @Query("SELECT * FROM txns WHERE shop_id = :shopId AND party_id = :partyId AND deleted_at IS NULL ORDER BY txn_date DESC")
     fun observeTxnsByParty(shopId: String, partyId: String): Flow<List<TxnEntity>>
+
+    @Query("""
+        SELECT COUNT(*) FROM txns 
+        WHERE shop_id = :shopId 
+          AND type = 'SALE' 
+          AND txn_date >= :startOfDayMs 
+          AND txn_date <= :endOfDayMs 
+          AND deleted_at IS NULL
+    """)
+    suspend fun getTodaySalesCount(shopId: String, startOfDayMs: Long, endOfDayMs: Long): Int
+
+    @Query("""
+        SELECT COALESCE(SUM(total_amount), 0) FROM txns 
+        WHERE shop_id = :shopId 
+          AND type = 'SALE' 
+          AND txn_date >= :startOfDayMs 
+          AND txn_date <= :endOfDayMs 
+          AND deleted_at IS NULL
+    """)
+    suspend fun getTodaySalesAmountPaisa(shopId: String, startOfDayMs: Long, endOfDayMs: Long): Long
 }
 
 @Dao

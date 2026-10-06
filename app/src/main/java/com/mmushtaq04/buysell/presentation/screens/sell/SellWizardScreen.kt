@@ -4,11 +4,14 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -28,7 +31,19 @@ data class SimpleStockItem(val id: String, val title: String, val imei: String, 
 @Composable
 fun SellWizardScreen(
     stockList: List<SimpleStockItem> = emptyList(),
+    currentUserName: String = "Malik / Staff",
     onNavigateBack: () -> Unit = {},
+    onSaveSale: (
+        stockItemId: String,
+        salePriceRs: Long,
+        buyerName: String,
+        buyerPhone: String,
+        recordedBy: String,
+        receivedAmountRs: Long,
+        paymentMethodStr: String,
+        paymentDetails: String,
+        promisedDateStr: String
+    ) -> Unit = { _, _, _, _, _, _, _, _, _ -> },
     onSaveSuccess: () -> Unit = {}
 ) {
     var step by remember { mutableIntStateOf(1) }
@@ -38,6 +53,7 @@ fun SellWizardScreen(
 
     var buyerName by remember { mutableStateOf("") }
     var buyerPhone by remember { mutableStateOf("") }
+    var recordedBy by remember { mutableStateOf(currentUserName) }
     var salePriceText by remember { mutableStateOf("") }
     var receivedAmountText by remember { mutableStateOf("") }
     var paymentMethod by remember { mutableStateOf("Cash") }
@@ -72,7 +88,12 @@ fun SellWizardScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
                 LinearProgressIndicator(
                     progress = { step / 3f },
                     modifier = Modifier.fillMaxWidth().height(8.dp)
@@ -108,7 +129,10 @@ fun SellWizardScreen(
                                 )
                             }
                         } else {
-                            LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            LazyColumn(
+                                modifier = Modifier.height(280.dp),
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
                                 items(filtered) { item ->
                                     val isSelected = selectedItem?.id == item.id
                                     Card(
@@ -163,6 +187,20 @@ fun SellWizardScreen(
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             modifier = Modifier.fillMaxWidth()
                         )
+
+                        HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+
+                        Text("Sale Record Karne Wala (User):", fontSize = 15.sp, fontWeight = FontWeight.Bold)
+
+                        OutlinedTextField(
+                            value = recordedBy,
+                            onValueChange = { recordedBy = it },
+                            label = { Text("Record Karne Wale Ka Naam / User *") },
+                            placeholder = { Text("e.g. Ali Ahmed") },
+                            leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
+                            supportingText = { Text("Farokht kis user/staff ne record ki") },
+                            modifier = Modifier.fillMaxWidth()
+                        )
                     }
 
                     3 -> {
@@ -178,6 +216,7 @@ fun SellWizardScreen(
                         ) {
                             Column(modifier = Modifier.padding(16.dp)) {
                                 Text("Sale Price: Rs $salePrice", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                                Text("Record karne wala: $recordedBy", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                 if (remaining > 0) {
                                     Text("Customer par baqi udhaar: Rs $remaining", color = Color(0xFFD32F2F), fontWeight = FontWeight.Bold)
                                 } else {
@@ -249,6 +288,21 @@ fun SellWizardScreen(
                         if (step == 1 && selectedItem == null) return@Button
                         step++
                     } else {
+                        selectedItem?.let { item ->
+                            val salePrice = salePriceText.toLongOrNull() ?: 0L
+                            val received = receivedAmountText.toLongOrNull() ?: salePrice
+                            onSaveSale(
+                                item.id,
+                                salePrice,
+                                buyerName,
+                                buyerPhone,
+                                recordedBy,
+                                received,
+                                paymentMethod,
+                                paymentDetails,
+                                promisedDateText
+                            )
+                        }
                         onSaveSuccess()
                     }
                 },

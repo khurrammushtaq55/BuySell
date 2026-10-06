@@ -7,6 +7,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Store
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -23,11 +24,12 @@ import com.mmushtaq04.buysell.ui.theme.BuySellTheme
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun ShopSetupScreen(
-    onShopCreated: () -> Unit = {}
+    onShopCreated: (userName: String) -> Unit = {}
 ) {
+    var userName by remember { mutableStateOf("") }
     var shopName by remember { mutableStateOf("") }
     var shopPhone by remember { mutableStateOf("") }
-    var shopAddress by remember { mutableStateOf("") }
+    var shopNumberAddress by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
 
     val presetCategories = listOf(
@@ -67,14 +69,27 @@ fun ShopSetupScreen(
                     }
                 }
 
+                // User Name Field
+                OutlinedTextField(
+                    value = userName,
+                    onValueChange = { userName = it },
+                    label = { Text("Aap ka Naam / User Name *") },
+                    placeholder = { Text("e.g. Muhammad Ali") },
+                    leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                // Shop Name Field
                 OutlinedTextField(
                     value = shopName,
                     onValueChange = { shopName = it },
                     label = { Text("Dukan Ka Naam *") },
                     placeholder = { Text("e.g. Hafeez Center Mobiles") },
+                    leadingIcon = { Icon(Icons.Default.Store, contentDescription = null) },
                     modifier = Modifier.fillMaxWidth()
                 )
 
+                // Shop Phone Field
                 OutlinedTextField(
                     value = shopPhone,
                     onValueChange = { shopPhone = it },
@@ -84,11 +99,13 @@ fun ShopSetupScreen(
                     modifier = Modifier.fillMaxWidth()
                 )
 
+                // Shop Number / Address Field
                 OutlinedTextField(
-                    value = shopAddress,
-                    onValueChange = { shopAddress = it },
-                    label = { Text("Address / Shehar") },
+                    value = shopNumberAddress,
+                    onValueChange = { shopNumberAddress = it },
+                    label = { Text("Dukan / Shop Number *") },
                     placeholder = { Text("e.g. Shop #12, Hafeez Center, Lahore") },
+                    supportingText = { Text("Dukan ka number aur market ka naam") },
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -125,12 +142,12 @@ fun ShopSetupScreen(
 
             Button(
                 onClick = {
-                    if (shopName.isNotBlank() && shopPhone.isNotBlank()) {
+                    if (userName.isNotBlank() && shopName.isNotBlank() && shopPhone.isNotBlank() && shopNumberAddress.isNotBlank()) {
                         isLoading = true
-                        onShopCreated()
+                        onShopCreated(userName.trim())
                     }
                 },
-                enabled = shopName.isNotBlank() && shopPhone.isNotBlank() && !isLoading,
+                enabled = userName.isNotBlank() && shopName.isNotBlank() && shopPhone.isNotBlank() && shopNumberAddress.isNotBlank() && !isLoading,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(52.dp),

@@ -1,11 +1,14 @@
 package com.mmushtaq04.buysell.presentation.screens.buy
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -20,13 +23,34 @@ import com.mmushtaq04.buysell.ui.theme.BuySellTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BuyWizardScreen(
+    currentUserName: String = "Malik / Staff",
+    enabledCategories: List<String> = emptyList(),
     onNavigateBack: () -> Unit = {},
+    onSavePurchase: (
+        categoryName: String,
+        brand: String,
+        model: String,
+        imei: String,
+        priceRs: Long,
+        sellerName: String,
+        sellerPhone: String,
+        sellerCnic: String,
+        recordedBy: String,
+        paidAmountRs: Long,
+        paymentMethodStr: String,
+        paymentDetails: String,
+        promisedDateStr: String
+    ) -> Unit = { _, _, _, _, _, _, _, _, _, _, _, _, _ -> },
     onSaveSuccess: () -> Unit = {}
 ) {
     var step by remember { mutableIntStateOf(1) }
 
+    val activeCategories = if (enabledCategories.isNotEmpty()) enabledCategories else listOf(
+        "Mobile", "Tablet / iPad", "Laptop", "Console", "Smartwatch", "Earbuds / Audio", "Accessories"
+    )
+
     // Form states
-    var category by remember { mutableStateOf("Mobile") }
+    var category by remember { mutableStateOf(activeCategories.firstOrNull() ?: "Mobile") }
     var brand by remember { mutableStateOf("") }
     var model by remember { mutableStateOf("") }
     var imei by remember { mutableStateOf("") }
@@ -35,6 +59,7 @@ fun BuyWizardScreen(
     var sellerName by remember { mutableStateOf("") }
     var sellerPhone by remember { mutableStateOf("") }
     var sellerCnic by remember { mutableStateOf("") }
+    var recordedBy by remember { mutableStateOf(currentUserName) }
 
     var paidAmountText by remember { mutableStateOf("") }
     var paymentMethod by remember { mutableStateOf("Cash") }
@@ -68,7 +93,12 @@ fun BuyWizardScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
                 // Progress Bar
                 LinearProgressIndicator(
                     progress = { step / 4f },
@@ -78,6 +108,7 @@ fun BuyWizardScreen(
 
                 when (step) {
                     1 -> StepCategorySelect(
+                        categoriesList = activeCategories,
                         selectedCategory = category,
                         onSelectCategory = { category = it }
                     )
@@ -90,7 +121,8 @@ fun BuyWizardScreen(
                     3 -> StepSellerInfo(
                         name = sellerName, onNameChange = { sellerName = it },
                         phone = sellerPhone, onPhoneChange = { sellerPhone = it },
-                        cnic = sellerCnic, onCnicChange = { sellerCnic = it }
+                        cnic = sellerCnic, onCnicChange = { sellerCnic = it },
+                        recordedBy = recordedBy, onRecordedByChange = { recordedBy = it }
                     )
                     4 -> StepPaymentInfo(
                         totalPrice = priceText.toLongOrNull() ?: 0L,
@@ -109,6 +141,23 @@ fun BuyWizardScreen(
                         step++
                     } else {
                         isSaving = true
+                        val price = priceText.toLongOrNull() ?: 0L
+                        val paid = paidAmountText.toLongOrNull() ?: price
+                        onSavePurchase(
+                            category,
+                            brand,
+                            model,
+                            imei,
+                            price,
+                            sellerName,
+                            sellerPhone,
+                            sellerCnic,
+                            recordedBy,
+                            paid,
+                            paymentMethod,
+                            paymentDetails,
+                            promisedDateText
+                        )
                         onSaveSuccess()
                     }
                 },
@@ -133,15 +182,14 @@ fun BuyWizardScreen(
 
 @Composable
 private fun StepCategorySelect(
+    categoriesList: List<String>,
     selectedCategory: String,
     onSelectCategory: (String) -> Unit
 ) {
-    val categories = listOf("Mobile", "Tablet / iPad", "Laptop", "Console", "Smartwatch", "Earbuds / Audio", "Accessories")
-
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text("Category choose karein:", fontSize = 16.sp, fontWeight = FontWeight.Bold)
 
-        categories.chunked(2).forEach { row ->
+        categoriesList.chunked(2).forEach { row ->
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
                 row.forEach { cat ->
                     val isSelected = cat == selectedCategory
@@ -253,7 +301,8 @@ private fun StepDeviceDetails(
 private fun StepSellerInfo(
     name: String, onNameChange: (String) -> Unit,
     phone: String, onPhoneChange: (String) -> Unit,
-    cnic: String, onCnicChange: (String) -> Unit
+    cnic: String, onCnicChange: (String) -> Unit,
+    recordedBy: String, onRecordedByChange: (String) -> Unit
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text("Bechne wale ki maloomat (Seller):", fontSize = 16.sp, fontWeight = FontWeight.Bold)
@@ -279,6 +328,20 @@ private fun StepSellerInfo(
             label = { Text("CNIC Number *") },
             supportingText = { Text("13 digits, dashto ke baghair bhi chalega") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+
+        Text("Khareedari Record Karne Wala (User):", fontSize = 15.sp, fontWeight = FontWeight.Bold)
+
+        OutlinedTextField(
+            value = recordedBy,
+            onValueChange = onRecordedByChange,
+            label = { Text("Record Karne Wale Ka Naam / User *") },
+            placeholder = { Text("e.g. Ali Ahmed") },
+            leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
+            supportingText = { Text("Khareedari kis user/staff ne record ki") },
             modifier = Modifier.fillMaxWidth()
         )
     }

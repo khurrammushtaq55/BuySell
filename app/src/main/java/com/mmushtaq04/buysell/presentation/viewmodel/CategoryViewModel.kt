@@ -1,0 +1,66 @@
+package com.mmushtaq04.buysell.presentation.viewmodel
+
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
+import com.mmushtaq04.buysell.data.local.AppDatabase
+import com.mmushtaq04.buysell.data.local.CategoryPresets
+import com.mmushtaq04.buysell.data.local.entity.CategoryEntity
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+
+class CategoryViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val db = AppDatabase.getInstance(application)
+
+    private val _enabledCategories = MutableStateFlow<List<CategoryEntity>>(emptyList())
+    val enabledCategories: StateFlow<List<CategoryEntity>> = _enabledCategories.asStateFlow()
+
+    private val _allCategories = MutableStateFlow<List<CategoryEntity>>(emptyList())
+    val allCategories: StateFlow<List<CategoryEntity>> = _allCategories.asStateFlow()
+
+    init {
+        initAndObserveCategories()
+    }
+
+    private fun initAndObserveCategories() {
+        viewModelScope.launch {
+            val meta = db.appMetaDao().getAppMeta()
+            val activeShopId = meta?.activeShopId ?: "default_shop"
+
+            // Check if categories exist in DB, if not initialize from CategoryPresets
+            val existing = db.categoryDao().getCategories(activeShopId)
+            if (existing.isEmpty()) {
+                val presets = CategoryPresets.getPresetCategories(activeShopId)
+                db.categoryDao().insertCategories(presets)
+            }
+
+            // Observe enabled categories for BuyWizard
+            db.categoryDao().observeCategories(activeShopId).collect { enabledList ->
+                _enabledCategories.value = enabledList
+            }
+        }
+
+        viewModelScope.launch {
+            val meta = db.appMetaDao().getAppMeta()
+            val activeShopId = meta?.activeShopId ?: "default_shop"
+
+            // Observe all categories for SettingsScreen management
+            db.categoryDao().observeAllCategories(activeShopId).collect { allList ->
+                _allCategories.value = allList
+            }
+        }
+    }
+
+    fun toggleCategoryEnabled(category: CategoryEntity) {
+        viewModelScope.launch {
+            val updated = category.copy(
+                enabled = !category.enabled,
+                updatedAt = System.currentTimeMillis()
+            )
+            db.categoryDao().updateCategory(updated)
+        }
+    }
+}

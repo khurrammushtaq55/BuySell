@@ -35,6 +35,7 @@ import com.mmushtaq04.buysell.data.local.entity.*
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
+    abstract fun userDao(): UserDao
     abstract fun shopDao(): ShopDao
     abstract fun categoryDao(): CategoryDao
     abstract fun partyDao(): PartyDao
