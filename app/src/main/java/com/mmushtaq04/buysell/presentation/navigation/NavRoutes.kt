@@ -15,4 +15,6 @@ sealed class NavRoutes(val route: String) {
         fun createRoute(partyId: String) = "party_ledger/$partyId"
     }
     object Settings : NavRoutes("settings")
+    object OwnerDashboard : NavRoutes("owner_dashboard")
+    object Help : NavRoutes("help")
 }

@@ -6,6 +6,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.mmushtaq04.buysell.presentation.screens.buy.BuyWizardScreen
+import com.mmushtaq04.buysell.presentation.screens.dashboard.OwnerDashboardScreen
+import com.mmushtaq04.buysell.presentation.screens.help.HelpScreen
 import com.mmushtaq04.buysell.presentation.screens.home.HomeScreen
 import com.mmushtaq04.buysell.presentation.screens.party.PartyListScreen
 import com.mmushtaq04.buysell.presentation.screens.sell.SellWizardScreen
@@ -61,6 +63,18 @@ fun AppNavigation(
 
         composable(NavRoutes.Settings.route) {
             SettingsScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(NavRoutes.OwnerDashboard.route) {
+            OwnerDashboardScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(NavRoutes.Help.route) {
+            HelpScreen(
                 onNavigateBack = { navController.popBackStack() }
             )
         }
