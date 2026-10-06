@@ -1,0 +1,76 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isShopMember(shopId) {
+      return isAuthenticated() &&
+        exists(/databases/$(database)/documents/shops/$(shopId)/members/$(request.auth.uid));
+    }
+
+    function getShopMember(shopId) {
+      return get(/databases/$(database)/documents/shops/$(shopId)/members/$(request.auth.uid)).data;
+    }
+
+    function isOwner(shopId) {
+      return isShopMember(shopId) && getShopMember(shopId).role == 'OWNER';
+    }
+
+    function isStaff(shopId) {
+      return isShopMember(shopId) && getShopMember(shopId).role == 'STAFF';
+    }
+
+    function isPartner(shopId) {
+      return isShopMember(shopId) && getShopMember(shopId).role == 'PARTNER';
+    }
+
+    // Users
+    match /users/{uid} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && request.auth.uid == uid;
+    }
+
+    // Shops
+    match /shops/{shopId} {
+      allow read: if isShopMember(shopId);
+      allow write: if isOwner(shopId);
+
+      // Members & Invites
+      match /members/{uid} {
+        allow read: if isShopMember(shopId);
+        allow write: if isOwner(shopId);
+      }
+
+      match /invites/{code} {
+        allow read: if isAuthenticated();
+        allow write: if isOwner(shopId);
+      }
+
+      // Public Scope: Parties, Categories, StockItems, Sales, Public Payments, Promises
+      match /scopes/public/{collection}/{docId} {
+        allow read: if isShopMember(shopId);
+        allow create, update: if isOwner(shopId) || isStaff(shopId);
+        allow delete: if isOwner(shopId);
+      }
+
+      // Vault Scope: Purchases, Expenses, Supplier Out Payments, Vault Attachments, Summaries
+      match /scopes/vault/{collection}/{docId} {
+        // Owner & Partner can read vault; Staff CANNOT read vault
+        allow read: if isOwner(shopId) || isPartner(shopId);
+        // Owner can write vault; Staff can write (push) vault entries on buy/payout but cannot read them back
+        allow create, update: if isOwner(shopId) || isStaff(shopId);
+        allow delete: if isOwner(shopId);
+      }
+
+      // Vault Summaries
+      match /scopes/vault/summaries/{date} {
+        allow read: if isOwner(shopId) || isPartner(shopId);
+        allow write: if isOwner(shopId);
+      }
+    }
+  }
+}
