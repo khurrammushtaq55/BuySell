@@ -1,3 +1,15 @@
 <resources>
-    <string name="app_name">BuySell</string>
+    <string name="app_name">Hafeez Center Buy/Sell</string>
+    <string name="action_buy">Buy Device</string>
+    <string name="action_sell">Sell Device</string>
+    <string name="action_khata">Khata / Ledger</string>
+    <string name="action_stock">My Stock</string>
+    <string name="action_exchange">Exchange Device</string>
+    <string name="action_save">Save</string>
+    <string name="action_next">Next</string>
+    <string name="label_cash">Cash</string>
+    <string name="label_easypaisa">Easypaisa</string>
+    <string name="label_jazzcash">JazzCash</string>
+    <string name="label_bank_transfer">Bank Transfer</string>
+    <string name="label_other">Other</string>
 </resources>

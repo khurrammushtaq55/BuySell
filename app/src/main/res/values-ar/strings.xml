@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">حفيظ سنتر شراء/بيع</string>
+    <string name="action_buy">شراء جهاز</string>
+    <string name="action_sell">بيع جهاز</string>
+    <string name="action_khata">دفتر الحسابات</string>
+    <string name="action_stock">مخزوني</string>
+    <string name="action_exchange">استبدال جهاز</string>
+    <string name="action_save">حفظ</string>
+    <string name="action_next">التالي</string>
+    <string name="label_cash">نقداً</string>
+    <string name="label_easypaisa">EasyPaisa</string>
+    <string name="label_jazzcash">JazzCash</string>
+    <string name="label_bank_transfer">تحويل بانكي</string>
+    <string name="label_other">آخر</string>
+</resources>

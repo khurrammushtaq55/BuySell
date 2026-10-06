@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Hafeez Center 买卖追踪器</string>
+    <string name="action_buy">购买设备</string>
+    <string name="action_sell">出售设备</string>
+    <string name="action_khata">账本 / 账户</string>
+    <string name="action_stock">我的库存</string>
+    <string name="action_exchange">以旧换新</string>
+    <string name="action_save">保存</string>
+    <string name="action_next">下一步</string>
+    <string name="label_cash">现金</string>
+    <string name="label_easypaisa">Easypaisa</string>
+    <string name="label_jazzcash">JazzCash</string>
+    <string name="label_bank_transfer">银行转账</string>
+    <string name="label_other">其他</string>
+</resources>

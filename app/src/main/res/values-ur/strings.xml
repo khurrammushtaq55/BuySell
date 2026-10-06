@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">حفیظ سینٹر خریداری/فروخت</string>
+    <string name="action_buy">فون خریدنا</string>
+    <string name="action_sell">فون بیچنا</string>
+    <string name="action_khata">کھاتہ / حساب</string>
+    <string name="action_stock">میرا سٹاک</string>
+    <string name="action_exchange">پرانا دے کر نیا</string>
+    <string name="action_save">سیو کریں</string>
+    <string name="action_next">آگے چلیں</string>
+    <string name="label_cash">نقد (Cash)</string>
+    <string name="label_easypaisa">EasyPaisa</string>
+    <string name="label_jazzcash">JazzCash</string>
+    <string name="label_bank_transfer">بینک ٹرانسفر</string>
+    <string name="label_other">دیگر</string>
+</resources>

@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Hafeez Center Achat/Vente</string>
+    <string name="action_buy">Acheter Appareil</string>
+    <string name="action_sell">Vendre Appareil</string>
+    <string name="action_khata">Livre de Comptes</string>
+    <string name="action_stock">Mon Stock</string>
+    <string name="action_exchange">Échange Appareil</string>
+    <string name="action_save">Enregistrer</string>
+    <string name="action_next">Suivant</string>
+    <string name="label_cash">Espèces</string>
+    <string name="label_easypaisa">Easypaisa</string>
+    <string name="label_jazzcash">JazzCash</string>
+    <string name="label_bank_transfer">Virement Bancaire</string>
+    <string name="label_other">Autre</string>
+</resources>

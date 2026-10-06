@@ -7,6 +7,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -23,9 +24,21 @@ import androidx.compose.ui.unit.sp
 fun SettingsScreen(
     onNavigateBack: () -> Unit
 ) {
-    var selectedLanguage by remember { mutableStateOf("Urdu / اردو") }
+    var selectedLanguage by remember { mutableStateOf("Roman Urdu / رومن اردو") }
+    var expandedLanguageDropdown by remember { mutableStateOf(false) }
     var slowStockDaysText by remember { mutableStateOf("30") }
     var receiptFooterText by remember { mutableStateOf("Shukriya! Visit again.") }
+
+    val languages = listOf(
+        "Roman Urdu / رومن اردو",
+        "Urdu / اردو",
+        "English",
+        "Spanish / Español",
+        "French / Français",
+        "Hindi / हिंदी",
+        "Arabic / العربية",
+        "Chinese / 简体中文"
+    )
 
     Scaffold(
         topBar = {
@@ -49,15 +62,38 @@ fun SettingsScreen(
         ) {
             // Language Selection
             Text("Aap ki Zaban (Language):", fontWeight = FontWeight.Bold, fontSize = 16.sp)
-            OutlinedTextField(
-                value = selectedLanguage,
-                onValueChange = { selectedLanguage = it },
-                label = { Text("App Language") },
-                modifier = Modifier.fillMaxWidth(),
-                readOnly = true
-            )
 
-            Divider()
+            Box {
+                OutlinedTextField(
+                    value = selectedLanguage,
+                    onValueChange = {},
+                    label = { Text("App Language") },
+                    modifier = Modifier.fillMaxWidth().clickable { expandedLanguageDropdown = true },
+                    readOnly = true,
+                    trailingIcon = {
+                        IconButton(onClick = { expandedLanguageDropdown = true }) {
+                            Icon(Icons.Default.ArrowDropDown, contentDescription = null)
+                        }
+                    }
+                )
+
+                DropdownMenu(
+                    expanded = expandedLanguageDropdown,
+                    onDismissRequest = { expandedLanguageDropdown = false }
+                ) {
+                    languages.forEach { lang ->
+                        DropdownMenuItem(
+                            text = { Text(lang) },
+                            onClick = {
+                                selectedLanguage = lang
+                                expandedLanguageDropdown = false
+                            }
+                        )
+                    }
+                }
+            }
+
+            HorizontalDivider()
 
             // Shop Profile Settings
             Text("Shop Detail:", fontWeight = FontWeight.Bold, fontSize = 16.sp)
@@ -94,7 +130,7 @@ fun SettingsScreen(
                 }
             }
 
-            Divider()
+            HorizontalDivider()
 
             // Account & Security
             Text("Account & Security:", fontWeight = FontWeight.Bold, fontSize = 16.sp)
@@ -112,7 +148,7 @@ fun SettingsScreen(
             ) { }
 
             SettingClickableRow(
-                icon = Icons.Default.Logout,
+                icon = Icons.AutoMirrored.Filled.Logout,
                 title = "Sign Out",
                 subtitle = "Logout active session"
             ) { }

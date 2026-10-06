@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Hafeez Center Buy/Sell</string>
+    <string name="action_buy">Phone Khareedna</string>
+    <string name="action_sell">Phone Bechna</string>
+    <string name="action_khata">Khata / Hisaab</string>
+    <string name="action_stock">Mera Stock</string>
+    <string name="action_exchange">Purana De Kar Naya</string>
+    <string name="action_save">Save Karein</string>
+    <string name="action_next">Aage Chalein</string>
+    <string name="label_cash">Cash</string>
+    <string name="label_easypaisa">EasyPaisa</string>
+    <string name="label_jazzcash">JazzCash</string>
+    <string name="label_bank_transfer">Bank Transfer</string>
+    <string name="label_other">Doosra</string>
+</resources>
