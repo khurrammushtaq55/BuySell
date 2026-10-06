@@ -1,6 +1,6 @@
 # Device Buy/Sell Tracker: Database Schema (v0.4)
 
-Companion to `hafeez-center-app-spec.md` (v0.4).  
+Companion to `hafeez-center-app-spec.md` (v0.6).  
 Local DB: **Room (SQLite)** — source of truth on owner/staff devices.  
 Cloud: **Firebase Auth + Firestore + Cloud Storage** (v1).
 
@@ -9,6 +9,8 @@ Cloud: **Firebase Auth + Firestore + Cloud Storage** (v1).
 ### Changes in v0.4
 - Owner decisions: photos **local-only** v1 (A); **8 locales** + `shops.preferred_language` (B); receipt **logo** (C); slow stock **30** (D); **Blaze** yes (E).
 - Removed §9 security rules outline (implemented in app repo only, per owner).
+- Firestore path structure updated to 6 segments (`shops/{shopId}/scopes/{scope}/{collection}/{id}`) for valid document paths.
+- Payment scope linked to transaction scope (`SALE_RETURN` refund = `PUBLIC`) to ensure correct 0 net balance on staff devices.
 
 ### Changes in v0.3
 - Lot-based quantity, standalone payments + FIFO, sync protocol (§8), Firestore mapping (§7).
@@ -141,7 +143,7 @@ Categories: `RENT`, `ELECTRICITY`, `SALARY`, `REPAIR`, `ACCESSORIES`, `COMMISSIO
 **`sync_cursor`:** `collection_path`, `last_pulled_at`, `last_rev_seen` (optional)
 
 ### 3.15 Cloud-only summaries (VAULT)
-`shops/{shopId}/vault/summaries/{yyyy-MM-dd}`: `revenue`, `cost`, `expenses`, `net_profit`, `units_sold`, `top_models` (array), `updated_at`, `written_by_device_id`
+`shops/{shopId}/scopes/vault/summaries/{yyyy-MM-dd}`: `revenue`, `cost`, `expenses`, `net_profit`, `units_sold`, `top_models` (array), `updated_at`, `written_by_device_id`
 
 Owner device recomputes after sync when local day changes or on manual "Refresh summary". Partner reads this doc only.
 
@@ -153,7 +155,7 @@ Owner device recomputes after sync when local day changes or on manual "Refresh 
 (Same worked example as v0.2 — SALE + PURCHASE + TRADE_IN payments, shared `exchange_group_id`.)
 
 ### Returns
-- `SALE_RETURN`: `original_txn_id`, restock UNIQUE or qty, refund OUT, adjust promises.
+- `SALE_RETURN`: `original_txn_id`, restock UNIQUE or qty, refund OUT, adjust promises. Refund OUT payment uses `scope = PUBLIC` to maintain correct 0 party balance on staff devices.
 - `PURCHASE_RETURN`: supplier return, `RETURNED_TO_SUPPLIER`.
 
 ### Duplicate identifier (buy)
@@ -176,8 +178,10 @@ Owner sets `WRITTEN_OFF`; optional expense; no sale.
 
 | Scope | Contents | Owner | Partner | Staff |
 |---|---|---|---|---|
-| PUBLIC | categories, parties, stock_items, payment_accounts, SALE/SALE_RETURN txns/lines, IN payments, RECEIVE promises, public attachments | sync | sync | sync |
-| VAULT | PURCHASE/PURCHASE_RETURN, OUT payments, PAY promises, expenses, summaries, vault audit, vault attachments | sync | sync | **never** |
+| PUBLIC | categories, parties, stock_items, payment_accounts, SALE/SALE_RETURN txns/lines, IN payments & SALE_RETURN refund payments, RECEIVE promises, public attachments | sync | sync | sync |
+| VAULT | PURCHASE/PURCHASE_RETURN, supplier OUT payments, PAY promises, expenses, summaries, vault audit, vault attachments | sync | sync | **never** |
+
+**Payment Scope Rule:** Payments linked to `SALE` or `SALE_RETURN` inherit `scope = PUBLIC`. Standalone customer payments set `scope = PUBLIC`. Supplier purchase payments set `scope = VAULT`.
 
 Staff buy: write local vault → upload → **purge vault rows** from staff DB after server ACK; public `stock_items` row remains without cost.
 
@@ -207,7 +211,7 @@ FROM parties p
 WHERE p.shop_id = :shopId AND p.deleted_at IS NULL;
 ```
 
-**Staff-visible customer balance:** same formula but restrict `t.type` to `SALE`/`SALE_RETURN` and payments `direction = 'IN'` and `scope = 'PUBLIC'` only.
+**Staff-visible customer balance:** same formula but restrict `t.type` to `SALE`/`SALE_RETURN` and payments `scope = 'PUBLIC'` only (removing `direction = 'IN'` restriction so customer refunds on `SALE_RETURN` correctly calculate 0 balance on staff devices).
 
 **Capital in stock, slow stock, overdue promises, per-account movement** — unchanged from v0.2 except slow stock uses `shops.slow_stock_days`.
 
@@ -221,15 +225,16 @@ WHERE p.shop_id = :shopId AND p.deleted_at IS NULL;
 
 ```
 users/{uid}
-shops/{shopId}                          // shop profile fields
+shops/{shopId}                                  // shop profile fields
 shops/{shopId}/members/{uid}
 shops/{shopId}/invites/{code}
-shops/{shopId}/public/{collection}/{id} // parties, categories, stock_items, txns, txn_lines, payments, promises (RECEIVE), payment_accounts, attachments (public)
-shops/{shopId}/vault/{collection}/{id}  // purchase txns/lines, OUT payments, PAY promises, expenses, audit, attachments (vault)
-shops/{shopId}/vault/summaries/{yyyy-MM-dd}
+shops/{shopId}/scopes/public/{collection}/{id}  // parties, categories, stock_items, txns, txn_lines, payments, promises (RECEIVE), payment_accounts, attachments (public)
+shops/{shopId}/scopes/vault/{collection}/{id}   // purchase txns/lines, OUT payments, PAY promises, expenses, audit, attachments (vault)
+shops/{shopId}/scopes/vault/summaries/{yyyy-MM-dd}
 ```
 
 - Document id = entity UUID.
+- Paths use 6 segments (even number) for valid Firestore document locations.
 - `txn_lines` stored nested under txn **or** subcollection `txns/{id}/lines/{lineId}` — pick one in code (recommended: subcollection for rule simplicity).
 - Every write includes `rev`, `updated_at`, `updated_by`; server rejects if `session_id` ≠ `users.active_session_id`.
 

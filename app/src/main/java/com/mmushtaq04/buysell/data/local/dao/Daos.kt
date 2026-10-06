@@ -90,6 +90,24 @@ interface PartyDao {
         LIMIT 1
     """)
     suspend fun getPartyBalance(shopId: String, partyId: String): PartyBalanceDto?
+
+    @Query("""
+        SELECT p.id, p.name, p.phone, p.cnic,
+          COALESCE((SELECT SUM(
+            CASE t.type
+              WHEN 'SALE' THEN t.total_amount
+              WHEN 'SALE_RETURN' THEN -t.total_amount
+              ELSE 0 END)
+            FROM txns t
+            WHERE t.party_id = p.id AND t.scope = 'PUBLIC' AND t.deleted_at IS NULL), 0)
+          - COALESCE((SELECT SUM(CASE WHEN y.direction = 'IN' THEN y.amount ELSE -y.amount END)
+            FROM payments y
+            WHERE y.party_id = p.id AND y.scope = 'PUBLIC' AND y.deleted_at IS NULL), 0) AS balance
+        FROM parties p
+        WHERE p.shop_id = :shopId AND p.id = :partyId AND p.deleted_at IS NULL
+        LIMIT 1
+    """)
+    suspend fun getPublicPartyBalance(shopId: String, partyId: String): PartyBalanceDto?
 }
 
 @Dao

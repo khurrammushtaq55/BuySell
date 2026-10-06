@@ -4,8 +4,8 @@ Working name: **Hafeez Center App**
 Platform: Android (Play Store release)  
 Status: **Ready for implementation** — only [pilot shop (F)](#14-owner-decisions) TBD.
 
-Companion schema: `hafeez-center-app-schema.md` (v0.4).  
-Engineering bootstrap: [`NEW_APP_BOOTSTRAP_RULES.md`](file:///Users/a1702/Desktop/personal/PlaystoreApps/NEW_APP_BOOTSTRAP_RULES.md) — adopted in [§17](#17-android-engineering-bootstrap).
+Companion schema: `hafeez-center-app-schema.md` (v0.6).  
+Engineering bootstrap: `NEW_APP_BOOTSTRAP_RULES.md` — adopted in [§17](#17-android-engineering-bootstrap).
 
 Decisions are marked **Decided** (locked for v1) or **Later** (explicitly out of v1).
 

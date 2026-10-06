@@ -16,6 +16,8 @@ firebaseBom = "33.9.0"
 coil = "2.6.0"
 gson = "2.11.0"
 playReview = "2.0.2"
+robolectric = "4.14.1"
+testCoreKtx = "1.6.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -61,6 +63,10 @@ gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 
 # Play Review
 play-review-ktx = { group = "com.google.android.play", name = "review-ktx", version.ref = "playReview" }
+
+# Testing
+robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectric" }
+androidx-test-core-ktx = { group = "androidx.test", name = "core-ktx", version.ref = "testCoreKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
