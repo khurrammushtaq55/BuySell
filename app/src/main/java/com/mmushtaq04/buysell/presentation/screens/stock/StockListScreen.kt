@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -25,6 +26,8 @@ data class DisplayStock(
     val model: String,
     val imei: String,
     val category: String,
+    val color: String = "",
+    val issue: String = "",
     val remainingQty: Int,
     val status: String
 )
@@ -37,11 +40,42 @@ fun StockListScreen(
     onSelectItem: (String) -> Unit = {}
 ) {
     var searchQuery by remember { mutableStateOf("") }
+    var selectedStockDetail by remember { mutableStateOf<DisplayStock?>(null) }
 
     val filtered = stockItems.filter {
         it.model.contains(searchQuery, ignoreCase = true) ||
                 it.brand.contains(searchQuery, ignoreCase = true) ||
-                it.imei.contains(searchQuery)
+                it.imei.contains(searchQuery) ||
+                it.color.contains(searchQuery, ignoreCase = true)
+    }
+
+    if (selectedStockDetail != null) {
+        val item = selectedStockDetail!!
+        AlertDialog(
+            onDismissRequest = { selectedStockDetail = null },
+            icon = { Icon(Icons.Default.Info, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
+            title = {
+                Text(
+                    text = "${item.brand} ${item.model}",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp
+                )
+            },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    DetailRow(label = "IMEI / Serial:", value = if (item.imei != "N/A") item.imei else "None")
+                    DetailRow(label = "Color / Rung:", value = if (item.color.isNotBlank()) item.color else "N/A")
+                    DetailRow(label = "Kharabi / Issue:", value = if (item.issue.isNotBlank()) item.issue else "Koi kharabi nahi (Clean)")
+                    DetailRow(label = "Remaining Quantity:", value = "${item.remainingQty}")
+                    DetailRow(label = "Status:", value = item.status)
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { selectedStockDetail = null }) {
+                    Text("Band Karein (Close)")
+                }
+            }
+        )
     }
 
     Scaffold(
@@ -66,7 +100,7 @@ fun StockListScreen(
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
-                label = { Text("Search by IMEI, Brand, or Model") },
+                label = { Text("Search by IMEI, Brand, Model, or Color") },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                 modifier = Modifier.fillMaxWidth()
             )
@@ -88,7 +122,10 @@ fun StockListScreen(
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clickable { onSelectItem(item.id) },
+                                .clickable {
+                                    selectedStockDetail = item
+                                    onSelectItem(item.id)
+                                },
                             shape = RoundedCornerShape(12.dp),
                             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
                         ) {
@@ -99,12 +136,14 @@ fun StockListScreen(
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Column {
+                                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                                     Text("${item.brand} ${item.model}", fontWeight = FontWeight.Bold, fontSize = 16.sp)
                                     if (item.imei != "N/A") {
                                         Text("IMEI: ${item.imei}", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                     }
-                                    Text("Category: ${item.category}", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    if (item.color.isNotBlank()) {
+                                        Text("Color: ${item.color}", fontSize = 12.sp, color = MaterialTheme.colorScheme.primary)
+                                    }
                                 }
 
                                 Surface(
@@ -128,13 +167,23 @@ fun StockListScreen(
     }
 }
 
+@Composable
+private fun DetailRow(label: String, value: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(text = label, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+        Text(text = value, fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 fun StockListScreenPreview() {
     val sampleItems = listOf(
-        DisplayStock("1", "Apple", "iPhone 15 Pro Max 256GB", "358912345678901", "Mobile", 1, "IN_STOCK"),
-        DisplayStock("2", "Samsung", "Galaxy S24 Ultra", "351234567890123", "Mobile", 1, "IN_STOCK"),
-        DisplayStock("3", "Apple", "iPad Air 5 64GB WiFi", "SER987654321", "Tablet", 1, "IN_STOCK")
+        DisplayStock("1", "Apple", "iPhone 15 Pro Max 256GB", "358912345678901", "Mobile", "Natural Titanium", "None", 1, "IN_STOCK"),
+        DisplayStock("2", "Samsung", "Galaxy S24 Ultra", "351234567890123", "Mobile", "Titanium Gray", "Glass crack minor", 1, "IN_STOCK")
     )
 
     BuySellTheme {

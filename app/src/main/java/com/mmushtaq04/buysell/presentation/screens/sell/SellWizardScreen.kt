@@ -85,13 +85,11 @@ fun SellWizardScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
+                .verticalScroll(rememberScrollState())
                 .padding(16.dp),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
             Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 LinearProgressIndicator(
@@ -280,42 +278,44 @@ fun SellWizardScreen(
                         }
                     }
                 }
-            }
 
-            Button(
-                onClick = {
-                    if (step < 3) {
-                        if (step == 1 && selectedItem == null) return@Button
-                        step++
-                    } else {
-                        selectedItem?.let { item ->
-                            val salePrice = salePriceText.toLongOrNull() ?: 0L
-                            val received = receivedAmountText.toLongOrNull() ?: salePrice
-                            onSaveSale(
-                                item.id,
-                                salePrice,
-                                buyerName,
-                                buyerPhone,
-                                recordedBy,
-                                received,
-                                paymentMethod,
-                                paymentDetails,
-                                promisedDateText
-                            )
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Button(
+                    onClick = {
+                        if (step < 3) {
+                            if (step == 1 && selectedItem == null) return@Button
+                            step++
+                        } else {
+                            selectedItem?.let { item ->
+                                val salePrice = salePriceText.toLongOrNull() ?: 0L
+                                val received = receivedAmountText.toLongOrNull() ?: salePrice
+                                onSaveSale(
+                                    item.id,
+                                    salePrice,
+                                    buyerName,
+                                    buyerPhone,
+                                    recordedBy,
+                                    received,
+                                    paymentMethod,
+                                    paymentDetails,
+                                    promisedDateText
+                                )
+                            }
+                            onSaveSuccess()
                         }
-                        onSaveSuccess()
-                    }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Text(
-                    text = if (step < 3) "Aage Chalein (Next)" else "Sale Record Karein ✓",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text(
+                        text = if (step < 3) "Aage Chalein (Next)" else "Sale Record Karein ✓",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             }
         }
     }

@@ -224,6 +224,26 @@ interface TxnDao {
           AND deleted_at IS NULL
     """)
     suspend fun getTodaySalesAmountPaisa(shopId: String, startOfDayMs: Long, endOfDayMs: Long): Long
+
+    @Query("""
+        SELECT COUNT(*) FROM txns 
+        WHERE shop_id = :shopId 
+          AND type = 'SALE' 
+          AND txn_date >= :startOfDayMs 
+          AND txn_date <= :endOfDayMs 
+          AND deleted_at IS NULL
+    """)
+    fun observeTodaySalesCount(shopId: String, startOfDayMs: Long, endOfDayMs: Long): Flow<Int>
+
+    @Query("""
+        SELECT COALESCE(SUM(total_amount), 0) FROM txns 
+        WHERE shop_id = :shopId 
+          AND type = 'SALE' 
+          AND txn_date >= :startOfDayMs 
+          AND txn_date <= :endOfDayMs 
+          AND deleted_at IS NULL
+    """)
+    fun observeTodaySalesAmountPaisa(shopId: String, startOfDayMs: Long, endOfDayMs: Long): Flow<Long>
 }
 
 @Dao

@@ -10,6 +10,7 @@ import com.mmushtaq04.buysell.data.local.entity.ShopEntity
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.util.Calendar
@@ -74,6 +75,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             }
 
             val shopTitle = localShop?.name ?: "Mera Buy/Sell Store"
+            _uiState.value = _uiState.value.copy(shopName = shopTitle, userRole = "Owner")
 
             // 3. Compute today's start and end timestamps (Karachi timezone / local midnight)
             val cal = Calendar.getInstance().apply {
@@ -86,16 +88,17 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             cal.add(Calendar.DAY_OF_MONTH, 1)
             val endOfDayMs = cal.timeInMillis - 1
 
-            val salesCount = db.txnDao().getTodaySalesCount(activeShopId, startOfDayMs, endOfDayMs)
-            val salesAmountPaisa = db.txnDao().getTodaySalesAmountPaisa(activeShopId, startOfDayMs, endOfDayMs)
-
-            _uiState.value = HomeUiState(
-                shopName = shopTitle,
-                userRole = "Owner",
-                todaySalesCount = salesCount,
-                todaySalesAmountPaisa = salesAmountPaisa,
-                isLoading = false
-            )
+            // 4. Reactively observe sales count and sales total amount in real time from Room DB
+            combine(
+                db.txnDao().observeTodaySalesCount(activeShopId, startOfDayMs, endOfDayMs),
+                db.txnDao().observeTodaySalesAmountPaisa(activeShopId, startOfDayMs, endOfDayMs)
+            ) { count, amountPaisa ->
+                _uiState.value = _uiState.value.copy(
+                    todaySalesCount = count,
+                    todaySalesAmountPaisa = amountPaisa,
+                    isLoading = false
+                )
+            }.collect {}
         }
     }
 }

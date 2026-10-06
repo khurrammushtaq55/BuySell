@@ -1,15 +1,61 @@
 <resources>
-    <string name="app_name">حفيظ سنتر شراء/بيع</string>
+    <string name="app_name">مركز حفيظ شراء/بيع</string>
+
+    <!-- General Actions -->
     <string name="action_buy">شراء جهاز</string>
     <string name="action_sell">بيع جهاز</string>
-    <string name="action_khata">دفتر الحسابات</string>
-    <string name="action_stock">مخزوني</string>
+    <string name="action_khata">الدفتر / الحسابات</string>
+    <string name="action_stock">المخزون</string>
     <string name="action_exchange">استبدال جهاز</string>
     <string name="action_save">حفظ</string>
     <string name="action_next">التالي</string>
+    <string name="action_back">رجوع</string>
+    <string name="action_confirm">تأكيد</string>
+    <string name="action_cancel">إلغاء</string>
+
+    <!-- Payment Modes -->
     <string name="label_cash">نقداً</string>
     <string name="label_easypaisa">EasyPaisa</string>
     <string name="label_jazzcash">JazzCash</string>
     <string name="label_bank_transfer">تحويل بانكي</string>
     <string name="label_other">آخر</string>
+
+    <!-- Onboarding & Shop Setup -->
+    <string name="shop_setup_title">إعداد المحل</string>
+    <string name="shop_setup_sub">أدخل تفاصيل المحل الخاص بك</string>
+    <string name="label_user_name">اسمك / اسم المستخدم *</string>
+    <string name="label_shop_name">اسم المحل *</string>
+    <string name="label_shop_phone">رقم هاتف المحل *</string>
+    <string name="label_shop_number">رقم المحل *</string>
+    <string name="btn_create_shop">إنشاء المحل والبدء ✓</string>
+
+    <!-- Buy Wizard -->
+    <string name="buy_title">شراء هاتف</string>
+    <string name="buy_step">الخطوة %1$d من %2$d</string>
+    <string name="label_seller_name">اسم البائع *</string>
+    <string name="label_mobile_number">رقم الهاتف *</string>
+    <string name="label_cnic">رقم الهوية الوطنية *</string>
+    <string name="label_recorded_by">تم التسجيل بواسطة *</string>
+    <string name="label_purchase_price">سعر الشراء (روبية) *</string>
+    <string name="label_model_name">اسم الموديل *</string>
+    <string name="label_imei">رمز IMEI / الرقم التسلسلي</string>
+    <string name="btn_save_purchase">حفظ الشراء ✓</string>
+
+    <!-- Sell Wizard -->
+    <string name="sell_title">بيع هاتف</string>
+    <string name="label_buyer_name">اسم المشتري *</string>
+    <string name="label_sale_price">سعر البيع (روبية) *</string>
+    <string name="btn_save_sale">تسجيل البيع ✓</string>
+
+    <!-- Exchange Wizard -->
+    <string name="exchange_title">استبدال قديم بجديد</string>
+    <string name="exchange_explainer_title">عملية الاستبدال</string>
+    <string name="exchange_explainer_sub">شراء الهاتف القديم وإضافته للمخزون، وبيع الجديد</string>
+    <string name="btn_save_exchange">إنهاء الاستبدال ✓</string>
+
+    <!-- Home & Dashboard -->
+    <string name="home_today_sales">مبيعات اليوم</string>
+    <string name="dashboard_title">لوحة التحكم والتقارير</string>
+    <string name="settings_title">الإعدادات والتفضيلات</string>
+    <string name="help_title">المساعدة والإرشادات</string>
 </resources>

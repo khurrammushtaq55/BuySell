@@ -1,15 +1,61 @@
 <resources>
     <string name="app_name">Hafeez Center Achat/Vente</string>
+
+    <!-- General Actions -->
     <string name="action_buy">Acheter Appareil</string>
     <string name="action_sell">Vendre Appareil</string>
-    <string name="action_khata">Livre de Comptes</string>
+    <string name="action_khata">Livre Compte</string>
     <string name="action_stock">Mon Stock</string>
     <string name="action_exchange">Échange Appareil</string>
     <string name="action_save">Enregistrer</string>
     <string name="action_next">Suivant</string>
+    <string name="action_back">Retour</string>
+    <string name="action_confirm">Confirmer</string>
+    <string name="action_cancel">Annuler</string>
+
+    <!-- Payment Modes -->
     <string name="label_cash">Espèces</string>
     <string name="label_easypaisa">Easypaisa</string>
     <string name="label_jazzcash">JazzCash</string>
     <string name="label_bank_transfer">Virement Bancaire</string>
     <string name="label_other">Autre</string>
+
+    <!-- Onboarding & Shop Setup -->
+    <string name="shop_setup_title">Configuration Magasin</string>
+    <string name="shop_setup_sub">Entrez les détails de votre magasin</string>
+    <string name="label_user_name">Votre Nom / Utilisateur *</string>
+    <string name="label_shop_name">Nom du Magasin *</string>
+    <string name="label_shop_phone">Téléphone du Magasin *</string>
+    <string name="label_shop_number">Numéro du Magasin *</string>
+    <string name="btn_create_shop">Créer Magasin &amp; Démarrer ✓</string>
+
+    <!-- Buy Wizard -->
+    <string name="buy_title">Acheter Téléphone</string>
+    <string name="buy_step">Étape %1$d sur %2$d</string>
+    <string name="label_seller_name">Nom du Vendeur *</string>
+    <string name="label_mobile_number">Numéro Mobile *</string>
+    <string name="label_cnic">Numéro d\'Identité (CNIC) *</string>
+    <string name="label_recorded_by">Enregistré par *</string>
+    <string name="label_purchase_price">Prix d\'Achat (Rs) *</string>
+    <string name="label_model_name">Nom du Modèle *</string>
+    <string name="label_imei">IMEI / Numéro de Série</string>
+    <string name="btn_save_purchase">Enregistrer l\'Achat ✓</string>
+
+    <!-- Sell Wizard -->
+    <string name="sell_title">Vendre Téléphone</string>
+    <string name="label_buyer_name">Nom de l\'Acheteur *</string>
+    <string name="label_sale_price">Prix de Vente (Rs) *</string>
+    <string name="btn_save_sale">Enregistrer la Vente ✓</string>
+
+    <!-- Exchange Wizard -->
+    <string name="exchange_title">Échange d\'Appareil</string>
+    <string name="exchange_explainer_title">Flux d\'Échange</string>
+    <string name="exchange_explainer_sub">Acheter l\'ancien et vendre le nouveau</string>
+    <string name="btn_save_exchange">Finaliser l\'Échange ✓</string>
+
+    <!-- Home & Dashboard -->
+    <string name="home_today_sales">Ventes d\'Aujourd\'hui</string>
+    <string name="dashboard_title">Tableau de Bord Proprio &amp; Rapports</string>
+    <string name="settings_title">Paramètres &amp; Préférences</string>
+    <string name="help_title">Aide &amp; Orientation</string>
 </resources>

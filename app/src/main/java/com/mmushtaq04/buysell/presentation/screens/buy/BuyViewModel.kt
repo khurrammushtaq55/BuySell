@@ -3,14 +3,19 @@ package com.mmushtaq04.buysell.presentation.screens.buy
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.gson.Gson
 import com.mmushtaq04.buysell.data.local.AppDatabase
 import com.mmushtaq04.buysell.data.local.entity.PartyEntity
+import com.mmushtaq04.buysell.data.local.entity.SyncOutboxEntity
 import com.mmushtaq04.buysell.data.local.enums.PartyTypeHint
 import com.mmushtaq04.buysell.data.local.enums.PaymentDirection
 import com.mmushtaq04.buysell.data.local.enums.PaymentMethod
 import com.mmushtaq04.buysell.data.local.enums.PromiseDirection
+import com.mmushtaq04.buysell.data.local.enums.Role
+import com.mmushtaq04.buysell.data.local.enums.SyncOp
 import com.mmushtaq04.buysell.data.repository.StockRepositoryImpl
 import com.mmushtaq04.buysell.data.repository.toEntity
+import com.mmushtaq04.buysell.data.sync.FirestoreSyncManager
 import com.mmushtaq04.buysell.domain.model.Payment
 import com.mmushtaq04.buysell.domain.model.PaymentPromise
 import com.mmushtaq04.buysell.domain.model.StockItem
@@ -27,6 +32,8 @@ class BuyViewModel(application: Application) : AndroidViewModel(application) {
         brand: String,
         model: String,
         imei: String,
+        color: String,
+        issue: String,
         priceRs: Long,
         sellerName: String,
         sellerPhone: String,
@@ -58,11 +65,27 @@ class BuyViewModel(application: Application) : AndroidViewModel(application) {
                 updatedBy = recordedBy
             )
             db.partyDao().insertParty(sellerParty)
+            db.syncDao().enqueueOutbox(
+                SyncOutboxEntity(
+                    id = UUID.randomUUID().toString(),
+                    entityType = "parties",
+                    entityId = sellerParty.id,
+                    op = SyncOp.UPSERT,
+                    payloadJson = Gson().toJson(sellerParty),
+                    createdAt = now
+                )
+            )
 
             // 2. Find Category ID
             val categories = db.categoryDao().getCategories(activeShopId)
             val matchedCat = categories.firstOrNull { it.name.equals(categoryName, ignoreCase = true) }
             val categoryId = matchedCat?.id ?: UUID.randomUUID().toString()
+
+            // Construct attributes JSON for color and issue
+            val attrMap = mutableMapOf<String, String>()
+            if (color.isNotBlank()) attrMap["color"] = color.trim()
+            if (issue.isNotBlank()) attrMap["issue"] = issue.trim()
+            val attributesJson = if (attrMap.isNotEmpty()) Gson().toJson(attrMap) else null
 
             // 3. Create Stock Item
             val stockItem = StockItem(
@@ -72,6 +95,8 @@ class BuyViewModel(application: Application) : AndroidViewModel(application) {
                 brand = brand.ifBlank { "Generic" },
                 model = model.ifBlank { categoryName },
                 identifier = imei.ifBlank { null },
+                attributes = attributesJson,
+                condition = issue.ifBlank { "GOOD" },
                 quantity = 1,
                 remainingQty = 1,
                 stockedAt = now
@@ -107,7 +132,18 @@ class BuyViewModel(application: Application) : AndroidViewModel(application) {
                     referenceNo = paymentDetails.ifBlank { null },
                     payDate = now
                 )
-                db.paymentDao().insertPayment(payment.toEntity(recordedBy))
+                val paymentEntity = payment.toEntity(recordedBy)
+                db.paymentDao().insertPayment(paymentEntity)
+                db.syncDao().enqueueOutbox(
+                    SyncOutboxEntity(
+                        id = UUID.randomUUID().toString(),
+                        entityType = "payments",
+                        entityId = paymentEntity.id,
+                        op = SyncOp.UPSERT,
+                        payloadJson = Gson().toJson(paymentEntity),
+                        createdAt = now
+                    )
+                )
             }
 
             // 6. Record Promise if Partial Payment
@@ -123,7 +159,23 @@ class BuyViewModel(application: Application) : AndroidViewModel(application) {
                     promisedDate = now + 7 * 24 * 60 * 60 * 1000L, // default 7 days
                     note = promisedDateStr.ifBlank { null }
                 )
-                db.paymentPromiseDao().insertPromise(promise.toEntity(recordedBy))
+                val promiseEntity = promise.toEntity(recordedBy)
+                db.paymentPromiseDao().insertPromise(promiseEntity)
+                db.syncDao().enqueueOutbox(
+                    SyncOutboxEntity(
+                        id = UUID.randomUUID().toString(),
+                        entityType = "payment_promises",
+                        entityId = promiseEntity.id,
+                        op = SyncOp.UPSERT,
+                        payloadJson = Gson().toJson(promiseEntity),
+                        createdAt = now
+                    )
+                )
+            }
+
+            // 7. Trigger Firestore Push
+            runCatching {
+                FirestoreSyncManager(db).pushOutbox(activeShopId, Role.OWNER, "session_active")
             }
 
             onSuccess()

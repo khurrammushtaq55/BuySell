@@ -3,6 +3,8 @@ package com.mmushtaq04.buysell.presentation.screens.stock
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.mmushtaq04.buysell.data.local.AppDatabase
 import com.mmushtaq04.buysell.data.repository.StockRepositoryImpl
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,12 +31,21 @@ class StockListViewModel(application: Application) : AndroidViewModel(applicatio
 
             stockRepository.observeInStockItems(activeShopId).collect { list ->
                 val displayList = list.map { item ->
+                    val attrMap = runCatching {
+                        item.attributes?.let { json ->
+                            val type = object : TypeToken<Map<String, String>>() {}.type
+                            Gson().fromJson<Map<String, String>>(json, type)
+                        }
+                    }.getOrNull() ?: emptyMap()
+
                     DisplayStock(
                         id = item.id,
                         brand = item.brand,
                         model = item.model,
                         imei = item.identifier ?: "N/A",
                         category = item.categoryId,
+                        color = attrMap["color"] ?: "",
+                        issue = attrMap["issue"] ?: item.condition ?: "",
                         remainingQty = item.remainingQty,
                         status = item.status.name
                     )

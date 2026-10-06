@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">Hafeez Center Buy/Sell</string>
+
+    <!-- General Actions -->
     <string name="action_buy">Phone Khareedna</string>
     <string name="action_sell">Phone Bechna</string>
     <string name="action_khata">Khata / Hisaab</string>
@@ -7,9 +9,53 @@
     <string name="action_exchange">Purana De Kar Naya</string>
     <string name="action_save">Save Karein</string>
     <string name="action_next">Aage Chalein</string>
+    <string name="action_back">Wapas</string>
+    <string name="action_confirm">Confirm Karein</string>
+    <string name="action_cancel">Cancel Karein</string>
+
+    <!-- Payment Modes -->
     <string name="label_cash">Cash</string>
     <string name="label_easypaisa">EasyPaisa</string>
     <string name="label_jazzcash">JazzCash</string>
     <string name="label_bank_transfer">Bank Transfer</string>
     <string name="label_other">Doosra</string>
+
+    <!-- Onboarding & Shop Setup -->
+    <string name="shop_setup_title">Dukan Setup</string>
+    <string name="shop_setup_sub">Apni dukan ki detail bharein</string>
+    <string name="label_user_name">Aap Ka Naam / User Name *</string>
+    <string name="label_shop_name">Dukan Ka Naam *</string>
+    <string name="label_shop_phone">Dukan Ka Mobile Number *</string>
+    <string name="label_shop_number">Dukan / Shop Number *</string>
+    <string name="btn_create_shop">Dukan Banayein &amp; Shuru Karein ✓</string>
+
+    <!-- Buy Wizard -->
+    <string name="buy_title">Phone Khareedna</string>
+    <string name="buy_step">Step %1$d of %2$d</string>
+    <string name="label_seller_name">Seller Ka Naam *</string>
+    <string name="label_mobile_number">Mobile Number *</string>
+    <string name="label_cnic">CNIC Number *</string>
+    <string name="label_recorded_by">Record Karne Wale Ka Naam / User *</string>
+    <string name="label_purchase_price">Khareedne ki qeemat (Rs) *</string>
+    <string name="label_model_name">Model Name *</string>
+    <string name="label_imei">IMEI / Serial Number</string>
+    <string name="btn_save_purchase">Save Karein ✓</string>
+
+    <!-- Sell Wizard -->
+    <string name="sell_title">Phone Bechna</string>
+    <string name="label_buyer_name">Buyer Ka Naam *</string>
+    <string name="label_sale_price">Bechnay ki qeemat (Rs) *</string>
+    <string name="btn_save_sale">Sale Record Karein ✓</string>
+
+    <!-- Exchange Wizard -->
+    <string name="exchange_title">Purana De Kar Naya (Exchange)</string>
+    <string name="exchange_explainer_title">Exchange Flow (Dono 1 Flow Mein)</string>
+    <string name="exchange_explainer_sub">Purana phone khareed ke stock m jayega, naya bech diya jayega</string>
+    <string name="btn_save_exchange">Exchange Final Karein ✓</string>
+
+    <!-- Home & Dashboard -->
+    <string name="home_today_sales">Aaj Ki Sales</string>
+    <string name="dashboard_title">Owner Dashboard &amp; Reports</string>
+    <string name="settings_title">Settings &amp; Preferences</string>
+    <string name="help_title">Madad &amp; Guidance</string>
 </resources>

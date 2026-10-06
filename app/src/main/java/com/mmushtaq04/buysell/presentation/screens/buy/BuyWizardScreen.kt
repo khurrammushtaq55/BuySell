@@ -31,6 +31,8 @@ fun BuyWizardScreen(
         brand: String,
         model: String,
         imei: String,
+        color: String,
+        issue: String,
         priceRs: Long,
         sellerName: String,
         sellerPhone: String,
@@ -40,7 +42,7 @@ fun BuyWizardScreen(
         paymentMethodStr: String,
         paymentDetails: String,
         promisedDateStr: String
-    ) -> Unit = { _, _, _, _, _, _, _, _, _, _, _, _, _ -> },
+    ) -> Unit = { _, _, _, _, _, _, _, _, _, _, _, _, _, _, _ -> },
     onSaveSuccess: () -> Unit = {}
 ) {
     var step by remember { mutableIntStateOf(1) }
@@ -54,6 +56,8 @@ fun BuyWizardScreen(
     var brand by remember { mutableStateOf("") }
     var model by remember { mutableStateOf("") }
     var imei by remember { mutableStateOf("") }
+    var colorText by remember { mutableStateOf("") }
+    var issueText by remember { mutableStateOf("") }
     var priceText by remember { mutableStateOf("") }
 
     var sellerName by remember { mutableStateOf("") }
@@ -90,13 +94,11 @@ fun BuyWizardScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
+                .verticalScroll(rememberScrollState())
                 .padding(16.dp),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
             Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 // Progress Bar
@@ -113,9 +115,12 @@ fun BuyWizardScreen(
                         onSelectCategory = { category = it }
                     )
                     2 -> StepDeviceDetails(
+                        category = category,
                         brand = brand, onBrandChange = { brand = it },
                         model = model, onModelChange = { model = it },
                         imei = imei, onImeiChange = { imei = it },
+                        color = colorText, onColorChange = { colorText = it },
+                        issue = issueText, onIssueChange = { issueText = it },
                         price = priceText, onPriceChange = { priceText = it }
                     )
                     3 -> StepSellerInfo(
@@ -132,48 +137,52 @@ fun BuyWizardScreen(
                         promisedDate = promisedDateText, onPromisedDateChange = { promisedDateText = it }
                     )
                 }
-            }
 
-            // Bottom Navigation Button
-            Button(
-                onClick = {
-                    if (step < 4) {
-                        step++
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Bottom Navigation Button
+                Button(
+                    onClick = {
+                        if (step < 4) {
+                            step++
+                        } else {
+                            isSaving = true
+                            val price = priceText.toLongOrNull() ?: 0L
+                            val paid = paidAmountText.toLongOrNull() ?: price
+                            onSavePurchase(
+                                category,
+                                brand,
+                                model,
+                                imei,
+                                colorText,
+                                issueText,
+                                price,
+                                sellerName,
+                                sellerPhone,
+                                sellerCnic,
+                                recordedBy,
+                                paid,
+                                paymentMethod,
+                                paymentDetails,
+                                promisedDateText
+                            )
+                            onSaveSuccess()
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    if (isSaving) {
+                        CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
                     } else {
-                        isSaving = true
-                        val price = priceText.toLongOrNull() ?: 0L
-                        val paid = paidAmountText.toLongOrNull() ?: price
-                        onSavePurchase(
-                            category,
-                            brand,
-                            model,
-                            imei,
-                            price,
-                            sellerName,
-                            sellerPhone,
-                            sellerCnic,
-                            recordedBy,
-                            paid,
-                            paymentMethod,
-                            paymentDetails,
-                            promisedDateText
+                        Text(
+                            text = if (step < 4) "Aage Chalein (Next)" else "Save Karein ✓",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold
                         )
-                        onSaveSuccess()
                     }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                if (isSaving) {
-                    CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
-                } else {
-                    Text(
-                        text = if (step < 4) "Aage Chalein (Next)" else "Save Karein ✓",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
-                    )
                 }
             }
         }
@@ -214,11 +223,19 @@ private fun StepCategorySelect(
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun StepDeviceDetails(
+    category: String,
     brand: String, onBrandChange: (String) -> Unit,
     model: String, onModelChange: (String) -> Unit,
     imei: String, onImeiChange: (String) -> Unit,
+    color: String, onColorChange: (String) -> Unit,
+    issue: String, onIssueChange: (String) -> Unit,
     price: String, onPriceChange: (String) -> Unit
 ) {
+    val showDefaultBrandChips = category.contains("Mobile", ignoreCase = true) ||
+            category.contains("Phone", ignoreCase = true) ||
+            category.contains("Tablet", ignoreCase = true) ||
+            category.contains("iPad", ignoreCase = true)
+
     val topBrands = listOf("Apple", "Samsung", "Xiaomi", "Vivo", "Google", "OnePlus")
     val otherBrands = listOf("Oppo", "Realme", "Infinix", "Tecno", "Motorola", "Nokia", "Huawei")
     val allPresetBrands = topBrands + otherBrands
@@ -228,32 +245,34 @@ private fun StepDeviceDetails(
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text("Device ki detail bharein:", fontSize = 16.sp, fontWeight = FontWeight.Bold)
 
-        Text("Brand select karein:", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+        if (showDefaultBrandChips) {
+            Text("Brand select karein:", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
 
-        FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            (allPresetBrands + "Other").forEach { preset ->
-                val isSelected = (preset == selectedChip) || (preset == brand && preset != "Other")
-                FilterChip(
-                    selected = isSelected,
-                    onClick = {
-                        selectedChip = preset
-                        if (preset != "Other") {
-                            onBrandChange(preset)
-                        } else {
-                            if (brand in allPresetBrands) {
-                                onBrandChange("")
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                (allPresetBrands + "Other").forEach { preset ->
+                    val isSelected = (preset == selectedChip) || (preset == brand && preset != "Other")
+                    FilterChip(
+                        selected = isSelected,
+                        onClick = {
+                            selectedChip = preset
+                            if (preset != "Other") {
+                                onBrandChange(preset)
+                            } else {
+                                if (brand in allPresetBrands) {
+                                    onBrandChange("")
+                                }
                             }
-                        }
-                    },
-                    label = { Text(preset, fontSize = 13.sp) },
-                    leadingIcon = if (isSelected) {
-                        { Icon(Icons.Default.CheckCircle, contentDescription = null, modifier = Modifier.size(16.dp)) }
-                    } else null
-                )
+                        },
+                        label = { Text(preset, fontSize = 13.sp) },
+                        leadingIcon = if (isSelected) {
+                            { Icon(Icons.Default.CheckCircle, contentDescription = null, modifier = Modifier.size(16.dp)) }
+                        } else null
+                    )
+                }
             }
         }
 
@@ -266,31 +285,52 @@ private fun StepDeviceDetails(
                 }
             },
             label = {
-                Text(if (selectedChip == "Other") "Brand Name (Type manually) *" else "Brand Name *")
+                Text(
+                    if (showDefaultBrandChips && selectedChip == "Other") "Brand Name (Type manually) *"
+                    else "Brand Name *"
+                )
             },
-            placeholder = { Text("e.g. Apple, Samsung, Google, etc.") },
+            placeholder = { Text("e.g. Apple, Samsung, Sony, Bose, Dell, etc.") },
             modifier = Modifier.fillMaxWidth()
         )
 
         OutlinedTextField(
             value = model,
             onValueChange = onModelChange,
-            label = { Text("Model (e.g. Galaxy S23)") },
+            label = { Text("Model Name / Item Name *") },
+            placeholder = { Text("e.g. Galaxy S23, Charger 20W, Airpods Pro") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        OutlinedTextField(
+            value = color,
+            onValueChange = onColorChange,
+            label = { Text("Color / Rung (Optional)") },
+            placeholder = { Text("e.g. Black, Gold, Natural Titanium") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        OutlinedTextField(
+            value = issue,
+            onValueChange = onIssueChange,
+            label = { Text("Kharabi / Fault / Issue (Optional)") },
+            placeholder = { Text("e.g. Battery health 80%, Glass crack, None") },
+            supportingText = { Text("Agar phone mein koi fault hai to yahan likhein") },
             modifier = Modifier.fillMaxWidth()
         )
 
         OutlinedTextField(
             value = imei,
             onValueChange = onImeiChange,
-            label = { Text("IMEI / Serial Number") },
-            supportingText = { Text("15 digit number; Settings -> About phone par hota hai") },
+            label = { Text("IMEI / Serial Number (Optional for accessories)") },
+            supportingText = { Text("15 digit IMEI or Serial number") },
             modifier = Modifier.fillMaxWidth()
         )
 
         OutlinedTextField(
             value = price,
             onValueChange = onPriceChange,
-            label = { Text("Khareedne ki qeemat (Rs)") },
+            label = { Text("Khareedne ki qeemat (Rs) *") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             modifier = Modifier.fillMaxWidth()
         )

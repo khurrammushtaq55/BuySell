@@ -1,13 +1,41 @@
 package com.mmushtaq04.buysell.data.repository
 
+import com.google.gson.Gson
 import com.mmushtaq04.buysell.data.local.AppDatabase
 import com.mmushtaq04.buysell.data.local.entity.*
 import com.mmushtaq04.buysell.data.local.enums.*
+import com.mmushtaq04.buysell.data.sync.FirestoreSyncManager
 import com.mmushtaq04.buysell.domain.model.*
 import com.mmushtaq04.buysell.domain.repository.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.util.UUID
+
+// --- Helper for Sync Outbox Enqueue ---
+private suspend fun enqueueSyncOutbox(
+    db: AppDatabase,
+    entityType: String,
+    entityId: String,
+    op: SyncOp,
+    payload: Any
+) {
+    runCatching {
+        val json = Gson().toJson(payload)
+        val outbox = SyncOutboxEntity(
+            id = UUID.randomUUID().toString(),
+            entityType = entityType,
+            entityId = entityId,
+            op = op,
+            payloadJson = json,
+            createdAt = System.currentTimeMillis()
+        )
+        db.syncDao().enqueueOutbox(outbox)
+
+        val meta = db.appMetaDao().getAppMeta()
+        val activeShopId = meta?.activeShopId ?: "default_shop"
+        FirestoreSyncManager(db).pushOutbox(activeShopId, Role.OWNER, "session_active")
+    }
+}
 
 // --- Mappers ---
 fun StockItemEntity.toDomain() = StockItem(
@@ -250,6 +278,10 @@ class StockRepositoryImpl(private val db: AppDatabase) : StockRepository {
         stockDao.insertStockItem(stockItemEntity)
         txnDao.insertTxnWithLines(txnEntity, listOf(lineEntity))
 
+        enqueueSyncOutbox(db, "stock_items", stockItemEntity.id, SyncOp.UPSERT, stockItemEntity)
+        enqueueSyncOutbox(db, "txns", txnEntity.id, SyncOp.UPSERT, txnEntity)
+        enqueueSyncOutbox(db, "txn_lines", lineEntity.id, SyncOp.UPSERT, lineEntity)
+
         return txnEntity.toDomain(listOf(lineEntity))
     }
 
@@ -310,6 +342,10 @@ class StockRepositoryImpl(private val db: AppDatabase) : StockRepository {
         stockDao.updateStockItem(updatedStockEntity)
         txnDao.insertTxnWithLines(txnEntity, listOf(lineEntity))
 
+        enqueueSyncOutbox(db, "stock_items", updatedStockEntity.id, SyncOp.UPSERT, updatedStockEntity)
+        enqueueSyncOutbox(db, "txns", txnEntity.id, SyncOp.UPSERT, txnEntity)
+        enqueueSyncOutbox(db, "txn_lines", lineEntity.id, SyncOp.UPSERT, lineEntity)
+
         return txnEntity.toDomain(listOf(lineEntity))
     }
 
@@ -349,7 +385,9 @@ class PartyRepositoryImpl(private val db: AppDatabase) : PartyRepository {
     }
 
     override suspend fun createParty(party: Party) {
-        partyDao.insertParty(party.toEntity())
+        val entity = party.toEntity()
+        partyDao.insertParty(entity)
+        enqueueSyncOutbox(db, "parties", entity.id, SyncOp.UPSERT, entity)
     }
 
     override suspend fun getPartyBalance(shopId: String, partyId: String): PartyBalance? {
@@ -397,7 +435,9 @@ class PaymentRepositoryImpl(private val db: AppDatabase) : PaymentRepository {
     }
 
     override suspend fun recordPayment(payment: Payment) {
-        paymentDao.insertPayment(payment.toEntity())
+        val entity = payment.toEntity()
+        paymentDao.insertPayment(entity)
+        enqueueSyncOutbox(db, "payments", entity.id, SyncOp.UPSERT, entity)
 
         // Check if there is an OPEN promise on linked txn and if fully paid, auto-KEPT
         payment.txnId?.let { txnId ->
@@ -406,16 +446,16 @@ class PaymentRepositoryImpl(private val db: AppDatabase) : PaymentRepository {
                 val sumPaid = paymentDao.getSumPaymentsForTxn(payment.shopId, txnId) ?: 0L
                 val txnEntity = db.txnDao().getTxnById(txnId)
                 if (txnEntity != null && sumPaid >= txnEntity.totalAmount) {
-                    promiseDao.updatePromise(openPromise.copy(status = PromiseStatus.KEPT))
+                    val updated = openPromise.copy(status = PromiseStatus.KEPT)
+                    promiseDao.updatePromise(updated)
+                    enqueueSyncOutbox(db, "payment_promises", updated.id, SyncOp.UPSERT, updated)
                 }
             }
         }
     }
 
     override suspend fun reversePayment(paymentId: String, reason: String, userId: String) {
-        // Appends reversing payment with reversed direction and reverses_payment_id = paymentId
-        val payments = paymentDao.observePaymentsByParty("", "").map { list -> list.firstOrNull { it.id == paymentId } }
-        // Reversal logic implemented in business use cases
+        // Reversal logic
     }
 
     override fun observeOverduePromises(shopId: String, nowMs: Long): Flow<List<PaymentPromise>> {
@@ -423,6 +463,8 @@ class PaymentRepositoryImpl(private val db: AppDatabase) : PaymentRepository {
     }
 
     override suspend fun recordPromise(promise: PaymentPromise) {
-        promiseDao.insertPromise(promise.toEntity())
+        val entity = promise.toEntity()
+        promiseDao.insertPromise(entity)
+        enqueueSyncOutbox(db, "payment_promises", entity.id, SyncOp.UPSERT, entity)
     }
 }

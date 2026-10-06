@@ -13,6 +13,8 @@ import com.mmushtaq04.buysell.presentation.screens.buy.BuyViewModel
 import com.mmushtaq04.buysell.presentation.screens.buy.BuyWizardScreen
 import com.mmushtaq04.buysell.presentation.screens.dashboard.OwnerDashboardScreen
 import com.mmushtaq04.buysell.presentation.screens.dashboard.OwnerDashboardViewModel
+import com.mmushtaq04.buysell.presentation.screens.exchange.ExchangeViewModel
+import com.mmushtaq04.buysell.presentation.screens.exchange.ExchangeWizardScreen
 import com.mmushtaq04.buysell.presentation.screens.help.HelpScreen
 import com.mmushtaq04.buysell.presentation.screens.home.HomeScreen
 import com.mmushtaq04.buysell.presentation.screens.home.HomeViewModel
@@ -110,7 +112,7 @@ fun AppNavigation(
                 todaySalesAmountPaisa = homeUiState.todaySalesAmountPaisa,
                 onNavigateToBuy = { navController.navigate(NavRoutes.BuyWizard.route) },
                 onNavigateToSell = { navController.navigate(NavRoutes.SellWizard.route) },
-                onNavigateToExchange = { navController.navigate(NavRoutes.BuyWizard.route) },
+                onNavigateToExchange = { navController.navigate(NavRoutes.ExchangeWizard.route) },
                 onNavigateToStock = { navController.navigate(NavRoutes.StockList.route) },
                 onNavigateToParties = { navController.navigate(NavRoutes.PartyList.route) },
                 onNavigateToSettings = { navController.navigate(NavRoutes.Settings.route) }
@@ -124,12 +126,14 @@ fun AppNavigation(
                 currentUserName = registeredUserName,
                 enabledCategories = enabledCategories.map { it.name },
                 onNavigateBack = { navController.popBackStack() },
-                onSavePurchase = { cat, brand, model, imei, price, name, phone, cnic, recordedBy, paid, method, details, promised ->
+                onSavePurchase = { cat, brand, model, imei, color, issue, price, name, phone, cnic, recordedBy, paid, method, details, promised ->
                     buyViewModel.savePurchase(
                         categoryName = cat,
                         brand = brand,
                         model = model,
                         imei = imei,
+                        color = color,
+                        issue = issue,
                         priceRs = price,
                         sellerName = name,
                         sellerPhone = phone,
@@ -165,6 +169,37 @@ fun AppNavigation(
                         paymentMethodStr = method,
                         paymentDetails = details,
                         promisedDateStr = promised,
+                        onSuccess = {}
+                    )
+                },
+                onSaveSuccess = { navController.popBackStack() }
+            )
+        }
+
+        composable(NavRoutes.ExchangeWizard.route) {
+            val exchangeViewModel: ExchangeViewModel = viewModel()
+            val stockList by exchangeViewModel.stockList.collectAsState()
+
+            ExchangeWizardScreen(
+                stockList = stockList,
+                currentUserName = registeredUserName,
+                onNavigateBack = { navController.popBackStack() },
+                onSaveExchange = { soldItemId, newPrice, oldCat, oldBrand, oldModel, oldImei, oldColor, oldIssue, oldPrice, name, phone, recordedBy, cash, method ->
+                    exchangeViewModel.saveExchange(
+                        soldStockItemId = soldItemId,
+                        newPhonePriceRs = newPrice,
+                        oldCategory = oldCat,
+                        oldBrand = oldBrand,
+                        oldModel = oldModel,
+                        oldImei = oldImei,
+                        oldColor = oldColor,
+                        oldIssue = oldIssue,
+                        oldPhoneValueRs = oldPrice,
+                        customerName = name,
+                        customerPhone = phone,
+                        recordedBy = recordedBy,
+                        cashPaidRs = cash,
+                        paymentMethodStr = method,
                         onSuccess = {}
                     )
                 },
