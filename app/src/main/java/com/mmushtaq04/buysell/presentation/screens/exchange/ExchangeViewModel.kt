@@ -1,6 +1,7 @@
 package com.mmushtaq04.buysell.presentation.screens.exchange
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
@@ -28,6 +29,10 @@ class ExchangeViewModel(application: Application) : AndroidViewModel(application
     private val _stockList = MutableStateFlow<List<SimpleStockItem>>(emptyList())
     val stockList: StateFlow<List<SimpleStockItem>> = _stockList.asStateFlow()
 
+    companion object {
+        private const val TAG = "ExchangeViewModel"
+    }
+
     init {
         loadInStockItems()
     }
@@ -39,13 +44,15 @@ class ExchangeViewModel(application: Application) : AndroidViewModel(application
 
             stockRepository.observeInStockItems(activeShopId).collect { list ->
                 _stockList.value = list.map { item ->
+                    val costPaisa = item.purchaseLineId?.let { db.txnDao().getUnitPriceByLineId(it) } ?: 0L
                     SimpleStockItem(
                         id = item.id,
                         title = "${item.brand} ${item.model}",
                         imei = item.identifier ?: "N/A",
-                        cost = 0L
+                        cost = costPaisa / 100
                     )
                 }
+                Log.d(TAG, "Loaded ${list.size} in-stock items for Exchange")
             }
         }
     }
@@ -68,6 +75,7 @@ class ExchangeViewModel(application: Application) : AndroidViewModel(application
         onSuccess: () -> Unit
     ) {
         viewModelScope.launch {
+            Log.d(TAG, "Starting saveExchange: SoldItem ID=$soldStockItemId, NewPrice=Rs $newPhonePriceRs, OldBrand=$oldBrand, OldPrice=Rs $oldPhoneValueRs, Customer=$customerName")
             val meta = db.appMetaDao().getAppMeta()
             val activeShopId = meta?.activeShopId ?: "default_shop"
             val now = System.currentTimeMillis()
@@ -142,17 +150,14 @@ class ExchangeViewModel(application: Application) : AndroidViewModel(application
                 db.txnDao().insertTxn(saleEntity.copy(exchangeGroupId = exchangeGroupId))
             }
 
+            Log.i(TAG, "✓ Linked Exchange Group ID '$exchangeGroupId' between Purchase Txn ${purchaseTxn.id} & Sale Txn ${saleTxn.id}")
+
             // 4. Record Net Cash Difference Payment
             val netDifferenceRs = newPhonePriceRs - oldPhoneValueRs
             val cashPaisa = cashPaidRs * 100
 
             if (cashPaisa > 0) {
-                val methodEnum = when (paymentMethodStr.uppercase()) {
-                    "CASH" -> PaymentMethod.CASH
-                    "EASYPAISA", "JAZZCASH" -> PaymentMethod.WALLET
-                    "BANK TRANSFER" -> PaymentMethod.BANK
-                    else -> PaymentMethod.OTHER
-                }
+                val methodEnum = PaymentMethod.fromStr(paymentMethodStr)
 
                 val direction = if (netDifferenceRs >= 0) PaymentDirection.IN else PaymentDirection.OUT
 

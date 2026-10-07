@@ -13,17 +13,22 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mmushtaq04.buysell.ui.theme.BuySellTheme
+import com.mmushtaq04.buysell.util.AppPreferencesManager
 
 data class SimpleStockItem(val id: String, val title: String, val imei: String, val cost: Long)
 
@@ -32,6 +37,7 @@ data class SimpleStockItem(val id: String, val title: String, val imei: String, 
 fun SellWizardScreen(
     stockList: List<SimpleStockItem> = emptyList(),
     currentUserName: String = "Malik / Staff",
+    showBuyCostInSellWizard: Boolean = true,
     onNavigateBack: () -> Unit = {},
     onSaveSale: (
         stockItemId: String,
@@ -46,10 +52,12 @@ fun SellWizardScreen(
     ) -> Unit = { _, _, _, _, _, _, _, _, _ -> },
     onSaveSuccess: () -> Unit = {}
 ) {
+    val context = LocalContext.current
     var step by remember { mutableIntStateOf(1) }
 
     var selectedItem by remember { mutableStateOf<SimpleStockItem?>(null) }
     var searchQuery by remember { mutableStateOf("") }
+    var isCostVisible by remember { mutableStateOf(false) }
 
     var buyerName by remember { mutableStateOf("") }
     var buyerPhone by remember { mutableStateOf("") }
@@ -60,6 +68,13 @@ fun SellWizardScreen(
     var promisedDateText by remember { mutableStateOf("") }
 
     val methods = listOf("Cash", "Easypaisa", "JazzCash", "Bank Transfer", "Other")
+
+    val isStepValid = when (step) {
+        1 -> selectedItem != null
+        2 -> buyerName.isNotBlank() && buyerPhone.isNotBlank() && (salePriceText.toLongOrNull() ?: 0L) > 0
+        3 -> true
+        else -> false
+    }
 
     Scaffold(
         topBar = {
@@ -98,7 +113,7 @@ fun SellWizardScreen(
 
                 when (step) {
                     1 -> {
-                        Text("Stock se phone choose karein:", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                        Text("Stock se phone choose karein *:", fontSize = 16.sp, fontWeight = FontWeight.Bold)
 
                         OutlinedTextField(
                             value = searchQuery,
@@ -151,7 +166,7 @@ fun SellWizardScreen(
                     }
 
                     2 -> {
-                        Text("Gahak (Buyer) ki detail:", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                        Text("Gahak (Buyer) ki detail (Mandatory fields *):", fontSize = 16.sp, fontWeight = FontWeight.Bold)
 
                         selectedItem?.let { item ->
                             Card(modifier = Modifier.fillMaxWidth()) {
@@ -162,10 +177,52 @@ fun SellWizardScreen(
                             }
                         }
 
+                        // Hidden Buy Price Card with Eye Toggle
+                        val isPrefEnabled = AppPreferencesManager.isShowBuyCostInSellEnabled(context)
+                        if (showBuyCostInSellWizard && isPrefEnabled && selectedItem != null) {
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 12.dp, vertical = 8.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(Icons.Default.ShoppingCart, contentDescription = null, modifier = Modifier.size(18.dp), tint = MaterialTheme.colorScheme.primary)
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text(
+                                            text = "Khareed Qeemat (Buy Price): ",
+                                            fontSize = 13.sp,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                        Text(
+                                            text = if (isCostVisible) "Rs ${selectedItem?.cost ?: 0}" else "Rs ••••••",
+                                            fontSize = 14.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = if (isCostVisible) MaterialTheme.colorScheme.primary else Color.Gray
+                                        )
+                                    }
+
+                                    IconButton(onClick = { isCostVisible = !isCostVisible }) {
+                                        Icon(
+                                            imageVector = if (isCostVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                                            contentDescription = if (isCostVisible) "Hide buy price" else "Show buy price",
+                                            tint = MaterialTheme.colorScheme.primary
+                                        )
+                                    }
+                                }
+                            }
+                        }
+
                         OutlinedTextField(
                             value = buyerName,
                             onValueChange = { buyerName = it },
                             label = { Text("Buyer Ka Naam *") },
+                            isError = buyerName.isBlank(),
                             modifier = Modifier.fillMaxWidth()
                         )
 
@@ -173,6 +230,7 @@ fun SellWizardScreen(
                             value = buyerPhone,
                             onValueChange = { buyerPhone = it },
                             label = { Text("Mobile Number *") },
+                            isError = buyerPhone.isBlank(),
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -181,6 +239,7 @@ fun SellWizardScreen(
                             value = salePriceText,
                             onValueChange = { salePriceText = it },
                             label = { Text("Bechnay ki qeemat (Rs) *") },
+                            isError = (salePriceText.toLongOrNull() ?: 0L) <= 0,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -304,6 +363,7 @@ fun SellWizardScreen(
                             onSaveSuccess()
                         }
                     },
+                    enabled = isStepValid,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),
@@ -324,9 +384,9 @@ fun SellWizardScreen(
 @Composable
 fun SellWizardScreenPreview() {
     val dummyStock = listOf(
-        SimpleStockItem("1", "Apple iPhone 15 Pro", "358912345678901", 210000),
-        SimpleStockItem("2", "Samsung Galaxy S24 Ultra", "351234567890123", 240000),
-        SimpleStockItem("3", "iPad Air 5th Gen", "SER987654321", 115000)
+        SimpleStockItem("1", "Apple iPhone 15 Pro", "358912345678901", 180000),
+        SimpleStockItem("2", "Samsung Galaxy S24 Ultra", "351234567890123", 210000),
+        SimpleStockItem("3", "iPad Air 5th Gen", "SER987654321", 95000)
     )
 
     BuySellTheme {

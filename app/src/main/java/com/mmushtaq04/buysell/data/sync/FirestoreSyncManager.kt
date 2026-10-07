@@ -61,6 +61,7 @@ class FirestoreSyncManager(
 
                     // Determine valid 6-segment or root doc path in Firestore
                     val docPath = when (item.entityType.lowercase().trim()) {
+                        "users", "user" -> "users/${item.entityId}"
                         "shops", "shop" -> "shops/${item.entityId}"
                         "shop_members", "shopmember", "member" -> "shops/$shopId/members/${item.entityId}"
                         else -> "shops/$shopId/scopes/$scopeFolder/$collectionName/${item.entityId}"
@@ -166,6 +167,7 @@ class FirestoreSyncManager(
             "attachment", "attachments" -> "attachments"
             "shop", "shops" -> "shops"
             "shop_member", "shopmember", "shop_members", "shopmembers", "member", "members" -> "members"
+            "user", "users" -> "users"
             else -> if (clean.endsWith("s")) clean else clean + "s"
         }
     }

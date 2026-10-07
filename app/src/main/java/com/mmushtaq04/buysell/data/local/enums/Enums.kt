@@ -20,7 +20,21 @@ enum class TrackingMode {
 enum class Role {
     OWNER,
     STAFF,
-    PARTNER
+    PARTNER;
+
+    fun toDisplayName(): String = when (this) {
+        OWNER -> "Owner"
+        STAFF -> "Staff"
+        PARTNER -> "Sleeping Partner"
+    }
+
+    companion object {
+        fun fromStr(str: String): Role = when (str.uppercase().trim()) {
+            "STAFF" -> STAFF
+            "PARTNER", "SLEEPING PARTNER" -> PARTNER
+            else -> OWNER
+        }
+    }
 }
 
 enum class MemberStatus {
@@ -65,7 +79,27 @@ enum class PaymentMethod {
     WALLET,
     CHEQUE,
     EXCHANGE,
-    OTHER
+    OTHER;
+
+    fun toDisplayName(): String = when (this) {
+        CASH -> "Cash"
+        BANK -> "Bank Transfer"
+        WALLET -> "Easypaisa / JazzCash"
+        CHEQUE -> "Cheque"
+        EXCHANGE -> "Exchange"
+        OTHER -> "Other"
+    }
+
+    companion object {
+        fun fromStr(str: String): PaymentMethod = when (str.uppercase().trim()) {
+            "CASH" -> CASH
+            "BANK", "BANK TRANSFER" -> BANK
+            "WALLET", "EASYPAISA", "JAZZCASH" -> WALLET
+            "CHEQUE" -> CHEQUE
+            "EXCHANGE" -> EXCHANGE
+            else -> OTHER
+        }
+    }
 }
 
 enum class PaymentAccountType {

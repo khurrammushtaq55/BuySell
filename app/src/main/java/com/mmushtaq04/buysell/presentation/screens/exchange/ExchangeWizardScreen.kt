@@ -88,6 +88,13 @@ fun ExchangeWizardScreen(
 
     var selectedChip by remember { mutableStateOf(if (oldBrand in allPresetBrands) oldBrand else if (oldBrand.isNotBlank()) "Other" else "") }
 
+    val isStepValid = when (step) {
+        1 -> selectedItem != null && (newPhonePriceText.toLongOrNull() ?: 0L) > 0
+        2 -> oldBrand.isNotBlank() && oldModel.isNotBlank() && (oldPhoneValueText.toLongOrNull() ?: 0L) > 0
+        3 -> customerName.isNotBlank() && customerPhone.isNotBlank() && !isSaving
+        else -> false
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -149,7 +156,7 @@ fun ExchangeWizardScreen(
 
                 when (step) {
                     1 -> {
-                        Text("1. Shop ka naya phone choose karein:", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                        Text("1. Shop ka naya phone choose karein (Mandatory *):", fontSize = 16.sp, fontWeight = FontWeight.Bold)
 
                         OutlinedTextField(
                             value = searchQuery,
@@ -204,13 +211,14 @@ fun ExchangeWizardScreen(
                             value = newPhonePriceText,
                             onValueChange = { newPhonePriceText = it },
                             label = { Text("Naye Phone Ki Qeemat / Sale Price (Rs) *") },
+                            isError = (newPhonePriceText.toLongOrNull() ?: 0L) <= 0,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
 
                     2 -> {
-                        Text("2. Customer ke purane phone ki detail:", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                        Text("2. Customer ke purane phone ki detail (Mandatory *):", fontSize = 16.sp, fontWeight = FontWeight.Bold)
 
                         Text("Category:", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
                         FlowRow(
@@ -275,6 +283,7 @@ fun ExchangeWizardScreen(
                                     else "Brand Name *"
                                 )
                             },
+                            isError = oldBrand.isBlank(),
                             placeholder = { Text("e.g. Samsung, Apple, Sony, Dell, etc.") },
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -283,6 +292,7 @@ fun ExchangeWizardScreen(
                             value = oldModel,
                             onValueChange = { oldModel = it },
                             label = { Text("Model Name (e.g. Galaxy A12) *") },
+                            isError = oldModel.isBlank(),
                             modifier = Modifier.fillMaxWidth()
                         )
 
@@ -314,6 +324,7 @@ fun ExchangeWizardScreen(
                             value = oldPhoneValueText,
                             onValueChange = { oldPhoneValueText = it },
                             label = { Text("Purane Phone Ki Qeemat / Khareed Price (Rs) *") },
+                            isError = (oldPhoneValueText.toLongOrNull() ?: 0L) <= 0,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -324,7 +335,7 @@ fun ExchangeWizardScreen(
                         val oldPrice = oldPhoneValueText.toLongOrNull() ?: 0L
                         val netDiff = newPrice - oldPrice
 
-                        Text("3. Cash Balance & Customer Detail:", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                        Text("3. Cash Balance & Customer Detail (Mandatory *):", fontSize = 16.sp, fontWeight = FontWeight.Bold)
 
                         Card(
                             modifier = Modifier.fillMaxWidth(),
@@ -352,6 +363,7 @@ fun ExchangeWizardScreen(
                             value = customerName,
                             onValueChange = { customerName = it },
                             label = { Text("Customer Ka Naam *") },
+                            isError = customerName.isBlank(),
                             modifier = Modifier.fillMaxWidth()
                         )
 
@@ -359,6 +371,7 @@ fun ExchangeWizardScreen(
                             value = customerPhone,
                             onValueChange = { customerPhone = it },
                             label = { Text("Mobile Number *") },
+                            isError = customerPhone.isBlank(),
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -440,6 +453,7 @@ fun ExchangeWizardScreen(
                             onSaveSuccess()
                         }
                     },
+                    enabled = isStepValid,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),

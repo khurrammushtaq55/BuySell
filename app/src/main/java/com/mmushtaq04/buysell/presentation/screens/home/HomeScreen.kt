@@ -6,6 +6,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.HelpOutline
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -32,7 +33,8 @@ fun HomeScreen(
     onNavigateToStock: () -> Unit = {},
     onNavigateToParties: () -> Unit = {},
     onNavigateToDashboard: () -> Unit = {},
-    onNavigateToSettings: () -> Unit = {}
+    onNavigateToSettings: () -> Unit = {},
+    onNavigateToHelp: () -> Unit = {}
 ) {
     val isPartner = userRole.equals("Partner", ignoreCase = true)
 
@@ -50,6 +52,9 @@ fun HomeScreen(
                     }
                 },
                 actions = {
+                    IconButton(onClick = onNavigateToHelp) {
+                        Icon(Icons.AutoMirrored.Filled.HelpOutline, contentDescription = "Madad / Help")
+                    }
                     IconButton(onClick = onNavigateToSettings) {
                         Icon(Icons.Default.Settings, contentDescription = "Settings")
                     }

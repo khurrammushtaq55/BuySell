@@ -15,6 +15,7 @@ import com.mmushtaq04.buysell.data.local.entity.AppMetaEntity
 import com.mmushtaq04.buysell.data.local.entity.ShopEntity
 import com.mmushtaq04.buysell.data.local.entity.ShopMemberEntity
 import com.mmushtaq04.buysell.data.local.entity.SyncOutboxEntity
+import com.mmushtaq04.buysell.data.local.entity.UserEntity
 import com.mmushtaq04.buysell.data.local.enums.MemberStatus
 import com.mmushtaq04.buysell.data.local.enums.Role
 import com.mmushtaq04.buysell.data.local.enums.SyncOp
@@ -115,6 +116,30 @@ fun AppNavigation(
                         val shopId = "default_shop"
                         val now = System.currentTimeMillis()
                         val currentUserId = authManager.currentUser?.uid ?: UUID.randomUUID().toString()
+
+                        // 0. Create & Insert User Entity
+                        val userEntity = UserEntity(
+                            id = currentUserId,
+                            displayName = registeredUserName,
+                            email = authManager.currentUser?.email,
+                            phone = shopPhone,
+                            shopId = shopId,
+                            createdAt = now,
+                            updatedAt = now,
+                            createdBy = registeredUserName,
+                            updatedBy = registeredUserName
+                        )
+                        db.userDao().insertUser(userEntity)
+                        db.syncDao().enqueueOutbox(
+                            SyncOutboxEntity(
+                                id = UUID.randomUUID().toString(),
+                                entityType = "users",
+                                entityId = userEntity.id,
+                                op = SyncOp.UPSERT,
+                                payloadJson = Gson().toJson(userEntity),
+                                createdAt = now
+                            )
+                        )
 
                         // 1. Create & Insert Shop Entity with actual user inputs
                         val shopEntity = ShopEntity(
@@ -237,7 +262,8 @@ fun AppNavigation(
                 onNavigateToStock = { navController.navigate(NavRoutes.StockList.route) },
                 onNavigateToParties = { navController.navigate(NavRoutes.PartyList.route) },
                 onNavigateToDashboard = { navController.navigate(NavRoutes.OwnerDashboard.route) },
-                onNavigateToSettings = { navController.navigate(NavRoutes.Settings.route) }
+                onNavigateToSettings = { navController.navigate(NavRoutes.Settings.route) },
+                onNavigateToHelp = { navController.navigate(NavRoutes.Help.route) }
             )
         }
 
@@ -399,6 +425,7 @@ fun AppNavigation(
                     categoryViewModel.toggleCategoryEnabled(category)
                 },
                 onNavigateBack = { navController.popBackStack() },
+                onNavigateToHelp = { navController.navigate(NavRoutes.Help.route) },
                 onSignOutClick = {
                     authManager.signOut()
                     navController.navigate(NavRoutes.Login.route) {

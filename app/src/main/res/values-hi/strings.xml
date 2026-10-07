@@ -1,61 +1,60 @@
 <resources>
     <string name="app_name">हफ़ीज़ सेंटर खरीद/बिक्री</string>
-
-    <!-- General Actions -->
-    <string name="action_buy">डिवाइस खरीदें</string>
-    <string name="action_sell">डिवाइस बेचें</string>
-    <string name="action_khata">खाता / लेज़र</string>
+    <string name="action_buy">फोन खरीदें</string>
+    <string name="action_sell">फोन बेचें</string>
+    <string name="action_khata">खाता / लेजर</string>
     <string name="action_stock">मेरा स्टॉक</string>
-    <string name="action_exchange">एक्सचेंज डिवाइस</string>
-    <string name="action_save">सहेजें</string>
+    <string name="action_exchange">पुराना देकर नया (एक्सचेंज)</string>
+    <string name="action_save">सेव करें ✓</string>
     <string name="action_next">आगे बढ़ें</string>
-    <string name="action_back">वापस</string>
+    <string name="action_back">पीछे</string>
     <string name="action_confirm">पुष्टि करें</string>
     <string name="action_cancel">रद्द करें</string>
-
-    <!-- Payment Modes -->
-    <string name="label_cash">नकद (Cash)</string>
-    <string name="label_easypaisa">EasyPaisa</string>
-    <string name="label_jazzcash">JazzCash</string>
+    <string name="label_cash">नकद</string>
+    <string name="label_easypaisa">इज़ीपैसा</string>
+    <string name="label_jazzcash">जैज़कैश</string>
     <string name="label_bank_transfer">बैंक ट्रांसफर</string>
     <string name="label_other">अन्य</string>
-
-    <!-- Onboarding & Shop Setup -->
     <string name="shop_setup_title">दुकान सेटअप</string>
     <string name="shop_setup_sub">अपनी दुकान का विवरण दर्ज करें</string>
-    <string name="label_user_name">आपका नाम / यूज़र नेम *</string>
+    <string name="label_user_name">आपका नाम *</string>
     <string name="label_shop_name">दुकान का नाम *</string>
     <string name="label_shop_phone">दुकान का मोबाइल नंबर *</string>
-    <string name="label_shop_number">दुकान नंबर *</string>
+    <string name="label_shop_address">दुकान का पता *</string>
     <string name="btn_create_shop">दुकान बनाएं और शुरू करें ✓</string>
-
-    <!-- Buy Wizard -->
     <string name="buy_title">फोन खरीदें</string>
-    <string name="buy_step">चरण %1$d का %2$d</string>
+    <string name="buy_step">चरण %1$d / %2$d</string>
     <string name="label_seller_name">विक्रेता का नाम *</string>
     <string name="label_mobile_number">मोबाइल नंबर *</string>
-    <string name="label_cnic">आईडी कार्ड नंबर (CNIC) *</string>
-    <string name="label_recorded_by">दर्ज करने वाले का नाम *</string>
+    <string name="label_cnic">आईडी नंबर *</string>
+    <string name="label_recorded_by">दर्ज करने वाला *</string>
     <string name="label_purchase_price">खरीद मूल्य (रु) *</string>
-    <string name="label_model_name">मॉडल का नाम *</string>
-    <string name="label_imei">IMEI / सीरियल नंबर</string>
-    <string name="btn_save_purchase">सहेजें ✓</string>
-
-    <!-- Sell Wizard -->
+    <string name="label_brand_name">ब्रांड *</string>
+    <string name="label_model_name">मॉडल *</string>
+    <string name="label_imei">आईएमईआई / सीरियल नंबर</string>
+    <string name="btn_save_purchase">सेव करें ✓</string>
     <string name="sell_title">फोन बेचें</string>
     <string name="label_buyer_name">खरीदार का नाम *</string>
     <string name="label_sale_price">बिक्री मूल्य (रु) *</string>
+    <string name="label_buy_price">खरीद मूल्य: </string>
     <string name="btn_save_sale">बिक्री दर्ज करें ✓</string>
-
-    <!-- Exchange Wizard -->
-    <string name="exchange_title">पुराना देकर नया लें (एक्सचेंज)</string>
+    <string name="exchange_title">पुराना देकर नया (एक्सचेंज)</string>
     <string name="exchange_explainer_title">एक्सचेंज प्रक्रिया</string>
-    <string name="exchange_explainer_sub">पुराना फोन खरीदकर स्टॉक में जाएगा, नया बेचा जाएगा</string>
+    <string name="exchange_explainer_sub">पुराना फोन स्टॉक में जाएगा, नया फोन बिकेगा</string>
     <string name="btn_save_exchange">एक्सचेंज पूरा करें ✓</string>
-
-    <!-- Home & Dashboard -->
-    <string name="home_today_sales">आज की कुल बिक्री</string>
-    <string name="dashboard_title">मालिक डैशबोर्ड और रिपोर्ट</string>
-    <string name="settings_title">सेटिंग्स और प्राथमिकताएं</string>
+    <string name="home_today_sales">आज की बिक्री</string>
+    <string name="dashboard_title">डैशबोर्ड और रिपोर्ट</string>
+    <string name="settings_title">सेटिंग्स</string>
     <string name="help_title">मदद और मार्गदर्शन</string>
+    <string name="settings_section_store">दुकान की जानकारी</string>
+    <string name="settings_section_lang">भाषा और डिस्प्ले</string>
+    <string name="settings_section_team">टीम और कैटेगरी</string>
+    <string name="settings_section_receipt">रसीद नियम</string>
+    <string name="settings_section_security">सुरक्षा और खाता</string>
+    <string name="settings_app_language">ऐप की भाषा</string>
+    <string name="settings_show_buy_price">बिक्री के समय खरीद मूल्य दिखाएं</string>
+    <string name="settings_show_buy_price_sub">आई आइकन पर टैप करने पर खरीद मूल्य दिखेगा</string>
+    <string name="settings_team_code">टीम इन्वाइट कोड</string>
+    <string name="settings_app_pin">ऐप पिन लॉक</string>
+    <string name="settings_sign_out">साइन आउट</string>
 </resources>

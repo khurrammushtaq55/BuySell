@@ -201,6 +201,9 @@ interface TxnDao {
     @Query("SELECT * FROM txns WHERE id = :txnId AND deleted_at IS NULL LIMIT 1")
     suspend fun getTxnById(txnId: String): TxnEntity?
 
+    @Query("SELECT unit_price FROM txn_lines WHERE id = :lineId LIMIT 1")
+    suspend fun getUnitPriceByLineId(lineId: String): Long?
+
     @Transaction
     @Query("SELECT * FROM txns WHERE id = :txnId AND deleted_at IS NULL LIMIT 1")
     suspend fun getTxnWithLinesById(txnId: String): TxnWithLines?

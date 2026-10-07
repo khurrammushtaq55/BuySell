@@ -1,61 +1,60 @@
 <resources>
-    <string name="app_name">حفیظ سینٹر خریداری/فروخت</string>
-
-    <!-- General Actions -->
+    <string name="app_name">حفیظ سینٹر خرید و فروخت</string>
     <string name="action_buy">فون خریدنا</string>
     <string name="action_sell">فون بیچنا</string>
     <string name="action_khata">کھاتہ / حساب</string>
-    <string name="action_stock">میرا سٹاک</string>
-    <string name="action_exchange">پرانا دے کر نیا</string>
-    <string name="action_save">سیو کریں</string>
+    <string name="action_stock">میرا اسٹاک</string>
+    <string name="action_exchange">پرانا دے کر نیا (ایکسچینج)</string>
+    <string name="action_save">محفوظ کریں ✓</string>
     <string name="action_next">آگے چلیں</string>
     <string name="action_back">واپس</string>
     <string name="action_confirm">تصدیق کریں</string>
-    <string name="action_cancel">منسوخ کریں</string>
-
-    <!-- Payment Modes -->
-    <string name="label_cash">نقد (Cash)</string>
-    <string name="label_easypaisa">EasyPaisa</string>
-    <string name="label_jazzcash">JazzCash</string>
+    <string name="action_cancel">منسوخ</string>
+    <string name="label_cash">نقد</string>
+    <string name="label_easypaisa">ایزی پیسہ</string>
+    <string name="label_jazzcash">جائز کیش</string>
     <string name="label_bank_transfer">بینک ٹرانسفر</string>
     <string name="label_other">دیگر</string>
-
-    <!-- Onboarding & Shop Setup -->
-    <string name="shop_setup_title">دوکان سیٹ اپ</string>
-    <string name="shop_setup_sub">اپنی دوکان کی تفصیلات درج کریں</string>
-    <string name="label_user_name">آپ کا نام / یوزر نیم *</string>
-    <string name="label_shop_name">دوکان کا نام *</string>
-    <string name="label_shop_phone">دوکان کا موبائل نمبر *</string>
-    <string name="label_shop_number">دوکان نمبر / ایڈریس *</string>
-    <string name="btn_create_shop">دوکان بنائیں اور شروع کریں ✓</string>
-
-    <!-- Buy Wizard -->
+    <string name="shop_setup_title">دکان کی ترتیبات</string>
+    <string name="shop_setup_sub">اپنی دکان کی تفصیل درج کریں</string>
+    <string name="label_user_name">آپ کا نام *</string>
+    <string name="label_shop_name">دکان کا نام *</string>
+    <string name="label_shop_phone">دکان کا موبائل نمبر *</string>
+    <string name="label_shop_address">دکان کا پتہ *</string>
+    <string name="btn_create_shop">دکان بنائیں اور شروع کریں ✓</string>
     <string name="buy_title">فون خریدنا</string>
     <string name="buy_step">مرحلہ %1$d از %2$d</string>
     <string name="label_seller_name">بیچنے والے کا نام *</string>
     <string name="label_mobile_number">موبائل نمبر *</string>
-    <string name="label_cnic">شناختی کارڈ نمبر (CNIC) *</string>
-    <string name="label_recorded_by">ریکارڈ کرنے والے کا نام *</string>
-    <string name="label_purchase_price">خریدنے کی قیمت (روپے) *</string>
+    <string name="label_cnic">شناختی کارڈ نمبر *</string>
+    <string name="label_recorded_by">ریکارڈ کرنے والا کا نام *</string>
+    <string name="label_purchase_price">خریداری کی قیمت (روپے) *</string>
+    <string name="label_brand_name">برانڈ کا نام *</string>
     <string name="label_model_name">ماڈل کا نام *</string>
-    <string name="label_imei">IMEI / سیریل نمبر</string>
+    <string name="label_imei">آئی ایم ای آئی نمبر</string>
     <string name="btn_save_purchase">محفوظ کریں ✓</string>
-
-    <!-- Sell Wizard -->
     <string name="sell_title">فون بیچنا</string>
-    <string name="label_buyer_name">گاہک کا نام *</string>
-    <string name="label_sale_price">بیچنے کی قیمت (روپے) *</string>
+    <string name="label_buyer_name">خریدار کا نام *</string>
+    <string name="label_sale_price">فروخت کی قیمت (روپے) *</string>
+    <string name="label_buy_price">خریداری قیمت: </string>
     <string name="btn_save_sale">فروخت درج کریں ✓</string>
-
-    <!-- Exchange Wizard -->
     <string name="exchange_title">پرانا دے کر نیا (ایکسچینج)</string>
-    <string name="exchange_explainer_title">ایکسچینج فلو (دونوں ایک ساتھ)</string>
-    <string name="exchange_explainer_sub">پرانا فون خرید کر سٹاک میں جائے گا، نیا بیچ دیا جائے گا</string>
-    <string name="btn_save_exchange">ایکسچینج فائنل کریں ✓</string>
-
-    <!-- Home & Dashboard -->
-    <string name="home_today_sales">آج کی کل سیلز</string>
-    <string name="dashboard_title">آنر ڈیش بورڈ اور رپورٹس</string>
-    <string name="settings_title">سیٹنگز اور ترجیحات</string>
+    <string name="exchange_explainer_title">ایکسچینج کا طریقہ کار</string>
+    <string name="exchange_explainer_sub">پرانا فون اسٹاک میں جائے گا، نیا فون فروخت ہوگا</string>
+    <string name="btn_save_exchange">ایکسچینج مکمل کریں ✓</string>
+    <string name="home_today_sales">آج کی فروخت</string>
+    <string name="dashboard_title">ڈیش بورڈ اور رپورٹس</string>
+    <string name="settings_title">ترتیبات</string>
     <string name="help_title">مدد اور رہنمائی</string>
+    <string name="settings_section_store">دکان کی تفصیل</string>
+    <string name="settings_section_lang">زبان اور ڈسپلے</string>
+    <string name="settings_section_team">ٹیم اور کیٹیگریز</string>
+    <string name="settings_section_receipt">رسید کی ترتیبات</string>
+    <string name="settings_section_security">سیکیورٹی اور اکاؤنٹ</string>
+    <string name="settings_app_language">ایپ کی زبان</string>
+    <string name="settings_show_buy_price">فروخت کے وقت خریداری قیمت دکھائیں</string>
+    <string name="settings_show_buy_price_sub">آئی آئیکن پر کلک کرنے پر خریداری قیمت ظاہر ہوگی</string>
+    <string name="settings_team_code">ٹیم ممبر کا جوائن کوڈ</string>
+    <string name="settings_app_pin">ایپ پن لاک</string>
+    <string name="settings_sign_out">لاگ آؤٹ</string>
 </resources>

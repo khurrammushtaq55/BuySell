@@ -1,61 +1,60 @@
 <resources>
-    <string name="app_name">Hafeez Center 买卖记账</string>
-
-    <!-- General Actions -->
-    <string name="action_buy">购买设备</string>
-    <string name="action_sell">出售设备</string>
-    <string name="action_khata">账本 / 记账</string>
+    <string name="app_name">哈菲兹中心买卖追踪</string>
+    <string name="action_buy">购买手机</string>
+    <string name="action_sell">出售手机</string>
+    <string name="action_khata">账本</string>
     <string name="action_stock">我的库存</string>
     <string name="action_exchange">以旧换新</string>
-    <string name="action_save">保存</string>
+    <string name="action_save">保存 ✓</string>
     <string name="action_next">下一步</string>
     <string name="action_back">返回</string>
     <string name="action_confirm">确认</string>
     <string name="action_cancel">取消</string>
-
-    <!-- Payment Modes -->
     <string name="label_cash">现金</string>
     <string name="label_easypaisa">Easypaisa</string>
     <string name="label_jazzcash">JazzCash</string>
     <string name="label_bank_transfer">银行转账</string>
     <string name="label_other">其他</string>
-
-    <!-- Onboarding & Shop Setup -->
     <string name="shop_setup_title">店铺设置</string>
-    <string name="shop_setup_sub">请输入您的店铺详细信息</string>
-    <string name="label_user_name">您的姓名 / 用户名 *</string>
+    <string name="shop_setup_sub">请输入您的店铺信息</string>
+    <string name="label_user_name">您的姓名 *</string>
     <string name="label_shop_name">店铺名称 *</string>
-    <string name="label_shop_phone">店铺手机号 *</string>
-    <string name="label_shop_number">门牌号 / 店铺编号 *</string>
+    <string name="label_shop_phone">店铺电话 *</string>
+    <string name="label_shop_address">店铺地址 *</string>
     <string name="btn_create_shop">创建店铺并开始 ✓</string>
-
-    <!-- Buy Wizard -->
-    <string name="buy_title">收购手机</string>
+    <string name="buy_title">购买手机</string>
     <string name="buy_step">第 %1$d 步，共 %2$d 步</string>
     <string name="label_seller_name">卖家姓名 *</string>
     <string name="label_mobile_number">手机号码 *</string>
-    <string name="label_cnic">身份证号 (CNIC) *</string>
-    <string name="label_recorded_by">记录人姓名 *</string>
-    <string name="label_purchase_price">收购价格 (Rs) *</string>
-    <string name="label_model_name">型号名称 *</string>
+    <string name="label_cnic">身份证号 *</string>
+    <string name="label_recorded_by">记录人 *</string>
+    <string name="label_purchase_price">进货价格 (Rs) *</string>
+    <string name="label_brand_name">品牌 *</string>
+    <string name="label_model_name">型号 *</string>
     <string name="label_imei">IMEI / 序列号</string>
-    <string name="btn_save_purchase">保存收购记录 ✓</string>
-
-    <!-- Sell Wizard -->
+    <string name="btn_save_purchase">保存购买 ✓</string>
     <string name="sell_title">出售手机</string>
     <string name="label_buyer_name">买家姓名 *</string>
-    <string name="label_sale_price">售价 (Rs) *</string>
-    <string name="btn_save_sale">记录出售 ✓</string>
-
-    <!-- Exchange Wizard -->
-    <string name="exchange_title">以旧换新 (Exchange)</string>
+    <string name="label_sale_price">销售价格 (Rs) *</string>
+    <string name="label_buy_price">进货价格: </string>
+    <string name="btn_save_sale">记录销售 ✓</string>
+    <string name="exchange_title">以旧换新</string>
     <string name="exchange_explainer_title">以旧换新流程</string>
-    <string name="exchange_explainer_sub">收购旧手机入库，出售新手机</string>
-    <string name="btn_save_exchange">完成以旧换新 ✓</string>
-
-    <!-- Home & Dashboard -->
-    <string name="home_today_sales">今日销售额</string>
-    <string name="dashboard_title">店主仪表盘与报表</string>
+    <string name="exchange_explainer_sub">旧手机计入库存，新手机售出</string>
+    <string name="btn_save_exchange">完成换购 ✓</string>
+    <string name="home_today_sales">今日销售</string>
+    <string name="dashboard_title">仪表板与报告</string>
     <string name="settings_title">设置与偏好</string>
     <string name="help_title">帮助与指南</string>
+    <string name="settings_section_store">店铺资料</string>
+    <string name="settings_section_lang">语言与显示</string>
+    <string name="settings_section_team">团队与品类</string>
+    <string name="settings_section_receipt">小票与库存规则</string>
+    <string name="settings_section_security">安全与账户</string>
+    <string name="settings_app_language">应用语言</string>
+    <string name="settings_show_buy_price">出售时显示进货价</string>
+    <string name="settings_show_buy_price_sub">点击眼睛图标可显示进货价格</string>
+    <string name="settings_team_code">团队邀请码</string>
+    <string name="settings_app_pin">应用 PIN 码锁</string>
+    <string name="settings_sign_out">退出登录</string>
 </resources>

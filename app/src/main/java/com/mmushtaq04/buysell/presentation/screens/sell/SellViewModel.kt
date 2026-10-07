@@ -1,6 +1,7 @@
 package com.mmushtaq04.buysell.presentation.screens.sell
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
@@ -32,6 +33,10 @@ class SellViewModel(application: Application) : AndroidViewModel(application) {
     private val _stockList = MutableStateFlow<List<SimpleStockItem>>(emptyList())
     val stockList: StateFlow<List<SimpleStockItem>> = _stockList.asStateFlow()
 
+    companion object {
+        private const val TAG = "SellViewModel"
+    }
+
     init {
         loadInStockItems()
     }
@@ -43,13 +48,15 @@ class SellViewModel(application: Application) : AndroidViewModel(application) {
 
             stockRepository.observeInStockItems(activeShopId).collect { list ->
                 _stockList.value = list.map { item ->
+                    val costPaisa = item.purchaseLineId?.let { db.txnDao().getUnitPriceByLineId(it) } ?: 0L
                     SimpleStockItem(
                         id = item.id,
                         title = "${item.brand} ${item.model}",
                         imei = item.identifier ?: "N/A",
-                        cost = 0L
+                        cost = costPaisa / 100
                     )
                 }
+                Log.d(TAG, "Loaded ${list.size} in-stock items for shop '$activeShopId'")
             }
         }
     }
@@ -67,6 +74,7 @@ class SellViewModel(application: Application) : AndroidViewModel(application) {
         onSuccess: () -> Unit
     ) {
         viewModelScope.launch {
+            Log.d(TAG, "Starting saveSale: StockItem ID=$stockItemId, SalePrice=Rs $salePriceRs, Buyer=$buyerName, RecordedBy=$recordedBy")
             val meta = db.appMetaDao().getAppMeta()
             val activeShopId = meta?.activeShopId ?: "default_shop"
             val now = System.currentTimeMillis()
@@ -105,16 +113,12 @@ class SellViewModel(application: Application) : AndroidViewModel(application) {
                 createdByUserId = recordedBy,
                 qtyToSell = 1
             )
+            Log.i(TAG, "✓ Recorded Sale Txn ID: ${txn.id}")
 
             // 3. Record Payment IN
             val receivedPaisa = (receivedAmountRs * 100).coerceAtMost(salePricePaisa)
             if (receivedPaisa > 0) {
-                val methodEnum = when (paymentMethodStr.uppercase()) {
-                    "CASH" -> PaymentMethod.CASH
-                    "EASYPAISA", "JAZZCASH" -> PaymentMethod.WALLET
-                    "BANK TRANSFER" -> PaymentMethod.BANK
-                    else -> PaymentMethod.OTHER
-                }
+                val methodEnum = PaymentMethod.fromStr(paymentMethodStr)
 
                 val payment = Payment(
                     id = UUID.randomUUID().toString(),

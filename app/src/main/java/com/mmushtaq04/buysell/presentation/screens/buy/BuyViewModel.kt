@@ -1,6 +1,7 @@
 package com.mmushtaq04.buysell.presentation.screens.buy
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
@@ -27,6 +28,10 @@ class BuyViewModel(application: Application) : AndroidViewModel(application) {
     private val db = AppDatabase.getInstance(application)
     private val stockRepository = StockRepositoryImpl(db)
 
+    companion object {
+        private const val TAG = "BuyViewModel"
+    }
+
     fun savePurchase(
         categoryName: String,
         brand: String,
@@ -46,6 +51,7 @@ class BuyViewModel(application: Application) : AndroidViewModel(application) {
         onSuccess: () -> Unit
     ) {
         viewModelScope.launch {
+            Log.d(TAG, "Starting savePurchase: Category=$categoryName, Brand=$brand, Model=$model, Price=Rs $priceRs, Seller=$sellerName, RecordedBy=$recordedBy")
             val meta = db.appMetaDao().getAppMeta()
             val activeShopId = meta?.activeShopId ?: "default_shop"
             val now = System.currentTimeMillis()
@@ -110,16 +116,12 @@ class BuyViewModel(application: Application) : AndroidViewModel(application) {
                 partyId = partyId,
                 createdByUserId = recordedBy
             )
+            Log.i(TAG, "✓ Recorded Purchase Txn ID: ${txn.id}, StockItem ID: ${stockItem.id}")
 
             // 5. Record Payment
             val paidPaisa = (paidAmountRs * 100).coerceAtMost(pricePaisa)
             if (paidPaisa > 0) {
-                val methodEnum = when (paymentMethodStr.uppercase()) {
-                    "CASH" -> PaymentMethod.CASH
-                    "EASYPAISA", "JAZZCASH" -> PaymentMethod.WALLET
-                    "BANK TRANSFER" -> PaymentMethod.BANK
-                    else -> PaymentMethod.OTHER
-                }
+                val methodEnum = PaymentMethod.fromStr(paymentMethodStr)
 
                 val payment = Payment(
                     id = UUID.randomUUID().toString(),

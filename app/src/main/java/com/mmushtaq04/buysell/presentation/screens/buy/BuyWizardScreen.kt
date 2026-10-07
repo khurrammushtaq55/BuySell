@@ -47,9 +47,11 @@ fun BuyWizardScreen(
 ) {
     var step by remember { mutableIntStateOf(1) }
 
-    val activeCategories = if (enabledCategories.isNotEmpty()) enabledCategories else listOf(
+    val activeCategories = enabledCategories.ifEmpty {
+        listOf(
         "Mobile", "Tablet / iPad", "Laptop", "Console", "Smartwatch", "Earbuds / Audio", "Accessories"
     )
+    }
 
     // Form states
     var category by remember { mutableStateOf(activeCategories.firstOrNull() ?: "Mobile") }
@@ -69,6 +71,14 @@ fun BuyWizardScreen(
     var paymentDetails by remember { mutableStateOf("") }
     var promisedDateText by remember { mutableStateOf("") }
     var isSaving by remember { mutableStateOf(false) }
+
+    val isStepValid = when (step) {
+        1 -> category.isNotBlank()
+        2 -> brand.isNotBlank() && model.isNotBlank() && (priceText.toLongOrNull() ?: 0L) > 0
+        3 -> sellerName.isNotBlank() && sellerPhone.isNotBlank() && sellerCnic.isNotBlank()
+        4 -> !isSaving
+        else -> false
+    }
 
     Scaffold(
         topBar = {
@@ -168,6 +178,7 @@ fun BuyWizardScreen(
                             onSaveSuccess()
                         }
                     },
+                    enabled = isStepValid,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),
@@ -242,7 +253,7 @@ private fun StepDeviceDetails(
     var selectedChip by remember { mutableStateOf(if (brand in allPresetBrands) brand else if (brand.isNotBlank()) "Other" else "") }
 
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text("Device ki detail bharein:", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+        Text("Device ki detail bharein (Mandatory fields *) :", fontSize = 16.sp, fontWeight = FontWeight.Bold)
 
         if (showDefaultBrandChips) {
             Text("Brand select karein:", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
@@ -289,6 +300,7 @@ private fun StepDeviceDetails(
                     else "Brand Name *"
                 )
             },
+            isError = brand.isBlank(),
             placeholder = { Text("e.g. Apple, Samsung, Sony, Bose, Dell, etc.") },
             modifier = Modifier.fillMaxWidth()
         )
@@ -297,6 +309,7 @@ private fun StepDeviceDetails(
             value = model,
             onValueChange = onModelChange,
             label = { Text("Model Name / Item Name *") },
+            isError = model.isBlank(),
             placeholder = { Text("e.g. Galaxy S23, Charger 20W, Airpods Pro") },
             modifier = Modifier.fillMaxWidth()
         )
@@ -330,6 +343,7 @@ private fun StepDeviceDetails(
             value = price,
             onValueChange = onPriceChange,
             label = { Text("Khareedne ki qeemat (Rs) *") },
+            isError = (price.toLongOrNull() ?: 0L) <= 0,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             modifier = Modifier.fillMaxWidth()
         )
@@ -344,12 +358,13 @@ private fun StepSellerInfo(
     currentUserName: String
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text("Bechne wale ki maloomat (Seller):", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+        Text("Bechne wale ki maloomat (Seller - Mandatory *):", fontSize = 16.sp, fontWeight = FontWeight.Bold)
 
         OutlinedTextField(
             value = name,
             onValueChange = onNameChange,
             label = { Text("Seller Ka Naam *") },
+            isError = name.isBlank(),
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -357,6 +372,7 @@ private fun StepSellerInfo(
             value = phone,
             onValueChange = onPhoneChange,
             label = { Text("Mobile Number *") },
+            isError = phone.isBlank(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
             modifier = Modifier.fillMaxWidth()
         )
@@ -365,6 +381,7 @@ private fun StepSellerInfo(
             value = cnic,
             onValueChange = onCnicChange,
             label = { Text("CNIC Number *") },
+            isError = cnic.isBlank(),
             supportingText = { Text("13 digits, dashto ke baghair bhi chalega") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             modifier = Modifier.fillMaxWidth()

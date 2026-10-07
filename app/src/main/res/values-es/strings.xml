@@ -1,61 +1,60 @@
 <resources>
     <string name="app_name">Hafeez Center Compra/Venta</string>
-
-    <!-- General Actions -->
-    <string name="action_buy">Comprar Dispositivo</string>
-    <string name="action_sell">Vender Dispositivo</string>
-    <string name="action_khata">Libro Mayor / Cuenta</string>
+    <string name="action_buy">Comprar Teléfono</string>
+    <string name="action_sell">Vender Teléfono</string>
+    <string name="action_khata">Contabilidad</string>
     <string name="action_stock">Mi Inventario</string>
-    <string name="action_exchange">Intercambio</string>
-    <string name="action_save">Guardar</string>
+    <string name="action_exchange">Intercambiar Teléfono</string>
+    <string name="action_save">Guardar ✓</string>
     <string name="action_next">Siguiente</string>
-    <string name="action_back">Volver</string>
+    <string name="action_back">Atrás</string>
     <string name="action_confirm">Confirmar</string>
     <string name="action_cancel">Cancelar</string>
-
-    <!-- Payment Modes -->
     <string name="label_cash">Efectivo</string>
     <string name="label_easypaisa">Easypaisa</string>
     <string name="label_jazzcash">JazzCash</string>
     <string name="label_bank_transfer">Transferencia Bancaria</string>
     <string name="label_other">Otro</string>
-
-    <!-- Onboarding & Shop Setup -->
     <string name="shop_setup_title">Configuración de Tienda</string>
-    <string name="shop_setup_sub">Ingrese los detalles de su tienda</string>
-    <string name="label_user_name">Su Nombre / Usuario *</string>
+    <string name="shop_setup_sub">Ingrese los detalles de la tienda</string>
+    <string name="label_user_name">Tu Nombre *</string>
     <string name="label_shop_name">Nombre de la Tienda *</string>
     <string name="label_shop_phone">Teléfono de la Tienda *</string>
-    <string name="label_shop_number">Número de Tienda *</string>
+    <string name="label_shop_address">Dirección de la Tienda *</string>
     <string name="btn_create_shop">Crear Tienda y Comenzar ✓</string>
-
-    <!-- Buy Wizard -->
     <string name="buy_title">Comprar Teléfono</string>
     <string name="buy_step">Paso %1$d de %2$d</string>
     <string name="label_seller_name">Nombre del Vendedor *</string>
-    <string name="label_mobile_number">Número Móvil *</string>
-    <string name="label_cnic">Número de Identificación (CNIC) *</string>
-    <string name="label_recorded_by">Registrado por (Usuario) *</string>
+    <string name="label_mobile_number">Número de Celular *</string>
+    <string name="label_cnic">Número de Identificación *</string>
+    <string name="label_recorded_by">Registrado Por *</string>
     <string name="label_purchase_price">Precio de Compra (Rs) *</string>
-    <string name="label_model_name">Nombre del Modelo *</string>
-    <string name="label_imei">IMEI / Número de Serie</string>
+    <string name="label_brand_name">Marca *</string>
+    <string name="label_model_name">Modelo *</string>
+    <string name="label_imei">Número IMEI / Serie</string>
     <string name="btn_save_purchase">Guardar Compra ✓</string>
-
-    <!-- Sell Wizard -->
     <string name="sell_title">Vender Teléfono</string>
     <string name="label_buyer_name">Nombre del Comprador *</string>
     <string name="label_sale_price">Precio de Venta (Rs) *</string>
+    <string name="label_buy_price">Precio de Compra: </string>
     <string name="btn_save_sale">Registrar Venta ✓</string>
-
-    <!-- Exchange Wizard -->
-    <string name="exchange_title">Intercambio de Dispositivo</string>
-    <string name="exchange_explainer_title">Flujo de Intercambio</string>
-    <string name="exchange_explainer_sub">Comprar usado e inventariar, vender nuevo al cliente</string>
+    <string name="exchange_title">Intercambio de Teléfono</string>
+    <string name="exchange_explainer_title">Proceso de Intercambio</string>
+    <string name="exchange_explainer_sub">El teléfono usado entra al inventario, el nuevo se vende</string>
     <string name="btn_save_exchange">Finalizar Intercambio ✓</string>
-
-    <!-- Home & Dashboard -->
     <string name="home_today_sales">Ventas de Hoy</string>
-    <string name="dashboard_title">Panel del Propietario e Informes</string>
+    <string name="dashboard_title">Panel y Reportes</string>
     <string name="settings_title">Ajustes y Preferencias</string>
     <string name="help_title">Ayuda y Orientación</string>
+    <string name="settings_section_store">Perfil de Tienda</string>
+    <string name="settings_section_lang">Idioma y Pantalla</string>
+    <string name="settings_section_team">Equipo y Categorías</string>
+    <string name="settings_section_receipt">Recibo e Inventario</string>
+    <string name="settings_section_security">Seguridad y Cuenta</string>
+    <string name="settings_app_language">Idioma de la Aplicación</string>
+    <string name="settings_show_buy_price">Mostrar Precio de Compra al Vender</string>
+    <string name="settings_show_buy_price_sub">Ver precio de costo tocando el ícono de ojo</string>
+    <string name="settings_team_code">Código de Invitación de Equipo</string>
+    <string name="settings_app_pin">Bloqueo por PIN</string>
+    <string name="settings_sign_out">Cerrar Sesión</string>
 </resources>
