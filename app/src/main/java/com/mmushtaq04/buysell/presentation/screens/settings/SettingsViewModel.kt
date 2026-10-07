@@ -9,9 +9,8 @@ import com.mmushtaq04.buysell.data.local.AppDatabase
 import com.mmushtaq04.buysell.data.local.entity.CategoryEntity
 import com.mmushtaq04.buysell.data.local.entity.ShopEntity
 import com.mmushtaq04.buysell.data.local.entity.SyncOutboxEntity
-import com.mmushtaq04.buysell.data.local.enums.Role
 import com.mmushtaq04.buysell.data.local.enums.SyncOp
-import com.mmushtaq04.buysell.data.sync.FirestoreSyncManager
+import com.mmushtaq04.buysell.data.sync.SyncWorker
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -100,13 +99,8 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
                 )
             )
 
-            runCatching {
-                val user = db.userDao().getPrimaryUser()
-                val role = user?.role ?: Role.OWNER
-                val sessionId = user?.activeSessionId?.ifBlank { "session_active" } ?: "session_active"
-                FirestoreSyncManager(db).pushOutbox(shopId, role, sessionId)
-            }
-            Log.i(TAG, "✓ Updated Shop Profile in Room DB & Firestore: ${updatedShop.name}")
+            SyncWorker.enqueueOneTimeSync(getApplication())
+            Log.i(TAG, "✓ Updated Shop Profile in Room DB & Enqueued Background Sync: ${updatedShop.name}")
         }
     }
 
@@ -128,6 +122,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
                     createdAt = System.currentTimeMillis()
                 )
             )
+            SyncWorker.enqueueOneTimeSync(getApplication())
             Log.d(TAG, "Toggled Category '${category.name}' enabled status to ${updated.enabled}")
         }
     }

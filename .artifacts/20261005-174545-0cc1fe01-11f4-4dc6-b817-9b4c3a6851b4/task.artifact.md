@@ -41,8 +41,7 @@
 	- [x] Implemented `restoreUserDataFromFirestore(userId)` in `FirestoreSyncManager.kt` and `applyFirestoreDocToRoom(...)`
 	- [x] Created `DataRestorationOverlayScreen` overlay in `AppNavigation.kt` with progress spinner and status messages so the UI never appears frozen during restore
 	- [x] Fixed `pullChanges` query filter when `lastPulled == 0L` to fetch all documents directly from Firestore without `whereGreaterThan("updated_at", 0)` filter restrictions
-- [x] Legacy Path Security Rule & Query Guard
-	- [x] Added `match /{collection}/{docId}` direct 4-segment collection rule to `firestore.rules`
-	- [x] Wrapped legacy path fallback queries in `runCatching { ... }` to prevent permission errors
-- [x] Settings Store Profile State Binding
-	- [x] Added `primaryShop` flow observation in `SettingsViewModel.kt` and passed current shop name, phone, and address from Room DB to `SettingsScreen` in `SettingsNavGraph.kt`
+- [x] WorkManager Application Scheduler
+	- [x] Created `BuySellApplication.kt` and registered it in `AndroidManifest.xml`
+	- [x] Enqueued periodic background sync (`SyncWorker.schedulePeriodicSync`) every 15 mins when online
+	- [x] Enqueued daily Udhaar reminder worker (`UdhaarReminderWorker.scheduleDailyReminder`) every 24 hours

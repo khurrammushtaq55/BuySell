@@ -2,10 +2,10 @@ package com.mmushtaq04.buysell.data.sync
 
 import android.content.Context
 import android.util.Log
-import androidx.work.CoroutineWorker
-import androidx.work.WorkerParameters
+import androidx.work.*
 import com.mmushtaq04.buysell.data.local.AppDatabase
 import com.mmushtaq04.buysell.data.local.enums.Role
+import java.util.concurrent.TimeUnit
 
 class SyncWorker(
     appContext: Context,
@@ -14,6 +14,48 @@ class SyncWorker(
 
     companion object {
         private const val TAG = "SyncWorker"
+        private const val ONE_TIME_WORK_NAME = "OneTimeSyncWork"
+        private const val PERIODIC_WORK_NAME = "PeriodicSyncWork"
+
+        fun enqueueOneTimeSync(context: Context) {
+            runCatching {
+                val constraints = Constraints.Builder()
+                    .setRequiredNetworkType(NetworkType.CONNECTED)
+                    .build()
+
+                val request = OneTimeWorkRequestBuilder<SyncWorker>()
+                    .setConstraints(constraints)
+                    .build()
+
+                WorkManager.getInstance(context).enqueueUniqueWork(
+                    ONE_TIME_WORK_NAME,
+                    ExistingWorkPolicy.KEEP,
+                    request
+                )
+            }.onFailure { e ->
+                Log.e(TAG, "Failed to enqueue one-time SyncWorker: ${e.localizedMessage}", e)
+            }
+        }
+
+        fun schedulePeriodicSync(context: Context) {
+            runCatching {
+                val constraints = Constraints.Builder()
+                    .setRequiredNetworkType(NetworkType.CONNECTED)
+                    .build()
+
+                val periodicRequest = PeriodicWorkRequestBuilder<SyncWorker>(15, TimeUnit.MINUTES)
+                    .setConstraints(constraints)
+                    .build()
+
+                WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+                    PERIODIC_WORK_NAME,
+                    ExistingPeriodicWorkPolicy.KEEP,
+                    periodicRequest
+                )
+            }.onFailure { e ->
+                Log.e(TAG, "Failed to schedule periodic SyncWorker: ${e.localizedMessage}", e)
+            }
+        }
     }
 
     override suspend fun doWork(): Result {

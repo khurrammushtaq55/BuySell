@@ -12,12 +12,11 @@ import com.mmushtaq04.buysell.data.local.enums.PartyTypeHint
 import com.mmushtaq04.buysell.data.local.enums.PaymentDirection
 import com.mmushtaq04.buysell.data.local.enums.PaymentMethod
 import com.mmushtaq04.buysell.data.local.enums.PromiseDirection
-import com.mmushtaq04.buysell.data.local.enums.Role
 import com.mmushtaq04.buysell.data.local.enums.Scope
 import com.mmushtaq04.buysell.data.local.enums.SyncOp
 import com.mmushtaq04.buysell.data.repository.StockRepositoryImpl
 import com.mmushtaq04.buysell.data.repository.toEntity
-import com.mmushtaq04.buysell.data.sync.FirestoreSyncManager
+import com.mmushtaq04.buysell.data.sync.SyncWorker
 import com.mmushtaq04.buysell.domain.model.Payment
 import com.mmushtaq04.buysell.domain.model.PaymentPromise
 import com.mmushtaq04.buysell.domain.model.StockItem
@@ -178,13 +177,8 @@ class BuyViewModel(application: Application) : AndroidViewModel(application) {
                 )
             }
 
-            // 7. Trigger Firestore Push
-            runCatching {
-                val user = db.userDao().getPrimaryUser()
-                val role = user?.role ?: Role.STAFF
-                val sessionId = user?.activeSessionId?.ifBlank { "session_active" } ?: "session_active"
-                FirestoreSyncManager(db).pushOutbox(activeShopId, role, sessionId)
-            }
+            // 7. Enqueue Non-Blocking Background SyncWorker
+            SyncWorker.enqueueOneTimeSync(getApplication())
 
             onSuccess()
         }

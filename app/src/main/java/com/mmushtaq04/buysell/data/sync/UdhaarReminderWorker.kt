@@ -1,19 +1,43 @@
 package com.mmushtaq04.buysell.data.sync
 
 import android.content.Context
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.work.CoroutineWorker
-import androidx.work.WorkerParameters
+import androidx.work.*
 import com.mmushtaq04.buysell.R
 import com.mmushtaq04.buysell.data.local.AppDatabase
 import com.mmushtaq04.buysell.util.AppNotificationManager
 import kotlinx.coroutines.flow.firstOrNull
+import java.util.concurrent.TimeUnit
 
 class UdhaarReminderWorker(
     appContext: Context,
     workerParams: WorkerParameters
 ) : CoroutineWorker(appContext, workerParams) {
+
+    companion object {
+        private const val TAG = "UdhaarReminderWorker"
+        private const val WORK_NAME = "DailyUdhaarReminderWork"
+
+        fun scheduleDailyReminder(context: Context) {
+            runCatching {
+                val constraints = Constraints.Builder().build()
+
+                val dailyRequest = PeriodicWorkRequestBuilder<UdhaarReminderWorker>(24, TimeUnit.HOURS)
+                    .setConstraints(constraints)
+                    .build()
+
+                WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+                    WORK_NAME,
+                    ExistingPeriodicWorkPolicy.KEEP,
+                    dailyRequest
+                )
+            }.onFailure { e ->
+                Log.e(TAG, "Failed to schedule daily UdhaarReminderWorker: ${e.localizedMessage}", e)
+            }
+        }
+    }
 
     override suspend fun doWork(): Result {
         val db = AppDatabase.getInstance(applicationContext)

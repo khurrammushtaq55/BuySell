@@ -5,7 +5,6 @@ import com.mmushtaq04.buysell.data.local.AppDatabase
 import com.mmushtaq04.buysell.data.local.entity.*
 import com.mmushtaq04.buysell.data.local.enums.*
 import com.mmushtaq04.buysell.data.sync.ConflictDetector
-import com.mmushtaq04.buysell.data.sync.FirestoreSyncManager
 import com.mmushtaq04.buysell.domain.model.*
 import com.mmushtaq04.buysell.domain.repository.*
 import kotlinx.coroutines.flow.Flow
@@ -31,14 +30,6 @@ private suspend fun enqueueSyncOutbox(
             createdAt = System.currentTimeMillis()
         )
         db.syncDao().enqueueOutbox(outbox)
-
-        val meta = db.appMetaDao().getAppMeta()
-        val activeShopId = meta?.activeShopId ?: "default_shop"
-        val user = db.userDao().getPrimaryUser()
-        val role = user?.role ?: Role.STAFF
-        val sessionId = user?.activeSessionId?.ifBlank { "session_active" } ?: "session_active"
-
-        FirestoreSyncManager(db).pushOutbox(activeShopId, role, sessionId)
     }
 }
 
@@ -321,7 +312,8 @@ class StockRepositoryImpl(private val db: AppDatabase) : StockRepository {
             remainingQty = newRemaining,
             status = newStatus,
             updatedAt = now,
-            updatedBy = createdByUserId
+            updatedBy = createdByUserId,
+            rev = stockEntity.rev + 1L
         )
 
         val totalAmount = salePrice * qtyToSell
@@ -461,7 +453,7 @@ class PaymentRepositoryImpl(private val db: AppDatabase) : PaymentRepository {
                 val sumPaid = paymentDao.getSumPaymentsForTxn(payment.shopId, txnId) ?: 0L
                 val txnEntity = db.txnDao().getTxnById(txnId)
                 if (txnEntity != null && sumPaid >= txnEntity.totalAmount) {
-                    val updated = openPromise.copy(status = PromiseStatus.KEPT)
+                    val updated = openPromise.copy(status = PromiseStatus.KEPT, updatedAt = System.currentTimeMillis(), rev = openPromise.rev + 1L)
                     promiseDao.updatePromise(updated)
                     enqueueSyncOutbox(db, "payment_promises", updated.id, SyncOp.UPSERT, updated)
                 }
