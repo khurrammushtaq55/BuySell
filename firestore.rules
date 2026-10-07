@@ -138,6 +138,14 @@ service cloud.firestore {
         allow update: if isOwner(shopId) && collection != 'payments';
         allow delete: if isOwner(shopId);
       }
+
+
+      // --- Direct 4-Segment Collections (Legacy Compatibility) ---
+      match /{collection}/{docId} {
+        allow read: if isShopMember(shopId);
+        allow create, update: if isOwner(shopId) || isStaff(shopId);
+        allow delete: if isOwner(shopId);
+      }
     }
   }
 }

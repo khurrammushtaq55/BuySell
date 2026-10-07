@@ -1,5 +1,7 @@
 package com.mmushtaq04.buysell.presentation.navigation
 
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -20,9 +22,13 @@ fun NavGraphBuilder.settingsNavGraph(
 ) {
     composable(NavRoutes.Settings.route) {
         val settingsViewModel: SettingsViewModel = viewModel()
+        val shopEntity by settingsViewModel.primaryShop.collectAsState()
 
         SettingsScreen(
             userRole = registeredUserRole,
+            shopName = shopEntity?.name ?: "Mera Buy/Sell Store",
+            shopPhone = shopEntity?.phone ?: "",
+            shopAddress = shopEntity?.address ?: "",
             allCategories = allCategories,
             onUpdateShopProfile = { newName, newPhone, newAddress ->
                 settingsViewModel.updateShopProfile(

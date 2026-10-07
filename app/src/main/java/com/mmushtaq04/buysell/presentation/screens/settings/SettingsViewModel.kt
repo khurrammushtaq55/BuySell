@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import com.mmushtaq04.buysell.data.local.AppDatabase
 import com.mmushtaq04.buysell.data.local.entity.CategoryEntity
+import com.mmushtaq04.buysell.data.local.entity.ShopEntity
 import com.mmushtaq04.buysell.data.local.entity.SyncOutboxEntity
 import com.mmushtaq04.buysell.data.local.enums.Role
 import com.mmushtaq04.buysell.data.local.enums.SyncOp
@@ -24,12 +25,16 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     private val _categories = MutableStateFlow<List<CategoryEntity>>(emptyList())
     val categories: StateFlow<List<CategoryEntity>> = _categories.asStateFlow()
 
+    private val _primaryShop = MutableStateFlow<ShopEntity?>(null)
+    val primaryShop: StateFlow<ShopEntity?> = _primaryShop.asStateFlow()
+
     companion object {
         private const val TAG = "SettingsViewModel"
     }
 
     init {
         loadCategories()
+        observeShop()
     }
 
     private fun loadCategories() {
@@ -42,38 +47,66 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
+    private fun observeShop() {
+        viewModelScope.launch {
+            val meta = db.appMetaDao().getAppMeta()
+            val shopId = meta?.activeShopId ?: "default_shop"
+            db.shopDao().observeShopById(shopId).collect { shop ->
+                _primaryShop.value = shop
+            }
+        }
+    }
+
     fun updateShopProfile(name: String, phone: String, address: String) {
         viewModelScope.launch {
             val meta = db.appMetaDao().getAppMeta()
             val shopId = meta?.activeShopId ?: "default_shop"
             val existingShop = db.shopDao().getShopById(shopId)
-            if (existingShop != null) {
-                val now = System.currentTimeMillis()
-                val updatedShop = existingShop.copy(
+            val now = System.currentTimeMillis()
+
+            val updatedShop = if (existingShop != null) {
+                existingShop.copy(
                     name = name,
                     phone = phone.ifBlank { null },
                     address = address.ifBlank { null },
-                    updatedAt = now
+                    updatedAt = now,
+                    rev = existingShop.rev + 1L
                 )
-                db.shopDao().updateShop(updatedShop)
-                db.syncDao().enqueueOutbox(
-                    SyncOutboxEntity(
-                        id = UUID.randomUUID().toString(),
-                        entityType = "shops",
-                        entityId = updatedShop.id,
-                        op = SyncOp.UPSERT,
-                        payloadJson = Gson().toJson(updatedShop),
-                        createdAt = now
-                    )
+            } else {
+                val user = db.userDao().getPrimaryUser()
+                ShopEntity(
+                    id = shopId,
+                    name = name,
+                    code = "SHOP01",
+                    ownerUserId = user?.id ?: "",
+                    phone = phone.ifBlank { null },
+                    address = address.ifBlank { null },
+                    createdAt = now,
+                    updatedAt = now,
+                    createdBy = user?.displayName ?: "Owner",
+                    updatedBy = user?.displayName ?: "Owner"
                 )
-                runCatching {
-                    val user = db.userDao().getPrimaryUser()
-                    val role = user?.role ?: Role.OWNER
-                    val sessionId = user?.activeSessionId?.ifBlank { "session_active" } ?: "session_active"
-                    FirestoreSyncManager(db).pushOutbox(shopId, role, sessionId)
-                }
-                Log.i(TAG, "✓ Updated Shop Profile in Room DB & Firestore")
             }
+
+            db.shopDao().insertShop(updatedShop)
+            db.syncDao().enqueueOutbox(
+                SyncOutboxEntity(
+                    id = UUID.randomUUID().toString(),
+                    entityType = "shops",
+                    entityId = updatedShop.id,
+                    op = SyncOp.UPSERT,
+                    payloadJson = Gson().toJson(updatedShop),
+                    createdAt = now
+                )
+            )
+
+            runCatching {
+                val user = db.userDao().getPrimaryUser()
+                val role = user?.role ?: Role.OWNER
+                val sessionId = user?.activeSessionId?.ifBlank { "session_active" } ?: "session_active"
+                FirestoreSyncManager(db).pushOutbox(shopId, role, sessionId)
+            }
+            Log.i(TAG, "✓ Updated Shop Profile in Room DB & Firestore: ${updatedShop.name}")
         }
     }
 
@@ -81,7 +114,8 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         viewModelScope.launch {
             val updated = category.copy(
                 enabled = !category.enabled,
-                updatedAt = System.currentTimeMillis()
+                updatedAt = System.currentTimeMillis(),
+                rev = category.rev + 1L
             )
             db.categoryDao().updateCategory(updated)
             db.syncDao().enqueueOutbox(

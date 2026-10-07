@@ -207,6 +207,9 @@ interface TxnDao {
     @Query("SELECT * FROM txns WHERE id = :txnId AND deleted_at IS NULL LIMIT 1")
     suspend fun getTxnById(txnId: String): TxnEntity?
 
+    @Query("DELETE FROM txns WHERE id = :txnId")
+    suspend fun deleteTxn(txnId: String)
+
     @Query("SELECT unit_price FROM txn_lines WHERE id = :lineId LIMIT 1")
     suspend fun getUnitPriceByLineId(lineId: String): Long?
 
@@ -268,6 +271,9 @@ interface TxnDao {
 interface PaymentDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPayment(payment: PaymentEntity)
+
+    @Query("DELETE FROM payments WHERE id = :paymentId")
+    suspend fun deletePayment(paymentId: String)
 
     @Query("SELECT * FROM payments WHERE shop_id = :shopId AND party_id = :partyId AND deleted_at IS NULL ORDER BY pay_date DESC")
     fun observePaymentsByParty(shopId: String, partyId: String): Flow<List<PaymentEntity>>
