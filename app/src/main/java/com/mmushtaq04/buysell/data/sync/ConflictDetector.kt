@@ -1,5 +1,6 @@
 package com.mmushtaq04.buysell.data.sync
 
+import android.util.Log
 import com.mmushtaq04.buysell.data.local.AppDatabase
 import com.mmushtaq04.buysell.data.local.entity.ConflictEntity
 import com.mmushtaq04.buysell.data.local.enums.ConflictStatus
@@ -7,15 +8,19 @@ import java.util.UUID
 
 class ConflictDetector(private val db: AppDatabase) {
 
-    suspend fun detectConflictsForStockItem(shopId: String, stockItemId: String): Boolean {
-        // Query non-deleted SALE lines referencing this UNIQUE stock item
+    companion object {
+        private const val TAG = "ConflictDetector"
+    }
+
+    suspend fun checkConflictForStockItem(shopId: String, stockItemId: String): Boolean {
         val item = db.stockItemDao().getStockItemById(stockItemId) ?: return false
 
-        val saleTxns = db.txnDao().observeTxns(shopId)
-        // Check for double sale on UNIQUE item
-        val sales = db.txnDao().getTxnById(stockItemId)
-
-        // If item has multiple active sales, mark conflict
+        // Check if there are multiple txn lines associated with this UNIQUE stock item in SALE txns
+        val history = db.stockItemDao().findByIdentifierHistory(shopId, item.identifier ?: "")
+        if (history.size > 1 && history.any { it.hasConflict }) {
+            Log.w(TAG, "Conflict already flagged for stock item '$stockItemId'")
+            return true
+        }
         return item.hasConflict
     }
 
@@ -25,6 +30,7 @@ class ConflictDetector(private val db: AppDatabase) {
         txnIdA: String,
         txnIdB: String
     ) {
+        Log.w(TAG, "Recording double-sale conflict for stockItem '$stockItemId' between Txn A '$txnIdA' and Txn B '$txnIdB'")
         val conflict = ConflictEntity(
             id = UUID.randomUUID().toString(),
             shopId = shopId,

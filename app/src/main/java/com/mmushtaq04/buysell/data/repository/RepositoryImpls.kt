@@ -4,6 +4,7 @@ import com.google.gson.Gson
 import com.mmushtaq04.buysell.data.local.AppDatabase
 import com.mmushtaq04.buysell.data.local.entity.*
 import com.mmushtaq04.buysell.data.local.enums.*
+import com.mmushtaq04.buysell.data.sync.ConflictDetector
 import com.mmushtaq04.buysell.data.sync.FirestoreSyncManager
 import com.mmushtaq04.buysell.domain.model.*
 import com.mmushtaq04.buysell.domain.repository.*
@@ -298,6 +299,16 @@ class StockRepositoryImpl(private val db: AppDatabase) : StockRepository {
         val now = System.currentTimeMillis()
         val txnId = UUID.randomUUID().toString()
         val lineId = UUID.randomUUID().toString()
+
+        // Detect offline double-sale conflict if item was already marked as SOLD
+        if (stockEntity.status == ItemStatus.SOLD) {
+            ConflictDetector(db).recordConflict(
+                shopId = stockEntity.shopId,
+                stockItemId = stockItemId,
+                txnIdA = stockEntity.purchaseLineId ?: "PREV_TXN",
+                txnIdB = txnId
+            )
+        }
 
         val newRemaining = (stockEntity.remainingQty - qtyToSell).coerceAtLeast(0)
         val newStatus = if (newRemaining == 0) ItemStatus.SOLD else ItemStatus.IN_STOCK
