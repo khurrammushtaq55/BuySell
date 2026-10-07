@@ -22,11 +22,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mmushtaq04.buysell.R
 import com.mmushtaq04.buysell.ui.theme.BuySellTheme
 import com.mmushtaq04.buysell.util.AppPreferencesManager
 
@@ -81,8 +83,8 @@ fun SellWizardScreen(
             TopAppBar(
                 title = {
                     Column {
-                        Text(text = "Phone Bechna", fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                        Text(text = "Step $step of 3", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(text = stringResource(R.string.sell_title), fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                        Text(text = stringResource(R.string.buy_step, step, 3), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 },
                 navigationIcon = {
@@ -113,12 +115,12 @@ fun SellWizardScreen(
 
                 when (step) {
                     1 -> {
-                        Text("Stock se phone choose karein *:", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.sell_select_stock), fontSize = 16.sp, fontWeight = FontWeight.Bold)
 
                         OutlinedTextField(
                             value = searchQuery,
                             onValueChange = { searchQuery = it },
-                            label = { Text("IMEI ya Model search karein") },
+                            label = { Text(stringResource(R.string.label_search_stock)) },
                             leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -135,7 +137,7 @@ fun SellWizardScreen(
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
-                                    text = "Pehle stock mein phone hona chahiye — pehle khareedari record karein",
+                                    text = "Pehle stock mein phone hona chahiye",
                                     color = Color.Gray,
                                     fontSize = 14.sp
                                 )
@@ -166,7 +168,7 @@ fun SellWizardScreen(
                     }
 
                     2 -> {
-                        Text("Gahak (Buyer) ki detail (Mandatory fields *):", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.sell_buyer_info_header), fontSize = 16.sp, fontWeight = FontWeight.Bold)
 
                         selectedItem?.let { item ->
                             Card(modifier = Modifier.fillMaxWidth()) {
@@ -195,7 +197,7 @@ fun SellWizardScreen(
                                         Icon(Icons.Default.ShoppingCart, contentDescription = null, modifier = Modifier.size(18.dp), tint = MaterialTheme.colorScheme.primary)
                                         Spacer(modifier = Modifier.width(8.dp))
                                         Text(
-                                            text = "Khareed Qeemat (Buy Price): ",
+                                            text = stringResource(R.string.label_buy_price),
                                             fontSize = 13.sp,
                                             fontWeight = FontWeight.Bold
                                         )
@@ -221,7 +223,7 @@ fun SellWizardScreen(
                         OutlinedTextField(
                             value = buyerName,
                             onValueChange = { buyerName = it },
-                            label = { Text("Buyer Ka Naam *") },
+                            label = { Text(stringResource(R.string.label_buyer_name)) },
                             isError = buyerName.isBlank(),
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -229,7 +231,7 @@ fun SellWizardScreen(
                         OutlinedTextField(
                             value = buyerPhone,
                             onValueChange = { buyerPhone = it },
-                            label = { Text("Mobile Number *") },
+                            label = { Text(stringResource(R.string.label_mobile_number)) },
                             isError = buyerPhone.isBlank(),
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                             modifier = Modifier.fillMaxWidth()
@@ -238,7 +240,7 @@ fun SellWizardScreen(
                         OutlinedTextField(
                             value = salePriceText,
                             onValueChange = { salePriceText = it },
-                            label = { Text("Bechnay ki qeemat (Rs) *") },
+                            label = { Text(stringResource(R.string.label_sale_price)) },
                             isError = (salePriceText.toLongOrNull() ?: 0L) <= 0,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             modifier = Modifier.fillMaxWidth()
@@ -246,15 +248,13 @@ fun SellWizardScreen(
 
                         HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
 
-                        Text("Sale Record Karne Wala (User):", fontSize = 15.sp, fontWeight = FontWeight.Bold)
-
                         OutlinedTextField(
                             value = currentUserName,
                             onValueChange = {},
                             readOnly = true,
-                            label = { Text("Record Karne Wala (Logged-in User) *") },
+                            label = { Text(stringResource(R.string.label_recorded_by)) },
                             leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
-                            supportingText = { Text("Aap ka logged-in account name — badla nahi ja sakta") },
+                            supportingText = { Text(stringResource(R.string.sub_readonly_user)) },
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
@@ -290,8 +290,7 @@ fun SellWizardScreen(
                             modifier = Modifier.fillMaxWidth()
                         )
 
-                        // Mode of Payment Selection
-                        Text("Mode of Payment:", fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.label_payment_mode), fontSize = 14.sp, fontWeight = FontWeight.Bold)
 
                         FlowRow(
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -311,7 +310,6 @@ fun SellWizardScreen(
                             }
                         }
 
-                        // Optional / Custom Details Text Box
                         OutlinedTextField(
                             value = paymentDetails,
                             onValueChange = { paymentDetails = it },
@@ -322,7 +320,6 @@ fun SellWizardScreen(
                                 )
                             },
                             placeholder = { Text("e.g. HBL / Easypaisa Txn #12345 / Account title") },
-                            supportingText = { Text("Bank name, account details, or transaction ID") },
                             modifier = Modifier.fillMaxWidth()
                         )
 
@@ -370,7 +367,7 @@ fun SellWizardScreen(
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Text(
-                        text = if (step < 3) "Aage Chalein (Next)" else "Sale Record Karein ✓",
+                        text = if (step < 3) stringResource(R.string.action_next) else stringResource(R.string.btn_save_sale),
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
                     )

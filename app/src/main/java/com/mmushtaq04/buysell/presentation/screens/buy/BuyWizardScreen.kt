@@ -13,11 +13,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mmushtaq04.buysell.R
 import com.mmushtaq04.buysell.ui.theme.BuySellTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -49,8 +51,8 @@ fun BuyWizardScreen(
 
     val activeCategories = enabledCategories.ifEmpty {
         listOf(
-        "Mobile", "Tablet / iPad", "Laptop", "Console", "Smartwatch", "Earbuds / Audio", "Accessories"
-    )
+            "Mobile", "Tablet / iPad", "Laptop", "Console", "Smartwatch", "Earbuds / Audio", "Accessories"
+        )
     }
 
     // Form states
@@ -85,8 +87,8 @@ fun BuyWizardScreen(
             TopAppBar(
                 title = {
                     Column {
-                        Text(text = "Phone Khareedna", fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                        Text(text = "Step $step of 4", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(text = stringResource(R.string.buy_title), fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                        Text(text = stringResource(R.string.buy_step, step, 4), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 },
                 navigationIcon = {
@@ -188,7 +190,7 @@ fun BuyWizardScreen(
                         CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
                     } else {
                         Text(
-                            text = if (step < 4) "Aage Chalein (Next)" else "Save Karein ✓",
+                            text = if (step < 4) stringResource(R.string.action_next) else stringResource(R.string.btn_save_purchase),
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -206,7 +208,7 @@ private fun StepCategorySelect(
     onSelectCategory: (String) -> Unit
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text("Category choose karein:", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+        Text(stringResource(R.string.buy_select_category), fontSize = 16.sp, fontWeight = FontWeight.Bold)
 
         categoriesList.chunked(2).forEach { row ->
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
@@ -253,10 +255,10 @@ private fun StepDeviceDetails(
     var selectedChip by remember { mutableStateOf(if (brand in allPresetBrands) brand else if (brand.isNotBlank()) "Other" else "") }
 
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text("Device ki detail bharein (Mandatory fields *) :", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+        Text(stringResource(R.string.buy_fill_device_details), fontSize = 16.sp, fontWeight = FontWeight.Bold)
 
         if (showDefaultBrandChips) {
-            Text("Brand select karein:", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+            Text(stringResource(R.string.buy_select_brand), fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
 
             FlowRow(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -296,8 +298,8 @@ private fun StepDeviceDetails(
             },
             label = {
                 Text(
-                    if (showDefaultBrandChips && selectedChip == "Other") "Brand Name (Type manually) *"
-                    else "Brand Name *"
+                    if (showDefaultBrandChips && selectedChip == "Other") stringResource(R.string.label_brand_manual)
+                    else stringResource(R.string.label_brand_name)
                 )
             },
             isError = brand.isBlank(),
@@ -308,7 +310,7 @@ private fun StepDeviceDetails(
         OutlinedTextField(
             value = model,
             onValueChange = onModelChange,
-            label = { Text("Model Name / Item Name *") },
+            label = { Text(stringResource(R.string.label_item_model_name)) },
             isError = model.isBlank(),
             placeholder = { Text("e.g. Galaxy S23, Charger 20W, Airpods Pro") },
             modifier = Modifier.fillMaxWidth()
@@ -317,7 +319,7 @@ private fun StepDeviceDetails(
         OutlinedTextField(
             value = color,
             onValueChange = onColorChange,
-            label = { Text("Color / Rung (Optional)") },
+            label = { Text(stringResource(R.string.label_color)) },
             placeholder = { Text("e.g. Black, Gold, Natural Titanium") },
             modifier = Modifier.fillMaxWidth()
         )
@@ -325,24 +327,24 @@ private fun StepDeviceDetails(
         OutlinedTextField(
             value = issue,
             onValueChange = onIssueChange,
-            label = { Text("Kharabi / Fault / Issue (Optional)") },
+            label = { Text(stringResource(R.string.label_fault_issue)) },
             placeholder = { Text("e.g. Battery health 80%, Glass crack, None") },
-            supportingText = { Text("Agar phone mein koi fault hai to yahan likhein") },
+            supportingText = { Text(stringResource(R.string.sub_fault_issue)) },
             modifier = Modifier.fillMaxWidth()
         )
 
         OutlinedTextField(
             value = imei,
             onValueChange = onImeiChange,
-            label = { Text("IMEI / Serial Number (Optional for accessories)") },
-            supportingText = { Text("15 digit IMEI or Serial number") },
+            label = { Text(stringResource(R.string.label_imei)) },
+            supportingText = { Text(stringResource(R.string.sub_imei)) },
             modifier = Modifier.fillMaxWidth()
         )
 
         OutlinedTextField(
             value = price,
             onValueChange = onPriceChange,
-            label = { Text("Khareedne ki qeemat (Rs) *") },
+            label = { Text(stringResource(R.string.label_purchase_price)) },
             isError = (price.toLongOrNull() ?: 0L) <= 0,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             modifier = Modifier.fillMaxWidth()
@@ -358,12 +360,12 @@ private fun StepSellerInfo(
     currentUserName: String
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text("Bechne wale ki maloomat (Seller - Mandatory *):", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+        Text(stringResource(R.string.buy_seller_info_header), fontSize = 16.sp, fontWeight = FontWeight.Bold)
 
         OutlinedTextField(
             value = name,
             onValueChange = onNameChange,
-            label = { Text("Seller Ka Naam *") },
+            label = { Text(stringResource(R.string.label_seller_name)) },
             isError = name.isBlank(),
             modifier = Modifier.fillMaxWidth()
         )
@@ -371,7 +373,7 @@ private fun StepSellerInfo(
         OutlinedTextField(
             value = phone,
             onValueChange = onPhoneChange,
-            label = { Text("Mobile Number *") },
+            label = { Text(stringResource(R.string.label_mobile_number)) },
             isError = phone.isBlank(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
             modifier = Modifier.fillMaxWidth()
@@ -380,24 +382,22 @@ private fun StepSellerInfo(
         OutlinedTextField(
             value = cnic,
             onValueChange = onCnicChange,
-            label = { Text("CNIC Number *") },
+            label = { Text(stringResource(R.string.label_cnic)) },
             isError = cnic.isBlank(),
-            supportingText = { Text("13 digits, dashto ke baghair bhi chalega") },
+            supportingText = { Text(stringResource(R.string.sub_cnic)) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             modifier = Modifier.fillMaxWidth()
         )
 
         HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
 
-        Text("Khareedari Record Karne Wala (User):", fontSize = 15.sp, fontWeight = FontWeight.Bold)
-
         OutlinedTextField(
             value = currentUserName,
             onValueChange = {},
             readOnly = true,
-            label = { Text("Record Karne Wala (Logged-in User) *") },
+            label = { Text(stringResource(R.string.label_recorded_by)) },
             leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
-            supportingText = { Text("Aap ka logged-in account name — badla nahi ja sakta") },
+            supportingText = { Text(stringResource(R.string.sub_readonly_user)) },
             modifier = Modifier.fillMaxWidth()
         )
     }
@@ -418,7 +418,7 @@ private fun StepPaymentInfo(
     val methods = listOf("Cash", "Easypaisa", "JazzCash", "Bank Transfer", "Other")
 
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text("Payment aur Baqi date:", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+        Text(stringResource(R.string.buy_payment_header), fontSize = 16.sp, fontWeight = FontWeight.Bold)
 
         Card(
             modifier = Modifier.fillMaxWidth(),
@@ -437,14 +437,13 @@ private fun StepPaymentInfo(
         OutlinedTextField(
             value = paidAmount,
             onValueChange = onPaidAmountChange,
-            label = { Text("Kitne paisay diye? (Rs)") },
+            label = { Text(stringResource(R.string.label_paid_amount)) },
             placeholder = { Text(totalPrice.toString()) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             modifier = Modifier.fillMaxWidth()
         )
 
-        // Mode of Payment Selection
-        Text("Mode of Payment:", fontSize = 14.sp, fontWeight = FontWeight.Bold)
+        Text(stringResource(R.string.label_payment_mode), fontSize = 14.sp, fontWeight = FontWeight.Bold)
 
         FlowRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -464,7 +463,6 @@ private fun StepPaymentInfo(
             }
         }
 
-        // Optional / Custom Details Text Box
         OutlinedTextField(
             value = paymentDetails,
             onValueChange = onDetailsChange,
@@ -475,7 +473,6 @@ private fun StepPaymentInfo(
                 )
             },
             placeholder = { Text("e.g. Meezan Bank / Txn ID #98765 / Slip info") },
-            supportingText = { Text("Bank name, account details, or transaction ID") },
             modifier = Modifier.fillMaxWidth()
         )
 

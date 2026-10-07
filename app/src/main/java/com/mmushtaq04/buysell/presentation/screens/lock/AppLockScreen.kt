@@ -15,10 +15,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mmushtaq04.buysell.R
 import com.mmushtaq04.buysell.ui.theme.BuySellTheme
 import com.mmushtaq04.buysell.util.AppPinManager
 
@@ -29,6 +31,7 @@ fun AppLockScreen(
     val context = LocalContext.current
     var inputPin by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf<String?>(null) }
+    val errWrongPin = stringResource(R.string.lock_wrong_pin)
 
     fun handleDigitInput(digit: String) {
         if (inputPin.length < 4) {
@@ -39,7 +42,7 @@ fun AppLockScreen(
                 if (isVerified) {
                     onUnlockSuccess()
                 } else {
-                    errorMessage = "Ghalat PIN — Dobara koshish karein"
+                    errorMessage = errWrongPin
                     inputPin = ""
                 }
             }
@@ -85,13 +88,13 @@ fun AppLockScreen(
                 }
 
                 Text(
-                    text = "Dukan Lock — PIN Daalein",
+                    text = stringResource(R.string.lock_title),
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
                 )
 
                 Text(
-                    text = "4-digit security PIN daal kar app kholain",
+                    text = stringResource(R.string.lock_subtitle),
                     fontSize = 13.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

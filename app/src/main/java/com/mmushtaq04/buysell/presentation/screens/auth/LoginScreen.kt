@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -55,6 +56,9 @@ fun LoginScreen(
 
     val credentialManager = remember { CredentialManager.create(context) }
 
+    val errInvalidEmail = stringResource(R.string.login_err_invalid_email)
+    val errPwdShort = stringResource(R.string.login_err_pwd_short)
+
     Scaffold { padding ->
         Column(
             modifier = Modifier
@@ -84,13 +88,13 @@ fun LoginScreen(
             }
 
             Text(
-                text = "Hafeez Center Buy/Sell",
+                text = stringResource(R.string.app_name),
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold
             )
 
             Text(
-                text = "Apni dukan ka hisaab aur stock mehfooz rakhein",
+                text = stringResource(R.string.login_tagline),
                 fontSize = 13.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -136,18 +140,18 @@ fun LoginScreen(
                                 } else {
                                     val err = authResult.exceptionOrNull()?.localizedMessage ?: "Google sign-in failed"
                                     errorMessage = err
-                                    Toast.makeText(context, "Google Sign-In Galti: $err", Toast.LENGTH_LONG).show()
+                                    Toast.makeText(context, err, Toast.LENGTH_LONG).show()
                                 }
                             } else {
                                 isLoading = false
-                                val err = "Sahi Google account credential nahi mila"
+                                val err = "Google account credential error"
                                 errorMessage = err
                                 Toast.makeText(context, err, Toast.LENGTH_LONG).show()
                             }
                         }.onFailure { e ->
                             isLoading = false
                             val msg = if (e is GetCredentialException && e.message?.contains("cancel", ignoreCase = true) == true) {
-                                "Google Sign-In cancel kar diya gaya"
+                                "Google Sign-In canceled"
                             } else {
                                 "Google Sign-In Error: ${e.localizedMessage ?: "Problem logging in"}"
                             }
@@ -167,7 +171,7 @@ fun LoginScreen(
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = "G  Google se login karein",
+                        text = "G  ${stringResource(R.string.login_btn_google)}",
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp
                     )
@@ -182,7 +186,7 @@ fun LoginScreen(
             ) {
                 HorizontalDivider(modifier = Modifier.weight(1f))
                 Text(
-                    text = "  ya Email se login karein  ",
+                    text = "  ${stringResource(R.string.login_or_email)}  ",
                     fontSize = 12.sp,
                     color = Color.Gray
                 )
@@ -196,7 +200,7 @@ fun LoginScreen(
                     email = it
                     if (errorMessage != null) errorMessage = null
                 },
-                label = { Text("Email Address") },
+                label = { Text(stringResource(R.string.label_email)) },
                 leadingIcon = { Icon(Icons.Default.Mail, contentDescription = null) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 modifier = Modifier.fillMaxWidth()
@@ -209,10 +213,14 @@ fun LoginScreen(
                     password = it
                     if (errorMessage != null) errorMessage = null
                 },
-                label = { Text("Password") },
+                label = { Text(stringResource(R.string.label_password)) },
                 supportingText = {
                     Text(
-                        text = if (password.isNotEmpty() && password.length < 4) "Kam az kam 4 characters (abhi ${password.length} hain)" else "Kam az kam 4 characters password zaroori hai",
+                        text = if (password.isNotEmpty() && password.length < 4) {
+                            stringResource(R.string.login_pwd_char_count, password.length)
+                        } else {
+                            stringResource(R.string.login_pwd_min_length)
+                        },
                         color = if (password.isNotEmpty() && password.length < 4) MaterialTheme.colorScheme.error else Color.Unspecified
                     )
                 },
@@ -242,11 +250,11 @@ fun LoginScreen(
             Button(
                 onClick = {
                     if (email.isBlank() || !email.contains("@")) {
-                        errorMessage = "Sahi email address darj karein"
+                        errorMessage = errInvalidEmail
                         return@Button
                     }
                     if (password.length < 4) {
-                        errorMessage = "Password kam az kam 4 characters ka hona zaroori hai"
+                        errorMessage = errPwdShort
                         return@Button
                     }
 
@@ -264,7 +272,7 @@ fun LoginScreen(
                         } else {
                             val err = result.exceptionOrNull()?.localizedMessage ?: "Authentication failed"
                             errorMessage = err
-                            Toast.makeText(context, "Login Galti: $err", Toast.LENGTH_LONG).show()
+                            Toast.makeText(context, err, Toast.LENGTH_LONG).show()
                         }
                     }
                 },
@@ -278,7 +286,7 @@ fun LoginScreen(
                     CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
                 } else {
                     Text(
-                        text = if (isRegisterMode) "Account Banayein ✓" else "Login Karein ✓",
+                        text = if (isRegisterMode) stringResource(R.string.login_btn_register) else stringResource(R.string.login_btn_submit),
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp
                     )
@@ -287,7 +295,7 @@ fun LoginScreen(
 
             // Mode Toggle Text
             Text(
-                text = if (isRegisterMode) "Pehle se account hai? Login karein" else "Naya account banayein",
+                text = if (isRegisterMode) stringResource(R.string.login_toggle_login) else stringResource(R.string.login_toggle_register),
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold,
                 fontSize = 14.sp,

@@ -12,10 +12,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mmushtaq04.buysell.R
 import com.mmushtaq04.buysell.ui.theme.BuySellTheme
 
 data class HelpTopic(val title: String, val description: String)
@@ -44,7 +46,7 @@ fun HelpScreen(
             text = { Text(selectedTopic!!.description, fontSize = 16.sp) },
             confirmButton = {
                 TextButton(onClick = { selectedTopic = null }) {
-                    Text("Theek Hai")
+                    Text(stringResource(R.string.action_ok))
                 }
             }
         )
@@ -53,7 +55,7 @@ fun HelpScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Madad / Help Topics", fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(R.string.help_title), fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -69,7 +71,7 @@ fun HelpScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text("Sub se zyada pooche jaane wale sawal:", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.help_frequently_asked), fontSize = 16.sp, fontWeight = FontWeight.Bold)
 
             LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 items(topics) { topic ->

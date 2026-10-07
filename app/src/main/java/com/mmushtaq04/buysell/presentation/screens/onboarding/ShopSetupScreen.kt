@@ -17,11 +17,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mmushtaq04.buysell.R
 import com.mmushtaq04.buysell.ui.theme.BuySellTheme
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
@@ -61,7 +63,7 @@ fun ShopSetupScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Dukan Setup & Joining", fontWeight = FontWeight.Bold) }
+                title = { Text(stringResource(R.string.shop_setup_title_bar), fontWeight = FontWeight.Bold) }
             )
         }
     ) { padding ->
@@ -83,7 +85,7 @@ fun ShopSetupScreen(
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Icon(Icons.Default.Store, contentDescription = null, modifier = Modifier.size(16.dp))
                                 Spacer(modifier = Modifier.width(4.dp))
-                                Text("Owner", fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                                Text(stringResource(R.string.tab_owner), fontWeight = FontWeight.Bold, fontSize = 13.sp)
                             }
                         }
                     )
@@ -94,7 +96,7 @@ fun ShopSetupScreen(
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Icon(Icons.Default.Group, contentDescription = null, modifier = Modifier.size(16.dp))
                                 Spacer(modifier = Modifier.width(4.dp))
-                                Text("Staff", fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                                Text(stringResource(R.string.tab_staff), fontWeight = FontWeight.Bold, fontSize = 13.sp)
                             }
                         }
                     )
@@ -105,7 +107,7 @@ fun ShopSetupScreen(
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Icon(Icons.Default.Visibility, contentDescription = null, modifier = Modifier.size(16.dp))
                                 Spacer(modifier = Modifier.width(4.dp))
-                                Text("Partner", fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                                Text(stringResource(R.string.tab_partner), fontWeight = FontWeight.Bold, fontSize = 13.sp)
                             }
                         }
                     )
@@ -122,15 +124,15 @@ fun ShopSetupScreen(
                         )
                         Spacer(modifier = Modifier.width(10.dp))
                         Column {
-                            Text("Apni Dukan ki Detail Bharein", fontWeight = FontWeight.Bold, fontSize = 17.sp)
-                            Text("Pehli dafa owner shop setup kar raha hai", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(stringResource(R.string.shop_setup_owner_header), fontWeight = FontWeight.Bold, fontSize = 17.sp)
+                            Text(stringResource(R.string.shop_setup_owner_sub), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                     }
 
                     OutlinedTextField(
                         value = userName,
                         onValueChange = { userName = it },
-                        label = { Text("Aap ka Naam / Owner Name *") },
+                        label = { Text(stringResource(R.string.label_owner_name)) },
                         placeholder = { Text("e.g. Muhammad Ali") },
                         leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
                         modifier = Modifier.fillMaxWidth()
@@ -139,7 +141,7 @@ fun ShopSetupScreen(
                     OutlinedTextField(
                         value = shopName,
                         onValueChange = { shopName = it },
-                        label = { Text("Dukan Ka Naam *") },
+                        label = { Text(stringResource(R.string.label_shop_name)) },
                         placeholder = { Text("e.g. Hafeez Center Mobiles") },
                         leadingIcon = { Icon(Icons.Default.Store, contentDescription = null) },
                         modifier = Modifier.fillMaxWidth()
@@ -148,7 +150,7 @@ fun ShopSetupScreen(
                     OutlinedTextField(
                         value = shopPhone,
                         onValueChange = { shopPhone = it },
-                        label = { Text("Dukan Ka Mobile Number *") },
+                        label = { Text(stringResource(R.string.label_shop_phone)) },
                         placeholder = { Text("03001234567") },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                         modifier = Modifier.fillMaxWidth()
@@ -157,14 +159,14 @@ fun ShopSetupScreen(
                     OutlinedTextField(
                         value = shopNumberAddress,
                         onValueChange = { shopNumberAddress = it },
-                        label = { Text("Dukan / Shop Number *") },
+                        label = { Text(stringResource(R.string.label_shop_address)) },
                         placeholder = { Text("e.g. Shop #12, Hafeez Center, Lahore") },
                         modifier = Modifier.fillMaxWidth()
                     )
 
                     HorizontalDivider()
 
-                    Text("Aap ki dukan kin cheezon mein deal karti hai?", fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                    Text(stringResource(R.string.shop_setup_categories_prompt), fontWeight = FontWeight.Bold, fontSize = 15.sp)
 
                     FlowRow(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -200,15 +202,15 @@ fun ShopSetupScreen(
                         )
                         Spacer(modifier = Modifier.width(10.dp))
                         Column {
-                            Text("Staff Member Join Karein", fontWeight = FontWeight.Bold, fontSize = 17.sp)
-                            Text("Dukan ke malik ka bheja hua Staff Code darj karein", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(stringResource(R.string.shop_setup_staff_header), fontWeight = FontWeight.Bold, fontSize = 17.sp)
+                            Text(stringResource(R.string.shop_setup_staff_sub), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                     }
 
                     OutlinedTextField(
                         value = joinUserName,
                         onValueChange = { joinUserName = it },
-                        label = { Text("Aap Ka Naam / Staff Name *") },
+                        label = { Text(stringResource(R.string.label_staff_name)) },
                         placeholder = { Text("e.g. Usman Ahmed") },
                         leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
                         modifier = Modifier.fillMaxWidth()
@@ -217,7 +219,7 @@ fun ShopSetupScreen(
                     OutlinedTextField(
                         value = joinPhone,
                         onValueChange = { joinPhone = it },
-                        label = { Text("Aap Ka Mobile Number *") },
+                        label = { Text(stringResource(R.string.label_mobile_number)) },
                         placeholder = { Text("03129876543") },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                         modifier = Modifier.fillMaxWidth()
@@ -226,10 +228,9 @@ fun ShopSetupScreen(
                     OutlinedTextField(
                         value = inviteCode,
                         onValueChange = { inviteCode = it.uppercase() },
-                        label = { Text("8-Digit Staff Invite Code *") },
+                        label = { Text(stringResource(R.string.label_staff_code)) },
                         placeholder = { Text("e.g. K7M2A9P4") },
                         leadingIcon = { Icon(Icons.Default.Key, contentDescription = null) },
-                        supportingText = { Text("Malik se Staff invite code lein") },
                         modifier = Modifier.fillMaxWidth()
                     )
                 } else {
@@ -243,15 +244,15 @@ fun ShopSetupScreen(
                         )
                         Spacer(modifier = Modifier.width(10.dp))
                         Column {
-                            Text("Sleeping Partner Join Karein", fontWeight = FontWeight.Bold, fontSize = 17.sp)
-                            Text("Sirf dekhne aur dashboard reports ke liye partner code", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(stringResource(R.string.shop_setup_partner_header), fontWeight = FontWeight.Bold, fontSize = 17.sp)
+                            Text(stringResource(R.string.shop_setup_partner_sub), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                     }
 
                     OutlinedTextField(
                         value = joinUserName,
                         onValueChange = { joinUserName = it },
-                        label = { Text("Aap Ka Naam / Partner Name *") },
+                        label = { Text(stringResource(R.string.label_partner_name)) },
                         placeholder = { Text("e.g. Bilal Khan") },
                         leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
                         modifier = Modifier.fillMaxWidth()
@@ -260,7 +261,7 @@ fun ShopSetupScreen(
                     OutlinedTextField(
                         value = joinPhone,
                         onValueChange = { joinPhone = it },
-                        label = { Text("Aap Ka Mobile Number *") },
+                        label = { Text(stringResource(R.string.label_mobile_number)) },
                         placeholder = { Text("03335554433") },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                         modifier = Modifier.fillMaxWidth()
@@ -269,10 +270,9 @@ fun ShopSetupScreen(
                     OutlinedTextField(
                         value = inviteCode,
                         onValueChange = { inviteCode = it.uppercase() },
-                        label = { Text("8-Digit Partner Invite Code *") },
+                        label = { Text(stringResource(R.string.label_partner_code)) },
                         placeholder = { Text("e.g. P8X9R2Q5") },
                         leadingIcon = { Icon(Icons.Default.Key, contentDescription = null) },
-                        supportingText = { Text("Malik se Partner (Sleeping Partner) invite code lein") },
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
@@ -312,9 +312,9 @@ fun ShopSetupScreen(
                     CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
                 } else {
                     val btnLabel = when (selectedTab) {
-                        0 -> "Dukan Banayein & Shuru Karein ✓"
-                        1 -> "Dukan Join Karein (Staff) ✓"
-                        else -> "Dukan Join Karein (Sleeping Partner) ✓"
+                        0 -> stringResource(R.string.btn_create_shop)
+                        1 -> stringResource(R.string.btn_join_staff)
+                        else -> stringResource(R.string.btn_join_partner)
                     }
                     Text(text = btnLabel, fontWeight = FontWeight.Bold, fontSize = 16.sp)
                 }

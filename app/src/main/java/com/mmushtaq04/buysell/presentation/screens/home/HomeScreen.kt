@@ -14,10 +14,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mmushtaq04.buysell.R
 import com.mmushtaq04.buysell.ui.theme.BuySellTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -45,7 +47,7 @@ fun HomeScreen(
                     Column {
                         Text(text = shopName, fontWeight = FontWeight.Bold, fontSize = 18.sp)
                         Text(
-                            text = "Role: $userRole • Cloud par save ✓",
+                            text = stringResource(R.string.home_role_cloud_sync, userRole),
                             fontSize = 12.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -84,8 +86,8 @@ fun HomeScreen(
                         Icon(Icons.Default.Visibility, contentDescription = null, modifier = Modifier.size(28.dp))
                         Spacer(modifier = Modifier.width(10.dp))
                         Column {
-                            Text("Sleeping Partner Mode (View-Only)", fontWeight = FontWeight.Bold, fontSize = 15.sp)
-                            Text("Sirf sales, munafa aur dashboard reports dekh sakte hain", fontSize = 12.sp)
+                            Text(stringResource(R.string.home_partner_banner_title), fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                            Text(stringResource(R.string.home_partner_banner_sub), fontSize = 12.sp)
                         }
                     }
                 }
@@ -107,9 +109,9 @@ fun HomeScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column {
-                        Text(text = "Aaj ki sales", fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(text = stringResource(R.string.home_today_sales), fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Text(
-                            text = if (todaySalesCount > 0) "$todaySalesCount sales • Rs ${todaySalesAmountPaisa / 100}" else "Abhi tak koi sale nahi hui (Rs 0)",
+                            text = if (todaySalesCount > 0) "$todaySalesCount sales • Rs ${todaySalesAmountPaisa / 100}" else "Rs 0",
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
                             color = if (todaySalesCount > 0) Color(0xFF2E7D32) else MaterialTheme.colorScheme.onSurfaceVariant
@@ -148,7 +150,7 @@ fun HomeScreen(
                         Spacer(modifier = Modifier.width(16.dp))
                         Column {
                             Text(
-                                text = "Owner / Partner Dashboard & Reports",
+                                text = stringResource(R.string.dashboard_title),
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 16.sp
                             )
@@ -163,7 +165,7 @@ fun HomeScreen(
             }
 
             Text(
-                text = if (isPartner) "View-Only Sections:" else "Kaya karna chahte hain?",
+                text = if (isPartner) stringResource(R.string.home_view_only_sections) else stringResource(R.string.home_what_to_do),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -174,7 +176,7 @@ fun HomeScreen(
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 ActionCard(
-                    title = "Phone Bechna",
+                    title = stringResource(R.string.action_sell),
                     subtitle = if (isPartner) "Read-Only" else "Farokht",
                     icon = Icons.Default.Sell,
                     backgroundColor = if (isPartner) Color.LightGray.copy(alpha = 0.3f) else Color(0xFFE8F5E9),
@@ -183,7 +185,7 @@ fun HomeScreen(
                     onClick = { if (!isPartner) onNavigateToSell() }
                 )
                 ActionCard(
-                    title = "Phone Khareedna",
+                    title = stringResource(R.string.action_buy),
                     subtitle = if (isPartner) "Read-Only" else "Khareedari",
                     icon = Icons.Default.ShoppingCart,
                     backgroundColor = if (isPartner) Color.LightGray.copy(alpha = 0.3f) else Color(0xFFE3F2FD),
@@ -198,7 +200,7 @@ fun HomeScreen(
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 ActionCard(
-                    title = "Khata / Hisaab",
+                    title = stringResource(R.string.action_khata),
                     subtitle = "Baqi paisay",
                     icon = Icons.Default.MenuBook,
                     backgroundColor = Color(0xFFFFF8E1),
@@ -207,7 +209,7 @@ fun HomeScreen(
                     onClick = onNavigateToParties
                 )
                 ActionCard(
-                    title = "Mera Stock",
+                    title = stringResource(R.string.action_stock),
                     subtitle = "Available phones",
                     icon = Icons.Default.Inventory2,
                     backgroundColor = Color(0xFFF3E5F5),
@@ -244,7 +246,7 @@ fun HomeScreen(
                     Spacer(modifier = Modifier.width(16.dp))
                     Column {
                         Text(
-                            text = "Purana de kar naya (Exchange)",
+                            text = stringResource(R.string.action_exchange),
                             fontWeight = FontWeight.Bold,
                             fontSize = 16.sp,
                             color = if (isPartner) Color.Gray else MaterialTheme.colorScheme.onSecondaryContainer

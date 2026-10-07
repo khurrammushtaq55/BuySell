@@ -19,11 +19,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mmushtaq04.buysell.R
 import com.mmushtaq04.buysell.presentation.screens.sell.SimpleStockItem
 import com.mmushtaq04.buysell.ui.theme.BuySellTheme
 
@@ -100,8 +102,8 @@ fun ExchangeWizardScreen(
             TopAppBar(
                 title = {
                     Column {
-                        Text(text = "Purana De Kar Naya (Exchange)", fontWeight = FontWeight.Bold, fontSize = 17.sp)
-                        Text(text = "Step $step of 3", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(text = stringResource(R.string.exchange_title), fontWeight = FontWeight.Bold, fontSize = 17.sp)
+                        Text(text = stringResource(R.string.buy_step, step, 3), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 },
                 navigationIcon = {
@@ -148,20 +150,20 @@ fun ExchangeWizardScreen(
                         )
                         Spacer(modifier = Modifier.width(10.dp))
                         Column {
-                            Text("Exchange Flow (Dono 1 Flow Mein)", fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                            Text("Purana phone khareed ke stock m jayega, naya bech diya jayega", fontSize = 12.sp)
+                            Text(stringResource(R.string.exchange_explainer_title), fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                            Text(stringResource(R.string.exchange_explainer_sub), fontSize = 12.sp)
                         }
                     }
                 }
 
                 when (step) {
                     1 -> {
-                        Text("1. Shop ka naya phone choose karein (Mandatory *):", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.exchange_step1_header), fontSize = 16.sp, fontWeight = FontWeight.Bold)
 
                         OutlinedTextField(
                             value = searchQuery,
                             onValueChange = { searchQuery = it },
-                            label = { Text("Mera Stock se IMEI ya Model search karein") },
+                            label = { Text(stringResource(R.string.label_search_stock)) },
                             leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -178,7 +180,7 @@ fun ExchangeWizardScreen(
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
-                                    text = "Stock mein koi phone nahi — pehle khareedari record karein",
+                                    text = "Stock mein koi phone nahi",
                                     color = Color.Gray,
                                     fontSize = 14.sp
                                 )
@@ -210,7 +212,7 @@ fun ExchangeWizardScreen(
                         OutlinedTextField(
                             value = newPhonePriceText,
                             onValueChange = { newPhonePriceText = it },
-                            label = { Text("Naye Phone Ki Qeemat / Sale Price (Rs) *") },
+                            label = { Text(stringResource(R.string.label_new_phone_price)) },
                             isError = (newPhonePriceText.toLongOrNull() ?: 0L) <= 0,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             modifier = Modifier.fillMaxWidth()
@@ -218,7 +220,7 @@ fun ExchangeWizardScreen(
                     }
 
                     2 -> {
-                        Text("2. Customer ke purane phone ki detail (Mandatory *):", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.exchange_step2_header), fontSize = 16.sp, fontWeight = FontWeight.Bold)
 
                         Text("Category:", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
                         FlowRow(
@@ -240,7 +242,7 @@ fun ExchangeWizardScreen(
                         }
 
                         if (showDefaultBrandChips) {
-                            Text("Brand select karein:", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                            Text(stringResource(R.string.buy_select_brand), fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
                             FlowRow(
                                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                                 verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -279,8 +281,8 @@ fun ExchangeWizardScreen(
                             },
                             label = {
                                 Text(
-                                    if (showDefaultBrandChips && selectedChip == "Other") "Brand Name (Type manually) *"
-                                    else "Brand Name *"
+                                    if (showDefaultBrandChips && selectedChip == "Other") stringResource(R.string.label_brand_manual)
+                                    else stringResource(R.string.label_brand_name)
                                 )
                             },
                             isError = oldBrand.isBlank(),
@@ -291,7 +293,7 @@ fun ExchangeWizardScreen(
                         OutlinedTextField(
                             value = oldModel,
                             onValueChange = { oldModel = it },
-                            label = { Text("Model Name (e.g. Galaxy A12) *") },
+                            label = { Text(stringResource(R.string.label_item_model_name)) },
                             isError = oldModel.isBlank(),
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -299,7 +301,7 @@ fun ExchangeWizardScreen(
                         OutlinedTextField(
                             value = oldColorText,
                             onValueChange = { oldColorText = it },
-                            label = { Text("Color / Rung (Optional)") },
+                            label = { Text(stringResource(R.string.label_color)) },
                             placeholder = { Text("e.g. Black, Gold, Natural Titanium") },
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -307,23 +309,23 @@ fun ExchangeWizardScreen(
                         OutlinedTextField(
                             value = oldIssueText,
                             onValueChange = { oldIssueText = it },
-                            label = { Text("Kharabi / Fault / Issue (Optional)") },
+                            label = { Text(stringResource(R.string.label_fault_issue)) },
                             placeholder = { Text("e.g. Battery health 80%, Glass crack, None") },
-                            supportingText = { Text("Agar phone mein koi fault hai to yahan likhein") },
+                            supportingText = { Text(stringResource(R.string.sub_fault_issue)) },
                             modifier = Modifier.fillMaxWidth()
                         )
 
                         OutlinedTextField(
                             value = oldImei,
                             onValueChange = { oldImei = it },
-                            label = { Text("IMEI / Serial Number") },
+                            label = { Text(stringResource(R.string.label_imei)) },
                             modifier = Modifier.fillMaxWidth()
                         )
 
                         OutlinedTextField(
                             value = oldPhoneValueText,
                             onValueChange = { oldPhoneValueText = it },
-                            label = { Text("Purane Phone Ki Qeemat / Khareed Price (Rs) *") },
+                            label = { Text(stringResource(R.string.label_old_phone_price)) },
                             isError = (oldPhoneValueText.toLongOrNull() ?: 0L) <= 0,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             modifier = Modifier.fillMaxWidth()
@@ -335,7 +337,7 @@ fun ExchangeWizardScreen(
                         val oldPrice = oldPhoneValueText.toLongOrNull() ?: 0L
                         val netDiff = newPrice - oldPrice
 
-                        Text("3. Cash Balance & Customer Detail (Mandatory *):", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.exchange_step3_header), fontSize = 16.sp, fontWeight = FontWeight.Bold)
 
                         Card(
                             modifier = Modifier.fillMaxWidth(),
@@ -362,7 +364,7 @@ fun ExchangeWizardScreen(
                         OutlinedTextField(
                             value = customerName,
                             onValueChange = { customerName = it },
-                            label = { Text("Customer Ka Naam *") },
+                            label = { Text(stringResource(R.string.label_customer_name)) },
                             isError = customerName.isBlank(),
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -370,7 +372,7 @@ fun ExchangeWizardScreen(
                         OutlinedTextField(
                             value = customerPhone,
                             onValueChange = { customerPhone = it },
-                            label = { Text("Mobile Number *") },
+                            label = { Text(stringResource(R.string.label_mobile_number)) },
                             isError = customerPhone.isBlank(),
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                             modifier = Modifier.fillMaxWidth()
@@ -379,13 +381,13 @@ fun ExchangeWizardScreen(
                         OutlinedTextField(
                             value = cashPaidText,
                             onValueChange = { cashPaidText = it },
-                            label = { Text("Kitne cash diye / liye? (Rs)") },
+                            label = { Text(stringResource(R.string.label_cash_paid)) },
                             placeholder = { Text(kotlin.math.abs(netDiff).toString()) },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             modifier = Modifier.fillMaxWidth()
                         )
 
-                        Text("Mode of Payment:", fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.label_payment_mode), fontSize = 14.sp, fontWeight = FontWeight.Bold)
                         FlowRow(
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                             verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -410,9 +412,9 @@ fun ExchangeWizardScreen(
                             value = currentUserName,
                             onValueChange = {},
                             readOnly = true,
-                            label = { Text("Exchange Record Karne Wala (Logged-in User) *") },
+                            label = { Text(stringResource(R.string.label_recorded_by)) },
                             leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
-                            supportingText = { Text("Aap ka logged-in account name — badla nahi ja sakta") },
+                            supportingText = { Text(stringResource(R.string.sub_readonly_user)) },
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
@@ -463,7 +465,7 @@ fun ExchangeWizardScreen(
                         CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
                     } else {
                         Text(
-                            text = if (step < 3) "Aage Chalein (Next)" else "Exchange Final Karein ✓",
+                            text = if (step < 3) stringResource(R.string.action_next) else stringResource(R.string.btn_save_exchange),
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold
                         )

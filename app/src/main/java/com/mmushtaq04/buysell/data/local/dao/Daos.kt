@@ -81,6 +81,9 @@ interface PartyDao {
     @Query("SELECT * FROM parties WHERE shop_id = :shopId AND deleted_at IS NULL ORDER BY name ASC")
     fun observeParties(shopId: String): Flow<List<PartyEntity>>
 
+    @Query("SELECT * FROM parties WHERE shop_id = :shopId AND deleted_at IS NULL")
+    suspend fun getAllParties(shopId: String): List<PartyEntity>
+
     @Query("""
         SELECT p.id, p.name, p.phone, p.cnic,
           COALESCE((SELECT SUM(
@@ -154,6 +157,9 @@ interface StockItemDao {
     @Query("SELECT * FROM stock_items WHERE shop_id = :shopId AND status = 'IN_STOCK' AND deleted_at IS NULL ORDER BY stocked_at DESC")
     fun observeInStockItems(shopId: String): Flow<List<StockItemEntity>>
 
+    @Query("SELECT * FROM stock_items WHERE shop_id = :shopId AND deleted_at IS NULL")
+    suspend fun getAllStockItems(shopId: String): List<StockItemEntity>
+
     @Query("SELECT * FROM stock_items WHERE shop_id = :shopId AND identifier = :identifier AND status = 'IN_STOCK' AND deleted_at IS NULL LIMIT 1")
     suspend fun findInStockByIdentifier(shopId: String, identifier: String): StockItemEntity?
 
@@ -211,6 +217,9 @@ interface TxnDao {
     @Query("SELECT * FROM txns WHERE shop_id = :shopId AND deleted_at IS NULL ORDER BY txn_date DESC")
     fun observeTxns(shopId: String): Flow<List<TxnEntity>>
 
+    @Query("SELECT * FROM txns WHERE shop_id = :shopId AND deleted_at IS NULL")
+    suspend fun getAllTxns(shopId: String): List<TxnEntity>
+
     @Query("SELECT * FROM txns WHERE shop_id = :shopId AND party_id = :partyId AND deleted_at IS NULL ORDER BY txn_date DESC")
     fun observeTxnsByParty(shopId: String, partyId: String): Flow<List<TxnEntity>>
 
@@ -262,6 +271,9 @@ interface PaymentDao {
 
     @Query("SELECT * FROM payments WHERE shop_id = :shopId AND party_id = :partyId AND deleted_at IS NULL ORDER BY pay_date DESC")
     fun observePaymentsByParty(shopId: String, partyId: String): Flow<List<PaymentEntity>>
+
+    @Query("SELECT * FROM payments WHERE shop_id = :shopId AND deleted_at IS NULL")
+    suspend fun getAllPayments(shopId: String): List<PaymentEntity>
 
     @Query("SELECT * FROM payments WHERE shop_id = :shopId AND txn_id = :txnId AND deleted_at IS NULL ORDER BY pay_date DESC")
     suspend fun getPaymentsByTxn(shopId: String, txnId: String): List<PaymentEntity>

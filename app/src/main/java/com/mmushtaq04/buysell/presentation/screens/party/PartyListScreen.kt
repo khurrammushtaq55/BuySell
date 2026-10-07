@@ -14,10 +14,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mmushtaq04.buysell.R
 import com.mmushtaq04.buysell.ui.theme.BuySellTheme
 
 data class DisplayPartyBalance(
@@ -45,8 +47,8 @@ fun PartyListScreen(
             TopAppBar(
                 title = {
                     Column {
-                        Text("Khata / Hisaab", fontWeight = FontWeight.Bold)
-                        Text("Kaun kitna dena / lena hai", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(stringResource(R.string.action_khata), fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.party_subtitle), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 },
                 navigationIcon = {
@@ -72,7 +74,7 @@ fun PartyListScreen(
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
-                label = { Text("Name ya Mobile number search karein") },
+                label = { Text(stringResource(R.string.party_search_label)) },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                 modifier = Modifier.fillMaxWidth()
             )
@@ -85,7 +87,7 @@ fun PartyListScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "Jab koi baqi paisay honge yahan nazar ayenge",
+                        text = stringResource(R.string.party_empty_msg),
                         fontSize = 15.sp,
                         color = Color.Gray
                     )
@@ -116,13 +118,13 @@ fun PartyListScreen(
                                     val amountRs = party.balance / 100
                                     when {
                                         party.balance > 0 -> {
-                                            Text("Us ne Rs $amountRs denay hain", color = Color(0xFF2E7D32), fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                                            Text(stringResource(R.string.party_owes_shop, amountRs), color = Color(0xFF2E7D32), fontWeight = FontWeight.Bold, fontSize = 14.sp)
                                         }
                                         party.balance < 0 -> {
-                                            Text("Hum ne Rs ${-amountRs} denay hain", color = Color(0xFFC62828), fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                                            Text(stringResource(R.string.party_shop_owes, -amountRs), color = Color(0xFFC62828), fontWeight = FontWeight.Bold, fontSize = 14.sp)
                                         }
                                         else -> {
-                                            Text("Hisaab barabar ✓", color = Color.Gray, fontSize = 14.sp)
+                                            Text(stringResource(R.string.party_settled), color = Color.Gray, fontSize = 14.sp)
                                         }
                                     }
                                 }

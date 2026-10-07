@@ -14,10 +14,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mmushtaq04.buysell.R
 import com.mmushtaq04.buysell.ui.theme.BuySellTheme
 
 data class DisplayStock(
@@ -72,7 +74,7 @@ fun StockListScreen(
             },
             confirmButton = {
                 TextButton(onClick = { selectedStockDetail = null }) {
-                    Text("Band Karein (Close)")
+                    Text(stringResource(R.string.stock_close_dialog))
                 }
             }
         )
@@ -81,7 +83,7 @@ fun StockListScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Mera Stock (${filtered.size})", fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(R.string.stock_title, filtered.size), fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -100,7 +102,7 @@ fun StockListScreen(
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
-                label = { Text("Search by IMEI, Brand, Model, or Color") },
+                label = { Text(stringResource(R.string.stock_search_label)) },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                 modifier = Modifier.fillMaxWidth()
             )
@@ -111,7 +113,7 @@ fun StockListScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "Abhi koi phone stock mein nahi — pehli khareedari add karein",
+                        text = stringResource(R.string.stock_empty_msg),
                         color = Color.Gray,
                         fontSize = 15.sp
                     )
@@ -151,7 +153,7 @@ fun StockListScreen(
                                     color = if (item.remainingQty > 0) Color(0xFFE8F5E9) else Color(0xFFFFEBEE)
                                 ) {
                                     Text(
-                                        text = if (item.remainingQty > 1) "Qty: ${item.remainingQty}" else "In Stock",
+                                        text = if (item.remainingQty > 1) stringResource(R.string.stock_qty_label, item.remainingQty) else stringResource(R.string.stock_in_stock_label),
                                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                                         fontSize = 12.sp,
                                         fontWeight = FontWeight.Bold,

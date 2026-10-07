@@ -12,10 +12,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mmushtaq04.buysell.R
 import com.mmushtaq04.buysell.ui.theme.BuySellTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -44,7 +46,7 @@ fun OwnerDashboardScreen(
                     showHelpDialogTitle = null
                     showHelpDialogMsg = null
                 }) {
-                    Text("Samajh Aa Gaya")
+                    Text(stringResource(R.string.action_confirm))
                 }
             }
         )
@@ -53,7 +55,7 @@ fun OwnerDashboardScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Owner Dashboard & Reports", fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(R.string.dashboard_title), fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -72,8 +74,8 @@ fun OwnerDashboardScreen(
         ) {
             // Card 1: Today Sales
             DashboardMetricCard(
-                title = "Aaj ki sales",
-                value = if (todaySalesCount > 0) "$todaySalesCount sales • Rs $todaySalesTotalRs" else "Abhi tak koi sale nahi hui (Rs 0)",
+                title = stringResource(R.string.home_today_sales),
+                value = if (todaySalesCount > 0) "$todaySalesCount sales • Rs $todaySalesTotalRs" else "Rs 0",
                 valueColor = if (todaySalesCount > 0) Color(0xFF2E7D32) else MaterialTheme.colorScheme.onSurfaceVariant,
                 helpTitle = "Aaj ki sales ka matlab?",
                 helpMsg = "Aaj subah se le kar ab tak jitni bhi mobile sales hui hain un ka kul jor.",
@@ -85,7 +87,7 @@ fun OwnerDashboardScreen(
 
             // Card 2: Monthly Profit
             DashboardMetricCard(
-                title = "Is mahine ka munafa (Net Profit)",
+                title = stringResource(R.string.dashboard_monthly_profit),
                 value = "Rs $monthlyNetProfitRs",
                 valueColor = Color(0xFF1565C0),
                 helpTitle = "Munafa (Profit) kaise banta hai?",
@@ -98,7 +100,7 @@ fun OwnerDashboardScreen(
 
             // Card 3: Capital in Stock
             DashboardMetricCard(
-                title = "Stock mein band paisa (Capital)",
+                title = stringResource(R.string.dashboard_capital_stock),
                 value = "Rs $capitalInStockRs",
                 valueColor = Color(0xFF7B1FA2),
                 helpTitle = "Band paisa kya hai?",
@@ -111,8 +113,8 @@ fun OwnerDashboardScreen(
 
             // Card 4: Slow Stock Warning
             DashboardMetricCard(
-                title = "Slow Stock (30 din se zyada)",
-                value = if (slowStockCount > 0) "$slowStockCount phones abhi tak nahi bechay" else "Koi slow stock nahi ✓",
+                title = stringResource(R.string.dashboard_slow_stock),
+                value = if (slowStockCount > 0) "$slowStockCount phones" else "0",
                 valueColor = if (slowStockCount > 0) Color(0xFFD32F2F) else Color(0xFF2E7D32),
                 helpTitle = "Slow Stock kya hai?",
                 helpMsg = "Jo mobile phones 30 din se zyada shop mein paday hain aur bechay nahi gaye.",

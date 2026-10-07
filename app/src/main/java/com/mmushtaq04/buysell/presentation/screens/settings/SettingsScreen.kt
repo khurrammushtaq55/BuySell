@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -31,6 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.firebase.firestore.FirebaseFirestore
+import com.mmushtaq04.buysell.R
 import com.mmushtaq04.buysell.data.local.entity.CategoryEntity
 import com.mmushtaq04.buysell.domain.InviteManager
 import com.mmushtaq04.buysell.ui.theme.BuySellTheme
@@ -259,7 +261,7 @@ fun SettingsScreen(
                     }
                 } else {
                     TextButton(onClick = { showPinDialog = false }) {
-                        Text("Cancel")
+                        Text(stringResource(R.string.action_cancel))
                     }
                 }
             }
@@ -269,8 +271,8 @@ fun SettingsScreen(
     if (showSignOutDialog) {
         AlertDialog(
             onDismissRequest = { showSignOutDialog = false },
-            title = { Text("Sign Out Karein?", fontWeight = FontWeight.Bold) },
-            text = { Text("Kaya aap apni dukan ke account se logout karna chahte hain?", fontSize = 15.sp) },
+            title = { Text(stringResource(R.string.settings_signout_dialog_title), fontWeight = FontWeight.Bold) },
+            text = { Text(stringResource(R.string.settings_signout_dialog_msg), fontSize = 15.sp) },
             confirmButton = {
                 Button(
                     onClick = {
@@ -279,12 +281,12 @@ fun SettingsScreen(
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                 ) {
-                    Text("Logout Karein")
+                    Text(stringResource(R.string.settings_btn_signout))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showSignOutDialog = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.action_cancel))
                 }
             }
         )
@@ -293,7 +295,7 @@ fun SettingsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Settings & Preferences", fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(R.string.settings_title), fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -317,14 +319,14 @@ fun SettingsScreen(
         ) {
             // CARD 1: Store Profile Section
             SettingsSectionCard(
-                title = "Store Profile (Dukan Details)",
+                title = stringResource(R.string.settings_section_store),
                 icon = Icons.Default.Store
             ) {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     OutlinedTextField(
                         value = editableShopName,
                         onValueChange = { editableShopName = it },
-                        label = { Text("Dukan Ka Naam") },
+                        label = { Text(stringResource(R.string.label_shop_name)) },
                         readOnly = !isOwner,
                         leadingIcon = { Icon(Icons.Default.Storefront, contentDescription = null) },
                         modifier = Modifier.fillMaxWidth()
@@ -333,7 +335,7 @@ fun SettingsScreen(
                     OutlinedTextField(
                         value = editableShopPhone,
                         onValueChange = { editableShopPhone = it },
-                        label = { Text("Mobile Number") },
+                        label = { Text(stringResource(R.string.label_shop_phone)) },
                         readOnly = !isOwner,
                         leadingIcon = { Icon(Icons.Default.Phone, contentDescription = null) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
@@ -343,7 +345,7 @@ fun SettingsScreen(
                     OutlinedTextField(
                         value = editableShopAddress,
                         onValueChange = { editableShopAddress = it },
-                        label = { Text("Shop Address") },
+                        label = { Text(stringResource(R.string.label_shop_address)) },
                         readOnly = !isOwner,
                         leadingIcon = { Icon(Icons.Default.LocationOn, contentDescription = null) },
                         modifier = Modifier.fillMaxWidth()
@@ -366,7 +368,7 @@ fun SettingsScreen(
                             enabled = editableShopName.isNotBlank() && !isSavingShopProfile,
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text("Save Shop Profile ✓", fontWeight = FontWeight.Bold)
+                            Text(stringResource(R.string.action_save), fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -374,11 +376,11 @@ fun SettingsScreen(
 
             // CARD 2: Language & Preferences Section
             SettingsSectionCard(
-                title = "Language & Display (Zaban Aur Preferences)",
+                title = stringResource(R.string.settings_section_lang),
                 icon = Icons.Default.Translate
             ) {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Text("App Language (Aap ki Zaban):", fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+                    Text(stringResource(R.string.settings_app_language), fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
 
                     Box {
                         OutlinedTextField(
@@ -426,8 +428,8 @@ fun SettingsScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Column(modifier = Modifier.weight(1f)) {
-                            Text("Show Buy Price in Sell Wizard", fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                            Text("Sale karte waqt khareed price eye icon par dikhayein", fontSize = 12.sp, color = Color.Gray)
+                            Text(stringResource(R.string.settings_show_buy_price), fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                            Text(stringResource(R.string.settings_show_buy_price_sub), fontSize = 12.sp, color = Color.Gray)
                         }
                         Switch(
                             checked = showBuyCostInSell,
@@ -442,7 +444,7 @@ fun SettingsScreen(
 
                     SettingClickableRow(
                         icon = Icons.AutoMirrored.Filled.HelpOutline,
-                        title = "Madad / App Guide (In-App Help)",
+                        title = stringResource(R.string.help_title),
                         subtitle = "App istemal karne ke aasan tareeqay aur hidayat dekhein"
                     ) {
                         onNavigateToHelp()
@@ -452,14 +454,14 @@ fun SettingsScreen(
 
             // CARD 3: Team Management & Categories Section
             SettingsSectionCard(
-                title = "Team & Trading Categories",
+                title = stringResource(R.string.settings_section_team),
                 icon = Icons.Default.Group
             ) {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     if (isOwner) {
                         SettingClickableRow(
                             icon = Icons.Default.GroupAdd,
-                            title = "Staff / Partner Join Code",
+                            title = stringResource(R.string.settings_team_code),
                             subtitle = "Staff ya Sleeping Partner ko join karwane ke liye code banayein"
                         ) {
                             showTeamDialog = true
@@ -494,7 +496,7 @@ fun SettingsScreen(
 
             // CARD 4: Receipt & Stock Rules
             SettingsSectionCard(
-                title = "Receipt & Stock Rules",
+                title = stringResource(R.string.settings_section_receipt),
                 icon = Icons.AutoMirrored.Filled.ReceiptLong
             ) {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -517,13 +519,13 @@ fun SettingsScreen(
 
             // CARD 5: Security & Account Section
             SettingsSectionCard(
-                title = "Security & Account",
+                title = stringResource(R.string.settings_section_security),
                 icon = Icons.Default.Security
             ) {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     SettingClickableRow(
                         icon = Icons.Default.Lock,
-                        title = "App PIN Lock",
+                        title = stringResource(R.string.settings_app_pin),
                         subtitle = if (isPinActive) "4-Digit PIN Active ✓" else "Set 4-digit PIN for cold start"
                     ) {
                         showPinDialog = true
@@ -539,7 +541,7 @@ fun SettingsScreen(
 
                     SettingClickableRow(
                         icon = Icons.AutoMirrored.Filled.Logout,
-                        title = "Sign Out",
+                        title = stringResource(R.string.settings_sign_out),
                         subtitle = "Logout active session"
                     ) {
                         showSignOutDialog = true
