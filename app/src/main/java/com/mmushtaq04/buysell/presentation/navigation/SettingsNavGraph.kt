@@ -23,13 +23,14 @@ fun NavGraphBuilder.settingsNavGraph(
     composable(NavRoutes.Settings.route) {
         val settingsViewModel: SettingsViewModel = viewModel()
         val shopEntity by settingsViewModel.primaryShop.collectAsState()
+        val categories by settingsViewModel.categories.collectAsState()
 
         SettingsScreen(
             userRole = registeredUserRole,
             shopName = shopEntity?.name ?: "Mera Buy/Sell Store",
             shopPhone = shopEntity?.phone ?: "",
             shopAddress = shopEntity?.address ?: "",
-            allCategories = allCategories,
+            allCategories = categories,
             onUpdateShopProfile = { newName, newPhone, newAddress ->
                 settingsViewModel.updateShopProfile(
                     name = newName,

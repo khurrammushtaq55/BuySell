@@ -22,34 +22,33 @@ class CategoryViewModel(application: Application) : AndroidViewModel(application
     val allCategories: StateFlow<List<CategoryEntity>> = _allCategories.asStateFlow()
 
     init {
-        initAndObserveCategories()
+        observeCategories()
     }
 
-    private fun initAndObserveCategories() {
+    private fun observeCategories() {
         viewModelScope.launch {
-            val meta = db.appMetaDao().getAppMeta()
-            val activeShopId = meta?.activeShopId ?: "default_shop"
+            db.appMetaDao().observeAppMeta().collect { meta ->
+                val activeShopId = meta?.activeShopId ?: "default_shop"
 
-            // Check if categories exist in DB, if not initialize from CategoryPresets
-            val existing = db.categoryDao().getCategories(activeShopId)
-            if (existing.isEmpty()) {
-                val presets = CategoryPresets.getPresetCategories(activeShopId)
-                db.categoryDao().insertCategories(presets)
-            }
+                val existing = db.categoryDao().getCategories(activeShopId)
+                if (existing.isEmpty()) {
+                    val presets = CategoryPresets.getPresetCategories(activeShopId)
+                    db.categoryDao().insertCategories(presets)
+                }
 
-            // Observe enabled categories for BuyWizard
-            db.categoryDao().observeCategories(activeShopId).collect { enabledList ->
-                _enabledCategories.value = enabledList
+                db.categoryDao().observeCategories(activeShopId).collect { enabledList ->
+                    _enabledCategories.value = enabledList
+                }
             }
         }
 
         viewModelScope.launch {
-            val meta = db.appMetaDao().getAppMeta()
-            val activeShopId = meta?.activeShopId ?: "default_shop"
+            db.appMetaDao().observeAppMeta().collect { meta ->
+                val activeShopId = meta?.activeShopId ?: "default_shop"
 
-            // Observe all categories for SettingsScreen management
-            db.categoryDao().observeAllCategories(activeShopId).collect { allList ->
-                _allCategories.value = allList
+                db.categoryDao().observeAllCategories(activeShopId).collect { allList ->
+                    _allCategories.value = allList
+                }
             }
         }
     }

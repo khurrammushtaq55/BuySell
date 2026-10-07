@@ -17,8 +17,8 @@
     <string name="login_err_pwd_short">Password kam az kam 4 characters ka hona zaroori hai</string>
 
     <!-- General Actions -->
-    <string name="action_buy">Phone Khareedna</string>
-    <string name="action_sell">Phone Bechna</string>
+    <string name="action_buy">Saman Khareedna</string>
+    <string name="action_sell">Saman Bechna</string>
     <string name="action_khata">Khata / Hisaab</string>
     <string name="action_stock">Mera Stock</string>
     <string name="action_exchange">Purana De Kar Naya (Exchange)</string>
@@ -64,7 +64,7 @@
     <string name="btn_join_partner">Dukan Join Karein (Sleeping Partner) ✓</string>
 
     <!-- Buy Wizard -->
-    <string name="buy_title">Phone Khareedna</string>
+    <string name="buy_title">Saman Khareedna</string>
     <string name="buy_step">Step %1$d of %2$d</string>
     <string name="label_seller_name">Seller Ka Naam *</string>
     <string name="label_mobile_number">Mobile Number *</string>
@@ -81,8 +81,12 @@
     <string name="label_brand_manual">Brand Name (Type manually) *</string>
     <string name="label_item_model_name">Model Name / Item Name *</string>
     <string name="label_color">Color / Rung (Optional)</string>
+    <string name="label_ram">RAM / Memory (Optional)</string>
+    <string name="label_storage">Storage Capacity / Variant (Optional)</string>
+    <string name="label_specs">Extra Specs / Details (Optional)</string>
+    <string name="sub_specs_hint">Laptop: Core i7 16GB/512GB, Console: PS5 Disc, Watch: 44mm</string>
     <string name="label_fault_issue">Kharabi / Fault / Issue (Optional)</string>
-    <string name="sub_fault_issue">Agar phone mein koi fault hai to yahan likhein</string>
+    <string name="sub_fault_issue">Agar item mein koi fault hai to yahan likhein</string>
     <string name="sub_imei">15 digit IMEI or Serial number</string>
     <string name="buy_seller_info_header">Bechne wale ki maloomat (Seller - Mandatory *):</string>
     <string name="sub_cnic">13 digits, dashto ke baghair bhi chalega</string>
@@ -92,18 +96,18 @@
     <string name="sub_readonly_user">Aap ka logged-in account name — badla nahi ja sakta</string>
 
     <!-- Sell Wizard -->
-    <string name="sell_title">Phone Bechna</string>
+    <string name="sell_title">Saman Bechna</string>
     <string name="label_buyer_name">Buyer Ka Naam *</string>
     <string name="label_sale_price">Bechnay ki qeemat (Rs) *</string>
     <string name="label_buy_price">Khareed Qeemat (Buy Price): </string>
     <string name="btn_save_sale">Sale Record Karein ✓</string>
-    <string name="sell_select_stock">Stock se phone choose karein *:</string>
+    <string name="sell_select_stock">Stock se item choose karein *:</string>
     <string name="sell_buyer_info_header">Gahak (Buyer) ki detail (Mandatory fields *):</string>
 
     <!-- Stock List Screen -->
     <string name="stock_title">Mera Stock (%1$d)</string>
-    <string name="stock_search_label">Search by IMEI, Brand, Model, or Color</string>
-    <string name="stock_empty_msg">Abhi koi phone stock mein nahi — pehli khareedari add karein</string>
+    <string name="stock_search_label">Search by IMEI, Brand, Model, Specs, or Color</string>
+    <string name="stock_empty_msg">Abhi koi item stock mein nahi — pehli khareedari add karein</string>
     <string name="stock_close_dialog">Band Karein (Close)</string>
     <string name="stock_qty_label">Qty: %1$d</string>
     <string name="stock_in_stock_label">In Stock</string>
@@ -111,14 +115,14 @@
     <!-- Exchange Wizard -->
     <string name="exchange_title">Purana De Kar Naya (Exchange)</string>
     <string name="exchange_explainer_title">Exchange Flow (Dono 1 Flow Mein)</string>
-    <string name="exchange_explainer_sub">Purana phone khareed ke stock m jayega, naya bech diya jayega</string>
+    <string name="exchange_explainer_sub">Purana item khareed ke stock m jayega, naya bech diya jayega</string>
     <string name="btn_save_exchange">Exchange Final Karein ✓</string>
-    <string name="exchange_step1_header">1. Shop ka naya phone choose karein (Mandatory *):</string>
-    <string name="exchange_step2_header">2. Customer ke purane phone ki detail (Mandatory *):</string>
+    <string name="exchange_step1_header">1. Shop ka naya item choose karein (Mandatory *):</string>
+    <string name="exchange_step2_header">2. Customer ke purane item ki detail (Mandatory *):</string>
     <string name="exchange_step3_header">3. Cash Balance &amp; Customer Detail (Mandatory *):</string>
     <string name="label_search_stock">Mera Stock se IMEI ya Model search karein</string>
-    <string name="label_new_phone_price">Naye Phone Ki Qeemat / Sale Price (Rs) *</string>
-    <string name="label_old_phone_price">Purane Phone Ki Qeemat / Khareed Price (Rs) *</string>
+    <string name="label_new_phone_price">Naye Item Ki Qeemat / Sale Price (Rs) *</string>
+    <string name="label_old_phone_price">Purane Item Ki Qeemat / Khareed Price (Rs) *</string>
     <string name="label_customer_name">Customer Ka Naam *</string>
     <string name="label_cash_paid">Kitne cash diye / liye? (Rs)</string>
 

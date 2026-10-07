@@ -71,6 +71,13 @@ fun SellWizardScreen(
 
     val methods = listOf("Cash", "Easypaisa", "JazzCash", "Bank Transfer", "Other")
 
+    // Automatically prefill receivedAmountText with salePriceText
+    LaunchedEffect(step, salePriceText) {
+        if (salePriceText.isNotBlank() && (receivedAmountText.isBlank() || (step == 3 && receivedAmountText.isBlank()))) {
+            receivedAmountText = salePriceText
+        }
+    }
+
     val isStepValid = when (step) {
         1 -> selectedItem != null
         2 -> buyerName.isNotBlank() && buyerPhone.isNotBlank() && (salePriceText.toLongOrNull() ?: 0L) > 0
@@ -239,7 +246,13 @@ fun SellWizardScreen(
 
                         OutlinedTextField(
                             value = salePriceText,
-                            onValueChange = { salePriceText = it },
+                            onValueChange = { newPrice ->
+                                val oldPrice = salePriceText
+                                salePriceText = newPrice
+                                if (receivedAmountText.isBlank() || receivedAmountText == oldPrice) {
+                                    receivedAmountText = newPrice
+                                }
+                            },
                             label = { Text(stringResource(R.string.label_sale_price)) },
                             isError = (salePriceText.toLongOrNull() ?: 0L) <= 0,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),

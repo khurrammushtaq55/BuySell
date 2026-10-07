@@ -34,6 +34,7 @@ import com.mmushtaq04.buysell.ui.theme.BuySellTheme
 fun ExchangeWizardScreen(
     stockList: List<SimpleStockItem> = emptyList(),
     currentUserName: String = "Malik / Staff",
+    enabledCategories: List<String> = emptyList(),
     onNavigateBack: () -> Unit = {},
     onSaveExchange: (
         soldStockItemId: String,
@@ -44,29 +45,39 @@ fun ExchangeWizardScreen(
         oldImei: String,
         oldColor: String,
         oldIssue: String,
+        oldRam: String,
+        oldStorage: String,
+        oldSpecs: String,
         oldPhoneValueRs: Long,
         customerName: String,
         customerPhone: String,
         recordedBy: String,
         cashPaidRs: Long,
         paymentMethodStr: String
-    ) -> Unit = { _, _, _, _, _, _, _, _, _, _, _, _, _, _ -> },
+    ) -> Unit = { _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _ -> },
     onSaveSuccess: () -> Unit = {}
 ) {
     var step by remember { mutableIntStateOf(1) }
 
-    // Step 1: Shop's New Phone
+    val activeCategories = enabledCategories.ifEmpty {
+        listOf("Mobile", "Tablet / iPad", "Laptop", "Console", "Smartwatch", "Earbuds", "Accessories")
+    }
+
+    // Step 1: Shop's New Device
     var selectedItem by remember { mutableStateOf<SimpleStockItem?>(null) }
     var searchQuery by remember { mutableStateOf("") }
     var newPhonePriceText by remember { mutableStateOf("") }
 
-    // Step 2: Customer's Old Phone
-    var oldCategory by remember { mutableStateOf("Mobile") }
+    // Step 2: Customer's Old Trade-In Device
+    var oldCategory by remember { mutableStateOf(activeCategories.firstOrNull() ?: "Mobile") }
     var oldBrand by remember { mutableStateOf("") }
     var oldModel by remember { mutableStateOf("") }
     var oldImei by remember { mutableStateOf("") }
     var oldColorText by remember { mutableStateOf("") }
     var oldIssueText by remember { mutableStateOf("") }
+    var oldRamText by remember { mutableStateOf("") }
+    var oldStorageText by remember { mutableStateOf("") }
+    var oldSpecsText by remember { mutableStateOf("") }
     var oldPhoneValueText by remember { mutableStateOf("") }
 
     // Step 3: Customer & Payment
@@ -77,35 +88,35 @@ fun ExchangeWizardScreen(
     var isSaving by remember { mutableStateOf(false) }
 
     val methods = listOf("Cash", "Easypaisa", "JazzCash", "Bank Transfer", "Other")
-    val presetCategories = listOf("Mobile", "Tablet / iPad", "Laptop", "Console", "Smartwatch", "Earbuds", "Accessories")
 
-    val showDefaultBrandChips = oldCategory.contains("Mobile", ignoreCase = true) ||
-            oldCategory.contains("Phone", ignoreCase = true) ||
-            oldCategory.contains("Tablet", ignoreCase = true) ||
-            oldCategory.contains("iPad", ignoreCase = true)
+    val allPresetBrands = listOf("Apple", "Samsung", "Xiaomi", "Vivo", "Oppo", "Realme", "Infinix", "Techno")
+    val showDefaultBrandChips = oldCategory.equals("Mobile", ignoreCase = true) || oldCategory.equals("Tablet / iPad", ignoreCase = true)
+    var selectedChip by remember { mutableStateOf<String?>(null) }
 
-    val topBrands = listOf("Apple", "Samsung", "Xiaomi", "Vivo", "Google", "OnePlus")
-    val otherBrands = listOf("Oppo", "Realme", "Infinix", "Tecno", "Motorola", "Nokia", "Huawei")
-    val allPresetBrands = topBrands + otherBrands
+    val presetRamList = listOf("4GB", "6GB", "8GB", "12GB", "16GB", "32GB")
+    val presetStorageList = listOf("64GB", "128GB", "256GB", "512GB", "1TB")
 
-    var selectedChip by remember { mutableStateOf(if (oldBrand in allPresetBrands) oldBrand else if (oldBrand.isNotBlank()) "Other" else "") }
+    val filteredStock = stockList.filter {
+        it.title.contains(searchQuery, ignoreCase = true) || it.imei.contains(searchQuery, ignoreCase = true)
+    }
 
-    val isStepValid = when (step) {
-        1 -> selectedItem != null && (newPhonePriceText.toLongOrNull() ?: 0L) > 0
-        2 -> oldBrand.isNotBlank() && oldModel.isNotBlank() && (oldPhoneValueText.toLongOrNull() ?: 0L) > 0
-        3 -> customerName.isNotBlank() && customerPhone.isNotBlank() && !isSaving
-        else -> false
+    // Automatically prefill cashPaidText with net cash difference in Step 3
+    val newPriceVal = newPhonePriceText.toLongOrNull() ?: 0L
+    val oldPriceVal = oldPhoneValueText.toLongOrNull() ?: 0L
+    val netDiffVal = (newPriceVal - oldPriceVal).coerceAtLeast(0L)
+
+    LaunchedEffect(step, newPhonePriceText, oldPhoneValueText) {
+        if (step == 3 && (cashPaidText.isBlank() || cashPaidText == "0")) {
+            if (netDiffVal > 0) {
+                cashPaidText = netDiffVal.toString()
+            }
+        }
     }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = {
-                    Column {
-                        Text(text = stringResource(R.string.exchange_title), fontWeight = FontWeight.Bold, fontSize = 17.sp)
-                        Text(text = stringResource(R.string.buy_step, step, 3), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    }
-                },
+                title = { Text("Exchange / Trade-in Wizard (Step $step/3)", fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = {
                         if (step > 1) step-- else onNavigateBack()
@@ -120,115 +131,92 @@ fun ExchangeWizardScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .verticalScroll(rememberScrollState())
                 .padding(16.dp),
-            verticalArrangement = Arrangement.SpaceBetween
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                LinearProgressIndicator(
-                    progress = { step / 3f },
-                    modifier = Modifier.fillMaxWidth().height(8.dp),
-                    color = MaterialTheme.colorScheme.primary
-                )
+            when (step) {
+                1 -> {
+                    // Step 1: Select new item from stock
+                    Text("1. Dukan se bechnay wala item chunay:", fontSize = 16.sp, fontWeight = FontWeight.Bold)
 
-                // Explainer Card
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
-                ) {
-                    Row(
-                        modifier = Modifier.padding(12.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                    OutlinedTextField(
+                        value = searchQuery,
+                        onValueChange = { searchQuery = it },
+                        label = { Text("Model ya IMEI se talash karein") },
+                        leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    LazyColumn(
+                        modifier = Modifier.weight(1f),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Icon(
-                            Icons.Default.SwapHoriz,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(32.dp)
-                        )
-                        Spacer(modifier = Modifier.width(10.dp))
-                        Column {
-                            Text(stringResource(R.string.exchange_explainer_title), fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                            Text(stringResource(R.string.exchange_explainer_sub), fontSize = 12.sp)
-                        }
-                    }
-                }
-
-                when (step) {
-                    1 -> {
-                        Text(stringResource(R.string.exchange_step1_header), fontSize = 16.sp, fontWeight = FontWeight.Bold)
-
-                        OutlinedTextField(
-                            value = searchQuery,
-                            onValueChange = { searchQuery = it },
-                            label = { Text(stringResource(R.string.label_search_stock)) },
-                            leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
-                            modifier = Modifier.fillMaxWidth()
-                        )
-
-                        val filtered = stockList.filter {
-                            it.title.contains(searchQuery, ignoreCase = true) || it.imei.contains(searchQuery)
-                        }
-
-                        if (filtered.isEmpty()) {
-                            Box(
+                        items(filteredStock) { item ->
+                            val isSelected = selectedItem?.id == item.id
+                            Card(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(vertical = 24.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = "Stock mein koi phone nahi",
-                                    color = Color.Gray,
-                                    fontSize = 14.sp
+                                    .clickable { selectedItem = item },
+                                shape = RoundedCornerShape(12.dp),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant
                                 )
-                            }
-                        } else {
-                            LazyColumn(
-                                modifier = Modifier.height(200.dp),
-                                verticalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-                                items(filtered) { item ->
-                                    val isSelected = selectedItem?.id == item.id
-                                    Card(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .clickable { selectedItem = item },
-                                        colors = CardDefaults.cardColors(
-                                            containerColor = if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant
-                                        )
-                                    ) {
-                                        Column(modifier = Modifier.padding(12.dp)) {
-                                            Text(item.title, fontWeight = FontWeight.Bold, fontSize = 15.sp)
-                                            Text("IMEI: ${item.imei}", fontSize = 12.sp, color = Color.Gray)
-                                        }
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Column {
+                                        Text(item.title, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                                        Text("IMEI: ${item.imei}", fontSize = 12.sp, color = Color.Gray)
+                                    }
+                                    if (isSelected) {
+                                        Icon(Icons.Default.CheckCircle, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                                     }
                                 }
                             }
                         }
+                    }
 
+                    if (selectedItem != null) {
                         OutlinedTextField(
                             value = newPhonePriceText,
                             onValueChange = { newPhonePriceText = it },
-                            label = { Text(stringResource(R.string.label_new_phone_price)) },
-                            isError = (newPhonePriceText.toLongOrNull() ?: 0L) <= 0,
+                            label = { Text("Naye Item ki Sale Price (Rs)") },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
 
-                    2 -> {
-                        Text(stringResource(R.string.exchange_step2_header), fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                    Button(
+                        onClick = { step = 2 },
+                        enabled = selectedItem != null && newPhonePriceText.isNotBlank(),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Agla Step (Purane Item ki Details)")
+                    }
+                }
 
-                        Text("Category:", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                2 -> {
+                    // Step 2: Customer's old device details
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .verticalScroll(rememberScrollState()),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Text("2. Grahak ka purana item jo lena hai:", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+
+                        Text("Select Category:", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
                         FlowRow(
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                             verticalArrangement = Arrangement.spacedBy(8.dp),
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            presetCategories.forEach { cat ->
+                            activeCategories.forEach { cat ->
                                 val isSelected = cat == oldCategory
                                 FilterChip(
                                     selected = isSelected,
@@ -279,22 +267,62 @@ fun ExchangeWizardScreen(
                                     selectedChip = "Other"
                                 }
                             },
-                            label = {
-                                Text(
-                                    if (showDefaultBrandChips && selectedChip == "Other") stringResource(R.string.label_brand_manual)
-                                    else stringResource(R.string.label_brand_name)
-                                )
-                            },
+                            label = { Text(stringResource(R.string.label_brand_name)) },
                             isError = oldBrand.isBlank(),
-                            placeholder = { Text("e.g. Samsung, Apple, Sony, Dell, etc.") },
                             modifier = Modifier.fillMaxWidth()
                         )
 
                         OutlinedTextField(
                             value = oldModel,
                             onValueChange = { oldModel = it },
-                            label = { Text(stringResource(R.string.label_item_model_name)) },
-                            isError = oldModel.isBlank(),
+                            label = { Text("Model Name / Variant") },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+
+                        // Memory / RAM Selection
+                        Text(stringResource(R.string.label_ram), fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                        FlowRow(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            presetRamList.forEach { r ->
+                                val isSelected = r == oldRamText
+                                FilterChip(
+                                    selected = isSelected,
+                                    onClick = { oldRamText = if (isSelected) "" else r },
+                                    label = { Text(r, fontSize = 12.sp) },
+                                    leadingIcon = if (isSelected) {
+                                        { Icon(Icons.Default.CheckCircle, contentDescription = null, modifier = Modifier.size(14.dp)) }
+                                    } else null
+                                )
+                            }
+                        }
+
+                        // Storage / Capacity Selection
+                        Text(stringResource(R.string.label_storage), fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                        FlowRow(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            presetStorageList.forEach { s ->
+                                val isSelected = s == oldStorageText
+                                FilterChip(
+                                    selected = isSelected,
+                                    onClick = { oldStorageText = if (isSelected) "" else s },
+                                    label = { Text(s, fontSize = 12.sp) },
+                                    leadingIcon = if (isSelected) {
+                                        { Icon(Icons.Default.CheckCircle, contentDescription = null, modifier = Modifier.size(14.dp)) }
+                                    } else null
+                                )
+                            }
+                        }
+
+                        OutlinedTextField(
+                            value = oldImei,
+                            onValueChange = { oldImei = it },
+                            label = { Text("IMEI / Serial Number") },
                             modifier = Modifier.fillMaxWidth()
                         )
 
@@ -302,78 +330,88 @@ fun ExchangeWizardScreen(
                             value = oldColorText,
                             onValueChange = { oldColorText = it },
                             label = { Text(stringResource(R.string.label_color)) },
-                            placeholder = { Text("e.g. Black, Gold, Natural Titanium") },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+
+                        OutlinedTextField(
+                            value = oldSpecsText,
+                            onValueChange = { oldSpecsText = it },
+                            label = { Text(stringResource(R.string.label_specs)) },
+                            supportingText = { Text(stringResource(R.string.sub_specs_hint)) },
                             modifier = Modifier.fillMaxWidth()
                         )
 
                         OutlinedTextField(
                             value = oldIssueText,
                             onValueChange = { oldIssueText = it },
-                            label = { Text(stringResource(R.string.label_fault_issue)) },
-                            placeholder = { Text("e.g. Battery health 80%, Glass crack, None") },
-                            supportingText = { Text(stringResource(R.string.sub_fault_issue)) },
-                            modifier = Modifier.fillMaxWidth()
-                        )
-
-                        OutlinedTextField(
-                            value = oldImei,
-                            onValueChange = { oldImei = it },
-                            label = { Text(stringResource(R.string.label_imei)) },
+                            label = { Text("Defects / Issue (if any)") },
+                            supportingText = { Text("e.g. Screen glass cracked, Face ID not working") },
                             modifier = Modifier.fillMaxWidth()
                         )
 
                         OutlinedTextField(
                             value = oldPhoneValueText,
                             onValueChange = { oldPhoneValueText = it },
-                            label = { Text(stringResource(R.string.label_old_phone_price)) },
-                            isError = (oldPhoneValueText.toLongOrNull() ?: 0L) <= 0,
+                            label = { Text("Purane Item ki Lagayei Gayi Qeemat (Rs)") },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
 
-                    3 -> {
-                        val newPrice = newPhonePriceText.toLongOrNull() ?: 0L
-                        val oldPrice = oldPhoneValueText.toLongOrNull() ?: 0L
-                        val netDiff = newPrice - oldPrice
+                    Button(
+                        onClick = { step = 3 },
+                        enabled = oldCategory.isNotBlank() && oldPhoneValueText.isNotBlank(),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Agla Step (Customer & Hisab)")
+                    }
+                }
 
-                        Text(stringResource(R.string.exchange_step3_header), fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                3 -> {
+                    // Step 3: Customer Info & Cash Difference
+                    val newPrice = newPhonePriceText.toLongOrNull() ?: 0L
+                    val oldVal = oldPhoneValueText.toLongOrNull() ?: 0L
+                    val diff = newPrice - oldVal
+
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .verticalScroll(rememberScrollState()),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Text("3. Exchange Hisab Kitab:", fontSize = 16.sp, fontWeight = FontWeight.Bold)
 
                         Card(
                             modifier = Modifier.fillMaxWidth(),
-                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
                         ) {
-                            Column(modifier = Modifier.padding(16.dp)) {
-                                Text("Naya Phone Sale Price: Rs $newPrice", fontWeight = FontWeight.Bold, fontSize = 15.sp)
-                                Text("Purana Phone Buy Price: Rs $oldPrice", fontWeight = FontWeight.Bold, fontSize = 15.sp)
-                                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                                when {
-                                    netDiff > 0 -> {
-                                        Text("Customer Rs $netDiff cash dega", color = Color(0xFF2E7D32), fontWeight = FontWeight.Bold, fontSize = 17.sp)
-                                    }
-                                    netDiff < 0 -> {
-                                        Text("Shop customer ko Rs ${-netDiff} cash degi", color = Color(0xFFD32F2F), fontWeight = FontWeight.Bold, fontSize = 17.sp)
-                                    }
-                                    else -> {
-                                        Text("Hisaab Barabar (0 cash difference) ✓", color = Color.Gray, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                                    }
-                                }
+                            Column(
+                                modifier = Modifier.padding(16.dp),
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Text("Naye Item Price: Rs $newPrice", fontWeight = FontWeight.SemiBold)
+                                Text("Purane Item Value: Rs $oldVal", fontWeight = FontWeight.SemiBold)
+                                HorizontalDivider()
+                                Text(
+                                    text = if (diff >= 0) "Grahak ne dene hain: Rs $diff" else "Shop ne dene hain: Rs ${-diff}",
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 18.sp,
+                                    color = if (diff >= 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+                                )
                             }
                         }
 
                         OutlinedTextField(
                             value = customerName,
                             onValueChange = { customerName = it },
-                            label = { Text(stringResource(R.string.label_customer_name)) },
-                            isError = customerName.isBlank(),
+                            label = { Text("Customer Name") },
                             modifier = Modifier.fillMaxWidth()
                         )
 
                         OutlinedTextField(
                             value = customerPhone,
                             onValueChange = { customerPhone = it },
-                            label = { Text(stringResource(R.string.label_mobile_number)) },
-                            isError = customerPhone.isBlank(),
+                            label = { Text("Customer Phone") },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -381,26 +419,24 @@ fun ExchangeWizardScreen(
                         OutlinedTextField(
                             value = cashPaidText,
                             onValueChange = { cashPaidText = it },
-                            label = { Text(stringResource(R.string.label_cash_paid)) },
-                            placeholder = { Text(kotlin.math.abs(netDiff).toString()) },
+                            label = { Text("Cash Received / Paid (Rs)") },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             modifier = Modifier.fillMaxWidth()
                         )
 
-                        Text(stringResource(R.string.label_payment_mode), fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                        Text("Payment Method:", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
                         FlowRow(
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                             verticalArrangement = Arrangement.spacedBy(8.dp),
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             methods.forEach { method ->
-                                val isSelected = method == paymentMethod
                                 FilterChip(
-                                    selected = isSelected,
+                                    selected = paymentMethod == method,
                                     onClick = { paymentMethod = method },
-                                    label = { Text(method, fontSize = 13.sp) },
-                                    leadingIcon = if (isSelected) {
-                                        { Icon(Icons.Default.CheckCircle, contentDescription = null, modifier = Modifier.size(16.dp)) }
+                                    label = { Text(method, fontSize = 12.sp) },
+                                    leadingIcon = if (paymentMethod == method) {
+                                        { Icon(Icons.Default.CheckCircle, contentDescription = null, modifier = Modifier.size(14.dp)) }
                                     } else null
                                 )
                             }
@@ -418,57 +454,39 @@ fun ExchangeWizardScreen(
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
-                }
 
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Button(
-                    onClick = {
-                        if (step < 3) {
-                            if (step == 1 && (selectedItem == null || newPhonePriceText.isBlank())) return@Button
-                            if (step == 2 && (oldBrand.isBlank() || oldPhoneValueText.isBlank())) return@Button
-                            step++
-                        } else {
-                            selectedItem?.let { item ->
-                                isSaving = true
-                                val newPrice = newPhonePriceText.toLongOrNull() ?: 0L
-                                val oldPrice = oldPhoneValueText.toLongOrNull() ?: 0L
-                                val cashPaid = cashPaidText.toLongOrNull() ?: kotlin.math.abs(newPrice - oldPrice)
-
-                                onSaveExchange(
-                                    item.id,
-                                    newPrice,
-                                    oldCategory,
-                                    oldBrand,
-                                    oldModel,
-                                    oldImei,
-                                    oldColorText,
-                                    oldIssueText,
-                                    oldPrice,
-                                    customerName,
-                                    customerPhone,
-                                    currentUserName,
-                                    cashPaid,
-                                    paymentMethod
-                                )
-                            }
+                    Button(
+                        onClick = {
+                            val selected = selectedItem ?: return@Button
+                            isSaving = true
+                            onSaveExchange(
+                                selected.id,
+                                newPrice,
+                                oldCategory,
+                                oldBrand,
+                                oldModel,
+                                oldImei,
+                                oldColorText,
+                                oldIssueText,
+                                oldRamText,
+                                oldStorageText,
+                                oldSpecsText,
+                                oldVal,
+                                customerName,
+                                customerPhone,
+                                currentUserName,
+                                cashPaidText.toLongOrNull() ?: 0L,
+                                paymentMethod
+                            )
+                            isSaving = false
                             onSaveSuccess()
-                        }
-                    },
-                    enabled = isStepValid,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    if (isSaving) {
-                        CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
-                    } else {
-                        Text(
-                            text = if (step < 3) stringResource(R.string.action_next) else stringResource(R.string.btn_save_exchange),
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold
-                        )
+                        },
+                        enabled = !isSaving,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Icon(Icons.Default.SwapHoriz, contentDescription = null)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Exchange Mukammal Karein")
                     }
                 }
             }
@@ -478,13 +496,8 @@ fun ExchangeWizardScreen(
 
 @Preview(showBackground = true)
 @Composable
-fun ExchangeWizardScreenPreview() {
-    val dummyStock = listOf(
-        SimpleStockItem("1", "Apple iPhone 15 Pro", "358912345678901", 210000),
-        SimpleStockItem("2", "Samsung Galaxy S24 Ultra", "351234567890123", 240000)
-    )
-
+fun ExchangeWizardPreview() {
     BuySellTheme {
-        ExchangeWizardScreen(stockList = dummyStock)
+        ExchangeWizardScreen()
     }
 }

@@ -39,6 +39,9 @@ class BuyViewModel(application: Application) : AndroidViewModel(application) {
         imei: String,
         color: String,
         issue: String,
+        ram: String = "",
+        storage: String = "",
+        specs: String = "",
         priceRs: Long,
         sellerName: String,
         sellerPhone: String,
@@ -87,10 +90,13 @@ class BuyViewModel(application: Application) : AndroidViewModel(application) {
             val matchedCat = categories.firstOrNull { it.name.equals(categoryName, ignoreCase = true) }
             val categoryId = matchedCat?.id ?: UUID.randomUUID().toString()
 
-            // Construct attributes JSON for color and issue
+            // Construct attributes JSON for color, issue, ram, storage, and specs
             val attrMap = mutableMapOf<String, String>()
             if (color.isNotBlank()) attrMap["color"] = color.trim()
             if (issue.isNotBlank()) attrMap["issue"] = issue.trim()
+            if (ram.isNotBlank()) attrMap["ram"] = ram.trim()
+            if (storage.isNotBlank()) attrMap["storage"] = storage.trim()
+            if (specs.isNotBlank()) attrMap["specs"] = specs.trim()
             val attributesJson = if (attrMap.isNotEmpty()) Gson().toJson(attrMap) else null
 
             // 3. Create Stock Item

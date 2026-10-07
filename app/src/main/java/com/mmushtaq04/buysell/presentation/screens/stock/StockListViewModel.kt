@@ -46,6 +46,9 @@ class StockListViewModel(application: Application) : AndroidViewModel(applicatio
                         category = item.categoryId,
                         color = attrMap["color"] ?: "",
                         issue = attrMap["issue"] ?: item.condition ?: "",
+                        ram = attrMap["ram"] ?: "",
+                        storage = attrMap["storage"] ?: "",
+                        specs = attrMap["specs"] ?: "",
                         remainingQty = item.remainingQty,
                         status = item.status.name
                     )

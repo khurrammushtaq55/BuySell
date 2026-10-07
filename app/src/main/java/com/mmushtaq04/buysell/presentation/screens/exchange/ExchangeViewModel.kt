@@ -54,6 +54,11 @@ class ExchangeViewModel(application: Application) : AndroidViewModel(application
         oldPhoneBrand: String,
         oldPhoneModel: String,
         oldPhoneImei: String,
+        oldPhoneColor: String = "",
+        oldPhoneIssue: String = "",
+        oldPhoneRam: String = "",
+        oldPhoneStorage: String = "",
+        oldPhoneSpecs: String = "",
         oldPhoneValueRs: Long,
         newPhonePriceRs: Long,
         cashPaidRs: Long,
@@ -97,15 +102,25 @@ class ExchangeViewModel(application: Application) : AndroidViewModel(application
                 )
             )
 
+            // Construct attributes JSON for trade-in device
+            val attrMap = mutableMapOf<String, String>()
+            if (oldPhoneColor.isNotBlank()) attrMap["color"] = oldPhoneColor.trim()
+            if (oldPhoneIssue.isNotBlank()) attrMap["issue"] = oldPhoneIssue.trim()
+            if (oldPhoneRam.isNotBlank()) attrMap["ram"] = oldPhoneRam.trim()
+            if (oldPhoneStorage.isNotBlank()) attrMap["storage"] = oldPhoneStorage.trim()
+            if (oldPhoneSpecs.isNotBlank()) attrMap["specs"] = oldPhoneSpecs.trim()
+            val attributesJson = if (attrMap.isNotEmpty()) Gson().toJson(attrMap) else null
+
             // 2. PURCHASE of Customer's Old Trade-In Device
             val oldStockItem = StockItem(
                 id = UUID.randomUUID().toString(),
                 shopId = activeShopId,
                 categoryId = "exchange_cat",
                 brand = oldPhoneBrand.ifBlank { "Generic" },
-                model = oldPhoneModel.ifBlank { "Trade-in Phone" },
+                model = oldPhoneModel.ifBlank { "Trade-in Device" },
                 identifier = oldPhoneImei.ifBlank { null },
-                condition = "USED_EXCHANGE",
+                attributes = attributesJson,
+                condition = oldPhoneIssue.ifBlank { "USED_EXCHANGE" },
                 quantity = 1,
                 remainingQty = 1,
                 stockedAt = now

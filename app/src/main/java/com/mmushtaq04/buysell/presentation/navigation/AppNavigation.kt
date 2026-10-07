@@ -60,7 +60,6 @@ fun AppNavigation(
     }
 
     val categoryViewModel: CategoryViewModel = viewModel()
-    val enabledCategories by categoryViewModel.enabledCategories.collectAsState()
     val allCategories by categoryViewModel.allCategories.collectAsState()
 
     LaunchedEffect(isUserLoggedIn) {
@@ -135,8 +134,7 @@ fun AppNavigation(
 
             wizardsNavGraph(
                 navController = navController,
-                registeredUserName = registeredUserName,
-                enabledCategories = enabledCategories
+                registeredUserName = registeredUserName
             )
 
             settingsNavGraph(

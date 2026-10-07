@@ -6,6 +6,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import com.mmushtaq04.buysell.data.local.AppDatabase
+import com.mmushtaq04.buysell.data.local.CategoryPresets
 import com.mmushtaq04.buysell.data.local.entity.CategoryEntity
 import com.mmushtaq04.buysell.data.local.entity.ShopEntity
 import com.mmushtaq04.buysell.data.local.entity.SyncOutboxEntity
@@ -40,6 +41,13 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         viewModelScope.launch {
             val meta = db.appMetaDao().getAppMeta()
             val shopId = meta?.activeShopId ?: "default_shop"
+
+            val existing = db.categoryDao().getCategories(shopId)
+            if (existing.isEmpty()) {
+                val presets = CategoryPresets.getPresetCategories(shopId)
+                db.categoryDao().insertCategories(presets)
+            }
+
             db.categoryDao().observeAllCategories(shopId).collect { list ->
                 _categories.value = list
             }

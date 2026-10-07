@@ -6,7 +6,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
-import com.mmushtaq04.buysell.data.local.entity.CategoryEntity
 import com.mmushtaq04.buysell.presentation.screens.buy.BuyViewModel
 import com.mmushtaq04.buysell.presentation.screens.buy.BuyWizardScreen
 import com.mmushtaq04.buysell.presentation.screens.exchange.ExchangeViewModel
@@ -14,20 +13,23 @@ import com.mmushtaq04.buysell.presentation.screens.exchange.ExchangeWizardScreen
 import com.mmushtaq04.buysell.presentation.screens.sell.SellViewModel
 import com.mmushtaq04.buysell.presentation.screens.sell.SellWizardScreen
 import com.mmushtaq04.buysell.presentation.screens.sell.SimpleStockItem
+import com.mmushtaq04.buysell.presentation.viewmodel.CategoryViewModel
 
 fun NavGraphBuilder.wizardsNavGraph(
     navController: NavHostController,
-    registeredUserName: String,
-    enabledCategories: List<CategoryEntity>
+    registeredUserName: String
 ) {
     composable(NavRoutes.BuyWizard.route) {
         val buyViewModel: BuyViewModel = viewModel()
+        val categoryViewModel: CategoryViewModel = viewModel()
+        val activeCategories by categoryViewModel.enabledCategories.collectAsState()
+        val enabledCategoryNames = activeCategories.filter { it.enabled }.map { it.name }
 
         BuyWizardScreen(
             currentUserName = registeredUserName,
-            enabledCategories = enabledCategories.map { it.name },
+            enabledCategories = enabledCategoryNames,
             onNavigateBack = { navController.popBackStack() },
-            onSavePurchase = { cat, brand, model, imei, color, issue, price, name, phone, cnic, recordedBy, paid, method, details, promised ->
+            onSavePurchase = { cat, brand, model, imei, color, issue, ram, storage, specs, price, name, phone, cnic, recordedBy, paid, method, details, promised ->
                 buyViewModel.savePurchase(
                     categoryName = cat,
                     brand = brand,
@@ -35,6 +37,9 @@ fun NavGraphBuilder.wizardsNavGraph(
                     imei = imei,
                     color = color,
                     issue = issue,
+                    ram = ram,
+                    storage = storage,
+                    specs = specs,
                     priceRs = price,
                     sellerName = name,
                     sellerPhone = phone,
@@ -88,6 +93,10 @@ fun NavGraphBuilder.wizardsNavGraph(
 
     composable(NavRoutes.ExchangeWizard.route) {
         val exchangeViewModel: ExchangeViewModel = viewModel()
+        val categoryViewModel: CategoryViewModel = viewModel()
+        val activeCategories by categoryViewModel.enabledCategories.collectAsState()
+        val enabledCategoryNames = activeCategories.filter { it.enabled }.map { it.name }
+
         val stockItems by exchangeViewModel.stockItems.collectAsState()
         val simpleStockList = stockItems.map {
             SimpleStockItem(
@@ -101,13 +110,19 @@ fun NavGraphBuilder.wizardsNavGraph(
         ExchangeWizardScreen(
             stockList = simpleStockList,
             currentUserName = registeredUserName,
+            enabledCategories = enabledCategoryNames,
             onNavigateBack = { navController.popBackStack() },
-            onSaveExchange = { soldItemId, newPrice, oldCat, oldBrand, oldModel, oldImei, oldColor, oldIssue, oldPrice, name, phone, recordedBy, cash, method ->
+            onSaveExchange = { soldItemId, newPrice, oldCat, oldBrand, oldModel, oldImei, oldColor, oldIssue, oldRam, oldStorage, oldSpecs, oldPrice, name, phone, recordedBy, cash, method ->
                 exchangeViewModel.processExchange(
                     soldStockItemId = soldItemId,
                     oldPhoneBrand = oldBrand,
                     oldPhoneModel = oldModel,
                     oldPhoneImei = oldImei,
+                    oldPhoneColor = oldColor,
+                    oldPhoneIssue = oldIssue,
+                    oldPhoneRam = oldRam,
+                    oldPhoneStorage = oldStorage,
+                    oldPhoneSpecs = oldSpecs,
                     oldPhoneValueRs = oldPrice,
                     newPhonePriceRs = newPrice,
                     cashPaidRs = cash,

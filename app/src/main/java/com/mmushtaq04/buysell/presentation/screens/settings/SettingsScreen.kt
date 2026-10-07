@@ -485,7 +485,7 @@ fun SettingsScreen(
                             allCategories.forEach { categoryItem ->
                                 FilterChip(
                                     selected = categoryItem.enabled,
-                                    enabled = isOwner,
+                                    enabled = true,
                                     onClick = { onToggleCategory(categoryItem) },
                                     label = { Text(categoryItem.name, fontSize = 13.sp) },
                                     leadingIcon = if (categoryItem.enabled) {

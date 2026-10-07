@@ -41,7 +41,22 @@
 	- [x] Implemented `restoreUserDataFromFirestore(userId)` in `FirestoreSyncManager.kt` and `applyFirestoreDocToRoom(...)`
 	- [x] Created `DataRestorationOverlayScreen` overlay in `AppNavigation.kt` with progress spinner and status messages so the UI never appears frozen during restore
 	- [x] Fixed `pullChanges` query filter when `lastPulled == 0L` to fetch all documents directly from Firestore without `whereGreaterThan("updated_at", 0)` filter restrictions
-- [x] WorkManager Application Scheduler
-	- [x] Created `BuySellApplication.kt` and registered it in `AndroidManifest.xml`
-	- [x] Enqueued periodic background sync (`SyncWorker.schedulePeriodicSync`) every 15 mins when online
-	- [x] Enqueued daily Udhaar reminder worker (`UdhaarReminderWorker.scheduleDailyReminder`) every 24 hours
+- [x] Legacy Path Security Rule & Query Guard
+	- [x] Added `match /{collection}/{docId}` direct 4-segment collection rule to `firestore.rules`
+	- [x] Wrapped legacy path fallback queries in `runCatching { ... }` to prevent permission errors
+- [x] Settings Store Profile State Binding
+	- [x] Added `primaryShop` flow observation in `SettingsViewModel.kt` and passed current shop name, phone, and address from Room DB to `SettingsScreen` in `SettingsNavGraph.kt`
+- [x] Non-Blocking Pure Offline Save Flow
+	- [x] Removed inline network calls from `enqueueSyncOutbox` and ViewModels so local save operations write instantly to Room DB + `sync_outbox` in < 10 ms
+	- [x] Added `SyncWorker.enqueueOneTimeSync(context)` to delegate sync execution to background `WorkManager` when connected
+- [x] Category Filter Chips Interactivity Fix
+	- [x] Set `enabled = true` on `FilterChip` in `SettingsScreen.kt` and bound category list to `SettingsViewModel.categories` state flow in `SettingsNavGraph.kt`
+- [x] Dynamic Route-Scoped Category Filtering in Buy & Exchange Wizards
+	- [x] Moved `categoryViewModel.enabledCategories.collectAsState()` inside route lambdas in `WizardsNavGraph.kt`
+	- [x] Updated `CategoryViewModel.kt` to observe `appMetaDao().observeAppMeta()` reactively for active shop updates
+	- [x] Confirmed `BuyWizardScreen` and `ExchangeWizardScreen` strictly render only enabled categories
+- [x] Optional Memory/Storage Spec Fields & Generic Item Terminology
+	- [x] Added RAM (`4GB`, `6GB`, `8GB`, `12GB`, `16GB`, `32GB`), Storage (`64GB`, `128GB`, `256GB`, `512GB`, `1TB`), and Extra Specs fields to `BuyWizardScreen` and `ExchangeWizardScreen`
+	- [x] Packed RAM/Storage/Specs into `StockItem.attributes` JSON payload in `BuyViewModel` and `ExchangeViewModel`
+	- [x] Displayed RAM/Storage/Specs badges on stock cards in `StockListScreen.kt`
+	- [x] Updated Home Screen action cards and wizard titles to generic item wording ("Saman Khareedna" / "Saman Bechna") across all localized string files
