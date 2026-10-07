@@ -1,0 +1,48 @@
+# Task List: Hafeez Center Device Buy/Sell Tracker Implementation
+
+- [x] Phase 0 (P0): Infrastructure, Dependencies, Room Database & Core Models
+	- [x] Update build configuration (`compileSdk = 37`, Room KSP/plugins, version catalog dependencies)
+	- [x] Create package structure: `data`, `domain`, `presentation` (Clean Architecture)
+	- [x] Define Room Entities from schema v0.4 (`Shop`, `User`, `ShopMember`, `Category`, `Party`, `StockItem`, `Txn`, `TxnLine`, `Payment`, `PaymentAccount`, `PaymentPromise`, `Attachment`, `Expense`, `AuditLog`, `Conflict`, `AppMeta`, `SyncOutbox`, `SyncCursor`)
+	- [x] Define Room DAOs and TypeConverters for JSON/Enums
+	- [x] Create Room Database class `AppDatabase` and Database Module / Provider
+	- [x] Create Repository interfaces and Room implementation classes (StockRepository, TxnRepository, PartyRepository, PaymentRepository)
+	- [x] Unit tests for Room DB & Repositories (Buy/Sell UNIQUE offline, balance calculations)
+- [x] Phase 1 (P1): Core Business Features (Parties, Payments, Promises, Quantity Lots, Exchange)
+	- [x] Implement Party management & Ledger queries
+	- [x] Implement Payment recording & promise tracking (`payment_promises`)
+	- [x] Implement Quantity lot tracking (`stock_items` lot with `remaining_qty`, FIFO lot picking)
+	- [x] Implement Exchange / Trade-in flow (linked SALE + PURCHASE with `exchange_group_id`)
+	- [x] Unit tests for acceptance scenarios 1–8 (§13)
+- [x] Phase 2 (P2): Offline-First Sync & Firestore Integration Foundation
+	- [x] Outbox and sync entity mapping (`SyncOutboxEntity`, `SyncCursorEntity`, `SyncDao`, `FirestoreSyncManager`, `SyncWorker`, `ConflictDetector`)
+	- [x] Firestore 6-segment path alignment (`shops/{shopId}/scopes/{scope}/{collection}/{id}`)
+	- [x] Security rules (`firestore.rules`, `storage.rules`)
+- [x] Phase 3 (P3): Roles, Auth & Invites
+	- [x] `FirebaseAuthManager` (Google Sign-In + Email/Password)
+	- [x] `InviteManager` (8-character code, A-Z2-9, 7-day expiration)
+	- [x] Preset categories initialization (`mobile`, `tablet`, `laptop`, `console`, `smartwatch`, `earbuds`, `accessories`, `parts`, `camera`, `other`)
+- [x] Phase 4 (P4 & P4b): Dashboard, Reports, Export & UX Pass
+	- [x] Owner/Partner Dashboard metrics (`OwnerDashboardScreen.kt`)
+	- [x] On-device PDF receipt generator (`PdfReceiptGenerator.kt` + WhatsApp share)
+	- [x] In-app Help screen (`HelpScreen.kt` - 7 core topics)
+	- [x] §19 UX Pass: Plain language UI, big touch targets
+	- [x] Compose UI Screens (Home, Buy Wizard, Sell Wizard, Stock List, Khata/Party List, Settings)
+- [x] Phase 5 (P5): Notifications, Localization & Release Polish
+	- [x] `AppNotificationManager` & `UdhaarReminderWorker`
+	- [x] Localized `strings.xml` for all 8 locales (`en`, `ur`, `es`, `fr`, `hi`, `ar`, `zh-rCN`, `values-b+ur+Latn` Roman Urdu)
+	- [x] `LOCALIZATION_NOTES.md` user-facing glossary & strict string resource guidelines
+	- [x] `RatingManager` & `STORE_LISTING.md`
+- [x] Complete String Resource Extraction Across All Screens
+	- [x] Extracted all string literals across all screens (`LoginScreen`, `ShopSetupScreen`, `BuyWizardScreen`, `SellWizardScreen`, `ExchangeWizardScreen`, `HomeScreen`, `SettingsScreen`, `StockListScreen`, `PartyListScreen`, `OwnerDashboardScreen`, `HelpScreen`, `AppLockScreen`) into `R.string...` resources across all 8 supported locales
+- [x] Room Database Version Upgrade
+	- [x] Incremented `version = 2` in `@Database(version = 2)` in `AppDatabase.kt` to fix Room schema identity hash mismatch exception
+- [x] Automatic Data Restoration & Dedicated Loading Screen
+	- [x] Implemented `restoreUserDataFromFirestore(userId)` in `FirestoreSyncManager.kt` and `applyFirestoreDocToRoom(...)`
+	- [x] Created `DataRestorationOverlayScreen` overlay in `AppNavigation.kt` with progress spinner and status messages so the UI never appears frozen during restore
+	- [x] Fixed `pullChanges` query filter when `lastPulled == 0L` to fetch all documents directly from Firestore without `whereGreaterThan("updated_at", 0)` filter restrictions
+- [x] Legacy Path Security Rule & Query Guard
+	- [x] Added `match /{collection}/{docId}` direct 4-segment collection rule to `firestore.rules`
+	- [x] Wrapped legacy path fallback queries in `runCatching { ... }` to prevent permission errors
+- [x] Settings Store Profile State Binding
+	- [x] Added `primaryShop` flow observation in `SettingsViewModel.kt` and passed current shop name, phone, and address from Room DB to `SettingsScreen` in `SettingsNavGraph.kt`
