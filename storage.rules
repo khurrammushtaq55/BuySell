@@ -6,12 +6,14 @@ service firebase.storage {
       return request.auth != null;
     }
 
-    match /shops/{shopId}/public/{allPaths=**} {
-      allow read, write: if isAuthenticated();
+    match /shops/{shopId}/scopes/public/{allPaths=**} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated();
     }
 
-    match /shops/{shopId}/vault/{allPaths=**} {
-      allow read, write: if isAuthenticated();
+    match /shops/{shopId}/scopes/vault/{allPaths=**} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated();
     }
   }
 }

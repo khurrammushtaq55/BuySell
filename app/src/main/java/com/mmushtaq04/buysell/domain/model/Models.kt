@@ -5,28 +5,31 @@ import com.mmushtaq04.buysell.data.local.enums.*
 data class Shop(
     val id: String,
     val name: String,
-    val phone: String,
-    val address: String,
-    val currency: String = "PKR",
-    val timezone: String = "Asia/Karachi",
+    val code: String,
+    val address: String? = null,
     val ownerUserId: String,
-    val receiptFooter: String? = null,
-    val logoUri: String? = null,
-    val slowStockDays: Int = 30,
-    val preferredLanguage: String? = null,
-    val cloudPhotoUploadEnabled: Boolean = false
+    val phone: String? = null
+)
+
+data class User(
+    val id: String,
+    val name: String,
+    val email: String,
+    val phone: String? = null,
+    val isOwner: Boolean = false,
+    val role: Role = Role.STAFF
 )
 
 data class Category(
     val id: String,
     val shopId: String,
     val name: String,
-    val presetKey: String,
-    val identifierType: IdentifierType,
-    val trackingMode: TrackingMode,
-    val fieldSchema: String? = null,
-    val enabled: Boolean = true,
-    val sortOrder: Int = 0
+    val code: String,
+    val hasUniqueItems: Boolean = true,
+    val requiresImei: Boolean = true,
+    val attributesSchemaJson: String? = null,
+    val sortOrder: Int = 0,
+    val enabled: Boolean = true
 )
 
 data class Party(
@@ -46,7 +49,7 @@ data class PartyBalance(
     val name: String,
     val phone: String?,
     val cnic: String?,
-    val balance: Long // positive = party owes shop, negative = shop owes party
+    val balance: Long // in paisa (PKR * 100)
 )
 
 data class StockItem(
@@ -58,7 +61,7 @@ data class StockItem(
     val identifier: String? = null,
     val identifier2: String? = null,
     val attributes: String? = null,
-    val condition: String? = null,
+    val condition: String = "GOOD",
     val quantity: Int = 1,
     val remainingQty: Int = 1,
     val status: ItemStatus = ItemStatus.IN_STOCK,
@@ -73,7 +76,7 @@ data class TxnLine(
     val shopId: String,
     val txnId: String,
     val stockItemId: String,
-    val quantity: Int = 1,
+    val quantity: Int,
     val unitPrice: Long,
     val lineTotal: Long,
     val scope: Scope = Scope.PUBLIC
@@ -83,8 +86,8 @@ data class Txn(
     val id: String,
     val shopId: String,
     val type: TxnType,
-    val partyId: String,
-    val txnDate: Long = System.currentTimeMillis(),
+    val partyId: String? = null,
+    val txnDate: Long,
     val totalAmount: Long,
     val receiptNo: String? = null,
     val exchangeGroupId: String? = null,
@@ -106,7 +109,7 @@ data class Payment(
     val referenceNo: String? = null,
     val payDate: Long = System.currentTimeMillis(),
     val reversesPaymentId: String? = null,
-    val scope: Scope = Scope.PUBLIC,
+    val scope: Scope,
     val note: String? = null
 )
 
@@ -120,6 +123,6 @@ data class PaymentPromise(
     val promisedDate: Long,
     val status: PromiseStatus = PromiseStatus.OPEN,
     val previousPromiseId: String? = null,
-    val scope: Scope = Scope.PUBLIC,
+    val scope: Scope,
     val note: String? = null
 )

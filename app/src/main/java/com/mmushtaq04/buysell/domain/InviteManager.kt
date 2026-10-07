@@ -30,11 +30,9 @@ object InviteManager {
             code = generateInviteCode(),
             shopId = shopId,
             role = role,
-            createdBy = createdByUserId,
-            expiresAt = expiresAt,
+            createdByUserId = createdByUserId,
             createdAt = now,
-            updatedAt = now,
-            updatedBy = createdByUserId
+            expiresAt = expiresAt
         )
     }
 }

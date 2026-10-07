@@ -7,14 +7,16 @@ import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import com.mmushtaq04.buysell.data.local.AppDatabase
 import com.mmushtaq04.buysell.data.local.entity.PartyEntity
+import com.mmushtaq04.buysell.data.local.entity.SyncOutboxEntity
 import com.mmushtaq04.buysell.data.local.enums.PartyTypeHint
 import com.mmushtaq04.buysell.data.local.enums.PaymentDirection
 import com.mmushtaq04.buysell.data.local.enums.PaymentMethod
+import com.mmushtaq04.buysell.data.local.enums.Scope
+import com.mmushtaq04.buysell.data.local.enums.SyncOp
 import com.mmushtaq04.buysell.data.repository.StockRepositoryImpl
 import com.mmushtaq04.buysell.data.repository.toEntity
 import com.mmushtaq04.buysell.domain.model.Payment
 import com.mmushtaq04.buysell.domain.model.StockItem
-import com.mmushtaq04.buysell.presentation.screens.sell.SimpleStockItem
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,8 +28,8 @@ class ExchangeViewModel(application: Application) : AndroidViewModel(application
     private val db = AppDatabase.getInstance(application)
     private val stockRepository = StockRepositoryImpl(db)
 
-    private val _stockList = MutableStateFlow<List<SimpleStockItem>>(emptyList())
-    val stockList: StateFlow<List<SimpleStockItem>> = _stockList.asStateFlow()
+    private val _stockItems = MutableStateFlow<List<StockItem>>(emptyList())
+    val stockItems: StateFlow<List<StockItem>> = _stockItems.asStateFlow()
 
     companion object {
         private const val TAG = "ExchangeViewModel"
@@ -40,81 +42,70 @@ class ExchangeViewModel(application: Application) : AndroidViewModel(application
     private fun loadInStockItems() {
         viewModelScope.launch {
             val meta = db.appMetaDao().getAppMeta()
-            val activeShopId = meta?.activeShopId ?: "default_shop"
-
-            stockRepository.observeInStockItems(activeShopId).collect { list ->
-                _stockList.value = list.map { item ->
-                    val costPaisa = item.purchaseLineId?.let { db.txnDao().getUnitPriceByLineId(it) } ?: 0L
-                    SimpleStockItem(
-                        id = item.id,
-                        title = "${item.brand} ${item.model}",
-                        imei = item.identifier ?: "N/A",
-                        cost = costPaisa / 100
-                    )
-                }
-                Log.d(TAG, "Loaded ${list.size} in-stock items for Exchange")
+            val shopId = meta?.activeShopId ?: "default_shop"
+            stockRepository.observeInStockItems(shopId).collect { items ->
+                _stockItems.value = items
             }
         }
     }
 
-    fun saveExchange(
+    fun processExchange(
         soldStockItemId: String,
-        newPhonePriceRs: Long,
-        oldCategory: String,
-        oldBrand: String,
-        oldModel: String,
-        oldImei: String,
-        oldColor: String,
-        oldIssue: String,
+        oldPhoneBrand: String,
+        oldPhoneModel: String,
+        oldPhoneImei: String,
         oldPhoneValueRs: Long,
+        newPhonePriceRs: Long,
+        cashPaidRs: Long,
         customerName: String,
         customerPhone: String,
+        customerCnic: String,
         recordedBy: String,
-        cashPaidRs: Long,
         paymentMethodStr: String,
         onSuccess: () -> Unit
     ) {
         viewModelScope.launch {
-            Log.d(TAG, "Starting saveExchange: SoldItem ID=$soldStockItemId, NewPrice=Rs $newPhonePriceRs, OldBrand=$oldBrand, OldPrice=Rs $oldPhoneValueRs, Customer=$customerName")
+            Log.d(TAG, "Starting processExchange: SoldStockItemID=$soldStockItemId, OldPhone=$oldPhoneBrand $oldPhoneModel, Value=Rs $oldPhoneValueRs, NewPrice=Rs $newPhonePriceRs, Customer=$customerName")
             val meta = db.appMetaDao().getAppMeta()
             val activeShopId = meta?.activeShopId ?: "default_shop"
             val now = System.currentTimeMillis()
-            val exchangeGroupId = UUID.randomUUID().toString()
+            val exchangeGroupId = "EXG-${UUID.randomUUID().toString().take(8)}"
 
-            // 1. Create or Find Customer Party
+            // 1. Create or Find Customer/Party
             val partyId = UUID.randomUUID().toString()
-            val customerParty = PartyEntity(
+            val partyEntity = PartyEntity(
                 id = partyId,
                 shopId = activeShopId,
                 name = customerName.ifBlank { "Exchange Customer" },
                 phone = customerPhone.ifBlank { null },
+                cnic = customerCnic.ifBlank { null },
                 typeHint = PartyTypeHint.BOTH,
                 createdAt = now,
                 updatedAt = now,
                 createdBy = recordedBy,
                 updatedBy = recordedBy
             )
-            db.partyDao().insertParty(customerParty)
+            db.partyDao().insertParty(partyEntity)
+            db.syncDao().enqueueOutbox(
+                SyncOutboxEntity(
+                    id = UUID.randomUUID().toString(),
+                    entityType = "parties",
+                    entityId = partyEntity.id,
+                    op = SyncOp.UPSERT,
+                    payloadJson = Gson().toJson(partyEntity),
+                    createdAt = now
+                )
+            )
 
-            // 2. PURCHASE of Customer's Old Phone
-            val categories = db.categoryDao().getCategories(activeShopId)
-            val matchedCat = categories.firstOrNull { it.name.equals(oldCategory, ignoreCase = true) }
-            val categoryId = matchedCat?.id ?: UUID.randomUUID().toString()
-
-            val attrMap = mutableMapOf<String, String>()
-            if (oldColor.isNotBlank()) attrMap["color"] = oldColor.trim()
-            if (oldIssue.isNotBlank()) attrMap["issue"] = oldIssue.trim()
-            val attributesJson = if (attrMap.isNotEmpty()) Gson().toJson(attrMap) else null
-
+            // 2. PURCHASE of Customer's Old Trade-In Device
             val oldStockItem = StockItem(
                 id = UUID.randomUUID().toString(),
                 shopId = activeShopId,
-                categoryId = categoryId,
-                brand = oldBrand.ifBlank { "Generic" },
-                model = oldModel.ifBlank { oldCategory },
-                identifier = oldImei.ifBlank { null },
-                attributes = attributesJson,
-                condition = oldIssue.ifBlank { "GOOD" },
+                categoryId = "exchange_cat",
+                brand = oldPhoneBrand.ifBlank { "Generic" },
+                model = oldPhoneModel.ifBlank { "Trade-in Phone" },
+                identifier = oldPhoneImei.ifBlank { null },
+                condition = "USED_EXCHANGE",
                 quantity = 1,
                 remainingQty = 1,
                 stockedAt = now
@@ -160,6 +151,7 @@ class ExchangeViewModel(application: Application) : AndroidViewModel(application
                 val methodEnum = PaymentMethod.fromStr(paymentMethodStr)
 
                 val direction = if (netDifferenceRs >= 0) PaymentDirection.IN else PaymentDirection.OUT
+                val scope = if (direction == PaymentDirection.OUT) Scope.VAULT else Scope.PUBLIC
 
                 val payment = Payment(
                     id = UUID.randomUUID().toString(),
@@ -170,7 +162,8 @@ class ExchangeViewModel(application: Application) : AndroidViewModel(application
                     amount = cashPaisa,
                     method = methodEnum,
                     note = "Exchange Cash Difference",
-                    payDate = now
+                    payDate = now,
+                    scope = scope
                 )
                 db.paymentDao().insertPayment(payment.toEntity(recordedBy))
             }

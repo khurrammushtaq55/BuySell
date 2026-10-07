@@ -13,12 +13,14 @@ import com.mmushtaq04.buysell.data.local.enums.PaymentDirection
 import com.mmushtaq04.buysell.data.local.enums.PaymentMethod
 import com.mmushtaq04.buysell.data.local.enums.PromiseDirection
 import com.mmushtaq04.buysell.data.local.enums.Role
+import com.mmushtaq04.buysell.data.local.enums.Scope
 import com.mmushtaq04.buysell.data.local.enums.SyncOp
 import com.mmushtaq04.buysell.data.repository.StockRepositoryImpl
 import com.mmushtaq04.buysell.data.repository.toEntity
 import com.mmushtaq04.buysell.data.sync.FirestoreSyncManager
 import com.mmushtaq04.buysell.domain.model.Payment
 import com.mmushtaq04.buysell.domain.model.PaymentPromise
+import com.mmushtaq04.buysell.domain.model.StockItem
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -30,8 +32,8 @@ class SellViewModel(application: Application) : AndroidViewModel(application) {
     private val db = AppDatabase.getInstance(application)
     private val stockRepository = StockRepositoryImpl(db)
 
-    private val _stockList = MutableStateFlow<List<SimpleStockItem>>(emptyList())
-    val stockList: StateFlow<List<SimpleStockItem>> = _stockList.asStateFlow()
+    private val _stockItems = MutableStateFlow<List<StockItem>>(emptyList())
+    val stockItems: StateFlow<List<StockItem>> = _stockItems.asStateFlow()
 
     companion object {
         private const val TAG = "SellViewModel"
@@ -44,37 +46,34 @@ class SellViewModel(application: Application) : AndroidViewModel(application) {
     private fun loadInStockItems() {
         viewModelScope.launch {
             val meta = db.appMetaDao().getAppMeta()
-            val activeShopId = meta?.activeShopId ?: "default_shop"
-
-            stockRepository.observeInStockItems(activeShopId).collect { list ->
-                _stockList.value = list.map { item ->
-                    val costPaisa = item.purchaseLineId?.let { db.txnDao().getUnitPriceByLineId(it) } ?: 0L
-                    SimpleStockItem(
-                        id = item.id,
-                        title = "${item.brand} ${item.model}",
-                        imei = item.identifier ?: "N/A",
-                        cost = costPaisa / 100
-                    )
-                }
-                Log.d(TAG, "Loaded ${list.size} in-stock items for shop '$activeShopId'")
+            val shopId = meta?.activeShopId ?: "default_shop"
+            stockRepository.observeInStockItems(shopId).collect { items ->
+                _stockItems.value = items
             }
         }
     }
 
+    suspend fun getOriginalPurchaseCost(stockItemId: String): Long? {
+        val stockEntity = db.stockItemDao().getStockItemById(stockItemId) ?: return null
+        val purchaseLineId = stockEntity.purchaseLineId ?: return null
+        return db.txnDao().getUnitPriceByLineId(purchaseLineId)
+    }
+
     fun saveSale(
         stockItemId: String,
-        salePriceRs: Long,
+        priceRs: Long,
         buyerName: String,
         buyerPhone: String,
+        buyerCnic: String,
         recordedBy: String,
-        receivedAmountRs: Long,
+        paidAmountRs: Long,
         paymentMethodStr: String,
         paymentDetails: String,
         promisedDateStr: String,
         onSuccess: () -> Unit
     ) {
         viewModelScope.launch {
-            Log.d(TAG, "Starting saveSale: StockItem ID=$stockItemId, SalePrice=Rs $salePriceRs, Buyer=$buyerName, RecordedBy=$recordedBy")
+            Log.d(TAG, "Starting saveSale: StockItemID=$stockItemId, SalePrice=Rs $priceRs, Buyer=$buyerName, Paid=Rs $paidAmountRs")
             val meta = db.appMetaDao().getAppMeta()
             val activeShopId = meta?.activeShopId ?: "default_shop"
             val now = System.currentTimeMillis()
@@ -84,8 +83,9 @@ class SellViewModel(application: Application) : AndroidViewModel(application) {
             val buyerParty = PartyEntity(
                 id = partyId,
                 shopId = activeShopId,
-                name = buyerName.ifBlank { "Buyer" },
+                name = buyerName.ifBlank { "Customer" },
                 phone = buyerPhone.ifBlank { null },
+                cnic = buyerCnic.ifBlank { null },
                 typeHint = PartyTypeHint.CUSTOMER,
                 createdAt = now,
                 updatedAt = now,
@@ -104,20 +104,20 @@ class SellViewModel(application: Application) : AndroidViewModel(application) {
                 )
             )
 
-            // 2. Record Sale Txn in Room DB
-            val salePricePaisa = salePriceRs * 100
+            // 2. Record Sale Txn
+            val pricePaisa = priceRs * 100
             val txn = stockRepository.recordSale(
                 stockItemId = stockItemId,
-                salePrice = salePricePaisa,
+                salePrice = pricePaisa,
                 partyId = partyId,
                 createdByUserId = recordedBy,
                 qtyToSell = 1
             )
-            Log.i(TAG, "✓ Recorded Sale Txn ID: ${txn.id}")
+            Log.i(TAG, "✓ Recorded Sale Txn ID: ${txn.id} for StockItemID: $stockItemId")
 
-            // 3. Record Payment IN
-            val receivedPaisa = (receivedAmountRs * 100).coerceAtMost(salePricePaisa)
-            if (receivedPaisa > 0) {
+            // 3. Record Payment
+            val paidPaisa = (paidAmountRs * 100).coerceAtMost(pricePaisa)
+            if (paidPaisa > 0) {
                 val methodEnum = PaymentMethod.fromStr(paymentMethodStr)
 
                 val payment = Payment(
@@ -126,10 +126,11 @@ class SellViewModel(application: Application) : AndroidViewModel(application) {
                     txnId = txn.id,
                     partyId = partyId,
                     direction = PaymentDirection.IN,
-                    amount = receivedPaisa,
+                    amount = paidPaisa,
                     method = methodEnum,
                     referenceNo = paymentDetails.ifBlank { null },
-                    payDate = now
+                    payDate = now,
+                    scope = Scope.PUBLIC
                 )
                 val paymentEntity = payment.toEntity(recordedBy)
                 db.paymentDao().insertPayment(paymentEntity)
@@ -146,7 +147,7 @@ class SellViewModel(application: Application) : AndroidViewModel(application) {
             }
 
             // 4. Record Promise if Partial Payment
-            val remainingPaisa = salePricePaisa - receivedPaisa
+            val remainingPaisa = pricePaisa - paidPaisa
             if (remainingPaisa > 0) {
                 val promise = PaymentPromise(
                     id = UUID.randomUUID().toString(),
@@ -156,7 +157,8 @@ class SellViewModel(application: Application) : AndroidViewModel(application) {
                     direction = PromiseDirection.RECEIVE,
                     amount = remainingPaisa,
                     promisedDate = now + 7 * 24 * 60 * 60 * 1000L, // default 7 days
-                    note = promisedDateStr.ifBlank { null }
+                    note = promisedDateStr.ifBlank { null },
+                    scope = Scope.PUBLIC
                 )
                 val promiseEntity = promise.toEntity(recordedBy)
                 db.paymentPromiseDao().insertPromise(promiseEntity)
@@ -174,7 +176,10 @@ class SellViewModel(application: Application) : AndroidViewModel(application) {
 
             // 5. Trigger Firestore Push
             runCatching {
-                FirestoreSyncManager(db).pushOutbox(activeShopId, Role.OWNER, "session_active")
+                val user = db.userDao().getPrimaryUser()
+                val role = user?.role ?: Role.STAFF
+                val sessionId = user?.activeSessionId?.ifBlank { "session_active" } ?: "session_active"
+                FirestoreSyncManager(db).pushOutbox(activeShopId, role, sessionId)
             }
 
             onSuccess()

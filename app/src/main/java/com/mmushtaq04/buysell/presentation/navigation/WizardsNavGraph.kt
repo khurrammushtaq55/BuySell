@@ -13,6 +13,7 @@ import com.mmushtaq04.buysell.presentation.screens.exchange.ExchangeViewModel
 import com.mmushtaq04.buysell.presentation.screens.exchange.ExchangeWizardScreen
 import com.mmushtaq04.buysell.presentation.screens.sell.SellViewModel
 import com.mmushtaq04.buysell.presentation.screens.sell.SellWizardScreen
+import com.mmushtaq04.buysell.presentation.screens.sell.SimpleStockItem
 
 fun NavGraphBuilder.wizardsNavGraph(
     navController: NavHostController,
@@ -52,20 +53,29 @@ fun NavGraphBuilder.wizardsNavGraph(
 
     composable(NavRoutes.SellWizard.route) {
         val sellViewModel: SellViewModel = viewModel()
-        val stockList by sellViewModel.stockList.collectAsState()
+        val stockItems by sellViewModel.stockItems.collectAsState()
+        val simpleStockList = stockItems.map {
+            SimpleStockItem(
+                id = it.id,
+                title = "${it.brand} ${it.model}",
+                imei = it.identifier ?: "N/A",
+                cost = 0L
+            )
+        }
 
         SellWizardScreen(
-            stockList = stockList,
+            stockList = simpleStockList,
             currentUserName = registeredUserName,
             onNavigateBack = { navController.popBackStack() },
             onSaveSale = { itemId, price, name, phone, recordedBy, received, method, details, promised ->
                 sellViewModel.saveSale(
                     stockItemId = itemId,
-                    salePriceRs = price,
+                    priceRs = price,
                     buyerName = name,
                     buyerPhone = phone,
+                    buyerCnic = "",
                     recordedBy = recordedBy,
-                    receivedAmountRs = received,
+                    paidAmountRs = received,
                     paymentMethodStr = method,
                     paymentDetails = details,
                     promisedDateStr = promised,
@@ -78,27 +88,33 @@ fun NavGraphBuilder.wizardsNavGraph(
 
     composable(NavRoutes.ExchangeWizard.route) {
         val exchangeViewModel: ExchangeViewModel = viewModel()
-        val stockList by exchangeViewModel.stockList.collectAsState()
+        val stockItems by exchangeViewModel.stockItems.collectAsState()
+        val simpleStockList = stockItems.map {
+            SimpleStockItem(
+                id = it.id,
+                title = "${it.brand} ${it.model}",
+                imei = it.identifier ?: "N/A",
+                cost = 0L
+            )
+        }
 
         ExchangeWizardScreen(
-            stockList = stockList,
+            stockList = simpleStockList,
             currentUserName = registeredUserName,
             onNavigateBack = { navController.popBackStack() },
             onSaveExchange = { soldItemId, newPrice, oldCat, oldBrand, oldModel, oldImei, oldColor, oldIssue, oldPrice, name, phone, recordedBy, cash, method ->
-                exchangeViewModel.saveExchange(
+                exchangeViewModel.processExchange(
                     soldStockItemId = soldItemId,
-                    newPhonePriceRs = newPrice,
-                    oldCategory = oldCat,
-                    oldBrand = oldBrand,
-                    oldModel = oldModel,
-                    oldImei = oldImei,
-                    oldColor = oldColor,
-                    oldIssue = oldIssue,
+                    oldPhoneBrand = oldBrand,
+                    oldPhoneModel = oldModel,
+                    oldPhoneImei = oldImei,
                     oldPhoneValueRs = oldPrice,
+                    newPhonePriceRs = newPrice,
+                    cashPaidRs = cash,
                     customerName = name,
                     customerPhone = phone,
+                    customerCnic = "",
                     recordedBy = recordedBy,
-                    cashPaidRs = cash,
                     paymentMethodStr = method,
                     onSuccess = {}
                 )

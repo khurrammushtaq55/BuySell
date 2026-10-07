@@ -44,6 +44,7 @@ class ShopSetupViewModel(application: Application) : AndroidViewModel(applicatio
             val now = System.currentTimeMillis()
             val currentUserId = authManager.currentUser?.uid ?: UUID.randomUUID().toString()
             val registeredUserName = name.ifBlank { authManager.currentUser?.displayName ?: "Malik / Staff" }
+            val roleEnum = Role.fromStr(role)
 
             // 0. Create & Insert User Entity
             val userEntity = UserEntity(
@@ -51,6 +52,7 @@ class ShopSetupViewModel(application: Application) : AndroidViewModel(applicatio
                 displayName = registeredUserName,
                 email = authManager.currentUser?.email,
                 phone = shopPhone,
+                role = roleEnum,
                 shopId = shopId,
                 createdAt = now,
                 updatedAt = now,
@@ -73,10 +75,10 @@ class ShopSetupViewModel(application: Application) : AndroidViewModel(applicatio
             val shopEntity = ShopEntity(
                 id = shopId,
                 name = shopName.ifBlank { "Hafeez Center Store" },
+                code = "SHOP01",
+                ownerUserId = currentUserId,
                 phone = shopPhone.ifBlank { "" },
                 address = shopAddress.ifBlank { "" },
-                ownerUserId = currentUserId,
-                shopId = shopId,
                 createdAt = now,
                 updatedAt = now,
                 createdBy = registeredUserName,
@@ -115,7 +117,6 @@ class ShopSetupViewModel(application: Application) : AndroidViewModel(applicatio
             }
 
             // 3. Create & Insert Member Entity
-            val roleEnum = Role.fromStr(role)
             val memberEntity = ShopMemberEntity(
                 id = UUID.randomUUID().toString(),
                 shopId = shopId,

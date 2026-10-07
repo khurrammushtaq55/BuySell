@@ -4,12 +4,10 @@ service cloud.firestore {
 
     // --- Helper Functions ---
 
-    // Checks if request is from an authenticated Firebase user
     function isAuthenticated() {
       return request.auth != null;
     }
 
-    // Checks if the authenticated user owns the target shop document
     function isShopOwnerByDoc(shopId) {
       return isAuthenticated() && exists(/databases/$(database)/documents/shops/$(shopId)) && (
         get(/databases/$(database)/documents/shops/$(shopId)).data.owner_user_id == request.auth.uid ||
@@ -17,7 +15,6 @@ service cloud.firestore {
       );
     }
 
-    // Checks if the user is a registered member of the shop
     function isShopMember(shopId) {
       return isAuthenticated() && (
         isShopOwnerByDoc(shopId) ||
@@ -25,12 +22,10 @@ service cloud.firestore {
       );
     }
 
-    // Gets member data record for current user
     function getMemberData(shopId) {
       return get(/databases/$(database)/documents/shops/$(shopId)/members/$(request.auth.uid)).data;
     }
 
-    // Role predicates
     function isOwner(shopId) {
       return isShopOwnerByDoc(shopId) || (
         isShopMember(shopId) && getMemberData(shopId).role == 'OWNER'
@@ -48,23 +43,22 @@ service cloud.firestore {
 
     // --- Global Root Collections ---
 
-    // User Accounts
     match /users/{uid} {
-      allow read: if isAuthenticated();
-      allow write: if isAuthenticated() && request.auth.uid == uid;
+      allow read: if isAuthenticated() && (request.auth.uid == uid || exists(/databases/$(database)/documents/users/$(request.auth.uid)));
+      allow create, update: if isAuthenticated() && request.auth.uid == uid;
     }
 
-    // Root Invites (used for 8-character invite code lookup)
     match /invites/{code} {
       allow read: if isAuthenticated();
-      allow write: if isAuthenticated();
+      allow create, update, delete: if isAuthenticated() && (
+        request.resource.data.shop_id != null && isOwner(request.resource.data.shop_id)
+      );
     }
 
 
-    // --- Shop Subtree Architecture ---
+    // --- Shop Subtree ---
 
     match /shops/{shopId} {
-      // Shop Document Rules
       allow read: if isAuthenticated() && (
         isShopMember(shopId) ||
         resource.data.owner_user_id == request.auth.uid ||
@@ -82,7 +76,20 @@ service cloud.firestore {
       // Shop Members Subcollection
       match /members/{uid} {
         allow read: if isShopMember(shopId) || request.auth.uid == uid;
-        allow create, update: if isAuthenticated() && (request.auth.uid == uid || isOwner(shopId));
+
+        allow create: if isAuthenticated() && (
+          // Owner creating initial member record for a new shop
+          (request.auth.uid == uid &&
+           get(/databases/$(database)/documents/shops/$(shopId)).data.owner_user_id == request.auth.uid &&
+           request.resource.data.role == 'OWNER') ||
+          // Owner adding member
+          isOwner(shopId) ||
+          // Joining via invite code
+          (request.auth.uid == uid && request.resource.data.role in ['STAFF', 'PARTNER'] &&
+           exists(/databases/$(database)/documents/shops/$(shopId)/invites/$(request.resource.data.invite_code)))
+        );
+
+        allow update: if isOwner(shopId);
         allow delete: if isOwner(shopId);
       }
 
@@ -90,13 +97,11 @@ service cloud.firestore {
       // Shop Invites Subcollection
       match /invites/{code} {
         allow read: if isAuthenticated();
-        allow create, update: if isOwner(shopId) || isAuthenticated();
-        allow delete: if isOwner(shopId);
+        allow create, update, delete: if isOwner(shopId);
       }
 
 
       // --- Public Scope ---
-      // Collections: parties, categories, stock_items, txns, txn_lines, payments, payment_promises
       match /scopes/public/{collection}/{docId} {
         allow read: if isShopMember(shopId);
         allow create, update: if isOwner(shopId) || isStaff(shopId);
@@ -104,24 +109,34 @@ service cloud.firestore {
       }
 
 
-      // --- Vault Scope ---
-      // Collections: txns (purchases), txn_lines, payments (supplier payouts), expenses, attachments
-      match /scopes/vault/{collection}/{docId} {
-        // Owner & Partner can read vault data; Staff CANNOT read vault data
+      // --- Vault Summaries (Explicit Non-Overlapping Path) ---
+      match /scopes/vault/summaries/{date} {
         allow read: if isOwner(shopId) || isPartner(shopId);
-
-        // Owner & Staff can write vault records (Staff pushes purchase records on device buy)
-        allow create, update: if isOwner(shopId) || isStaff(shopId);
-
-        // Only Owner can delete vault records
-        allow delete: if isOwner(shopId);
+        allow create, update, delete: if isOwner(shopId);
       }
 
 
-      // --- Vault Summaries ---
-      match /scopes/vault/summaries/{date} {
+      // --- Vault Scope Collections ---
+      match /scopes/vault/collections/{collection}/{docId} {
         allow read: if isOwner(shopId) || isPartner(shopId);
-        allow write: if isOwner(shopId);
+
+        allow create: if (isOwner(shopId) || isStaff(shopId)) &&
+          request.resource.data.shop_id == shopId &&
+          request.resource.data.scope == 'VAULT';
+
+        allow update: if isOwner(shopId) && collection != 'payments';
+        allow delete: if isOwner(shopId);
+      }
+
+      match /scopes/vault/{collection}/{docId} {
+        allow read: if isOwner(shopId) || isPartner(shopId);
+
+        allow create: if (isOwner(shopId) || isStaff(shopId)) &&
+          request.resource.data.shop_id == shopId &&
+          request.resource.data.scope == 'VAULT';
+
+        allow update: if isOwner(shopId) && collection != 'payments';
+        allow delete: if isOwner(shopId);
       }
     }
   }

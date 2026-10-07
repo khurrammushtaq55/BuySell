@@ -34,7 +34,11 @@ private suspend fun enqueueSyncOutbox(
 
         val meta = db.appMetaDao().getAppMeta()
         val activeShopId = meta?.activeShopId ?: "default_shop"
-        FirestoreSyncManager(db).pushOutbox(activeShopId, Role.OWNER, "session_active")
+        val user = db.userDao().getPrimaryUser()
+        val role = user?.role ?: Role.STAFF
+        val sessionId = user?.activeSessionId?.ifBlank { "session_active" } ?: "session_active"
+
+        FirestoreSyncManager(db).pushOutbox(activeShopId, role, sessionId)
     }
 }
 

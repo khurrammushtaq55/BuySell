@@ -1,16 +1,17 @@
 package com.mmushtaq04.buysell.presentation.screens.home
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.mmushtaq04.buysell.data.local.AppDatabase
+import com.mmushtaq04.buysell.data.local.entity.AppMetaEntity
 import com.mmushtaq04.buysell.data.local.entity.ShopEntity
+import com.mmushtaq04.buysell.data.sync.FirestoreSyncManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.util.Calendar
@@ -20,61 +21,55 @@ data class HomeUiState(
     val userRole: String = "Owner",
     val todaySalesCount: Int = 0,
     val todaySalesAmountPaisa: Long = 0L,
-    val isLoading: Boolean = false
+    val isSyncing: Boolean = false,
+    val isOnline: Boolean = true
 )
 
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     private val db = AppDatabase.getInstance(application)
     private val firestore = FirebaseFirestore.getInstance()
-    private val auth = FirebaseAuth.getInstance()
 
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
+    companion object {
+        private const val TAG = "HomeViewModel"
+    }
+
     init {
-        observeShopTitle()
-        loadHomeScreenData()
+        loadHomeData()
     }
 
-    private fun observeShopTitle() {
+    fun loadHomeData() {
         viewModelScope.launch {
-            db.shopDao().observePrimaryShop().collect { shop ->
-                if (shop != null && shop.name.isNotBlank()) {
-                    _uiState.value = _uiState.value.copy(shopName = shop.name)
-                }
-            }
-        }
-    }
+            Log.d(TAG, "Loading home data from AppDatabase & AppMeta...")
+            val meta = db.appMetaDao().getAppMeta() ?: AppMetaEntity(
+                id = 1,
+                deviceCode = "HC01",
+                deviceId = "dev-01"
+            )
 
-    fun loadHomeScreenData() {
-        viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true)
-
-            val meta = db.appMetaDao().getAppMeta()
-            val activeShopId = meta?.activeShopId ?: "default_shop"
-
-            // 1. Try reading Shop from Local Room DB first
+            val activeShopId = meta.activeShopId ?: "default_shop"
             var localShop = db.shopDao().getShopById(activeShopId)
 
-            // 2. If local shop not found, fetch from Cloud Firestore and cache in Room DB
             if (localShop == null) {
                 runCatching {
-                    val doc = firestore.collection("shops").document(activeShopId).get().await()
-                    if (doc.exists()) {
-                        val name = doc.getString("name") ?: "Mera Buy/Sell Store"
-                        val phone = doc.getString("phone") ?: ""
-                        val address = doc.getString("address") ?: ""
-                        val ownerUserId = doc.getString("owner_user_id") ?: auth.currentUser?.uid ?: ""
+                    val shopDoc = firestore.collection("shops").document(activeShopId).get().await()
+                    if (shopDoc.exists()) {
+                        val name = shopDoc.getString("name") ?: "Mera Buy/Sell Store"
+                        val phone = shopDoc.getString("phone")
+                        val address = shopDoc.getString("address")
+                        val ownerUserId = shopDoc.getString("owner_user_id") ?: ""
 
                         val now = System.currentTimeMillis()
                         localShop = ShopEntity(
                             id = activeShopId,
                             name = name,
+                            code = "SHOP",
+                            ownerUserId = ownerUserId,
                             phone = phone,
                             address = address,
-                            ownerUserId = ownerUserId,
-                            shopId = activeShopId,
                             createdAt = now,
                             updatedAt = now,
                             createdBy = ownerUserId,
@@ -85,31 +80,47 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 }
             }
 
-            val shopTitle = localShop?.name ?: "Mera Buy/Sell Store"
-            _uiState.value = _uiState.value.copy(shopName = shopTitle, userRole = "Owner")
-
-            // 3. Compute today's start and end timestamps (Karachi timezone / local midnight)
             val cal = Calendar.getInstance().apply {
                 set(Calendar.HOUR_OF_DAY, 0)
                 set(Calendar.MINUTE, 0)
                 set(Calendar.SECOND, 0)
                 set(Calendar.MILLISECOND, 0)
             }
-            val startOfDayMs = cal.timeInMillis
-            cal.add(Calendar.DAY_OF_MONTH, 1)
-            val endOfDayMs = cal.timeInMillis - 1
+            val startOfDay = cal.timeInMillis
+            val endOfDay = startOfDay + 24 * 60 * 60 * 1000L - 1L
 
-            // 4. Reactively observe sales count and sales total amount in real time from Room DB
-            combine(
-                db.txnDao().observeTodaySalesCount(activeShopId, startOfDayMs, endOfDayMs),
-                db.txnDao().observeTodaySalesAmountPaisa(activeShopId, startOfDayMs, endOfDayMs)
-            ) { count, amountPaisa ->
-                _uiState.value = _uiState.value.copy(
-                    todaySalesCount = count,
-                    todaySalesAmountPaisa = amountPaisa,
-                    isLoading = false
-                )
-            }.collect {}
+            val todayCount = db.txnDao().getTodaySalesCount(activeShopId, startOfDay, endOfDay)
+            val todayAmount = db.txnDao().getTodaySalesAmountPaisa(activeShopId, startOfDay, endOfDay)
+
+            val user = db.userDao().getPrimaryUser()
+            val userRole = user?.role?.name ?: "Owner"
+            val shopTitle = localShop?.name ?: "Mera Buy/Sell Store"
+
+            _uiState.value = _uiState.value.copy(
+                shopName = shopTitle,
+                userRole = userRole,
+                todaySalesCount = todayCount,
+                todaySalesAmountPaisa = todayAmount
+            )
+        }
+    }
+
+    fun triggerSync() {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isSyncing = true)
+            val meta = db.appMetaDao().getAppMeta()
+            val shopId = meta?.activeShopId ?: "default_shop"
+            val user = db.userDao().getPrimaryUser()
+            val role = user?.role ?: com.mmushtaq04.buysell.data.local.enums.Role.STAFF
+            val sessionId = user?.activeSessionId ?: "session_active"
+
+            runCatching {
+                val syncManager = FirestoreSyncManager(db)
+                syncManager.pushOutbox(shopId, role, sessionId)
+                syncManager.pullChanges(shopId, role)
+            }
+
+            _uiState.value = _uiState.value.copy(isSyncing = false)
         }
     }
 }

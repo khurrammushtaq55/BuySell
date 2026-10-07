@@ -13,6 +13,7 @@ import com.mmushtaq04.buysell.data.local.enums.PaymentDirection
 import com.mmushtaq04.buysell.data.local.enums.PaymentMethod
 import com.mmushtaq04.buysell.data.local.enums.PromiseDirection
 import com.mmushtaq04.buysell.data.local.enums.Role
+import com.mmushtaq04.buysell.data.local.enums.Scope
 import com.mmushtaq04.buysell.data.local.enums.SyncOp
 import com.mmushtaq04.buysell.data.repository.StockRepositoryImpl
 import com.mmushtaq04.buysell.data.repository.toEntity
@@ -132,7 +133,8 @@ class BuyViewModel(application: Application) : AndroidViewModel(application) {
                     amount = paidPaisa,
                     method = methodEnum,
                     referenceNo = paymentDetails.ifBlank { null },
-                    payDate = now
+                    payDate = now,
+                    scope = Scope.VAULT
                 )
                 val paymentEntity = payment.toEntity(recordedBy)
                 db.paymentDao().insertPayment(paymentEntity)
@@ -159,7 +161,8 @@ class BuyViewModel(application: Application) : AndroidViewModel(application) {
                     direction = PromiseDirection.PAY,
                     amount = remainingPaisa,
                     promisedDate = now + 7 * 24 * 60 * 60 * 1000L, // default 7 days
-                    note = promisedDateStr.ifBlank { null }
+                    note = promisedDateStr.ifBlank { null },
+                    scope = Scope.VAULT
                 )
                 val promiseEntity = promise.toEntity(recordedBy)
                 db.paymentPromiseDao().insertPromise(promiseEntity)
@@ -177,7 +180,10 @@ class BuyViewModel(application: Application) : AndroidViewModel(application) {
 
             // 7. Trigger Firestore Push
             runCatching {
-                FirestoreSyncManager(db).pushOutbox(activeShopId, Role.OWNER, "session_active")
+                val user = db.userDao().getPrimaryUser()
+                val role = user?.role ?: Role.STAFF
+                val sessionId = user?.activeSessionId?.ifBlank { "session_active" } ?: "session_active"
+                FirestoreSyncManager(db).pushOutbox(activeShopId, role, sessionId)
             }
 
             onSuccess()
