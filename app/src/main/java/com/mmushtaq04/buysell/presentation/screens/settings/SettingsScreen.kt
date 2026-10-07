@@ -38,6 +38,8 @@ import com.mmushtaq04.buysell.domain.InviteManager
 import com.mmushtaq04.buysell.ui.theme.BuySellTheme
 import com.mmushtaq04.buysell.util.AppPinManager
 import com.mmushtaq04.buysell.util.AppPreferencesManager
+import com.mmushtaq04.buysell.util.DataExporter
+import kotlinx.coroutines.launch
 
 data class LanguageOption(val displayName: String, val tag: String)
 
@@ -56,6 +58,8 @@ fun SettingsScreen(
     onSignOutClick: () -> Unit = {}
 ) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
     var editableShopName by remember(shopName) { mutableStateOf(shopName) }
     var editableShopPhone by remember(shopPhone) { mutableStateOf(shopPhone) }
     var editableShopAddress by remember(shopAddress) { mutableStateOf(shopAddress) }
@@ -536,7 +540,11 @@ fun SettingsScreen(
                             icon = Icons.Default.Download,
                             title = "Export All Data (ZIP)",
                             subtitle = "Save JSON + CSV records on phone"
-                        ) { }
+                        ) {
+                            scope.launch {
+                                DataExporter.exportDataZip(context)
+                            }
+                        }
                     }
 
                     SettingClickableRow(
