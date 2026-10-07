@@ -2,71 +2,123 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper functions
+    // --- Helper Functions ---
+
+    // Checks if request is from an authenticated Firebase user
     function isAuthenticated() {
       return request.auth != null;
     }
 
-    function isShopMember(shopId) {
-      return isAuthenticated() &&
-        exists(/databases/$(database)/documents/shops/$(shopId)/members/$(request.auth.uid));
+    // Checks if the authenticated user owns the target shop document
+    function isShopOwnerByDoc(shopId) {
+      return isAuthenticated() && exists(/databases/$(database)/documents/shops/$(shopId)) && (
+        get(/databases/$(database)/documents/shops/$(shopId)).data.owner_user_id == request.auth.uid ||
+        get(/databases/$(database)/documents/shops/$(shopId)).data.ownerUserId == request.auth.uid
+      );
     }
 
-    function getShopMember(shopId) {
+    // Checks if the user is a registered member of the shop
+    function isShopMember(shopId) {
+      return isAuthenticated() && (
+        isShopOwnerByDoc(shopId) ||
+        exists(/databases/$(database)/documents/shops/$(shopId)/members/$(request.auth.uid))
+      );
+    }
+
+    // Gets member data record for current user
+    function getMemberData(shopId) {
       return get(/databases/$(database)/documents/shops/$(shopId)/members/$(request.auth.uid)).data;
     }
 
+    // Role predicates
     function isOwner(shopId) {
-      return isShopMember(shopId) && getShopMember(shopId).role == 'OWNER';
+      return isShopOwnerByDoc(shopId) || (
+        isShopMember(shopId) && getMemberData(shopId).role == 'OWNER'
+      );
     }
 
     function isStaff(shopId) {
-      return isShopMember(shopId) && getShopMember(shopId).role == 'STAFF';
+      return isShopMember(shopId) && getMemberData(shopId).role == 'STAFF';
     }
 
     function isPartner(shopId) {
-      return isShopMember(shopId) && getShopMember(shopId).role == 'PARTNER';
+      return isShopMember(shopId) && getMemberData(shopId).role == 'PARTNER';
     }
 
-    // Users
+
+    // --- Global Root Collections ---
+
+    // User Accounts
     match /users/{uid} {
       allow read: if isAuthenticated();
       allow write: if isAuthenticated() && request.auth.uid == uid;
     }
 
-    // Shops
-    match /shops/{shopId} {
-      allow read: if isShopMember(shopId);
-      allow write: if isOwner(shopId);
+    // Root Invites (used for 8-character invite code lookup)
+    match /invites/{code} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated();
+    }
 
-      // Members & Invites
+
+    // --- Shop Subtree Architecture ---
+
+    match /shops/{shopId} {
+      // Shop Document Rules
+      allow read: if isAuthenticated() && (
+        isShopMember(shopId) ||
+        resource.data.owner_user_id == request.auth.uid ||
+        resource.data.ownerUserId == request.auth.uid
+      );
+
+      allow create: if isAuthenticated() && (
+        request.resource.data.owner_user_id == request.auth.uid ||
+        request.resource.data.ownerUserId == request.auth.uid
+      );
+
+      allow update, delete: if isOwner(shopId);
+
+
+      // Shop Members Subcollection
       match /members/{uid} {
-        allow read: if isShopMember(shopId);
-        allow write: if isOwner(shopId);
+        allow read: if isShopMember(shopId) || request.auth.uid == uid;
+        allow create, update: if isAuthenticated() && (request.auth.uid == uid || isOwner(shopId));
+        allow delete: if isOwner(shopId);
       }
 
+
+      // Shop Invites Subcollection
       match /invites/{code} {
         allow read: if isAuthenticated();
-        allow write: if isOwner(shopId);
+        allow create, update: if isOwner(shopId) || isAuthenticated();
+        allow delete: if isOwner(shopId);
       }
 
-      // Public Scope: Parties, Categories, StockItems, Sales, Public Payments, Promises
+
+      // --- Public Scope ---
+      // Collections: parties, categories, stock_items, txns, txn_lines, payments, payment_promises
       match /scopes/public/{collection}/{docId} {
         allow read: if isShopMember(shopId);
         allow create, update: if isOwner(shopId) || isStaff(shopId);
         allow delete: if isOwner(shopId);
       }
 
-      // Vault Scope: Purchases, Expenses, Supplier Out Payments, Vault Attachments, Summaries
+
+      // --- Vault Scope ---
+      // Collections: txns (purchases), txn_lines, payments (supplier payouts), expenses, attachments
       match /scopes/vault/{collection}/{docId} {
-        // Owner & Partner can read vault; Staff CANNOT read vault
+        // Owner & Partner can read vault data; Staff CANNOT read vault data
         allow read: if isOwner(shopId) || isPartner(shopId);
-        // Owner can write vault; Staff can write (push) vault entries on buy/payout but cannot read them back
+
+        // Owner & Staff can write vault records (Staff pushes purchase records on device buy)
         allow create, update: if isOwner(shopId) || isStaff(shopId);
+
+        // Only Owner can delete vault records
         allow delete: if isOwner(shopId);
       }
 
-      // Vault Summaries
+
+      // --- Vault Summaries ---
       match /scopes/vault/summaries/{date} {
         allow read: if isOwner(shopId) || isPartner(shopId);
         allow write: if isOwner(shopId);

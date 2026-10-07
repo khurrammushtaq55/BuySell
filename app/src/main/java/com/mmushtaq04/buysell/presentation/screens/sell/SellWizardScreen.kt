@@ -53,7 +53,6 @@ fun SellWizardScreen(
 
     var buyerName by remember { mutableStateOf("") }
     var buyerPhone by remember { mutableStateOf("") }
-    var recordedBy by remember { mutableStateOf(currentUserName) }
     var salePriceText by remember { mutableStateOf("") }
     var receivedAmountText by remember { mutableStateOf("") }
     var paymentMethod by remember { mutableStateOf("Cash") }
@@ -191,12 +190,12 @@ fun SellWizardScreen(
                         Text("Sale Record Karne Wala (User):", fontSize = 15.sp, fontWeight = FontWeight.Bold)
 
                         OutlinedTextField(
-                            value = recordedBy,
-                            onValueChange = { recordedBy = it },
-                            label = { Text("Record Karne Wale Ka Naam / User *") },
-                            placeholder = { Text("e.g. Ali Ahmed") },
+                            value = currentUserName,
+                            onValueChange = {},
+                            readOnly = true,
+                            label = { Text("Record Karne Wala (Logged-in User) *") },
                             leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
-                            supportingText = { Text("Farokht kis user/staff ne record ki") },
+                            supportingText = { Text("Aap ka logged-in account name — badla nahi ja sakta") },
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
@@ -214,7 +213,7 @@ fun SellWizardScreen(
                         ) {
                             Column(modifier = Modifier.padding(16.dp)) {
                                 Text("Sale Price: Rs $salePrice", fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                                Text("Record karne wala: $recordedBy", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Text("Record karne wala: $currentUserName", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                 if (remaining > 0) {
                                     Text("Customer par baqi udhaar: Rs $remaining", color = Color(0xFFD32F2F), fontWeight = FontWeight.Bold)
                                 } else {
@@ -295,7 +294,7 @@ fun SellWizardScreen(
                                     salePrice,
                                     buyerName,
                                     buyerPhone,
-                                    recordedBy,
+                                    currentUserName,
                                     received,
                                     paymentMethod,
                                     paymentDetails,

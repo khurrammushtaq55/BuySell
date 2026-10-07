@@ -6,7 +6,11 @@ import com.mmushtaq04.buysell.data.local.enums.TrackingMode
 import java.util.UUID
 
 object CategoryPresets {
-    fun getPresetCategories(shopId: String, userId: String = ""): List<CategoryEntity> {
+    fun getPresetCategories(
+        shopId: String,
+        selectedCategoryNames: Set<String> = emptySet(),
+        userId: String = ""
+    ): List<CategoryEntity> {
         val now = System.currentTimeMillis()
         val presets = listOf(
             Triple("mobile", "Mobile", Pair(IdentifierType.IMEI, TrackingMode.UNIQUE)),
@@ -22,6 +26,12 @@ object CategoryPresets {
         )
 
         return presets.mapIndexed { index, (key, name, types) ->
+            val isEnabled = if (selectedCategoryNames.isEmpty()) {
+                true
+            } else {
+                selectedCategoryNames.any { it.equals(name, ignoreCase = true) || it.equals(key, ignoreCase = true) }
+            }
+
             CategoryEntity(
                 id = UUID.randomUUID().toString(),
                 shopId = shopId,
@@ -29,7 +39,7 @@ object CategoryPresets {
                 presetKey = key,
                 identifierType = types.first,
                 trackingMode = types.second,
-                enabled = true,
+                enabled = isEnabled,
                 sortOrder = index,
                 createdAt = now,
                 updatedAt = now,

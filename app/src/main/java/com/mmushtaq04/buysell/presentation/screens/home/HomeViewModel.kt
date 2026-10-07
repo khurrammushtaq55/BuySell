@@ -33,7 +33,18 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
     init {
+        observeShopTitle()
         loadHomeScreenData()
+    }
+
+    private fun observeShopTitle() {
+        viewModelScope.launch {
+            db.shopDao().observePrimaryShop().collect { shop ->
+                if (shop != null && shop.name.isNotBlank()) {
+                    _uiState.value = _uiState.value.copy(shopName = shop.name)
+                }
+            }
+        }
     }
 
     fun loadHomeScreenData() {

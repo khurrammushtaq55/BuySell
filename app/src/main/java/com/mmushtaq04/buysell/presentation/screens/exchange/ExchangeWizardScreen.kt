@@ -70,7 +70,6 @@ fun ExchangeWizardScreen(
     // Step 3: Customer & Payment
     var customerName by remember { mutableStateOf("") }
     var customerPhone by remember { mutableStateOf("") }
-    var recordedBy by remember { mutableStateOf(currentUserName) }
     var cashPaidText by remember { mutableStateOf("") }
     var paymentMethod by remember { mutableStateOf("Cash") }
     var isSaving by remember { mutableStateOf(false) }
@@ -395,10 +394,12 @@ fun ExchangeWizardScreen(
                         HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
 
                         OutlinedTextField(
-                            value = recordedBy,
-                            onValueChange = { recordedBy = it },
-                            label = { Text("Exchange Record Karne Wala (User) *") },
+                            value = currentUserName,
+                            onValueChange = {},
+                            readOnly = true,
+                            label = { Text("Exchange Record Karne Wala (Logged-in User) *") },
                             leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
+                            supportingText = { Text("Aap ka logged-in account name — badla nahi ja sakta") },
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
@@ -431,7 +432,7 @@ fun ExchangeWizardScreen(
                                     oldPrice,
                                     customerName,
                                     customerPhone,
-                                    recordedBy,
+                                    currentUserName,
                                     cashPaid,
                                     paymentMethod
                                 )

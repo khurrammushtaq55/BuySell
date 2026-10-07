@@ -1,5 +1,10 @@
 package com.mmushtaq04.buysell.presentation.screens.settings
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import android.content.Intent
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -23,19 +28,31 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.firebase.firestore.FirebaseFirestore
 import com.mmushtaq04.buysell.data.local.entity.CategoryEntity
+import com.mmushtaq04.buysell.domain.InviteManager
 import com.mmushtaq04.buysell.ui.theme.BuySellTheme
 import com.mmushtaq04.buysell.util.AppPinManager
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun SettingsScreen(
+    userRole: String = "Owner",
+    shopName: String = "Mera Buy/Sell Store",
+    shopPhone: String = "",
+    shopAddress: String = "",
     allCategories: List<CategoryEntity> = emptyList(),
+    onUpdateShopProfile: (name: String, phone: String, address: String) -> Unit = { _, _, _ -> },
     onToggleCategory: (CategoryEntity) -> Unit = {},
     onNavigateBack: () -> Unit = {},
     onSignOutClick: () -> Unit = {}
 ) {
     val context = LocalContext.current
+    var editableShopName by remember(shopName) { mutableStateOf(shopName) }
+    var editableShopPhone by remember(shopPhone) { mutableStateOf(shopPhone) }
+    var editableShopAddress by remember(shopAddress) { mutableStateOf(shopAddress) }
+    var isSavingShopProfile by remember { mutableStateOf(false) }
+
     var selectedLanguage by remember { mutableStateOf("Roman Urdu / رومن اردو") }
     var expandedLanguageDropdown by remember { mutableStateOf(false) }
     var slowStockDaysText by remember { mutableStateOf("30") }
@@ -43,8 +60,16 @@ fun SettingsScreen(
 
     var showPinDialog by remember { mutableStateOf(false) }
     var showSignOutDialog by remember { mutableStateOf(false) }
+    var showTeamDialog by remember { mutableStateOf(false) }
+
+    var activeInviteCode by remember { mutableStateOf("") }
+    var inviteRole by remember { mutableStateOf("STAFF") }
+    var isGeneratingCode by remember { mutableStateOf(false) }
+
     var pinInputText by remember { mutableStateOf("") }
     var isPinActive by remember { mutableStateOf(runCatching { AppPinManager.isPinSet(context) }.getOrDefault(false)) }
+
+    val isOwner = userRole.equals("Owner", ignoreCase = true)
 
     val languages = listOf(
         "Roman Urdu / رومن اردو",
@@ -56,6 +81,123 @@ fun SettingsScreen(
         "Arabic / العربية",
         "Chinese / 简体中文"
     )
+
+    if (showTeamDialog) {
+        AlertDialog(
+            onDismissRequest = { showTeamDialog = false },
+            icon = { Icon(Icons.Default.Group, contentDescription = null) },
+            title = { Text("Team & Member Invites", fontWeight = FontWeight.Bold) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Text("Role chunay aur 8-digit join code banayein:", fontSize = 14.sp)
+
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        FilterChip(
+                            selected = inviteRole == "STAFF",
+                            onClick = { inviteRole = "STAFF" },
+                            label = { Text("Staff Member", fontSize = 12.sp) },
+                            leadingIcon = if (inviteRole == "STAFF") {
+                                { Icon(Icons.Default.CheckCircle, contentDescription = null, modifier = Modifier.size(14.dp)) }
+                            } else null
+                        )
+
+                        FilterChip(
+                            selected = inviteRole == "PARTNER",
+                            onClick = { inviteRole = "PARTNER" },
+                            label = { Text("Sleeping Partner", fontSize = 12.sp) },
+                            leadingIcon = if (inviteRole == "PARTNER") {
+                                { Icon(Icons.Default.CheckCircle, contentDescription = null, modifier = Modifier.size(14.dp)) }
+                            } else null
+                        )
+                    }
+
+                    if (activeInviteCode.isNotBlank()) {
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(16.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text("Invite Code ($inviteRole):", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Text(
+                                    text = activeInviteCode,
+                                    fontSize = 24.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                                Text("Expires in 7 days", fontSize = 11.sp, color = Color.Gray)
+                            }
+                        }
+
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            OutlinedButton(
+                                onClick = {
+                                    val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                                    val clip = ClipData.newPlainText("Invite Code", activeInviteCode)
+                                    clipboard.setPrimaryClip(clip)
+                                    Toast.makeText(context, "Code copied!", Toast.LENGTH_SHORT).show()
+                                },
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text("Copy Code")
+                            }
+
+                            Button(
+                                onClick = {
+                                    val roleLabel = if (inviteRole == "STAFF") "Staff Member" else "Sleeping Partner"
+                                    val shareMsg = "Aap ko Hafeez Center App par $roleLabel join karne ka Code bheja gaya hai: $activeInviteCode. App download karein aur 'Join with Code' chunay."
+                                    val intent = Intent(Intent.ACTION_SEND).apply {
+                                        type = "text/plain"
+                                        putExtra(Intent.EXTRA_TEXT, shareMsg)
+                                    }
+                                    context.startActivity(Intent.createChooser(intent, "Share Code"))
+                                },
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text("WhatsApp Share")
+                            }
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        isGeneratingCode = true
+                        val newCode = InviteManager.generateInviteCode()
+                        activeInviteCode = newCode
+
+                        runCatching {
+                            val db = FirebaseFirestore.getInstance()
+                            val inviteData = mapOf(
+                                "code" to newCode,
+                                "role" to inviteRole,
+                                "created_at" to System.currentTimeMillis()
+                            )
+                            db.collection("invites").document(newCode).set(inviteData)
+                        }
+                        isGeneratingCode = false
+                    },
+                    enabled = !isGeneratingCode
+                ) {
+                    Text(if (activeInviteCode.isBlank()) "Naya Code Banayein" else "Code Dobara Banayein")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showTeamDialog = false }) {
+                    Text("Close")
+                }
+            }
+        )
+    }
 
     if (showPinDialog) {
         AlertDialog(
@@ -154,6 +296,66 @@ fun SettingsScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            // Shop Details Editable Section (Owner Only)
+            Text("Dukan ki Details:", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+
+            OutlinedTextField(
+                value = editableShopName,
+                onValueChange = { editableShopName = it },
+                label = { Text("Dukan Ka Naam") },
+                readOnly = !isOwner,
+                leadingIcon = { Icon(Icons.Default.Store, contentDescription = null) },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            OutlinedTextField(
+                value = editableShopPhone,
+                onValueChange = { editableShopPhone = it },
+                label = { Text("Dukan Mobile Number") },
+                readOnly = !isOwner,
+                leadingIcon = { Icon(Icons.Default.Phone, contentDescription = null) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            OutlinedTextField(
+                value = editableShopAddress,
+                onValueChange = { editableShopAddress = it },
+                label = { Text("Dukan / Shop Address") },
+                readOnly = !isOwner,
+                leadingIcon = { Icon(Icons.Default.LocationOn, contentDescription = null) },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            if (isOwner) {
+                Button(
+                    onClick = {
+                        if (editableShopName.isNotBlank()) {
+                            isSavingShopProfile = true
+                            onUpdateShopProfile(
+                                editableShopName.trim(),
+                                editableShopPhone.trim(),
+                                editableShopAddress.trim()
+                            )
+                            isSavingShopProfile = false
+                            Toast.makeText(context, "Dukan ki detail update ho gayi ✓", Toast.LENGTH_SHORT).show()
+                        }
+                    },
+                    enabled = editableShopName.isNotBlank() && !isSavingShopProfile,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Dukan Details Save Karein ✓", fontWeight = FontWeight.Bold)
+                }
+            } else {
+                Text(
+                    text = "Note: Dukan ki detail sirf Shop Owner tabdeeli kar sakta hai.",
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
+            HorizontalDivider()
+
             // Language Selection
             Text("Aap ki Zaban (Language):", fontWeight = FontWeight.Bold, fontSize = 16.sp)
 
@@ -189,6 +391,21 @@ fun SettingsScreen(
 
             HorizontalDivider()
 
+            // Team Management (Owner Only)
+            if (isOwner) {
+                Text("Team & Staff Management:", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+
+                SettingClickableRow(
+                    icon = Icons.Default.GroupAdd,
+                    title = "Team & Staff Invites / Code",
+                    subtitle = "Staff members ya Sleeping Partner ke liye invite code banayein"
+                ) {
+                    showTeamDialog = true
+                }
+
+                HorizontalDivider()
+            }
+
             // Shop Categories Management
             Text("Trading Categories (Check/Uncheck Karein):", fontWeight = FontWeight.Bold, fontSize = 16.sp)
             Text("Jin categories mein dukan deal karti hai, unhein select karein:", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -202,6 +419,7 @@ fun SettingsScreen(
                     allCategories.forEach { categoryItem ->
                         FilterChip(
                             selected = categoryItem.enabled,
+                            enabled = isOwner,
                             onClick = {
                                 onToggleCategory(categoryItem)
                             },
@@ -216,8 +434,8 @@ fun SettingsScreen(
 
             HorizontalDivider()
 
-            // Shop Profile Settings
-            Text("Shop Detail:", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+            // Shop Receipt & Slow Stock Settings
+            Text("Receipt & Stock Settings:", fontWeight = FontWeight.Bold, fontSize = 16.sp)
 
             OutlinedTextField(
                 value = slowStockDaysText,
@@ -264,11 +482,13 @@ fun SettingsScreen(
                 showPinDialog = true
             }
 
-            SettingClickableRow(
-                icon = Icons.Default.Download,
-                title = "Export All Data (ZIP)",
-                subtitle = "Save JSON + CSV + Photos on phone"
-            ) { }
+            if (isOwner || userRole.equals("Partner", ignoreCase = true)) {
+                SettingClickableRow(
+                    icon = Icons.Default.Download,
+                    title = "Export All Data (ZIP)",
+                    subtitle = "Save JSON + CSV + Photos on phone"
+                ) { }
+            }
 
             SettingClickableRow(
                 icon = Icons.AutoMirrored.Filled.Logout,
@@ -286,7 +506,7 @@ fun SettingsScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "Hafeez Center Tracker v1.0 (Build 1)",
+                    text = "Hafeez Center Tracker v1.0 (Build 1) • Role: $userRole",
                     fontSize = 12.sp,
                     color = Color.Gray
                 )

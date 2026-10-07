@@ -33,11 +33,17 @@ interface ShopDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertShop(shop: ShopEntity)
 
+    @Update
+    suspend fun updateShop(shop: ShopEntity)
+
     @Query("SELECT * FROM shops WHERE id = :shopId AND deleted_at IS NULL LIMIT 1")
     suspend fun getShopById(shopId: String): ShopEntity?
 
     @Query("SELECT * FROM shops WHERE id = :shopId AND deleted_at IS NULL LIMIT 1")
     fun observeShopById(shopId: String): Flow<ShopEntity?>
+
+    @Query("SELECT * FROM shops WHERE deleted_at IS NULL LIMIT 1")
+    fun observePrimaryShop(): Flow<ShopEntity?>
 }
 
 @Dao

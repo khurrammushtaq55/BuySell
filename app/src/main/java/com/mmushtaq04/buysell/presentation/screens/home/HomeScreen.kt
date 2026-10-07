@@ -2,7 +2,9 @@ package com.mmushtaq04.buysell.presentation.screens.home
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -29,8 +31,11 @@ fun HomeScreen(
     onNavigateToExchange: () -> Unit = {},
     onNavigateToStock: () -> Unit = {},
     onNavigateToParties: () -> Unit = {},
+    onNavigateToDashboard: () -> Unit = {},
     onNavigateToSettings: () -> Unit = {}
 ) {
+    val isPartner = userRole.equals("Partner", ignoreCase = true)
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -56,12 +61,36 @@ fun HomeScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
+                .verticalScroll(rememberScrollState())
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            if (isPartner) {
+                // Partner Banner
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer)
+                ) {
+                    Row(
+                        modifier = Modifier.padding(14.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(Icons.Default.Visibility, contentDescription = null, modifier = Modifier.size(28.dp))
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Column {
+                            Text("Sleeping Partner Mode (View-Only)", fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                            Text("Sirf sales, munafa aur dashboard reports dekh sakte hain", fontSize = 12.sp)
+                        }
+                    }
+                }
+            }
+
             // Today Summary Banner
             Card(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { if (isPartner || userRole.equals("Owner", ignoreCase = true)) onNavigateToDashboard() },
                 shape = RoundedCornerShape(12.dp),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
             ) {
@@ -90,8 +119,46 @@ fun HomeScreen(
                 }
             }
 
+            // Prominent Dashboard Card for Owner and Partner
+            if (isPartner || userRole.equals("Owner", ignoreCase = true)) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { onNavigateToDashboard() },
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Assessment,
+                            contentDescription = null,
+                            modifier = Modifier.size(32.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Column {
+                            Text(
+                                text = "Owner / Partner Dashboard & Reports",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 16.sp
+                            )
+                            Text(
+                                text = "Munafa, sales analytics, aur stock reports dekhein",
+                                fontSize = 12.sp,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
+                            )
+                        }
+                    }
+                }
+            }
+
             Text(
-                text = "Kaya karna chahte hain?",
+                text = if (isPartner) "View-Only Sections:" else "Kaya karna chahte hain?",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -103,21 +170,21 @@ fun HomeScreen(
             ) {
                 ActionCard(
                     title = "Phone Bechna",
-                    subtitle = "Farokht",
+                    subtitle = if (isPartner) "Read-Only" else "Farokht",
                     icon = Icons.Default.Sell,
-                    backgroundColor = Color(0xFFE8F5E9),
-                    contentColor = Color(0xFF2E7D32),
+                    backgroundColor = if (isPartner) Color.LightGray.copy(alpha = 0.3f) else Color(0xFFE8F5E9),
+                    contentColor = if (isPartner) Color.Gray else Color(0xFF2E7D32),
                     modifier = Modifier.weight(1f),
-                    onClick = onNavigateToSell
+                    onClick = { if (!isPartner) onNavigateToSell() }
                 )
                 ActionCard(
                     title = "Phone Khareedna",
-                    subtitle = "Khareedari",
+                    subtitle = if (isPartner) "Read-Only" else "Khareedari",
                     icon = Icons.Default.ShoppingCart,
-                    backgroundColor = Color(0xFFE3F2FD),
-                    contentColor = Color(0xFF1565C0),
+                    backgroundColor = if (isPartner) Color.LightGray.copy(alpha = 0.3f) else Color(0xFFE3F2FD),
+                    contentColor = if (isPartner) Color.Gray else Color(0xFF1565C0),
                     modifier = Modifier.weight(1f),
-                    onClick = onNavigateToBuy
+                    onClick = { if (!isPartner) onNavigateToBuy() }
                 )
             }
 
@@ -151,9 +218,11 @@ fun HomeScreen(
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { onNavigateToExchange() },
+                    .clickable { if (!isPartner) onNavigateToExchange() },
                 shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
+                colors = CardDefaults.cardColors(
+                    containerColor = if (isPartner) Color.LightGray.copy(alpha = 0.3f) else MaterialTheme.colorScheme.secondaryContainer
+                )
             ) {
                 Row(
                     modifier = Modifier
@@ -165,19 +234,20 @@ fun HomeScreen(
                         imageVector = Icons.Default.SwapHoriz,
                         contentDescription = null,
                         modifier = Modifier.size(32.dp),
-                        tint = MaterialTheme.colorScheme.onSecondaryContainer
+                        tint = if (isPartner) Color.Gray else MaterialTheme.colorScheme.onSecondaryContainer
                     )
                     Spacer(modifier = Modifier.width(16.dp))
                     Column {
                         Text(
                             text = "Purana de kar naya (Exchange)",
                             fontWeight = FontWeight.Bold,
-                            fontSize = 16.sp
+                            fontSize = 16.sp,
+                            color = if (isPartner) Color.Gray else MaterialTheme.colorScheme.onSecondaryContainer
                         )
                         Text(
-                            text = "Customer purana phone de kar naya le raha hai",
+                            text = if (isPartner) "Partner mode — entry disabled" else "Customer purana phone de kar naya le raha hai",
                             fontSize = 12.sp,
-                            color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f)
+                            color = if (isPartner) Color.Gray else MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f)
                         )
                     }
                 }
@@ -237,6 +307,7 @@ private fun ActionCard(
 fun HomeScreenPreview() {
     BuySellTheme {
         HomeScreen(
+            userRole = "Partner",
             todaySalesCount = 3,
             todaySalesAmountPaisa = 12500000L
         )

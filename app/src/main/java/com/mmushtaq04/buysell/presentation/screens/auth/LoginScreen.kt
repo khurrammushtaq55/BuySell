@@ -12,6 +12,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Mail
 import androidx.compose.material.icons.filled.Storefront
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -21,6 +23,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -46,6 +49,7 @@ fun LoginScreen(
     var isRegisterMode by remember { mutableStateOf(false) }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var isPasswordVisible by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
@@ -188,21 +192,40 @@ fun LoginScreen(
             // Email Field
             OutlinedTextField(
                 value = email,
-                onValueChange = { email = it },
+                onValueChange = {
+                    email = it
+                    if (errorMessage != null) errorMessage = null
+                },
                 label = { Text("Email Address") },
                 leadingIcon = { Icon(Icons.Default.Mail, contentDescription = null) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // Password Field
+            // Password Field with Show/Hide Toggle
             OutlinedTextField(
                 value = password,
-                onValueChange = { password = it },
+                onValueChange = {
+                    password = it
+                    if (errorMessage != null) errorMessage = null
+                },
                 label = { Text("Password") },
-                supportingText = { Text("Kam az kam 8 characters — aasan yaad wala rakhein") },
+                supportingText = {
+                    Text(
+                        text = if (password.isNotEmpty() && password.length < 4) "Kam az kam 4 characters (abhi ${password.length} hain)" else "Kam az kam 4 characters password zaroori hai",
+                        color = if (password.isNotEmpty() && password.length < 4) MaterialTheme.colorScheme.error else Color.Unspecified
+                    )
+                },
+                isError = password.isNotEmpty() && password.length < 4,
                 leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
-                visualTransformation = PasswordVisualTransformation(),
+                trailingIcon = {
+                    val image = if (isPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff
+                    val description = if (isPasswordVisible) "Hide password" else "Show password"
+                    IconButton(onClick = { isPasswordVisible = !isPasswordVisible }) {
+                        Icon(imageVector = image, contentDescription = description)
+                    }
+                },
+                visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 modifier = Modifier.fillMaxWidth()
             )
@@ -218,27 +241,34 @@ fun LoginScreen(
             // Submit Button
             Button(
                 onClick = {
-                    if (email.isNotBlank() && password.length >= 6) {
-                        isLoading = true
-                        scope.launch {
-                            val result = if (isRegisterMode) {
-                                authManager.createAccountWithEmail(email, password)
-                            } else {
-                                authManager.signInWithEmail(email, password)
-                            }
-                            isLoading = false
-                            if (result.isSuccess) {
-                                onEmailAuthSuccess()
-                            } else {
-                                val err = result.exceptionOrNull()?.localizedMessage ?: "Authentication failed"
-                                errorMessage = err
-                                Toast.makeText(context, "Login Galti: $err", Toast.LENGTH_LONG).show()
-                            }
+                    if (email.isBlank() || !email.contains("@")) {
+                        errorMessage = "Sahi email address darj karein"
+                        return@Button
+                    }
+                    if (password.length < 4) {
+                        errorMessage = "Password kam az kam 4 characters ka hona zaroori hai"
+                        return@Button
+                    }
+
+                    isLoading = true
+                    errorMessage = null
+                    scope.launch {
+                        val result = if (isRegisterMode) {
+                            authManager.createAccountWithEmail(email.trim(), password)
+                        } else {
+                            authManager.signInWithEmail(email.trim(), password)
                         }
-                    } else {
-                        errorMessage = "Sahi email aur kam az kam 6 digit password daalein"
+                        isLoading = false
+                        if (result.isSuccess) {
+                            onEmailAuthSuccess()
+                        } else {
+                            val err = result.exceptionOrNull()?.localizedMessage ?: "Authentication failed"
+                            errorMessage = err
+                            Toast.makeText(context, "Login Galti: $err", Toast.LENGTH_LONG).show()
+                        }
                     }
                 },
+                enabled = email.isNotBlank() && password.length >= 4 && !isLoading,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(52.dp),

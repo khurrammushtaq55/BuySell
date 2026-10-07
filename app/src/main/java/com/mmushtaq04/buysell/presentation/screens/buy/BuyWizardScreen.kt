@@ -63,7 +63,6 @@ fun BuyWizardScreen(
     var sellerName by remember { mutableStateOf("") }
     var sellerPhone by remember { mutableStateOf("") }
     var sellerCnic by remember { mutableStateOf("") }
-    var recordedBy by remember { mutableStateOf(currentUserName) }
 
     var paidAmountText by remember { mutableStateOf("") }
     var paymentMethod by remember { mutableStateOf("Cash") }
@@ -127,7 +126,7 @@ fun BuyWizardScreen(
                         name = sellerName, onNameChange = { sellerName = it },
                         phone = sellerPhone, onPhoneChange = { sellerPhone = it },
                         cnic = sellerCnic, onCnicChange = { sellerCnic = it },
-                        recordedBy = recordedBy, onRecordedByChange = { recordedBy = it }
+                        currentUserName = currentUserName
                     )
                     4 -> StepPaymentInfo(
                         totalPrice = priceText.toLongOrNull() ?: 0L,
@@ -160,7 +159,7 @@ fun BuyWizardScreen(
                                 sellerName,
                                 sellerPhone,
                                 sellerCnic,
-                                recordedBy,
+                                currentUserName,
                                 paid,
                                 paymentMethod,
                                 paymentDetails,
@@ -342,7 +341,7 @@ private fun StepSellerInfo(
     name: String, onNameChange: (String) -> Unit,
     phone: String, onPhoneChange: (String) -> Unit,
     cnic: String, onCnicChange: (String) -> Unit,
-    recordedBy: String, onRecordedByChange: (String) -> Unit
+    currentUserName: String
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text("Bechne wale ki maloomat (Seller):", fontSize = 16.sp, fontWeight = FontWeight.Bold)
@@ -376,12 +375,12 @@ private fun StepSellerInfo(
         Text("Khareedari Record Karne Wala (User):", fontSize = 15.sp, fontWeight = FontWeight.Bold)
 
         OutlinedTextField(
-            value = recordedBy,
-            onValueChange = onRecordedByChange,
-            label = { Text("Record Karne Wale Ka Naam / User *") },
-            placeholder = { Text("e.g. Ali Ahmed") },
+            value = currentUserName,
+            onValueChange = {},
+            readOnly = true,
+            label = { Text("Record Karne Wala (Logged-in User) *") },
             leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
-            supportingText = { Text("Khareedari kis user/staff ne record ki") },
+            supportingText = { Text("Aap ka logged-in account name — badla nahi ja sakta") },
             modifier = Modifier.fillMaxWidth()
         )
     }
