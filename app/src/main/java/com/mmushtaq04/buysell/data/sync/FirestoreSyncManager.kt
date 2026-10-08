@@ -6,23 +6,21 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.mmushtaq04.buysell.data.auth.FirebaseAuthManager
 import com.mmushtaq04.buysell.data.local.AppDatabase
 import com.mmushtaq04.buysell.data.local.entity.*
-import com.mmushtaq04.buysell.data.local.enums.Role
-import com.mmushtaq04.buysell.data.local.enums.Scope
-import com.mmushtaq04.buysell.data.local.enums.SyncOp
+import com.mmushtaq04.buysell.data.local.enums.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.util.UUID
 
-class FirestoreSyncManager(
-    private val db: AppDatabase,
-    private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance(),
-    private val gson: Gson = Gson()
-) {
+class FirestoreSyncManager(private val db: AppDatabase) {
+
+    private val firestore = FirebaseFirestore.getInstance()
     private val syncDao = db.syncDao()
+    private val gson = Gson()
 
     companion object {
         private const val TAG = "FirestoreSync"
@@ -159,6 +157,17 @@ class FirestoreSyncManager(
             val userDoc = runCatching { firestore.collection("users").document(userId).get().await() }.getOrNull()
             if (userDoc != null && userDoc.exists()) {
                 val userMap = userDoc.data ?: emptyMap()
+
+                // Single-Device Session Enforcement: Check active_session_id
+                val remoteSessionId = userDoc.getString("active_session_id") ?: userDoc.getString("activeSessionId")
+                val localUser = db.userDao().getPrimaryUser()
+                if (!remoteSessionId.isNullOrBlank() && localUser != null && !localUser.activeSessionId.isNullOrBlank() && remoteSessionId != localUser.activeSessionId) {
+                    Log.w(TAG, "Session mismatch detected: Remote ($remoteSessionId) != Local (${localUser.activeSessionId}). Logged in on another device.")
+                    FirebaseAuthManager().signOut()
+                    db.clearAllTables()
+                    return@runCatching ""
+                }
+
                 applyFirestoreDocToRoom("users", userMap)
                 shopId = userDoc.getString("shop_id") ?: userDoc.getString("shopId")
             }
@@ -211,11 +220,6 @@ class FirestoreSyncManager(
             }
 
             if (shopId.isNullOrBlank()) {
-                val primaryUser = db.userDao().getPrimaryUser()
-                shopId = primaryUser?.shopId
-            }
-
-            if (shopId.isNullOrBlank()) {
                 Log.w(TAG, "No shop ID found for restore, skipping restore step.")
                 return@runCatching ""
             }
@@ -260,59 +264,81 @@ class FirestoreSyncManager(
         }
     }
 
+    private suspend fun purgeLocalVaultRow(entityType: String, entityId: String) {
+        runCatching {
+            when (entityType.lowercase().trim()) {
+                "parties", "party" -> db.partyDao().getPartyById(entityId)?.let { db.partyDao().insertParty(it.copy(deletedAt = System.currentTimeMillis())) }
+                "payments", "payment" -> db.paymentDao().deletePayment(entityId)
+                "expenses", "expense" -> db.expenseDao().deleteExpense(entityId)
+                "txns", "txn" -> {
+                    db.txnDao().getTxnById(entityId)?.let { db.txnDao().insertTxn(it.copy(deletedAt = System.currentTimeMillis())) }
+                    db.txnDao().deleteTxnLinesByTxnId(entityId)
+                }
+            }
+            Log.d(TAG, "Purged local staff vault row for entity '$entityType', ID '$entityId'")
+        }
+    }
+
     private suspend fun applyFirestoreDocToRoom(colName: String, data: Map<String, Any?>) {
-        val normalizedMap = data.toMutableMap()
-        normalizedMap.forEach { (key, value) ->
-            if (value is Timestamp) {
-                normalizedMap[key] = value.toDate().time
+        val json = gson.toJson(data)
+        when (colName.lowercase().trim()) {
+            "users", "user" -> {
+                val obj = gson.fromJson(json, UserEntity::class.java)
+                db.userDao().insertUser(obj)
+            }
+            "shops", "shop" -> {
+                val obj = gson.fromJson(json, ShopEntity::class.java)
+                db.shopDao().insertShop(obj)
+            }
+            "categories", "category" -> {
+                val obj = gson.fromJson(json, CategoryEntity::class.java)
+                db.categoryDao().insertCategories(listOf(obj))
+            }
+            "parties", "party" -> {
+                val obj = gson.fromJson(json, PartyEntity::class.java)
+                db.partyDao().insertParty(obj)
+            }
+            "stock_items", "stockitem", "stock" -> {
+                val obj = gson.fromJson(json, StockItemEntity::class.java)
+                db.stockItemDao().insertStockItem(obj)
+            }
+            "txns", "txn" -> {
+                val obj = gson.fromJson(json, TxnEntity::class.java)
+                db.txnDao().insertTxn(obj)
+            }
+            "txn_lines", "txnline", "line" -> {
+                val obj = gson.fromJson(json, TxnLineEntity::class.java)
+                db.txnDao().insertTxnLines(listOf(obj))
+            }
+            "payments", "payment" -> {
+                val obj = gson.fromJson(json, PaymentEntity::class.java)
+                db.paymentDao().insertPayment(obj)
+            }
+            "payment_promises", "paymentpromise", "promise" -> {
+                val obj = gson.fromJson(json, PaymentPromiseEntity::class.java)
+                db.paymentPromiseDao().insertPromise(obj)
+            }
+            "expenses", "expense" -> {
+                val obj = gson.fromJson(json, ExpenseEntity::class.java)
+                db.expenseDao().insertExpense(obj)
             }
         }
-        val json = gson.toJson(normalizedMap)
-        runCatching {
-            when (colName.lowercase().trim()) {
-                "stock_items", "stock_item" -> {
-                    val entity = gson.fromJson(json, StockItemEntity::class.java)
-                    if (entity != null) db.stockItemDao().insertStockItem(entity)
-                }
-                "parties", "party" -> {
-                    val entity = gson.fromJson(json, PartyEntity::class.java)
-                    if (entity != null) db.partyDao().insertParty(entity)
-                }
-                "categories", "category" -> {
-                    val entity = gson.fromJson(json, CategoryEntity::class.java)
-                    if (entity != null) db.categoryDao().insertCategories(listOf(entity))
-                }
-                "txns", "txn" -> {
-                    val entity = gson.fromJson(json, TxnEntity::class.java)
-                    if (entity != null) db.txnDao().insertTxn(entity)
-                }
-                "txn_lines", "txn_line" -> {
-                    val entity = gson.fromJson(json, TxnLineEntity::class.java)
-                    if (entity != null) db.txnDao().insertTxnLines(listOf(entity))
-                }
-                "payments", "payment" -> {
-                    val entity = gson.fromJson(json, PaymentEntity::class.java)
-                    if (entity != null) db.paymentDao().insertPayment(entity)
-                }
-                "payment_promises", "payment_promise" -> {
-                    val entity = gson.fromJson(json, PaymentPromiseEntity::class.java)
-                    if (entity != null) db.paymentPromiseDao().insertPromise(entity)
-                }
-                "expenses", "expense" -> {
-                    val entity = gson.fromJson(json, ExpenseEntity::class.java)
-                    if (entity != null) db.expenseDao().insertExpense(entity)
-                }
-                "shops", "shop" -> {
-                    val entity = gson.fromJson(json, ShopEntity::class.java)
-                    if (entity != null) db.shopDao().insertShop(entity)
-                }
-                "users", "user" -> {
-                    val entity = gson.fromJson(json, UserEntity::class.java)
-                    if (entity != null) db.userDao().insertUser(entity)
-                }
-            }
-        }.onFailure { e ->
-            Log.e(TAG, "Error applying Firestore doc to Room for collection '$colName': ${e.localizedMessage}", e)
+    }
+
+    private fun getCollectionName(entityType: String): String {
+        return when (entityType.lowercase().trim()) {
+            "stock_items", "stockitem", "stock" -> "stock_items"
+            "txn_lines", "txnline", "line" -> "txn_lines"
+            "payment_promises", "paymentpromise", "promise" -> "payment_promises"
+            "payment_accounts", "paymentaccount" -> "payment_accounts"
+            "shop_members", "shopmember", "member" -> "members"
+            "parties", "party" -> "parties"
+            "categories", "category" -> "categories"
+            "txns", "txn" -> "txns"
+            "payments", "payment" -> "payments"
+            "expenses", "expense" -> "expenses"
+            "attachments", "attachment" -> "attachments"
+            else -> entityType
         }
     }
 
@@ -322,44 +348,6 @@ class FirestoreSyncManager(
             is Timestamp -> valObj.toDate().time
             is String -> valObj.toLongOrNull() ?: 0L
             else -> 0L
-        }
-    }
-
-    private suspend fun purgeLocalVaultRow(entityType: String, entityId: String) {
-        runCatching {
-            when (entityType.lowercase().trim()) {
-                "txn", "txns" -> {
-                    db.txnDao().getTxnById(entityId)?.let { txn ->
-                        if (txn.scope == Scope.VAULT) {
-                            db.txnDao().deleteTxn(entityId)
-                            db.txnDao().deleteTxnLinesByTxnId(entityId)
-                            Log.d(TAG, "Purged staff local vault purchase txn '$entityId' & purchase txn_lines from Room DB.")
-                        }
-                    }
-                }
-                "payment", "payments" -> {
-                    db.paymentDao().deletePayment(entityId)
-                    Log.d(TAG, "Purged staff local vault payment '$entityId' from Room DB.")
-                }
-            }
-        }
-    }
-
-    private fun getCollectionName(entityType: String): String {
-        return when (val clean = entityType.lowercase().trim()) {
-            "party", "parties" -> "parties"
-            "category", "categories" -> "categories"
-            "stock_item", "stockitem", "stock_items", "stockitems" -> "stock_items"
-            "txn", "txns", "transaction", "transactions" -> "txns"
-            "txn_line", "txnline", "txn_lines", "txnlines" -> "txn_lines"
-            "payment", "payments" -> "payments"
-            "payment_promise", "paymentpromise", "payment_promises", "paymentpromises" -> "payment_promises"
-            "expense", "expenses" -> "expenses"
-            "attachment", "attachments" -> "attachments"
-            "shop", "shops" -> "shops"
-            "shop_member", "shopmember", "shop_members", "shopmembers", "member", "members" -> "members"
-            "user", "users" -> "users"
-            else -> if (clean.endsWith("s")) clean else clean + "s"
         }
     }
 }

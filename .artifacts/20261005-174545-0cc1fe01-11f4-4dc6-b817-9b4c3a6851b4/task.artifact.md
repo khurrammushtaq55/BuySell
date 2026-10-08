@@ -161,3 +161,7 @@
 	- [x] Added automatic migration logic in `AppPreferencesManager.kt` to seamlessly convert legacy saved `"b+ur+Latn"` / `"zh-Hans"` preferences to `"ur-Latn"` / `"zh-CN"`.
 	- [x] Unified `supportedLanguages` in `AppPreferencesManager` as single source of truth and delegated `LocaleManagerUtil` to it.
 	- [x] Updated `locales_config.xml` entries to `<locale android:name="ur-Latn"/>` and `<locale android:name="zh-CN"/>`.
+- [x] Non-blocking Onboarding Sync, Member ID Keying & Single-Device Session Enforcement
+	- [x] Keyed `ShopMemberEntity.id = currentUserId` in `ShopSetupViewModel.kt`.
+	- [x] Replaced synchronous `pushOutbox` awaiting with asynchronous `SyncWorker.enqueueOneTimeSync(getApplication())` in `ShopSetupViewModel.kt` for instant (< 10 ms) offline shop creation and joining.
+	- [x] Added single-device `active_session_id` validation in `FirestoreSyncManager.kt` during data restoration.

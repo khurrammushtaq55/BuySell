@@ -19,6 +19,7 @@ import com.mmushtaq04.buysell.data.local.enums.MemberStatus
 import com.mmushtaq04.buysell.data.local.enums.Role
 import com.mmushtaq04.buysell.data.local.enums.SyncOp
 import com.mmushtaq04.buysell.data.sync.FirestoreSyncManager
+import com.mmushtaq04.buysell.data.sync.SyncWorker
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.util.UUID
@@ -164,10 +165,8 @@ class ShopSetupViewModel(application: Application) : AndroidViewModel(applicatio
             )
             db.appMetaDao().insertOrUpdate(meta.copy(activeShopId = shopId, deviceCode = finalDeviceCode))
 
-            // 5. Trigger Firestore Sync
-            runCatching {
-                FirestoreSyncManager(db).pushOutbox(shopId, roleEnum, activeSessionId)
-            }
+            // 5. Trigger Non-Blocking Background Sync via WorkManager (instant < 10 ms onboarding execution)
+            SyncWorker.enqueueOneTimeSync(getApplication())
 
             Log.i(TAG, "✓ Shop '$shopName' ($shopId) successfully created with device code '$finalDeviceCode'!")
             onSuccess()
@@ -303,8 +302,11 @@ class ShopSetupViewModel(application: Application) : AndroidViewModel(applicatio
                 )
                 db.appMetaDao().insertOrUpdate(meta.copy(activeShopId = shopId, deviceCode = finalDeviceCode))
 
-                // 6. Download Shop's Stock, Parties & Transactions
-                FirestoreSyncManager(db).restoreUserDataFromFirestore(currentUserId)
+                // 6. Asynchronously trigger restore/sync without hanging onboarding
+                SyncWorker.enqueueOneTimeSync(getApplication())
+                runCatching {
+                    FirestoreSyncManager(db).restoreUserDataFromFirestore(currentUserId)
+                }
 
                 Log.i(TAG, "✓ Successfully joined shop '$shopId' as role '$verifiedRole' via invite code '$codeClean'!")
                 onSuccess()

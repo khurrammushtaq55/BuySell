@@ -250,6 +250,12 @@ interface ExpenseDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertExpense(expense: ExpenseEntity)
 
+    @Query("SELECT * FROM expenses WHERE id = :expenseId LIMIT 1")
+    suspend fun getExpenseById(expenseId: String): ExpenseEntity?
+
+    @Query("DELETE FROM expenses WHERE id = :expenseId")
+    suspend fun deleteExpense(expenseId: String)
+
     @Query("SELECT * FROM expenses WHERE shop_id = :shopId ORDER BY expense_date DESC")
     fun observeExpenses(shopId: String): Flow<List<ExpenseEntity>>
 }
@@ -264,15 +270,12 @@ interface AppMetaDao {
 
     @Query("SELECT * FROM app_meta WHERE id = 1 LIMIT 1")
     fun observeAppMeta(): Flow<AppMetaEntity?>
-
-    @Query("UPDATE app_meta SET receipt_seq = receipt_seq + 1 WHERE id = 1")
-    suspend fun incrementReceiptSeq()
 }
 
 @Dao
 interface SyncDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun enqueueOutbox(outbox: SyncOutboxEntity)
+    suspend fun enqueueOutbox(item: SyncOutboxEntity)
 
     @Query("SELECT * FROM sync_outbox ORDER BY created_at ASC")
     suspend fun getPendingOutbox(): List<SyncOutboxEntity>
@@ -280,18 +283,9 @@ interface SyncDao {
     @Query("DELETE FROM sync_outbox WHERE id = :id")
     suspend fun deleteOutbox(id: String)
 
-    @Query("SELECT * FROM sync_cursor WHERE collection_path = :path LIMIT 1")
-    suspend fun getCursor(path: String): SyncCursorEntity?
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun saveCursor(cursor: SyncCursorEntity)
-}
 
-@Dao
-interface ConflictDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertConflict(conflict: ConflictEntity)
-
-    @Query("SELECT * FROM conflicts WHERE shop_id = :shopId AND status = 'OPEN'")
-    fun observeOpenConflicts(shopId: String): Flow<List<ConflictEntity>>
+    @Query("SELECT * FROM sync_cursor WHERE collection_path = :path LIMIT 1")
+    suspend fun getCursor(path: String): SyncCursorEntity?
 }
