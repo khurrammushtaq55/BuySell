@@ -170,3 +170,6 @@
 	- [x] Removed `NonCancellable` from `FirestoreSyncManager.kt` `pushOutbox` and `pullChanges`.
 	- [x] Wrapped all Firestore `.await()` network tasks in `kotlinx.coroutines.withTimeout(5_000L)`.
 	- [x] Wrapped `pushOutbox` in `withTimeoutOrNull(5_000L)` inside `SettingsViewModel.kt` `handleSignOut` so offline sign-out attempts time out in 5 seconds and display the **Unsynced Data Warning Dialog** immediately without freezing the UI.
+- [x] Privilege Escalation Fix in Member Security Rules
+	- [x] Separated `allow create` from `allow update, delete` under `match /members/{uid}` in `firestore.rules`.
+	- [x] Restricted member document creation to new registrations with valid invite codes, and restricted member document updates and deletions strictly to shop owners (`isShopOwner(shopId)`).
