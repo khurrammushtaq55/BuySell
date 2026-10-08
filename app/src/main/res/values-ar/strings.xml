@@ -268,7 +268,7 @@
     <string name="theme_light">المظهر الفاتح</string>
     <string name="theme_dark">المظهر الداكن</string>
     <string name="settings_unsynced_warning_title">تحذير: بيانات غير متزامنة</string>
-    <string name="settings_unsynced_warning_msg">لديك %1 سجل محلي لم يتم مزامنته مع السحابة بعد. تسجيل الخروج الآن سيؤدي إلى حذف هذه السجلات نهائياً. يرجى الاتصال بالإنترنت للمزامنة أولاً، أو التأكيد على الحذف.</string>
+    <string name="settings_unsynced_warning_msg">لديك %1$d سجل محلي لم يتم مزامنته مع السحابة بعد. تسجيل الخروج الآن سيؤدي إلى حذف هذه السجلات نهائياً. يرجى الاتصال بالإنترنت للمزامنة أولاً، أو التأكيد على الحذف.</string>
     <string name="settings_btn_try_sync">إعادة محاولة المزامنة</string>
     <string name="settings_btn_discard_signout">حذف البيانات وتسجيل الخروج</string>
 </resources>

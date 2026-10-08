@@ -268,7 +268,7 @@
     <string name="theme_light">Thème Clair</string>
     <string name="theme_dark">Thème Sombre</string>
     <string name="settings_unsynced_warning_title">Avertissement Données non Synchronisées</string>
-    <string name="settings_unsynced_warning_msg">Vous avez %1 enregistrement(s) non synchronisé(s) localement. Se déconnecter maintenant supprimera définitivement ces données. Veuillez vous connecter à internet pour synchroniser d\'abord, ou confirmez l\'abandon.</string>
+    <string name="settings_unsynced_warning_msg">Vous avez %1$d enregistrement(s) non synchronisé(s) localement. Se déconnecter maintenant supprimera définitivement ces données. Veuillez vous connecter à internet pour synchroniser d\'abord, ou confirmez l\'abandon.</string>
     <string name="settings_btn_try_sync">Ressayer la Synchronisation</string>
     <string name="settings_btn_discard_signout">Se Déconnecter et Abandonner</string>
 </resources>

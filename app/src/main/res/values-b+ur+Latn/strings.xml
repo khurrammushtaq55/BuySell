@@ -268,7 +268,7 @@
     <string name="theme_light">Light Theme</string>
     <string name="theme_dark">Dark Theme</string>
     <string name="settings_unsynced_warning_title">Unsynced Data Warning</string>
-    <string name="settings_unsynced_warning_msg">Aap ke paas %1 local records hain jo abhi cloud par sync nahi huay. Logout karne se yeh records hamesha ke liye delete ho jayein ge. Baraye meharbani pehle internet connect kar ke sync karein ya discard karne ki tasdeeq karein.</string>
+    <string name="settings_unsynced_warning_msg">Aap ke paas %1$d local records hain jo abhi cloud par sync nahi huay. Logout karne se yeh records hamesha ke liye delete ho jayein ge. Baraye meharbani pehle internet connect kar ke sync karein ya discard karne ki tasdeeq karein.</string>
     <string name="settings_btn_try_sync">Dobara Sync Try Karein</string>
     <string name="settings_btn_discard_signout">Data Discard Karein aur Logout</string>
 </resources>

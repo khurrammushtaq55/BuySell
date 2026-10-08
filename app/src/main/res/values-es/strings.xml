@@ -268,7 +268,7 @@
     <string name="theme_light">Tema Claro</string>
     <string name="theme_dark">Tema Oscuro</string>
     <string name="settings_unsynced_warning_title">Advertencia de Datos no Sincronizados</string>
-    <string name="settings_unsynced_warning_msg">Tiene %1 registro(s) sin sincronizar guardados localmente. Cerrar sesión ahora borrará permanentemente estos registros. Por favor, conéctese a internet para sincronizar primero, o confirme para descartar.</string>
+    <string name="settings_unsynced_warning_msg">Tiene %1$d registro(s) sin sincronizar guardados localmente. Cerrar sesión ahora borrará permanentemente estos registros. Por favor, conéctese a internet para sincronizar primero, o confirme para descartar.</string>
     <string name="settings_btn_try_sync">Intentar Sincronizar de Nuevo</string>
     <string name="settings_btn_discard_signout">Cerrar Sesión y Descartar Datos</string>
 </resources>

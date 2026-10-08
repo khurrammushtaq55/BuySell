@@ -311,4 +311,49 @@ class CoreLogicTest {
         assertTrue(updatedItem?.hasConflict == true)
         assertTrue(conflictDetector.checkConflictForStockItem(shopId, item.id))
     }
+
+    @Test
+    fun testValidateAllStringFormatSpecifiers() {
+        val rootDir = java.io.File("src/main/res")
+        if (!rootDir.exists()) {
+            System.err.println("Skipping testValidateAllStringFormatSpecifiers in non-standard test directory")
+            return
+        }
+
+        val valueFolders = rootDir.listFiles { file -> file.isDirectory && file.name.startsWith("values") }
+        assertNotNull("No values folders found in res", valueFolders)
+        assertTrue("Expected values folders in res", valueFolders!!.isNotEmpty())
+
+        val badPattern = java.util.regex.Pattern.compile("%(\\d+)(?!\\$[a-zA-Z])")
+        val errors = mutableListOf<String>()
+
+        for (folder in valueFolders) {
+            val stringsFile = java.io.File(folder, "strings.xml")
+            if (!stringsFile.exists()) continue
+
+            try {
+                val factory = javax.xml.parsers.DocumentBuilderFactory.newInstance()
+                val builder = factory.newDocumentBuilder()
+                val doc = builder.parse(stringsFile)
+                val stringNodes = doc.getElementsByTagName("string")
+
+                for (i in 0 until stringNodes.length) {
+                    val node = stringNodes.item(i)
+                    val keyName = node.attributes.getNamedItem("name")?.nodeValue ?: "unknown"
+                    val textContent = node.textContent ?: ""
+
+                    val matcher = badPattern.matcher(textContent)
+                    if (matcher.find()) {
+                        errors.add("${folder.name}/strings.xml -> key '$keyName': \"$textContent\"")
+                    }
+                }
+            } catch (e: Exception) {
+                fail("Failed to parse ${folder.name}/strings.xml: ${e.message}")
+            }
+        }
+
+        if (errors.isNotEmpty()) {
+            fail("Found ${errors.size} invalid format specifier(s) without type conversion specifiers (\$s, \$d, etc.):\n" + errors.joinToString("\n"))
+        }
+    }
 }

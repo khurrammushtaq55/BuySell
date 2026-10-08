@@ -119,7 +119,7 @@
 	- [x] Verified 100% parity across all 8 locale folders
 - [x] Comprehensive Data Layer & Core Logic Unit Test Suite
 	- [x] Added `CoreLogicTest.kt` with Robolectric unit tests covering `AppPinManager` SHA-256 salting, `InviteManager` format, `AppMetaEntity` device code persistence, Trade-in Exchange transactions, Staff Vault Purge DAO operations, Khata Ledger payment calculations, and `ConflictDetector` double-sale flagging
-	- [x] Verified **9/9 JVM unit tests passed cleanly**.
+	- [x] Verified **10/10 JVM unit tests passed cleanly**.
 - [x] Google Sign-In CredentialManager Fix & Detailed Diagnostics
 	- [x] Implemented `CustomCredential` fallback in `LoginScreen.kt` via `GoogleIdTokenCredential.createFrom(credential.data)` to fix silent Google Sign-In failure on Android 14+ devices
 	- [x] Added detailed Logcat logging under tags `LoginScreen` and `FirebaseAuthManager` for Web Client ID resolution, credential class types, ID token extraction, and full exception stack traces (`Log.e`)
@@ -150,8 +150,9 @@
 - [x] Shop Member ID Keying & Firestore Security Rules Fix
 	- [x] Set `ShopMemberEntity.id = currentUserId` in `ShopSetupViewModel.kt` so outbox sync uploads directly to `shops/{shopId}/members/{currentUserId}`.
 	- [x] Expanded `match /members/{uid}` rules in `firestore.rules` to permit `create` and `update` (UPSERT) operations for shop members.
-- [x] Format Specifier %1$d Fix in login_pwd_char_count
-	- [x] Replaced `%1` with `%1$d` in `login_pwd_char_count` across all 8 locale `strings.xml` files (`values`, `values-ur`, `values-b+ur+Latn`, `values-es`, `values-fr`, `values-hi`, `values-ar`, `values-zh-rCN`), resolving the `UnknownFormatConversionException` crash during password typing.
+- [x] Format Specifier %1$d Fix in login_pwd_char_count & settings_unsynced_warning_msg
+	- [x] Replaced `%1` with `%1$d` in `settings_unsynced_warning_msg` across all 8 locale `strings.xml` files (`values`, `values-ur`, `values-b+ur+Latn`, `values-es`, `values-fr`, `values-hi`, `values-ar`, `values-zh-rCN`), resolving the `UnknownFormatConversionException` crash during dialog rendering.
+	- [x] Added permanent `@Test fun testValidateAllStringFormatSpecifiers()` to `CoreLogicTest.kt` to catch any unescaped `%1` format specifier on every unit test run.
 - [x] Pending Outbox Safeguard & Unsynced Data Warning on Sign Out
 	- [x] Implemented `handleSignOut` in `SettingsViewModel.kt` to trigger pre-logout sync push and check `sync_outbox`.
 	- [x] Added **Unsynced Data Warning Alert Dialog** in `SettingsScreen.kt` displaying unsynced count with options to retry sync or confirm data discard.
