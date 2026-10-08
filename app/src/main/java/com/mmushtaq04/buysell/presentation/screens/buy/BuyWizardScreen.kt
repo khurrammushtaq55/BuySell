@@ -490,11 +490,11 @@ private fun StepPayment(
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
-                Text("Kul Qeemat: Rs $totalPrice", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                Text(stringResource(R.string.label_total_price, totalPrice), fontWeight = FontWeight.Bold, fontSize = 18.sp)
                 if (remaining > 0) {
-                    Text("Baqi Udhaar: Rs $remaining", color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+                    Text(stringResource(R.string.label_remaining_udhaar, remaining), color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
                 } else {
-                    Text("Mukammal Ada Kar Diya ✓", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+                    Text(stringResource(R.string.label_fully_paid), color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
                 }
             }
         }
@@ -508,7 +508,7 @@ private fun StepPayment(
             modifier = Modifier.fillMaxWidth()
         )
 
-        Text("Payment Tariqa Select Karein:", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+        Text(stringResource(R.string.label_select_payment_method), fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
         FlowRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -530,7 +530,7 @@ private fun StepPayment(
         OutlinedTextField(
             value = details,
             onValueChange = onDetailsChange,
-            label = { Text("Payment Detail / Reference No") },
+            label = { Text(stringResource(R.string.label_payment_ref_no)) },
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -538,8 +538,8 @@ private fun StepPayment(
             OutlinedTextField(
                 value = promisedDate,
                 onValueChange = onPromisedChange,
-                label = { Text("Baqi Wapsi Date") },
-                supportingText = { Text("Jaise: 7 din baad, ya tareeq likhein") },
+                label = { Text(stringResource(R.string.label_promised_return_date)) },
+                supportingText = { Text(stringResource(R.string.sub_promised_date_hint)) },
                 modifier = Modifier.fillMaxWidth()
             )
         }

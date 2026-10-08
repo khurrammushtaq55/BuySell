@@ -116,7 +116,7 @@ fun ExchangeWizardScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Exchange / Trade-in Wizard (Step $step/3)", fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(R.string.exchange_wizard_title, step, 3), fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = {
                         if (step > 1) step-- else onNavigateBack()
@@ -137,12 +137,12 @@ fun ExchangeWizardScreen(
             when (step) {
                 1 -> {
                     // Step 1: Select new item from stock
-                    Text("1. Dukan se bechnay wala item chunay:", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.exchange_step1_header), fontSize = 16.sp, fontWeight = FontWeight.Bold)
 
                     OutlinedTextField(
                         value = searchQuery,
                         onValueChange = { searchQuery = it },
-                        label = { Text("Model ya IMEI se talash karein") },
+                        label = { Text(stringResource(R.string.exchange_search_label)) },
                         leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -185,7 +185,7 @@ fun ExchangeWizardScreen(
                         OutlinedTextField(
                             value = newPhonePriceText,
                             onValueChange = { newPhonePriceText = it },
-                            label = { Text("Naye Item ki Sale Price (Rs)") },
+                            label = { Text(stringResource(R.string.exchange_new_price_label)) },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -196,7 +196,7 @@ fun ExchangeWizardScreen(
                         enabled = selectedItem != null && newPhonePriceText.isNotBlank(),
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("Agla Step (Purane Item ki Details)")
+                        Text(stringResource(R.string.exchange_btn_step2))
                     }
                 }
 
@@ -208,9 +208,9 @@ fun ExchangeWizardScreen(
                             .verticalScroll(rememberScrollState()),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        Text("2. Grahak ka purana item jo lena hai:", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.exchange_step2_header), fontSize = 16.sp, fontWeight = FontWeight.Bold)
 
-                        Text("Select Category:", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                        Text(stringResource(R.string.exchange_select_category), fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
                         FlowRow(
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                             verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -275,7 +275,7 @@ fun ExchangeWizardScreen(
                         OutlinedTextField(
                             value = oldModel,
                             onValueChange = { oldModel = it },
-                            label = { Text("Model Name / Variant") },
+                            label = { Text(stringResource(R.string.exchange_old_model_label)) },
                             modifier = Modifier.fillMaxWidth()
                         )
 
@@ -322,7 +322,7 @@ fun ExchangeWizardScreen(
                         OutlinedTextField(
                             value = oldImei,
                             onValueChange = { oldImei = it },
-                            label = { Text("IMEI / Serial Number") },
+                            label = { Text(stringResource(R.string.exchange_old_imei_label)) },
                             modifier = Modifier.fillMaxWidth()
                         )
 
@@ -344,15 +344,15 @@ fun ExchangeWizardScreen(
                         OutlinedTextField(
                             value = oldIssueText,
                             onValueChange = { oldIssueText = it },
-                            label = { Text("Defects / Issue (if any)") },
-                            supportingText = { Text("e.g. Screen glass cracked, Face ID not working") },
+                            label = { Text(stringResource(R.string.exchange_defects_label)) },
+                            supportingText = { Text(stringResource(R.string.exchange_defects_sub)) },
                             modifier = Modifier.fillMaxWidth()
                         )
 
                         OutlinedTextField(
                             value = oldPhoneValueText,
                             onValueChange = { oldPhoneValueText = it },
-                            label = { Text("Purane Item ki Lagayei Gayi Qeemat (Rs)") },
+                            label = { Text(stringResource(R.string.exchange_old_value_label)) },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -363,7 +363,7 @@ fun ExchangeWizardScreen(
                         enabled = oldCategory.isNotBlank() && oldPhoneValueText.isNotBlank(),
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("Agla Step (Customer & Hisab)")
+                        Text(stringResource(R.string.exchange_btn_step3))
                     }
                 }
 
@@ -379,7 +379,7 @@ fun ExchangeWizardScreen(
                             .verticalScroll(rememberScrollState()),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        Text("3. Exchange Hisab Kitab:", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.exchange_step3_header), fontSize = 16.sp, fontWeight = FontWeight.Bold)
 
                         Card(
                             modifier = Modifier.fillMaxWidth(),
@@ -389,11 +389,11 @@ fun ExchangeWizardScreen(
                                 modifier = Modifier.padding(16.dp),
                                 verticalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-                                Text("Naye Item Price: Rs $newPrice", fontWeight = FontWeight.SemiBold)
-                                Text("Purane Item Value: Rs $oldVal", fontWeight = FontWeight.SemiBold)
+                                Text(stringResource(R.string.exchange_new_price_summary, newPrice), fontWeight = FontWeight.SemiBold)
+                                Text(stringResource(R.string.exchange_old_value_summary, oldVal), fontWeight = FontWeight.SemiBold)
                                 HorizontalDivider()
                                 Text(
-                                    text = if (diff >= 0) "Grahak ne dene hain: Rs $diff" else "Shop ne dene hain: Rs ${-diff}",
+                                    text = if (diff >= 0) stringResource(R.string.exchange_customer_due, diff) else stringResource(R.string.exchange_shop_due, -diff),
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 18.sp,
                                     color = if (diff >= 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
@@ -404,14 +404,14 @@ fun ExchangeWizardScreen(
                         OutlinedTextField(
                             value = customerName,
                             onValueChange = { customerName = it },
-                            label = { Text("Customer Name") },
+                            label = { Text(stringResource(R.string.exchange_customer_name_label)) },
                             modifier = Modifier.fillMaxWidth()
                         )
 
                         OutlinedTextField(
                             value = customerPhone,
                             onValueChange = { customerPhone = it },
-                            label = { Text("Customer Phone") },
+                            label = { Text(stringResource(R.string.exchange_customer_phone_label)) },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -419,12 +419,12 @@ fun ExchangeWizardScreen(
                         OutlinedTextField(
                             value = cashPaidText,
                             onValueChange = { cashPaidText = it },
-                            label = { Text("Cash Received / Paid (Rs)") },
+                            label = { Text(stringResource(R.string.exchange_cash_paid_label)) },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             modifier = Modifier.fillMaxWidth()
                         )
 
-                        Text("Payment Method:", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                        Text(stringResource(R.string.exchange_payment_method_label), fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
                         FlowRow(
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                             verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -486,7 +486,7 @@ fun ExchangeWizardScreen(
                     ) {
                         Icon(Icons.Default.SwapHoriz, contentDescription = null)
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Exchange Mukammal Karein")
+                        Text(stringResource(R.string.exchange_btn_finish))
                     }
                 }
             }

@@ -277,19 +277,19 @@ fun SellWizardScreen(
                         val received = receivedAmountText.toLongOrNull() ?: salePrice
                         val remaining = (salePrice - received).coerceAtLeast(0L)
 
-                        Text("Payment confirmation:", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.label_payment_confirmation), fontSize = 16.sp, fontWeight = FontWeight.Bold)
 
                         Card(
                             modifier = Modifier.fillMaxWidth(),
                             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
                         ) {
                             Column(modifier = Modifier.padding(16.dp)) {
-                                Text("Sale Price: Rs $salePrice", fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                                Text("Record karne wala: $currentUserName", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Text(stringResource(R.string.label_sale_price_summary, salePrice), fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                                Text(stringResource(R.string.label_recorded_by_summary, currentUserName), fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                 if (remaining > 0) {
-                                    Text("Customer par baqi udhaar: Rs $remaining", color = Color(0xFFD32F2F), fontWeight = FontWeight.Bold)
+                                    Text(stringResource(R.string.label_customer_udhaar_summary, remaining), color = Color(0xFFD32F2F), fontWeight = FontWeight.Bold)
                                 } else {
-                                    Text("Full payment received ✓", color = Color(0xFF2E7D32))
+                                    Text(stringResource(R.string.label_full_payment_received), color = Color(0xFF2E7D32))
                                 }
                             }
                         }
@@ -297,7 +297,7 @@ fun SellWizardScreen(
                         OutlinedTextField(
                             value = receivedAmountText,
                             onValueChange = { receivedAmountText = it },
-                            label = { Text("Customer ne kitne diye? (Rs)") },
+                            label = { Text(stringResource(R.string.label_amount_given_by_customer)) },
                             placeholder = { Text(salePrice.toString()) },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             modifier = Modifier.fillMaxWidth()
@@ -340,7 +340,7 @@ fun SellWizardScreen(
                             OutlinedTextField(
                                 value = promisedDateText,
                                 onValueChange = { promisedDateText = it },
-                                label = { Text("Baqi kab dega? (e.g. 20 March)") },
+                                label = { Text(stringResource(R.string.label_promised_due_date)) },
                                 modifier = Modifier.fillMaxWidth()
                             )
                         }

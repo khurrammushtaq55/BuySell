@@ -105,10 +105,10 @@ fun SettingsScreen(
         AlertDialog(
             onDismissRequest = { showTeamDialog = false },
             icon = { Icon(Icons.Default.Group, contentDescription = null) },
-            title = { Text("Team & Member Invites", fontWeight = FontWeight.Bold) },
+            title = { Text(stringResource(R.string.settings_team_title), fontWeight = FontWeight.Bold) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Text("Role chunay aur 8-digit join code banayein:", fontSize = 14.sp)
+                    Text(stringResource(R.string.settings_team_sub), fontSize = 14.sp)
 
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -117,7 +117,7 @@ fun SettingsScreen(
                         FilterChip(
                             selected = inviteRole == "STAFF",
                             onClick = { inviteRole = "STAFF" },
-                            label = { Text("Staff Member", fontSize = 12.sp) },
+                            label = { Text(stringResource(R.string.settings_staff_member), fontSize = 12.sp) },
                             leadingIcon = if (inviteRole == "STAFF") {
                                 { Icon(Icons.Default.CheckCircle, contentDescription = null, modifier = Modifier.size(14.dp)) }
                             } else null
@@ -126,7 +126,7 @@ fun SettingsScreen(
                         FilterChip(
                             selected = inviteRole == "PARTNER",
                             onClick = { inviteRole = "PARTNER" },
-                            label = { Text("Sleeping Partner", fontSize = 12.sp) },
+                            label = { Text(stringResource(R.string.settings_sleeping_partner), fontSize = 12.sp) },
                             leadingIcon = if (inviteRole == "PARTNER") {
                                 { Icon(Icons.Default.CheckCircle, contentDescription = null, modifier = Modifier.size(14.dp)) }
                             } else null
@@ -142,14 +142,14 @@ fun SettingsScreen(
                                 modifier = Modifier.padding(16.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                Text("Invite Code ($inviteRole):", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Text(stringResource(R.string.settings_invite_code_label, inviteRole), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                 Text(
                                     text = activeInviteCode,
                                     fontSize = 24.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.primary
                                 )
-                                Text("Expires in 7 days", fontSize = 11.sp, color = Color.Gray)
+                                Text(stringResource(R.string.settings_code_expires_hint), fontSize = 11.sp, color = Color.Gray)
                             }
                         }
 
@@ -166,7 +166,7 @@ fun SettingsScreen(
                                 },
                                 modifier = Modifier.weight(1f)
                             ) {
-                                Text("Copy Code")
+                                Text(stringResource(R.string.settings_btn_copy_code))
                             }
 
                             Button(
@@ -181,7 +181,7 @@ fun SettingsScreen(
                                 },
                                 modifier = Modifier.weight(1f)
                             ) {
-                                Text("WhatsApp Share")
+                                Text(stringResource(R.string.settings_btn_whatsapp_share))
                             }
                         }
                     }
@@ -198,12 +198,12 @@ fun SettingsScreen(
                     },
                     enabled = !isGeneratingCode
                 ) {
-                    Text(if (activeInviteCode.isBlank()) "Naya Code Banayein" else "Code Dobara Banayein")
+                    Text(if (activeInviteCode.isBlank()) stringResource(R.string.settings_btn_generate_new_code) else stringResource(R.string.settings_btn_regenerate_code))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showTeamDialog = false }) {
-                    Text("Close")
+                    Text(stringResource(R.string.stock_close_dialog))
                 }
             }
         )
@@ -215,11 +215,11 @@ fun SettingsScreen(
             title = { Text(if (isPinActive) "App PIN Lock Badlein / Khatam Karein" else "4-Digit PIN Set Karein") },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("Cold start par app kholne ke liye 4 digit PIN:", fontSize = 14.sp)
+                    Text(stringResource(R.string.settings_pin_dialog_msg), fontSize = 14.sp)
                     OutlinedTextField(
                         value = pinInputText,
                         onValueChange = { if (it.length <= 4 && it.all { char -> char.isDigit() }) pinInputText = it },
-                        label = { Text("4 Digit PIN") },
+                        label = { Text(stringResource(R.string.settings_label_4digit_pin)) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
                         visualTransformation = PasswordVisualTransformation(),
                         modifier = Modifier.fillMaxWidth()
@@ -238,7 +238,7 @@ fun SettingsScreen(
                     },
                     enabled = pinInputText.length == 4
                 ) {
-                    Text("PIN Set Karein")
+                    Text(stringResource(R.string.settings_btn_set_pin))
                 }
             },
             dismissButton = {
@@ -251,7 +251,7 @@ fun SettingsScreen(
                             pinInputText = ""
                         }
                     ) {
-                        Text("PIN Remove Karein", color = MaterialTheme.colorScheme.error)
+                        Text(stringResource(R.string.settings_btn_remove_pin), color = MaterialTheme.colorScheme.error)
                     }
                 } else {
                     TextButton(onClick = { showPinDialog = false }) {
@@ -380,7 +380,7 @@ fun SettingsScreen(
                         OutlinedTextField(
                             value = selectedLanguageOption.displayName,
                             onValueChange = {},
-                            label = { Text("Selected Language") },
+                            label = { Text(stringResource(R.string.settings_label_selected_language)) },
                             modifier = Modifier.fillMaxWidth().clickable { expandedLanguageDropdown = true },
                             readOnly = true,
                             trailingIcon = {
@@ -464,7 +464,7 @@ fun SettingsScreen(
                         HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
                     }
 
-                    Text("Trading Categories (Product Types):", fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+                    Text(stringResource(R.string.settings_trading_categories), fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
 
                     if (allCategories.isNotEmpty()) {
                         FlowRow(
@@ -497,15 +497,15 @@ fun SettingsScreen(
                     OutlinedTextField(
                         value = slowStockDaysText,
                         onValueChange = { slowStockDaysText = it },
-                        label = { Text("Slow Stock Warning (Days)") },
-                        supportingText = { Text("Default: 30 days old stock warning") },
+                        label = { Text(stringResource(R.string.settings_slow_stock_warning)) },
+                        supportingText = { Text(stringResource(R.string.settings_slow_stock_sub)) },
                         modifier = Modifier.fillMaxWidth()
                     )
 
                     OutlinedTextField(
                         value = receiptFooterText,
                         onValueChange = { receiptFooterText = it },
-                        label = { Text("Receipt Footer Note") },
+                        label = { Text(stringResource(R.string.settings_receipt_footer_note)) },
                         modifier = Modifier.fillMaxWidth()
                     )
                 }

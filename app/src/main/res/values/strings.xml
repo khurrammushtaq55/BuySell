@@ -189,4 +189,63 @@
     <!-- Help Screen -->
     <string name="help_title">Madad / Help Topics</string>
     <string name="help_frequently_asked">Sub se zyada pooche jaane wale sawal:</string>
+
+    <!-- Exchange Wizard Strings -->
+    <string name="exchange_wizard_title">Exchange / Trade-in Wizard (Step %1$d/%2$d)</string>
+    <string name="exchange_search_label">Search by model or IMEI</string>
+    <string name="exchange_new_price_label">Sale Price of New Item (Rs)</string>
+    <string name="exchange_btn_step2">Next Step (Trade-In Device Details)</string>
+    <string name="exchange_select_category">Select Category:</string>
+    <string name="exchange_old_model_label">Model Name / Variant</string>
+    <string name="exchange_old_imei_label">IMEI / Serial Number</string>
+    <string name="exchange_defects_label">Defects / Issue (if any)</string>
+    <string name="exchange_defects_sub">e.g. Screen glass cracked, Face ID not working</string>
+    <string name="exchange_old_value_label">Agreed Value for Old Item (Rs)</string>
+    <string name="exchange_btn_step3">Next Step (Customer &amp; Payment)</string>
+    <string name="exchange_new_price_summary">New Item Price: Rs %1$d</string>
+    <string name="exchange_old_value_summary">Trade-In Value: Rs %1$d</string>
+    <string name="exchange_customer_due">Customer owes: Rs %1$d</string>
+    <string name="exchange_shop_due">Shop owes customer: Rs %1$d</string>
+    <string name="exchange_customer_name_label">Customer Name</string>
+    <string name="exchange_customer_phone_label">Customer Phone</string>
+    <string name="exchange_cash_paid_label">Cash Received / Paid (Rs)</string>
+    <string name="exchange_payment_method_label">Payment Method:</string>
+    <string name="exchange_btn_finish">Complete Exchange Transaction</string>
+
+    <!-- Buy &amp; Sell Payment Summary Strings -->
+    <string name="label_total_price">Total Price: Rs %1$d</string>
+    <string name="label_remaining_udhaar">Remaining Udhaar: Rs %1$d</string>
+    <string name="label_fully_paid">Fully Paid ✓</string>
+    <string name="label_select_payment_method">Select Payment Method:</string>
+    <string name="label_payment_ref_no">Payment Detail / Reference No</string>
+    <string name="label_promised_return_date">Remaining Balance Return Date</string>
+    <string name="sub_promised_date_hint">e.g. After 7 days, or write specific date</string>
+    <string name="label_payment_confirmation">Payment Confirmation:</string>
+    <string name="label_sale_price_summary">Sale Price: Rs %1$d</string>
+    <string name="label_recorded_by_summary">Recorded by: %1$s</string>
+    <string name="label_customer_udhaar_summary">Customer remaining udhaar: Rs %1$d</string>
+    <string name="label_full_payment_received">Full payment received ✓</string>
+    <string name="label_amount_given_by_customer">Amount paid by customer? (Rs)</string>
+    <string name="label_promised_due_date">When will remaining balance be paid?</string>
+
+    <!-- Settings Dialog Strings -->
+    <string name="settings_team_title">Team &amp; Member Invites</string>
+    <string name="settings_team_sub">Select role and generate 8-digit join code:</string>
+    <string name="settings_staff_member">Staff Member</string>
+    <string name="settings_sleeping_partner">Sleeping Partner</string>
+    <string name="settings_invite_code_label">Invite Code (%1$s):</string>
+    <string name="settings_code_expires_hint">Expires in 7 days</string>
+    <string name="settings_btn_copy_code">Copy Code</string>
+    <string name="settings_btn_whatsapp_share">WhatsApp Share</string>
+    <string name="settings_btn_generate_new_code">Generate New Code</string>
+    <string name="settings_btn_regenerate_code">Regenerate Code</string>
+    <string name="settings_pin_dialog_msg">Enter 4-digit PIN to lock app on cold start:</string>
+    <string name="settings_label_4digit_pin">4 Digit PIN</string>
+    <string name="settings_btn_set_pin">Set PIN</string>
+    <string name="settings_btn_remove_pin">Remove PIN</string>
+    <string name="settings_label_selected_language">Selected Language</string>
+    <string name="settings_trading_categories">Trading Categories (Product Types):</string>
+    <string name="settings_slow_stock_warning">Slow Stock Warning (Days)</string>
+    <string name="settings_slow_stock_sub">Default: 30 days old stock warning</string>
+    <string name="settings_receipt_footer_note">Receipt Footer Note</string>
 </resources>
