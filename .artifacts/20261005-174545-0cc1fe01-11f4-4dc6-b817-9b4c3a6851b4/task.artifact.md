@@ -93,3 +93,11 @@
 - [x] Android 13+ Runtime Notification Permission Request
 	- [x] Added `rememberLauncherForActivityResult` for `Manifest.permission.POST_NOTIFICATIONS` in `HomeScreen.kt`
 	- [x] Automatically prompts the user for notification permissions on Android 13+ (API 33+) devices upon entering the Home Screen
+- [x] Firestore Security Rules Optimization & Refactoring
+	- [x] Flattened helper functions (`getShopOwner`, `getMemberRole`, `isShopOwner`, `isShopMember`, `isStaff`, `isPartner`) to eliminate cascading `get()`/`exists()` calls and prevent 10-read limit errors
+	- [x] Eliminated redundant self-reads in `match /shops/{shopId}` by inspecting `resource.data.owner_user_id` directly
+	- [x] Secured `/users/{uid}` read privacy by restricting access strictly to `request.auth.uid == uid`
+	- [x] Standardized all rules to `owner_user_id` (snake_case)
+	- [x] Preserved atomic `getAfter(...)` batch join validations and diff-based key restrictions on `/invites/{code}`
+- [x] Extraction of All Remaining Hardcoded UI Text Strings
+	- [x] Extracted all remaining hardcoded Compose `Text("...")` strings into `res/values/strings.xml` using `stringResource(R.string...)`
