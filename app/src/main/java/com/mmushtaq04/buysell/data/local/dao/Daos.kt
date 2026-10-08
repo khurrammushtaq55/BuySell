@@ -162,6 +162,9 @@ interface TxnDao {
     @Query("DELETE FROM txns WHERE id = :txnId")
     suspend fun deleteTxn(txnId: String)
 
+    @Query("DELETE FROM txn_lines WHERE txn_id = :txnId")
+    suspend fun deleteTxnLinesByTxnId(txnId: String)
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTxnLines(lines: List<TxnLineEntity>)
 

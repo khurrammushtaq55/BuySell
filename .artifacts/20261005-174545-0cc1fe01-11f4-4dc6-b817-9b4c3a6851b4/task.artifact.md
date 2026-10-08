@@ -83,3 +83,10 @@
 	- [x] Direct member document querying (`/shops/{shopId}/members/{userId}`) in `FirestoreSyncManager.kt` during restoration
 	- [x] Unified `STAFF` role fallback across `AppNavigation.kt`, `SyncWorker.kt`, `HomeViewModel.kt`, and `FirestoreSyncManager.kt`
 	- [x] Generated dynamic single-device session tokens (`sess_<uuid>`) in `ShopSetupViewModel.kt`
+- [x] Transactional Integrity, Security Hardening & Complete Staff Vault Purge
+	- [x] Wrapped all multi-table database operations in `db.withTransaction { ... }` in `BuyViewModel.kt`, `SellViewModel.kt`, and `ExchangeViewModel.kt`
+	- [x] Added `<uses-permission android:name="android.permission.POST_NOTIFICATIONS" />` and `<uses-permission android:name="android.permission.INTERNET" />` to `AndroidManifest.xml`
+	- [x] Hardened ADB backup security by setting `android:allowBackup="false"` in `AndroidManifest.xml`
+	- [x] Salted PIN hashing in `AppPinManager.kt` using per-device random SHA-256 salt (`pin + salt`)
+	- [x] Defaulted financial/vault entities (`PartyEntity`, `PaymentEntity`, `PaymentPromiseEntity`, `ExpenseEntity`, `PaymentAccountEntity`) to `Scope.VAULT`
+	- [x] Added `deleteTxnLinesByTxnId(txnId)` DAO query and updated `purgeLocalVaultRow` in `FirestoreSyncManager.kt` to purge purchase `txns`, purchase `txn_lines`, and payments locally on staff devices

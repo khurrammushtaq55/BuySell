@@ -332,7 +332,8 @@ class FirestoreSyncManager(
                     db.txnDao().getTxnById(entityId)?.let { txn ->
                         if (txn.scope == Scope.VAULT) {
                             db.txnDao().deleteTxn(entityId)
-                            Log.d(TAG, "Purged staff local vault purchase txn '$entityId' from Room DB.")
+                            db.txnDao().deleteTxnLinesByTxnId(entityId)
+                            Log.d(TAG, "Purged staff local vault purchase txn '$entityId' & purchase txn_lines from Room DB.")
                         }
                     }
                 }
