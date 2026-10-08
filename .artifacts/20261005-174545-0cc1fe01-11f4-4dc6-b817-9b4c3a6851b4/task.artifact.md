@@ -90,3 +90,6 @@
 	- [x] Salted PIN hashing in `AppPinManager.kt` using per-device random SHA-256 salt (`pin + salt`)
 	- [x] Defaulted financial/vault entities (`PartyEntity`, `PaymentEntity`, `PaymentPromiseEntity`, `ExpenseEntity`, `PaymentAccountEntity`) to `Scope.VAULT`
 	- [x] Added `deleteTxnLinesByTxnId(txnId)` DAO query and updated `purgeLocalVaultRow` in `FirestoreSyncManager.kt` to purge purchase `txns`, purchase `txn_lines`, and payments locally on staff devices
+- [x] Android 13+ Runtime Notification Permission Request
+	- [x] Added `rememberLauncherForActivityResult` for `Manifest.permission.POST_NOTIFICATIONS` in `HomeScreen.kt`
+	- [x] Automatically prompts the user for notification permissions on Android 13+ (API 33+) devices upon entering the Home Screen
