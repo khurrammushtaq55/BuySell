@@ -147,3 +147,8 @@
 	- [x] Added editable **Owner Name** `OutlinedTextField` to `SettingsScreen.kt` Store Profile section.
 	- [x] Updated `SettingsViewModel.kt` `updateShopProfile` to update both shop details and the user's `displayName` in Room DB and enqueued outbox sync to Firestore.
 	- [x] Confirmed footer note displays `"BuySell360 v1.0 (Build 1) • Role: [Role]"`.
+- [x] Shop Member ID Keying & Firestore Security Rules Fix
+	- [x] Set `ShopMemberEntity.id = currentUserId` in `ShopSetupViewModel.kt` so outbox sync uploads directly to `shops/{shopId}/members/{currentUserId}`.
+	- [x] Expanded `match /members/{uid}` rules in `firestore.rules` to permit `create` and `update` (UPSERT) operations for shop members.
+- [x] Format Specifier %1$d Fix in login_pwd_char_count
+	- [x] Replaced `%1` with `%1$d` in `login_pwd_char_count` across all 8 locale `strings.xml` files (`values`, `values-ur`, `values-b+ur+Latn`, `values-es`, `values-fr`, `values-hi`, `values-ar`, `values-zh-rCN`), resolving the `UnknownFormatConversionException` crash during password typing.

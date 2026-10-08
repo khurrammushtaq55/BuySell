@@ -7,7 +7,7 @@
     <string name="label_email">Adresse E-mail</string>
     <string name="label_password">Mot de passe</string>
     <string name="login_pwd_min_length">Mot de passe d\'au moins 6 caractères requis</string>
-    <string name="login_pwd_char_count">Au moins 6 caractères (actuellement %1)</string>
+    <string name="login_pwd_char_count">Au moins 6 caractères (actuellement %1$d)</string>
     <string name="login_btn_register">Créer un Compte ✓</string>
     <string name="login_btn_submit">Se Connecter ✓</string>
     <string name="login_toggle_login">Déjà un compte ? Connectez-vous</string>

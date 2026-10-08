@@ -7,7 +7,7 @@
     <string name="label_email">Correo Electrónico</string>
     <string name="label_password">Contraseña</string>
     <string name="login_pwd_min_length">Contraseña de al menos 6 caracteres requerida</string>
-    <string name="login_pwd_char_count">Mínimo 6 caracteres (%1 ingresados)</string>
+    <string name="login_pwd_char_count">Mínimo 6 caracteres (%1$d ingresados)</string>
     <string name="login_btn_register">Crear Cuenta ✓</string>
     <string name="login_btn_submit">Iniciar Sesión ✓</string>
     <string name="login_toggle_login">¿Ya tienes cuenta? Inicia sesión</string>

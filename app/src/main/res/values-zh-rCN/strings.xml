@@ -7,7 +7,7 @@
     <string name="label_email">电子邮箱</string>
     <string name="label_password">密码</string>
     <string name="login_pwd_min_length">密码最少需要 6 个字符</string>
-    <string name="login_pwd_char_count">最少 6 个字符 (已输入 %1 个)</string>
+    <string name="login_pwd_char_count">最少 6 个字符 (已输入 %1$d 个)</string>
     <string name="login_btn_register">创建账户 ✓</string>
     <string name="login_btn_submit">登录账户 ✓</string>
     <string name="login_toggle_login">已有账户？立即登录</string>

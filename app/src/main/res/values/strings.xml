@@ -12,7 +12,7 @@
     <string name="label_email">Email Address</string>
     <string name="label_password">Password</string>
     <string name="login_pwd_min_length">Password must be at least 6 characters</string>
-    <string name="login_pwd_char_count">Minimum 6 characters required (%1 entered)</string>
+    <string name="login_pwd_char_count">Minimum 6 characters required (%1$d entered)</string>
     <string name="login_btn_register">Create Account ✓</string>
     <string name="login_btn_submit">Log In ✓</string>
     <string name="login_toggle_login">Already have an account? Log in</string>

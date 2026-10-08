@@ -125,9 +125,9 @@ class ShopSetupViewModel(application: Application) : AndroidViewModel(applicatio
                 )
             }
 
-            // 3. Create & Insert Member Entity
+            // 3. Create & Insert Member Entity (Keyed by currentUserId for Firestore match /members/{uid})
             val memberEntity = ShopMemberEntity(
-                id = UUID.randomUUID().toString(),
+                id = currentUserId,
                 shopId = shopId,
                 userId = currentUserId,
                 role = roleEnum,

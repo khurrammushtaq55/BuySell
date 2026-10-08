@@ -7,7 +7,7 @@
     <string name="label_email">ای میل ایڈریس</string>
     <string name="label_password">پاس ورڈ</string>
     <string name="login_pwd_min_length">کم از کم 6 حروف کا پاس ورڈ ضروری ہے</string>
-    <string name="login_pwd_char_count">کم از کم 6 حروف (ابھی %1 ہیں)</string>
+    <string name="login_pwd_char_count">کم از کم 6 حروف (ابھی %1$d ہیں)</string>
     <string name="login_btn_register">اکاؤنٹ بنائیں ✓</string>
     <string name="login_btn_submit">لاگ ان کریں ✓</string>
     <string name="login_toggle_login">پہلے سے اکاؤنٹ ہے؟ لاگ ان کریں</string>

@@ -7,7 +7,7 @@
     <string name="label_email">Email Address</string>
     <string name="label_password">Password</string>
     <string name="login_pwd_min_length">Kam az kam 6 characters password zaroori hai</string>
-    <string name="login_pwd_char_count">Kam az kam 6 characters (abhi %1 hain)</string>
+    <string name="login_pwd_char_count">Kam az kam 6 characters (abhi %1$d hain)</string>
     <string name="login_btn_register">Account Banayein ✓</string>
     <string name="login_btn_submit">Login Karein ✓</string>
     <string name="login_toggle_login">Pehle se account hai? Login karein</string>

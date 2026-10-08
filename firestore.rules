@@ -94,15 +94,16 @@ service cloud.firestore {
       match /members/{uid} {
         allow read: if isAuthenticated() && (request.auth.uid == uid || isShopMember(shopId));
 
-        allow create: if isAuthenticated() && request.auth.uid == uid && (
-          // Owner creating initial member record for a new shop
-          (resource == null &&
+        allow create, update: if isAuthenticated() && (
+          // Owner creating or updating member records in their shop
+          isShopOwner(shopId) ||
+          // Owner creating or updating their own initial member record for a new shop
+          (request.auth.uid == uid &&
            get(/databases/$(database)/documents/shops/$(shopId)).data.owner_user_id == request.auth.uid &&
            request.resource.data.role == 'OWNER') ||
-          // Owner adding member
-          isShopOwner(shopId) ||
           // Joining via valid invite code in an ATOMIC BATCH WRITE that marks the invite as used!
           (
+            request.auth.uid == uid &&
             exists(/databases/$(database)/documents/invites/$(request.resource.data.invite_code)) &&
             get(/databases/$(database)/documents/invites/$(request.resource.data.invite_code)).data.shop_id == shopId &&
             get(/databases/$(database)/documents/invites/$(request.resource.data.invite_code)).data.role == request.resource.data.role &&
@@ -113,7 +114,7 @@ service cloud.firestore {
           )
         );
 
-        allow update, delete: if isShopOwner(shopId);
+        allow delete: if isShopOwner(shopId);
       }
 
 
