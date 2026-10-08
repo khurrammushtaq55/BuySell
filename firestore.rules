@@ -74,11 +74,8 @@ service cloud.firestore {
     // --- Shop Subtree ---
 
     match /shops/{shopId} {
-      // Direct resource.data inspection without extra get() self-read calls
-      allow read: if isAuthenticated() && (
-        resource.data.owner_user_id == request.auth.uid ||
-        isShopMember(shopId)
-      );
+      // Basic shop profile metadata (name, code, phone, address) is readable by authenticated users
+      allow read: if isAuthenticated();
 
       allow create: if isAuthenticated() && (
         request.resource.data.owner_user_id == request.auth.uid

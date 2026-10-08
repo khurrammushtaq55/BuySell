@@ -56,7 +56,7 @@
     <string name="btn_join_staff">Dukan Join Karein (Staff) ✓</string>
     <string name="btn_join_partner">Dukan Join Karein (Sleeping Partner) ✓</string>
     <string name="buy_title">Saman Khareedna</string>
-    <string name="buy_step">Step %1$s$d of %2$s$d</string>
+    <string name="buy_step">Step %1$d of %2$d</string>
     <string name="label_seller_name">Seller Ka Naam *</string>
     <string name="label_mobile_number">Mobile Number *</string>
     <string name="label_cnic">CNIC Number *</string>
@@ -92,11 +92,11 @@
     <string name="btn_save_sale">Sale Record Karein ✓</string>
     <string name="sell_select_stock">Stock se item choose karein *:</string>
     <string name="sell_buyer_info_header">Gahak (Buyer) ki detail (Mandatory fields *):</string>
-    <string name="stock_title">Mera Stock (%1$s$d)</string>
+    <string name="stock_title">Mera Stock (%1$d)</string>
     <string name="stock_search_label">Search by IMEI, Brand, Model, Specs, or Color</string>
     <string name="stock_empty_msg">Abhi koi item stock mein nahi — pehli khareedari add karein</string>
     <string name="stock_close_dialog">Band Karein (Close)</string>
-    <string name="stock_qty_label">Qty: %1$s$d</string>
+    <string name="stock_qty_label">Qty: %1$d</string>
     <string name="stock_in_stock_label">In Stock</string>
     <string name="exchange_title">Purana De Kar Naya (Exchange)</string>
     <string name="exchange_explainer_title">Exchange Flow (Dono 1 Flow Mein)</string>
@@ -111,7 +111,7 @@
     <string name="label_customer_name">Customer Ka Naam *</string>
     <string name="label_cash_paid">Kitne cash diye / liye? (Rs)</string>
     <string name="home_today_sales">Aaj ki sales</string>
-    <string name="home_role_cloud_sync">Role: %1$s$s • Cloud par save ✓</string>
+    <string name="home_role_cloud_sync">Role: %1$s • Cloud par save ✓</string>
     <string name="home_partner_banner_title">Sleeping Partner Mode (View-Only)</string>
     <string name="home_partner_banner_sub">Sirf sales, munafa aur dashboard reports dekh sakte hain</string>
     <string name="home_what_to_do">Kaya karna chahte hain?</string>
@@ -129,8 +129,8 @@
     <string name="party_subtitle">Kaun kitna dena / lena hai</string>
     <string name="party_search_label">Name ya Mobile number search karein</string>
     <string name="party_empty_msg">Jab koi baqi paisay honge yahan nazar ayenge</string>
-    <string name="party_owes_shop">Us ne Rs %1$s$d denay hain</string>
-    <string name="party_shop_owes">Hum ne Rs %1$s$d denay hain</string>
+    <string name="party_owes_shop">Us ne Rs %1$d denay hain</string>
+    <string name="party_shop_owes">Hum ne Rs %1$d denay hain</string>
     <string name="party_settled">Hisaab barabar ✓</string>
     <string name="settings_section_store">Store Profile (Dukan Details)</string>
     <string name="settings_section_lang">Language &amp; Display (Zaban Aur Preferences)</string>
@@ -271,4 +271,8 @@
     <string name="settings_unsynced_warning_msg">Aap ke paas %1$d local records hain jo abhi cloud par sync nahi huay. Logout karne se yeh records hamesha ke liye delete ho jayein ge. Baraye meharbani pehle internet connect kar ke sync karein ya discard karne ki tasdeeq karein.</string>
     <string name="settings_btn_try_sync">Dobara Sync Try Karein</string>
     <string name="settings_btn_discard_signout">Data Discard Karein aur Logout</string>
+    <string name="settings_staff_invite_title">Staff Member Invite Code</string>
+    <string name="settings_staff_invite_sub">Staff member ko shop mein shamil karne ke liye 8-digit code banayein</string>
+    <string name="settings_partner_invite_title">Sleeping Partner Invite Code</string>
+    <string name="settings_partner_invite_sub">Sleeping Partner ko dashboard aur munafa dikhane ke liye code banayein</string>
 </resources>

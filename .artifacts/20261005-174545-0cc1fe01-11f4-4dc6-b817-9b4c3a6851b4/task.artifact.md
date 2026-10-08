@@ -173,3 +173,12 @@
 - [x] Privilege Escalation Fix in Member Security Rules
 	- [x] Separated `allow create` from `allow update, delete` under `match /members/{uid}` in `firestore.rules`.
 	- [x] Restricted member document creation to new registrations with valid invite codes, and restricted member document updates and deletions strictly to shop owners (`isShopOwner(shopId)`).
+- [x] Extra Dollar Sign Format Specifier Cleanup
+	- [x] Cleaned up doubled format specifiers (`%1$s$s` -> `%1$s`, `%1$s$d` -> `%1$d`) in `home_role_cloud_sync`, `buy_step`, `party_owes_shop`, and other keys across all 8 locale `strings.xml` files.
+	- [x] Verified ZERO doubled or bare specifiers remain across all language resource files.
+- [x] Dedicated Invite Action Rows for Staff & Partner (Option 3)
+	- [x] Separated Team Management into two dedicated rows on `SettingsScreen.kt`: **Staff Member Invite Code** and **Sleeping Partner Invite Code**.
+	- [x] Completely removed role chips inside the dialog and created role-specific titles, descriptions, and WhatsApp share messages.
+- [x] Firestore Security Rule Fix for Staff Join
+	- [x] Updated `match /shops/{shopId}` read rule in `firestore.rules` to `allow read: if isAuthenticated()`.
+	- [x] Unblocked new staff members from encountering `PERMISSION_DENIED` when fetching store metadata (`shops/{shopId}`) prior to joining.

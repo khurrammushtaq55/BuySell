@@ -56,7 +56,7 @@
     <string name="btn_join_staff">加入店铺 (店员) ✓</string>
     <string name="btn_join_partner">加入店铺 (合伙人) ✓</string>
     <string name="buy_title">购买手机</string>
-    <string name="buy_step">第 %1$s$d 步，共 %2$s$d 步</string>
+    <string name="buy_step">第 %1$d 步，共 %2$d 步</string>
     <string name="label_seller_name">卖家姓名 *</string>
     <string name="label_mobile_number">手机号码 *</string>
     <string name="label_cnic">身份证号 *</string>
@@ -99,7 +99,7 @@
     <string name="label_customer_name">客户姓名 *</string>
     <string name="label_cash_paid">实收 / 实付现金 (Rs)</string>
     <string name="home_today_sales">今日销售</string>
-    <string name="home_role_cloud_sync">身份: %1$s$s • 已云端同步 ✓</string>
+    <string name="home_role_cloud_sync">身份: %1$s • 已云端同步 ✓</string>
     <string name="home_partner_banner_title">合伙人模式 (仅查看)</string>
     <string name="home_partner_banner_sub">仅可查看销售、利润及仪表板报告</string>
     <string name="home_what_to_do">您想要做什么？</string>
@@ -117,8 +117,8 @@
     <string name="party_subtitle">应收/应付账款明细</string>
     <string name="party_search_label">搜索姓名或手机号码</string>
     <string name="party_empty_msg">暂无未结账款</string>
-    <string name="party_owes_shop">欠本店 Rs %1$s$d</string>
-    <string name="party_shop_owes">本店欠 Rs %1$s$d</string>
+    <string name="party_owes_shop">欠本店 Rs %1$d</string>
+    <string name="party_shop_owes">本店欠 Rs %1$d</string>
     <string name="party_settled">账目已结清 ✓</string>
     <string name="settings_section_store">店铺资料</string>
     <string name="settings_section_lang">语言与显示</string>
@@ -271,4 +271,8 @@
     <string name="settings_unsynced_warning_msg">您有 %1$d 条本地未同步的数据记录。现在退出登录将永久删除这些未同步的数据。请先连接网络进行同步，或确认放弃这些数据。</string>
     <string name="settings_btn_try_sync">重新尝试同步</string>
     <string name="settings_btn_discard_signout">放弃数据并退出登录</string>
+    <string name="settings_staff_invite_title">店员邀请码</string>
+    <string name="settings_staff_invite_sub">生成 8 位邀请码以添加买卖设备的店员</string>
+    <string name="settings_partner_invite_title">非执行合伙人邀请码</string>
+    <string name="settings_partner_invite_sub">生成 8 位邀请码以允许合伙人查看仪表板与利润</string>
 </resources>

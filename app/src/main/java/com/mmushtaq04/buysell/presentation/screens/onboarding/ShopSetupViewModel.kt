@@ -224,7 +224,7 @@ class ShopSetupViewModel(application: Application) : AndroidViewModel(applicatio
 
                 // 2. Fetch Shop Document from Firestore to verify shop existence
                 val shopDoc = firestore.collection("shops").document(shopId).get().await()
-                val shopName = if (shopDoc.exists()) shopDoc.getString("name") ?: "Hafeez Center Store" else "Hafeez Center Store"
+                val shopName = if (shopDoc.exists()) shopDoc.getString("name") ?: "XYZ Center Store" else "XYZ Center Store"
                 val shopCode = if (shopDoc.exists()) shopDoc.getString("code") ?: ("S" + (10000..99999).random().toString()) else ("S" + (10000..99999).random().toString())
 
                 val now = System.currentTimeMillis()

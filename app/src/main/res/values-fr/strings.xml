@@ -56,7 +56,7 @@
     <string name="btn_join_staff">Rejoindre le Magasin (Personnel) ✓</string>
     <string name="btn_join_partner">Rejoindre le Magasin (Associé) ✓</string>
     <string name="buy_title">Acheter un Téléphone</string>
-    <string name="buy_step">Étape %1$s$d sur %2$s$d</string>
+    <string name="buy_step">Étape %1$d sur %2$d</string>
     <string name="label_seller_name">Nom du Vendeur *</string>
     <string name="label_mobile_number">Numéro de Mobile *</string>
     <string name="label_cnic">Numéro d\'Identité *</string>
@@ -99,7 +99,7 @@
     <string name="label_customer_name">Nom du Client *</string>
     <string name="label_cash_paid">Espèces encaissées / versées (Rs)</string>
     <string name="home_today_sales">Ventes d\'Aujourd\'hui</string>
-    <string name="home_role_cloud_sync">Rôle: %1$s$s • Enregistré sur le Cloud ✓</string>
+    <string name="home_role_cloud_sync">Rôle: %1$s • Enregistré sur le Cloud ✓</string>
     <string name="home_partner_banner_title">Mode Associé (Lecture Seule)</string>
     <string name="home_partner_banner_sub">Consultation des ventes et des rapports uniquement</string>
     <string name="home_what_to_do">Que souhaitez-vous faire ?</string>
@@ -117,8 +117,8 @@
     <string name="party_subtitle">Comptes clients et créances</string>
     <string name="party_search_label">Rechercher par nom ou numéro</string>
     <string name="party_empty_msg">Les comptes apparaîtront ici</string>
-    <string name="party_owes_shop">Doit à la boutique Rs %1$s$d</string>
-    <string name="party_shop_owes">La boutique doit Rs %1$s$d</string>
+    <string name="party_owes_shop">Doit à la boutique Rs %1$d</string>
+    <string name="party_shop_owes">La boutique doit Rs %1$d</string>
     <string name="party_settled">Compte réglé ✓</string>
     <string name="settings_section_store">Profil du Magasin</string>
     <string name="settings_section_lang">Langue &amp; Affichage</string>
@@ -271,4 +271,8 @@
     <string name="settings_unsynced_warning_msg">Vous avez %1$d enregistrement(s) non synchronisé(s) localement. Se déconnecter maintenant supprimera définitivement ces données. Veuillez vous connecter à internet pour synchroniser d\'abord, ou confirmez l\'abandon.</string>
     <string name="settings_btn_try_sync">Ressayer la Synchronisation</string>
     <string name="settings_btn_discard_signout">Se Déconnecter et Abandonner</string>
+    <string name="settings_staff_invite_title">Code d\'Invitation Employé</string>
+    <string name="settings_staff_invite_sub">Générez un code à 8 chiffres pour ajouter des membres du personnel</string>
+    <string name="settings_partner_invite_title">Code d\'Invitation Associé</string>
+    <string name="settings_partner_invite_sub">Générez un code à 8 chiffres pour l\'accès au tableau de bord associé</string>
 </resources>

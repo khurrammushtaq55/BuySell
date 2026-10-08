@@ -56,7 +56,7 @@
     <string name="btn_join_staff">Unirse a Tienda (Personal) ✓</string>
     <string name="btn_join_partner">Unirse a Tienda (Socio) ✓</string>
     <string name="buy_title">Comprar Teléfono</string>
-    <string name="buy_step">Paso %1$s$d de %2$s$d</string>
+    <string name="buy_step">Paso %1$d de %2$d</string>
     <string name="label_seller_name">Nombre del Vendedor *</string>
     <string name="label_mobile_number">Número de Celular *</string>
     <string name="label_cnic">Número de Identificación *</string>
@@ -99,7 +99,7 @@
     <string name="label_customer_name">Nombre del Cliente *</string>
     <string name="label_cash_paid">Efectivo cobrado / pagado (Rs)</string>
     <string name="home_today_sales">Ventas de Hoy</string>
-    <string name="home_role_cloud_sync">Rol: %1$s$s • Guardado en la Nube ✓</string>
+    <string name="home_role_cloud_sync">Rol: %1$s • Guardado en la Nube ✓</string>
     <string name="home_partner_banner_title">Modo Socio (Solo Lectura)</string>
     <string name="home_partner_banner_sub">Solo ver ventas, ganancias y reportes</string>
     <string name="home_what_to_do">¿Qué desea hacer?</string>
@@ -117,8 +117,8 @@
     <string name="party_subtitle">Saldos pendientes y cuentas por cobrar</string>
     <string name="party_search_label">Buscar nombre o número de teléfono</string>
     <string name="party_empty_msg">Los saldos aparecerán aquí</string>
-    <string name="party_owes_shop">Debe a la tienda Rs %1$s$d</string>
-    <string name="party_shop_owes">La tienda debe Rs %1$s$d</string>
+    <string name="party_owes_shop">Debe a la tienda Rs %1$d</string>
+    <string name="party_shop_owes">La tienda debe Rs %1$d</string>
     <string name="party_settled">Cuenta saldada ✓</string>
     <string name="settings_section_store">Perfil de Tienda</string>
     <string name="settings_section_lang">Idioma y Pantalla</string>
@@ -271,4 +271,8 @@
     <string name="settings_unsynced_warning_msg">Tiene %1$d registro(s) sin sincronizar guardados localmente. Cerrar sesión ahora borrará permanentemente estos registros. Por favor, conéctese a internet para sincronizar primero, o confirme para descartar.</string>
     <string name="settings_btn_try_sync">Intentar Sincronizar de Nuevo</string>
     <string name="settings_btn_discard_signout">Cerrar Sesión y Descartar Datos</string>
+    <string name="settings_staff_invite_title">Código de Invitación para Personal</string>
+    <string name="settings_staff_invite_sub">Genere un código de 8 dígitos para agregar miembros del personal</string>
+    <string name="settings_partner_invite_title">Código de Invitación para Socio</string>
+    <string name="settings_partner_invite_sub">Genere un código de 8 dígitos para acceso al panel de socio</string>
 </resources>

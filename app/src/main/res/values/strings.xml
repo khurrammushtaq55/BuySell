@@ -270,4 +270,8 @@
     <string name="settings_unsynced_warning_msg">You have %1$d unsynced record(s) saved locally. Logging out now will permanently erase these unsynced records. Please connect to the internet to sync first, or confirm to discard.</string>
     <string name="settings_btn_try_sync">Try Syncing Again</string>
     <string name="settings_btn_discard_signout">Log Out &amp; Discard Unsynced Data</string>
+    <string name="settings_staff_invite_title">Staff Member Invite Code</string>
+    <string name="settings_staff_invite_sub">Generate an 8-digit invite code for staff members to buy/sell devices</string>
+    <string name="settings_partner_invite_title">Sleeping Partner Invite Code</string>
+    <string name="settings_partner_invite_sub">Generate an 8-digit invite code for sleeping partners to view dashboard and profits</string>
 </resources>

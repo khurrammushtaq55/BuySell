@@ -56,7 +56,7 @@
     <string name="btn_join_staff">दुकान में जुड़ें (स्टाफ) ✓</string>
     <string name="btn_join_partner">दुकान में जुड़ें (पार्टनर) ✓</string>
     <string name="buy_title">फोन खरीदें</string>
-    <string name="buy_step">चरण %1$s$d / %2$s$d</string>
+    <string name="buy_step">चरण %1$d / %2$d</string>
     <string name="label_seller_name">विक्रेता का नाम *</string>
     <string name="label_mobile_number">मोबाइल नंबर *</string>
     <string name="label_cnic">आईडी नंबर *</string>
@@ -99,7 +99,7 @@
     <string name="label_customer_name">ग्राहक का नाम *</string>
     <string name="label_cash_paid">कितना नकद दिया / लिया? (रु)</string>
     <string name="home_today_sales">आज की बिक्री</string>
-    <string name="home_role_cloud_sync">रोल: %1$s$s • क्लाउड पर सुरक्षित ✓</string>
+    <string name="home_role_cloud_sync">रोल: %1$s • क्लाउड पर सुरक्षित ✓</string>
     <string name="home_partner_banner_title">स्लीपिंग पार्टनर मोड (केवल देखने के लिए)</string>
     <string name="home_partner_banner_sub">केवल बिक्री, लाभ और डैशबोर्ड रिपोर्ट देख सकते हैं</string>
     <string name="home_what_to_do">आप क्या करना चाहते हैं?</string>
@@ -117,8 +117,8 @@
     <string name="party_subtitle">किसके पास कितना बकाया है</string>
     <string name="party_search_label">नाम या मोबाइल नंबर खोजें</string>
     <string name="party_empty_msg">बकाया राशि यहां दिखाई देगी</string>
-    <string name="party_owes_shop">दुकान को Rs %1$s$d देने हैं</string>
-    <string name="party_shop_owes">दुकान पर Rs %1$s$d बकाया है</string>
+    <string name="party_owes_shop">दुकान को Rs %1$d देने हैं</string>
+    <string name="party_shop_owes">दुकान पर Rs %1$d बकाया है</string>
     <string name="party_settled">खाता बराबर ✓</string>
     <string name="settings_section_store">दुकान की जानकारी</string>
     <string name="settings_section_lang">भाषा और डिस्प्ले</string>
@@ -271,4 +271,8 @@
     <string name="settings_unsynced_warning_msg">आपके पास %1$d लोकल रिकॉर्ड हैं जो अभी क्लाउड पर सिंक नहीं हुए हैं। लॉग आउट करने से ये रिकॉर्ड हमेशा के लिए मिट जाएंगे। कृपया पहले इंटरनेट से कनेक्ट करके सिंक करें, या हटाने की पुष्टि करें।</string>
     <string name="settings_btn_try_sync">पुनः सिंक का प्रयास करें</string>
     <string name="settings_btn_discard_signout">डेटा हटाएं और लॉग आउट करें</string>
+    <string name="settings_staff_invite_title">स्टाफ सदस्य आमंत्रण कोड</string>
+    <string name="settings_staff_invite_sub">स्टाफ सदस्य को दुकान में शामिल करने के लिए 8-अंकों का कोड बनाएं</string>
+    <string name="settings_partner_invite_title">स्लीपिंग पार्टनर आमंत्रण कोड</string>
+    <string name="settings_partner_invite_sub">स्लीपिंग पार्टनर को डैशबोर्ड और लाभ देखने के लिए कोड बनाएं</string>
 </resources>

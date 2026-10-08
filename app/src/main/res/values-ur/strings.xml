@@ -56,7 +56,7 @@
     <string name="btn_join_staff">دکان میں شامل ہوں (اسٹاف) ✓</string>
     <string name="btn_join_partner">دکان میں شامل ہوں (پارٹنر) ✓</string>
     <string name="buy_title">فون خریدنا</string>
-    <string name="buy_step">مرحلہ %1$s$d از %2$s$d</string>
+    <string name="buy_step">مرحلہ %1$d از %2$d</string>
     <string name="label_seller_name">بیچنے والے کا نام *</string>
     <string name="label_mobile_number">موبائل نمبر *</string>
     <string name="label_cnic">شناختی کارڈ نمبر *</string>
@@ -99,7 +99,7 @@
     <string name="label_customer_name">کسٹمر کا نام *</string>
     <string name="label_cash_paid">کتنے نقد دیے / لیے؟ (روپے)</string>
     <string name="home_today_sales">آج کی فروخت</string>
-    <string name="home_role_cloud_sync">عہدہ: %1$s$s • کلاؤڈ پر محفوظ ✓</string>
+    <string name="home_role_cloud_sync">عہدہ: %1$s • کلاؤڈ پر محفوظ ✓</string>
     <string name="home_partner_banner_title">سلیپنگ پارٹنر موڈ (صرف دیکھنے کے لیے)</string>
     <string name="home_partner_banner_sub">صرف سیلز، منافع اور ڈیش بورڈ رپورٹس دیکھ سکتے ہیں</string>
     <string name="home_what_to_do">آپ کیا کرنا چاہتے ہیں؟</string>
@@ -117,8 +117,8 @@
     <string name="party_subtitle">کون کتنا دینا / لینا ہے</string>
     <string name="party_search_label">نام یا موبائل نمبر تلاش کریں</string>
     <string name="party_empty_msg">جب کوئی بقایا رقم ہوگی یہاں نظر آئے گی</string>
-    <string name="party_owes_shop">اس نے %1$s$d روپے دینے ہیں</string>
-    <string name="party_shop_owes">ہم نے %1$s$d روپے دینے ہیں</string>
+    <string name="party_owes_shop">اس نے %1$d روپے دینے ہیں</string>
+    <string name="party_shop_owes">ہم نے %1$d روپے دینے ہیں</string>
     <string name="party_settled">حساب برابر ✓</string>
     <string name="settings_section_store">دکان کی تفصیل</string>
     <string name="settings_section_lang">زبان اور ڈسپلے</string>
@@ -271,4 +271,8 @@
     <string name="settings_unsynced_warning_msg">آپ کے پاس %1$d لوکل ریکارڈز موجود ہیں جو ابھی کلاؤڈ پر سنک نہیں ہوئے۔ لاگ آؤٹ کرنے سے یہ ریکارڈز ہمیشہ کے لیے ضائع ہو جائیں گے۔ برائے مہربانی پہلے انٹرنیٹ سے کنیکٹ کر کے سنک کریں یا ضائع کرنے کی تصدیق کریں۔</string>
     <string name="settings_btn_try_sync">دوبارہ سنک کی کوشش کریں</string>
     <string name="settings_btn_discard_signout">ڈیٹا ضائع کریں اور لاگ آؤٹ کریں</string>
+    <string name="settings_staff_invite_title">اسٹاف ممبر انوائٹ کوڈ</string>
+    <string name="settings_staff_invite_sub">اسٹاف ممبر کو شاپ میں شامل کرنے کے لیے 8 ہندسوں کا کوڈ بنائیں</string>
+    <string name="settings_partner_invite_title">سلیپنگ پارٹنر انوائٹ کوڈ</string>
+    <string name="settings_partner_invite_sub">سلیپنگ پارٹنر کو ڈیش بورڈ اور منافع دکھانے کے لیے کوڈ بنائیں</string>
 </resources>

@@ -56,7 +56,7 @@
     <string name="btn_join_staff">الانضمام للمتجر (كموظف) ✓</string>
     <string name="btn_join_partner">الانضمام للمتجر (كشريك) ✓</string>
     <string name="buy_title">شراء هاتف</string>
-    <string name="buy_step">الخطوة %1$s$d من %2$s$d</string>
+    <string name="buy_step">الخطوة %1$d من %2$d</string>
     <string name="label_seller_name">اسم البائع *</string>
     <string name="label_mobile_number">رقم الهاتف *</string>
     <string name="label_cnic">رقم الهوية *</string>
@@ -99,7 +99,7 @@
     <string name="label_customer_name">اسم العميل *</string>
     <string name="label_cash_paid">المبلغ النقدي المدفوع / المستلم (روبية)</string>
     <string name="home_today_sales">مبيعات اليوم</string>
-    <string name="home_role_cloud_sync">الصفة: %1$s$s • محفوط بالسحابة ✓</string>
+    <string name="home_role_cloud_sync">الصفة: %1$s • محفوط بالسحابة ✓</string>
     <string name="home_partner_banner_title">وضع الشريك (عرض فقط)</string>
     <string name="home_partner_banner_sub">عرض المبيعات والأرباح والتقارير فقط</string>
     <string name="home_what_to_do">ماذا تريد أن تفعل؟</string>
@@ -117,8 +117,8 @@
     <string name="party_subtitle">الذمم والديون المستحقة</string>
     <string name="party_search_label">ابحث باسم أو رقم الهاتف</string>
     <string name="party_empty_msg">ستظهر الذمم المالية هنا</string>
-    <string name="party_owes_shop">يدين للمتجر بمبلغ Rs %1$s$d</string>
-    <string name="party_shop_owes">المتجر يدين بمبلغ Rs %1$s$d</string>
+    <string name="party_owes_shop">يدين للمتجر بمبلغ Rs %1$d</string>
+    <string name="party_shop_owes">المتجر يدين بمبلغ Rs %1$d</string>
     <string name="party_settled">الحساب خالص ✓</string>
     <string name="settings_section_store">ملف المتجر</string>
     <string name="settings_section_lang">اللغة والعرض</string>
@@ -271,4 +271,8 @@
     <string name="settings_unsynced_warning_msg">لديك %1$d سجل محلي لم يتم مزامنته مع السحابة بعد. تسجيل الخروج الآن سيؤدي إلى حذف هذه السجلات نهائياً. يرجى الاتصال بالإنترنت للمزامنة أولاً، أو التأكيد على الحذف.</string>
     <string name="settings_btn_try_sync">إعادة محاولة المزامنة</string>
     <string name="settings_btn_discard_signout">حذف البيانات وتسجيل الخروج</string>
+    <string name="settings_staff_invite_title">رمز دعوة الموظفين</string>
+    <string name="settings_staff_invite_sub">إنشاء رمز انضمام مكون من 8 أرقام لإضافة موظف للمتجر</string>
+    <string name="settings_partner_invite_title">رمز دعوة الشريك غير التنفيذي</string>
+    <string name="settings_partner_invite_sub">إنشاء رمز انضمام مكون من 8 أرقام للشريك لعرض الأرباح واللوحة</string>
 </resources>

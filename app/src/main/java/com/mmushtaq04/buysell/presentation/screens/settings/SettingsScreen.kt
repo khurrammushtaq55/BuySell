@@ -99,36 +99,18 @@ fun SettingsScreen(
     val isOwner = userRole.equals("Owner", ignoreCase = true)
 
     if (showTeamDialog) {
+        val isStaffInvite = inviteRole == "STAFF"
+        val dialogTitle = if (isStaffInvite) stringResource(R.string.settings_staff_invite_title) else stringResource(R.string.settings_partner_invite_title)
+        val dialogSub = if (isStaffInvite) stringResource(R.string.settings_staff_invite_sub) else stringResource(R.string.settings_partner_invite_sub)
+        val iconVector = if (isStaffInvite) Icons.Default.PersonAdd else Icons.Default.Handshake
+
         AlertDialog(
             onDismissRequest = { showTeamDialog = false },
-            icon = { Icon(Icons.Default.Group, contentDescription = null) },
-            title = { Text(stringResource(R.string.settings_team_title), fontWeight = FontWeight.Bold) },
+            icon = { Icon(iconVector, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
+            title = { Text(dialogTitle, fontWeight = FontWeight.Bold) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Text(stringResource(R.string.settings_team_sub), fontSize = 14.sp)
-
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        FilterChip(
-                            selected = inviteRole == "STAFF",
-                            onClick = { inviteRole = "STAFF" },
-                            label = { Text(stringResource(R.string.settings_staff_member), fontSize = 12.sp) },
-                            leadingIcon = if (inviteRole == "STAFF") {
-                                { Icon(Icons.Default.CheckCircle, contentDescription = null, modifier = Modifier.size(14.dp)) }
-                            } else null
-                        )
-
-                        FilterChip(
-                            selected = inviteRole == "PARTNER",
-                            onClick = { inviteRole = "PARTNER" },
-                            label = { Text(stringResource(R.string.settings_sleeping_partner), fontSize = 12.sp) },
-                            leadingIcon = if (inviteRole == "PARTNER") {
-                                { Icon(Icons.Default.CheckCircle, contentDescription = null, modifier = Modifier.size(14.dp)) }
-                            } else null
-                        )
-                    }
+                    Text(dialogSub, fontSize = 14.sp)
 
                     if (activeInviteCode.isNotBlank()) {
                         Card(
@@ -168,7 +150,7 @@ fun SettingsScreen(
 
                             Button(
                                 onClick = {
-                                    val roleLabel = if (inviteRole == "STAFF") "Staff Member" else "Sleeping Partner"
+                                    val roleLabel = if (isStaffInvite) "Staff Member" else "Sleeping Partner"
                                     val shareMsg = "Aap ko BuySell360 App par $roleLabel join karne ka Code bheja gaya hai: $activeInviteCode."
                                     val intent = Intent(Intent.ACTION_SEND).apply {
                                         type = "text/plain"
@@ -567,10 +549,22 @@ fun SettingsScreen(
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     if (isOwner) {
                         SettingClickableRow(
-                            icon = Icons.Default.GroupAdd,
-                            title = stringResource(R.string.settings_team_code),
-                            subtitle = "Staff ya Sleeping Partner ko join karwane ke liye code banayein"
+                            icon = Icons.Default.PersonAdd,
+                            title = stringResource(R.string.settings_staff_invite_title),
+                            subtitle = stringResource(R.string.settings_staff_invite_sub)
                         ) {
+                            inviteRole = "STAFF"
+                            activeInviteCode = ""
+                            showTeamDialog = true
+                        }
+
+                        SettingClickableRow(
+                            icon = Icons.Default.Handshake,
+                            title = stringResource(R.string.settings_partner_invite_title),
+                            subtitle = stringResource(R.string.settings_partner_invite_sub)
+                        ) {
+                            inviteRole = "PARTNER"
+                            activeInviteCode = ""
                             showTeamDialog = true
                         }
 
