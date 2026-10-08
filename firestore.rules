@@ -2,62 +2,63 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // --- Helper Functions ---
+    // --- Optimized, Flat Helper Functions ---
 
     function isAuthenticated() {
       return request.auth != null;
     }
 
-    function isShopOwnerByDoc(shopId) {
-      return isAuthenticated() && exists(/databases/$(database)/documents/shops/$(shopId)) && (
-        get(/databases/$(database)/documents/shops/$(shopId)).data.owner_user_id == request.auth.uid ||
-        get(/databases/$(database)/documents/shops/$(shopId)).data.ownerUserId == request.auth.uid
+    function getShopOwner(shopId) {
+      return get(/databases/$(database)/documents/shops/$(shopId)).data.owner_user_id;
+    }
+
+    function getMemberRole(shopId) {
+      return exists(/databases/$(database)/documents/shops/$(shopId)/members/$(request.auth.uid))
+        ? get(/databases/$(database)/documents/shops/$(shopId)/members/$(request.auth.uid)).data.role
+        : null;
+    }
+
+    function isShopOwner(shopId) {
+      return isAuthenticated() && (
+        getShopOwner(shopId) == request.auth.uid ||
+        getMemberRole(shopId) == 'OWNER'
       );
     }
 
     function isShopMember(shopId) {
       return isAuthenticated() && (
-        isShopOwnerByDoc(shopId) ||
-        exists(/databases/$(database)/documents/shops/$(shopId)/members/$(request.auth.uid))
-      );
-    }
-
-    function getMemberData(shopId) {
-      return get(/databases/$(database)/documents/shops/$(shopId)/members/$(request.auth.uid)).data;
-    }
-
-    function isOwner(shopId) {
-      return isShopOwnerByDoc(shopId) || (
-        isShopMember(shopId) && getMemberData(shopId).role == 'OWNER'
+        getShopOwner(shopId) == request.auth.uid ||
+        getMemberRole(shopId) != null
       );
     }
 
     function isStaff(shopId) {
-      return isShopMember(shopId) && getMemberData(shopId).role == 'STAFF';
+      return isAuthenticated() && getMemberRole(shopId) == 'STAFF';
     }
 
     function isPartner(shopId) {
-      return isShopMember(shopId) && getMemberData(shopId).role == 'PARTNER';
+      return isAuthenticated() && getMemberRole(shopId) == 'PARTNER';
     }
 
 
     // --- Global Root Collections ---
 
+    // Secure user profile path: Users can ONLY access their own profile
     match /users/{uid} {
-      allow read: if isAuthenticated() && (request.auth.uid == uid || exists(/databases/$(database)/documents/users/$(request.auth.uid)));
-      allow create, update: if isAuthenticated() && request.auth.uid == uid;
+      allow read, create, update: if isAuthenticated() && request.auth.uid == uid;
     }
 
+    // Root invites collection
     match /invites/{code} {
       allow get: if isAuthenticated();
 
       allow create: if isAuthenticated() &&
         request.resource.data.shop_id != null &&
-        isOwner(request.resource.data.shop_id) &&
+        isShopOwner(request.resource.data.shop_id) &&
         request.resource.data.code == code;
 
       allow update: if isAuthenticated() && (
-        isOwner(resource.data.shop_id) ||
+        isShopOwner(resource.data.shop_id) ||
         (
           request.resource.data.diff(resource.data).affectedKeys().hasOnly(['is_used', 'used_by', 'used_at']) &&
           resource.data.is_used == false &&
@@ -66,37 +67,40 @@ service cloud.firestore {
         )
       );
 
-      allow delete: if isAuthenticated() && isOwner(resource.data.shop_id);
+      allow delete: if isAuthenticated() && isShopOwner(resource.data.shop_id);
     }
 
 
     // --- Shop Subtree ---
 
     match /shops/{shopId} {
+      // Direct resource.data inspection without extra get() self-read calls
       allow read: if isAuthenticated() && (
-        isShopMember(shopId) ||
         resource.data.owner_user_id == request.auth.uid ||
-        resource.data.ownerUserId == request.auth.uid
+        isShopMember(shopId)
       );
 
       allow create: if isAuthenticated() && (
-        request.resource.data.owner_user_id == request.auth.uid ||
-        request.resource.data.ownerUserId == request.auth.uid
+        request.resource.data.owner_user_id == request.auth.uid
       );
 
-      allow update, delete: if isOwner(shopId);
+      allow update, delete: if isAuthenticated() && (
+        resource.data.owner_user_id == request.auth.uid ||
+        getMemberRole(shopId) == 'OWNER'
+      );
 
 
       // Shop Members Subcollection
       match /members/{uid} {
-        allow read: if isShopMember(shopId) || request.auth.uid == uid;
+        allow read: if isAuthenticated() && (request.auth.uid == uid || isShopMember(shopId));
 
         allow create: if isAuthenticated() && request.auth.uid == uid && (
           // Owner creating initial member record for a new shop
-          (get(/databases/$(database)/documents/shops/$(shopId)).data.owner_user_id == request.auth.uid &&
+          (resource == null &&
+           get(/databases/$(database)/documents/shops/$(shopId)).data.owner_user_id == request.auth.uid &&
            request.resource.data.role == 'OWNER') ||
           // Owner adding member
-          isOwner(shopId) ||
+          isShopOwner(shopId) ||
           // Joining via valid invite code in an ATOMIC BATCH WRITE that marks the invite as used!
           (
             exists(/databases/$(database)/documents/invites/$(request.resource.data.invite_code)) &&
@@ -109,47 +113,46 @@ service cloud.firestore {
           )
         );
 
-        allow update: if isOwner(shopId);
-        allow delete: if isOwner(shopId);
+        allow update, delete: if isShopOwner(shopId);
       }
 
 
       // --- Public Scope ---
       match /scopes/public/{collection}/{docId} {
         allow read: if isShopMember(shopId);
-        allow create, update: if isOwner(shopId) || isStaff(shopId);
-        allow delete: if isOwner(shopId);
+        allow create, update: if isShopOwner(shopId) || isStaff(shopId);
+        allow delete: if isShopOwner(shopId);
       }
 
 
-      // --- Vault Summaries (Explicit Non-Overlapping Path) ---
+      // --- Vault Summaries ---
       match /scopes/vault/summaries/{date} {
-        allow read: if isOwner(shopId) || isPartner(shopId);
-        allow create, update, delete: if isOwner(shopId);
+        allow read: if isShopOwner(shopId) || isPartner(shopId);
+        allow create, update, delete: if isShopOwner(shopId);
       }
 
 
       // --- Vault Scope Collections ---
       match /scopes/vault/collections/{collection}/{docId} {
-        allow read: if isOwner(shopId) || isPartner(shopId);
+        allow read: if isShopOwner(shopId) || isPartner(shopId);
 
-        allow create: if (isOwner(shopId) || isStaff(shopId)) &&
+        allow create: if (isShopOwner(shopId) || isStaff(shopId)) &&
           request.resource.data.shop_id == shopId &&
           request.resource.data.scope == 'VAULT';
 
-        allow update: if isOwner(shopId) && collection != 'payments';
-        allow delete: if isOwner(shopId);
+        allow update: if isShopOwner(shopId) && collection != 'payments';
+        allow delete: if isShopOwner(shopId);
       }
 
       match /scopes/vault/{collection}/{docId} {
-        allow read: if isOwner(shopId) || isPartner(shopId);
+        allow read: if isShopOwner(shopId) || isPartner(shopId);
 
-        allow create: if (isOwner(shopId) || isStaff(shopId)) &&
+        allow create: if (isShopOwner(shopId) || isStaff(shopId)) &&
           request.resource.data.shop_id == shopId &&
           request.resource.data.scope == 'VAULT';
 
-        allow update: if isOwner(shopId) && collection != 'payments';
-        allow delete: if isOwner(shopId);
+        allow update: if isShopOwner(shopId) && collection != 'payments';
+        allow delete: if isShopOwner(shopId);
       }
     }
   }
