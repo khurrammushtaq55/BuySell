@@ -73,12 +73,14 @@ fun OwnerDashboardScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             // Card 1: Today Sales
+            val salesTitle = stringResource(R.string.dashboard_help_today_sales_title)
+            val salesMsg = stringResource(R.string.dashboard_help_today_sales_msg)
             DashboardMetricCard(
                 title = stringResource(R.string.home_today_sales),
                 value = if (todaySalesCount > 0) "$todaySalesCount sales • Rs $todaySalesTotalRs" else "Rs 0",
                 valueColor = if (todaySalesCount > 0) Color(0xFF2E7D32) else MaterialTheme.colorScheme.onSurfaceVariant,
-                helpTitle = "Aaj ki sales ka matlab?",
-                helpMsg = "Aaj subah se le kar ab tak jitni bhi mobile sales hui hain un ka kul jor.",
+                helpTitle = salesTitle,
+                helpMsg = salesMsg,
                 onHelpClick = { title, msg ->
                     showHelpDialogTitle = title
                     showHelpDialogMsg = msg
@@ -86,12 +88,14 @@ fun OwnerDashboardScreen(
             )
 
             // Card 2: Monthly Profit
+            val profitTitle = stringResource(R.string.dashboard_help_profit_title)
+            val profitMsg = stringResource(R.string.dashboard_help_profit_msg)
             DashboardMetricCard(
                 title = stringResource(R.string.dashboard_monthly_profit),
                 value = "Rs $monthlyNetProfitRs",
                 valueColor = Color(0xFF1565C0),
-                helpTitle = "Munafa (Profit) kaise banta hai?",
-                helpMsg = "Is mahine ki Kul Sale − Khareedari ki qeemat − Shop ke kharch (Rent, Bijli, Repair).",
+                helpTitle = profitTitle,
+                helpMsg = profitMsg,
                 onHelpClick = { title, msg ->
                     showHelpDialogTitle = title
                     showHelpDialogMsg = msg
@@ -99,12 +103,14 @@ fun OwnerDashboardScreen(
             )
 
             // Card 3: Capital in Stock
+            val capitalTitle = stringResource(R.string.dashboard_help_capital_title)
+            val capitalMsg = stringResource(R.string.dashboard_help_capital_msg)
             DashboardMetricCard(
                 title = stringResource(R.string.dashboard_capital_stock),
                 value = "Rs $capitalInStockRs",
                 valueColor = Color(0xFF7B1FA2),
-                helpTitle = "Band paisa kya hai?",
-                helpMsg = "Shop ke available stock mein jitni phones paday hain un ki kul khareedari ki qeemat.",
+                helpTitle = capitalTitle,
+                helpMsg = capitalMsg,
                 onHelpClick = { title, msg ->
                     showHelpDialogTitle = title
                     showHelpDialogMsg = msg
@@ -112,12 +118,14 @@ fun OwnerDashboardScreen(
             )
 
             // Card 4: Slow Stock Warning
+            val slowTitle = stringResource(R.string.dashboard_help_slow_stock_title)
+            val slowMsg = stringResource(R.string.dashboard_help_slow_stock_msg)
             DashboardMetricCard(
                 title = stringResource(R.string.dashboard_slow_stock),
                 value = if (slowStockCount > 0) "$slowStockCount phones" else "0",
                 valueColor = if (slowStockCount > 0) Color(0xFFD32F2F) else Color(0xFF2E7D32),
-                helpTitle = "Slow Stock kya hai?",
-                helpMsg = "Jo mobile phones 30 din se zyada shop mein paday hain aur bechay nahi gaye.",
+                helpTitle = slowTitle,
+                helpMsg = slowMsg,
                 onHelpClick = { title, msg ->
                     showHelpDialogTitle = title
                     showHelpDialogMsg = msg

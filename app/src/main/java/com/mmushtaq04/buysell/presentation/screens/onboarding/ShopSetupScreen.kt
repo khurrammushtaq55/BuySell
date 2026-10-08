@@ -1,12 +1,14 @@
 package com.mmushtaq04.buysell.presentation.screens.onboarding
 
 import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Badge
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Group
@@ -15,6 +17,7 @@ import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Storefront
+import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -30,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mmushtaq04.buysell.R
 import com.mmushtaq04.buysell.ui.theme.BuySellTheme
+import com.mmushtaq04.buysell.util.AppPreferencesManager
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -46,6 +50,14 @@ fun ShopSetupScreen(
 ) {
     val context = LocalContext.current
     var selectedTab by remember { mutableIntStateOf(0) } // 0 = Owner, 1 = Staff, 2 = Partner
+
+    // Language Selection State
+    val languages = AppPreferencesManager.supportedLanguages
+    val currentTag = remember { AppPreferencesManager.getAppLanguageTag(context) }
+    var selectedLanguageOption by remember {
+        mutableStateOf(languages.find { it.tag.equals(currentTag, ignoreCase = true) } ?: languages.first())
+    }
+    var expandedLanguageDropdown by remember { mutableStateOf(false) }
 
     // Owner Form States
     var userName by remember { mutableStateOf("") }
@@ -83,6 +95,70 @@ fun ShopSetupScreen(
             verticalArrangement = Arrangement.SpaceBetween
         ) {
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                // Language Selection Card
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(14.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Default.Translate, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Column {
+                                Text(
+                                    text = stringResource(R.string.onboarding_select_lang_title),
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 14.sp
+                                )
+                                Text(
+                                    text = stringResource(R.string.onboarding_select_lang_sub),
+                                    fontSize = 11.sp,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+
+                        Box {
+                            OutlinedTextField(
+                                value = selectedLanguageOption.displayName,
+                                onValueChange = {},
+                                label = { Text(stringResource(R.string.settings_label_selected_language)) },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable { expandedLanguageDropdown = true },
+                                readOnly = true,
+                                trailingIcon = {
+                                    IconButton(onClick = { expandedLanguageDropdown = true }) {
+                                        Icon(Icons.Default.ArrowDropDown, contentDescription = null)
+                                    }
+                                }
+                            )
+
+                            DropdownMenu(
+                                expanded = expandedLanguageDropdown,
+                                onDismissRequest = { expandedLanguageDropdown = false }
+                            ) {
+                                languages.forEach { option ->
+                                    DropdownMenuItem(
+                                        text = { Text(option.displayName) },
+                                        onClick = {
+                                            selectedLanguageOption = option
+                                            expandedLanguageDropdown = false
+                                            AppPreferencesManager.setAppLanguageTag(context, option.tag)
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+
                 // Tab Selection: Owner vs Staff vs Partner
                 SecondaryTabRow(selectedTabIndex = selectedTab) {
                     Tab(

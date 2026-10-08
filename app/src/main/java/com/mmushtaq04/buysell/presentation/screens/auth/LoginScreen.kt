@@ -58,6 +58,10 @@ fun LoginScreen(
 
     val errInvalidEmail = stringResource(R.string.login_err_invalid_email)
     val errPwdShort = stringResource(R.string.login_err_pwd_short)
+    val errGoogleFailed = stringResource(R.string.login_err_google_failed)
+    val errGoogleCred = stringResource(R.string.login_err_google_cred)
+    val errGoogleCanceled = stringResource(R.string.login_err_google_canceled)
+    val errAuthFailed = stringResource(R.string.login_err_auth_failed)
 
     Scaffold { padding ->
         Column(
@@ -138,22 +142,22 @@ fun LoginScreen(
                                 if (authResult.isSuccess) {
                                     onGoogleSignInClick()
                                 } else {
-                                    val err = authResult.exceptionOrNull()?.localizedMessage ?: "Google sign-in failed"
+                                    val err = authResult.exceptionOrNull()?.localizedMessage ?: errGoogleFailed
                                     errorMessage = err
                                     Toast.makeText(context, err, Toast.LENGTH_LONG).show()
                                 }
                             } else {
                                 isLoading = false
-                                val err = "Google account credential error"
+                                val err = errGoogleCred
                                 errorMessage = err
                                 Toast.makeText(context, err, Toast.LENGTH_LONG).show()
                             }
                         }.onFailure { e ->
                             isLoading = false
                             val msg = if (e is GetCredentialException && e.message?.contains("cancel", ignoreCase = true) == true) {
-                                "Google Sign-In canceled"
+                                errGoogleCanceled
                             } else {
-                                "Google Sign-In Error: ${e.localizedMessage ?: "Problem logging in"}"
+                                "Google Sign-In Error: ${e.localizedMessage ?: errGoogleFailed}"
                             }
                             errorMessage = msg
                             Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
@@ -270,7 +274,7 @@ fun LoginScreen(
                         if (result.isSuccess) {
                             onEmailAuthSuccess()
                         } else {
-                            val err = result.exceptionOrNull()?.localizedMessage ?: "Authentication failed"
+                            val err = result.exceptionOrNull()?.localizedMessage ?: errAuthFailed
                             errorMessage = err
                             Toast.makeText(context, err, Toast.LENGTH_LONG).show()
                         }

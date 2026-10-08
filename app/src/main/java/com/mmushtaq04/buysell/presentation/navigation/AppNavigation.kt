@@ -12,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -20,6 +21,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
+import com.mmushtaq04.buysell.R
 import com.mmushtaq04.buysell.data.auth.FirebaseAuthManager
 import com.mmushtaq04.buysell.data.local.AppDatabase
 import com.mmushtaq04.buysell.data.local.enums.Role
@@ -39,8 +41,14 @@ fun AppNavigation(
     val isUserLoggedIn = authManager.isUserLoggedIn
     val isPinSet = AppPinManager.isPinSet(context)
 
+    val msgRecords = stringResource(R.string.restoration_msg_records)
+    val msgDownloading = stringResource(R.string.restoration_msg_downloading)
+    val msgSearching = stringResource(R.string.restoration_msg_searching)
+    val msgParties = stringResource(R.string.restoration_msg_parties)
+    val msgFinalizing = stringResource(R.string.restoration_msg_finalizing)
+
     var isRestoringData by remember { mutableStateOf(false) }
-    var restorationMessage by remember { mutableStateOf("Restoring shop records...") }
+    var restorationMessage by remember { mutableStateOf(msgRecords) }
 
     val primaryUserFlow = remember { db.userDao().observePrimaryUser() }
     val primaryUser by primaryUserFlow.collectAsState(initial = null)
@@ -68,7 +76,7 @@ fun AppNavigation(
             val meta = db.appMetaDao().getAppMeta()
             if (meta?.activeShopId.isNullOrBlank()) {
                 isRestoringData = true
-                restorationMessage = "Downloading shop stock & ledger records..."
+                restorationMessage = msgDownloading
                 FirestoreSyncManager(db).restoreUserDataFromFirestore(userId)
                 isRestoringData = false
             }
@@ -85,13 +93,13 @@ fun AppNavigation(
         val userId = authManager.currentUser?.uid
         scope.launch {
             isRestoringData = true
-            restorationMessage = "Searching existing shop records..."
+            restorationMessage = msgSearching
 
             val meta = db.appMetaDao().getAppMeta()
             var activeShopId = meta?.activeShopId
 
             if (activeShopId.isNullOrBlank() && userId != null) {
-                restorationMessage = "Downloading stock items, transactions & parties..."
+                restorationMessage = msgParties
                 val restoredId = FirestoreSyncManager(db).restoreUserDataFromFirestore(userId).getOrDefault("")
                 if (restoredId.isNotBlank()) {
                     activeShopId = restoredId
@@ -99,7 +107,7 @@ fun AppNavigation(
             }
 
             if (!activeShopId.isNullOrBlank()) {
-                restorationMessage = "Finalizing store setup..."
+                restorationMessage = msgFinalizing
                 val user = db.userDao().getPrimaryUser()
                 val role = user?.role ?: Role.STAFF
                 FirestoreSyncManager(db).pullChanges(activeShopId, role)
@@ -188,7 +196,7 @@ private fun DataRestorationOverlayScreen(message: String) {
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = "Restoring Your Store & Stock...",
+                text = stringResource(R.string.restoration_overlay_title),
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground,
@@ -215,7 +223,7 @@ private fun DataRestorationOverlayScreen(message: String) {
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Please wait a moment while your devices and ledgers are synchronized.",
+                text = stringResource(R.string.restoration_overlay_sub),
                 fontSize = 12.sp,
                 color = MaterialTheme.colorScheme.outline,
                 textAlign = TextAlign.Center

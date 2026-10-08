@@ -30,13 +30,13 @@ fun HelpScreen(
     var selectedTopic by remember { mutableStateOf<HelpTopic?>(null) }
 
     val topics = listOf(
-        HelpTopic("1. Pehli khareedari kaise likhein", "Home screen par 'Phone Khareedna' tap karein. Category choose karein, Model aur IMEI daalein, Seller detail aur payment add kar ke Save karein."),
-        HelpTopic("2. Phone kaise bechein", "Home screen par 'Phone Bechna' tap karein. Stock se phone select karein, Customer detail, sale price aur received amount daal kar Save karein."),
-        HelpTopic("3. Baqi (udhaar) kaise rakhein", "Khareedate ya bechte waqt jab poori payment na aaye to baqi amount khud calculate ho jaati hai. Wahan 'Baqi kab denge?' date set karein."),
-        HelpTopic("4. Customer se baad mein paisay kaise lein", "Home -> 'Khata / Hisaab' kholein. Customer ke naam par tap karein aur 'Paisay lein' button daba kar amount record karein."),
-        HelpTopic("5. Purana phone exchange", "Home par 'Purana de kar naya' tap karein. Purana phone ki buy detail aur naya phone ki sale detail ek hi screen par bharein."),
-        HelpTopic("6. Staff code kaise add karein", "Settings -> Team -> 'Invite Code Copy' karein aur staff ko WhatsApp par bhejein. Staff app mein code daal kar join karega."),
-        HelpTopic("7. Munafa kahan dikhega (Owner)", "Home top bar par Settings ke saath Dashboard icon tap karein. Un mein 'Is mahine ka munafa' card par poora hisaab dikhega.")
+        HelpTopic(stringResource(R.string.help_topic_1_title), stringResource(R.string.help_topic_1_desc)),
+        HelpTopic(stringResource(R.string.help_topic_2_title), stringResource(R.string.help_topic_2_desc)),
+        HelpTopic(stringResource(R.string.help_topic_3_title), stringResource(R.string.help_topic_3_desc)),
+        HelpTopic(stringResource(R.string.help_topic_4_title), stringResource(R.string.help_topic_4_desc)),
+        HelpTopic(stringResource(R.string.help_topic_5_title), stringResource(R.string.help_topic_5_desc)),
+        HelpTopic(stringResource(R.string.help_topic_6_title), stringResource(R.string.help_topic_6_desc)),
+        HelpTopic(stringResource(R.string.help_topic_7_title), stringResource(R.string.help_topic_7_desc))
     )
 
     if (selectedTopic != null) {

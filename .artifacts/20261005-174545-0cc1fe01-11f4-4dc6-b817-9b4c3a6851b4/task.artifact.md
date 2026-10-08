@@ -101,3 +101,10 @@
 	- [x] Preserved atomic `getAfter(...)` batch join validations and diff-based key restrictions on `/invites/{code}`
 - [x] Extraction of All Remaining Hardcoded UI Text Strings
 	- [x] Extracted all remaining hardcoded Compose `Text("...")` strings into `res/values/strings.xml` using `stringResource(R.string...)`
+	- [x] Conducted full codebase audit and extracted loading overlay texts, help topic descriptions, dashboard tooltips, party phone prefixes, and login error strings into `res/values/strings.xml`
+- [x] Mobile Locale Auto-Detection & Onboarding Language Selector
+	- [x] Added system locale auto-detection in `AppPreferencesManager.kt` with English (`"en"`) fallback if system locale is unsupported
+	- [x] Added prominent Language Selection card at top of `ShopSetupScreen.kt` for immediate language selection upon first signup/login
+- [x] 100% Translation Synchronization Across All 8 Locales
+	- [x] Generated and synchronized complete, context-accurate translations for all 119 missing string keys across all 7 non-English locale folders (`ur`, `b+ur+Latn`, `hi`, `ar`, `es`, `fr`, `zh-rCN`)
+	- [x] Confirmed 100% key match (250/250 keys) across all 8 supported language folders

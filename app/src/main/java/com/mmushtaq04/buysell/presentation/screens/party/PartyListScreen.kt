@@ -111,7 +111,7 @@ fun PartyListScreen(
                             ) {
                                 Column {
                                     Text(party.name, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                                    Text("Tel: ${party.phone}", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    Text(stringResource(R.string.party_phone_prefix, party.phone), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                 }
 
                                 Column(horizontalAlignment = Alignment.End) {

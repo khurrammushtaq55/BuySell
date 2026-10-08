@@ -1,7 +1,6 @@
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="app_name">Hafeez Center Buy/Sell</string>
-
-    <!-- Auth & Login -->
     <string name="login_tagline">Apni dukan ka hisaab aur stock mehfooz rakhein</string>
     <string name="login_btn_google">Google se login karein</string>
     <string name="login_or_email">ya Email se login karein</string>
@@ -15,8 +14,6 @@
     <string name="login_toggle_register">Naya account banayein</string>
     <string name="login_err_invalid_email">Sahi email address darj karein</string>
     <string name="login_err_pwd_short">Password kam az kam 4 characters ka hona zaroori hai</string>
-
-    <!-- General Actions -->
     <string name="action_buy">Saman Khareedna</string>
     <string name="action_sell">Saman Bechna</string>
     <string name="action_khata">Khata / Hisaab</string>
@@ -28,15 +25,11 @@
     <string name="action_confirm">Confirm</string>
     <string name="action_cancel">Cancel</string>
     <string name="action_ok">Theek Hai</string>
-
-    <!-- Payment Modes -->
     <string name="label_cash">Cash</string>
     <string name="label_easypaisa">Easypaisa</string>
     <string name="label_jazzcash">JazzCash</string>
     <string name="label_bank_transfer">Bank Transfer</string>
     <string name="label_other">Other</string>
-
-    <!-- Onboarding & Shop Setup -->
     <string name="shop_setup_title">Dukan Ki Setup (Shop Setup)</string>
     <string name="shop_setup_sub">Apni dukan ki detail bharein</string>
     <string name="label_user_name">Aap Ka Naam / Display Name *</string>
@@ -62,8 +55,6 @@
     <string name="label_partner_code">8-Digit Partner Invite Code *</string>
     <string name="btn_join_staff">Dukan Join Karein (Staff) ✓</string>
     <string name="btn_join_partner">Dukan Join Karein (Sleeping Partner) ✓</string>
-
-    <!-- Buy Wizard -->
     <string name="buy_title">Saman Khareedna</string>
     <string name="buy_step">Step %1$d of %2$d</string>
     <string name="label_seller_name">Seller Ka Naam *</string>
@@ -94,8 +85,6 @@
     <string name="label_paid_amount">Kitne paisay diye? (Rs)</string>
     <string name="label_payment_mode">Mode of Payment:</string>
     <string name="sub_readonly_user">Aap ka logged-in account name — badla nahi ja sakta</string>
-
-    <!-- Sell Wizard -->
     <string name="sell_title">Saman Bechna</string>
     <string name="label_buyer_name">Buyer Ka Naam *</string>
     <string name="label_sale_price">Bechnay ki qeemat (Rs) *</string>
@@ -103,16 +92,12 @@
     <string name="btn_save_sale">Sale Record Karein ✓</string>
     <string name="sell_select_stock">Stock se item choose karein *:</string>
     <string name="sell_buyer_info_header">Gahak (Buyer) ki detail (Mandatory fields *):</string>
-
-    <!-- Stock List Screen -->
     <string name="stock_title">Mera Stock (%1$d)</string>
     <string name="stock_search_label">Search by IMEI, Brand, Model, Specs, or Color</string>
     <string name="stock_empty_msg">Abhi koi item stock mein nahi — pehli khareedari add karein</string>
     <string name="stock_close_dialog">Band Karein (Close)</string>
     <string name="stock_qty_label">Qty: %1$d</string>
     <string name="stock_in_stock_label">In Stock</string>
-
-    <!-- Exchange Wizard -->
     <string name="exchange_title">Purana De Kar Naya (Exchange)</string>
     <string name="exchange_explainer_title">Exchange Flow (Dono 1 Flow Mein)</string>
     <string name="exchange_explainer_sub">Purana item khareed ke stock m jayega, naya bech diya jayega</string>
@@ -125,8 +110,6 @@
     <string name="label_old_phone_price">Purane Item Ki Qeemat / Khareed Price (Rs) *</string>
     <string name="label_customer_name">Customer Ka Naam *</string>
     <string name="label_cash_paid">Kitne cash diye / liye? (Rs)</string>
-
-    <!-- Home & Dashboard -->
     <string name="home_today_sales">Aaj ki sales</string>
     <string name="home_role_cloud_sync">Role: %1$s • Cloud par save ✓</string>
     <string name="home_partner_banner_title">Sleeping Partner Mode (View-Only)</string>
@@ -140,28 +123,20 @@
     <string name="settings_title">Settings &amp; Preferences</string>
     <string name="help_title">Madad / Help Topics</string>
     <string name="help_frequently_asked">Sub se zyada pooche jaane wale sawal:</string>
-
-    <!-- App Lock Screen -->
     <string name="lock_title">Dukan Lock — PIN Daalein</string>
     <string name="lock_subtitle">4-digit security PIN daal kar app kholain</string>
     <string name="lock_wrong_pin">Ghalat PIN — Dobara koshish karein</string>
-
-    <!-- Party List Screen -->
     <string name="party_subtitle">Kaun kitna dena / lena hai</string>
     <string name="party_search_label">Name ya Mobile number search karein</string>
     <string name="party_empty_msg">Jab koi baqi paisay honge yahan nazar ayenge</string>
     <string name="party_owes_shop">Us ne Rs %1$d denay hain</string>
     <string name="party_shop_owes">Hum ne Rs %1$d denay hain</string>
     <string name="party_settled">Hisaab barabar ✓</string>
-
-    <!-- Settings Sections -->
     <string name="settings_section_store">Store Profile (Dukan Details)</string>
     <string name="settings_section_lang">Language &amp; Display (Zaban Aur Preferences)</string>
     <string name="settings_section_team">Team &amp; Trading Categories</string>
     <string name="settings_section_receipt">Receipt &amp; Stock Rules</string>
     <string name="settings_section_security">Security &amp; Account</string>
-
-    <!-- Settings Controls -->
     <string name="settings_app_language">App Language (Aap ki Zaban)</string>
     <string name="settings_show_buy_price">Show Buy Price in Sell Wizard</string>
     <string name="settings_show_buy_price_sub">Sale karte waqt khareed price eye icon par dikhayein</string>
@@ -171,4 +146,108 @@
     <string name="settings_signout_dialog_title">Sign Out Karein?</string>
     <string name="settings_signout_dialog_msg">Kaya aap apni dukan ke account se logout karna chahte hain?</string>
     <string name="settings_btn_signout">Logout Karein</string>
+    <string name="login_welcome">Hafeez Center Device Tracker mein khushamdeed</string>
+    <string name="login_subtitle">Dukan ka hisab kitab aur khareed o farokht digital karein</string>
+    <string name="login_email">Email Address</string>
+    <string name="login_password">Password</string>
+    <string name="login_btn_login">Login Karein</string>
+    <string name="label_owner_shop_name">Dukan Ka Naam *</string>
+    <string name="label_owner_shop_phone">Dukan Ka Phone Number *</string>
+    <string name="label_owner_shop_address">Hafeez Center Shop Address *</string>
+    <string name="home_title">Hafeez Center Tracker</string>
+    <string name="home_welcome_role">Logged in as %1</string>
+    <string name="dashboard_total_profit">Kul Safi Munafa (Net Profit)</string>
+    <string name="dashboard_total_stock_value">Stock Ki Maliyat (Stock Value)</string>
+    <string name="dashboard_total_udhaar">Grahako Se Lene Hain (Receivable)</string>
+    <string name="dashboard_supplier_debts">Suppliers Ko Dene Hain (Payable)</string>
+    <string name="dashboard_recent_txns">Aakhri Transactions:</string>
+    <string name="exchange_wizard_title">Exchange / Trade-in Wizard (Step %1/%2)</string>
+    <string name="exchange_search_label">Model ya IMEI se talash karein</string>
+    <string name="exchange_new_price_label">Naye Item ki Sale Price (Rs)</string>
+    <string name="exchange_btn_step2">Agla Step (Purane Item ki Details)</string>
+    <string name="exchange_select_category">Select Category:</string>
+    <string name="exchange_old_model_label">Model Name / Variant</string>
+    <string name="exchange_old_imei_label">IMEI / Serial Number</string>
+    <string name="exchange_defects_label">Defects / Issue (if any)</string>
+    <string name="exchange_defects_sub">e.g. Screen glass cracked, Face ID not working</string>
+    <string name="exchange_old_value_label">Purane Item ki Lagayei Gayi Qeemat (Rs)</string>
+    <string name="exchange_btn_step3">Agla Step (Customer &amp; Hisab)</string>
+    <string name="exchange_new_price_summary">Naye Item Price: Rs %1</string>
+    <string name="exchange_old_value_summary">Purane Item Value: Rs %1</string>
+    <string name="exchange_customer_due">Customer owes: Rs %1</string>
+    <string name="exchange_shop_due">Shop owes customer: Rs %1</string>
+    <string name="exchange_customer_name_label">Customer Name</string>
+    <string name="exchange_customer_phone_label">Customer Phone</string>
+    <string name="exchange_cash_paid_label">Cash Received / Paid (Rs)</string>
+    <string name="exchange_payment_method_label">Payment Method:</string>
+    <string name="exchange_btn_finish">Exchange Mukammal Karein</string>
+    <string name="label_total_price">Kul Qeemat: Rs %1</string>
+    <string name="label_remaining_udhaar">Baqi Udhaar: Rs %1</string>
+    <string name="label_fully_paid">Mukammal Ada Kar Diya ✓</string>
+    <string name="label_select_payment_method">Payment Tariqa Select Karein:</string>
+    <string name="label_payment_ref_no">Payment Detail / Reference No</string>
+    <string name="label_promised_return_date">Baqi Wapsi Date</string>
+    <string name="sub_promised_date_hint">Jaise: 7 din baad, ya tareeq likhein</string>
+    <string name="label_payment_confirmation">Payment confirmation:</string>
+    <string name="label_sale_price_summary">Sale Price: Rs %1</string>
+    <string name="label_recorded_by_summary">Record karne wala: %1</string>
+    <string name="label_customer_udhaar_summary">Customer par baqi udhaar: Rs %1</string>
+    <string name="label_full_payment_received">Full payment received ✓</string>
+    <string name="label_amount_given_by_customer">Customer ne kitne diye? (Rs)</string>
+    <string name="label_promised_due_date">Baqi kab dega? (e.g. 20 March)</string>
+    <string name="settings_team_title">Team &amp; Member Invites</string>
+    <string name="settings_team_sub">Role chunay aur 8-digit join code banayein:</string>
+    <string name="settings_staff_member">Staff Member</string>
+    <string name="settings_sleeping_partner">Sleeping Partner</string>
+    <string name="settings_invite_code_label">Invite Code (%1):</string>
+    <string name="settings_code_expires_hint">Expires in 7 days</string>
+    <string name="settings_btn_copy_code">Copy Code</string>
+    <string name="settings_btn_whatsapp_share">WhatsApp Share</string>
+    <string name="settings_btn_generate_new_code">Naya Code Banayein</string>
+    <string name="settings_btn_regenerate_code">Code Dobara Banayein</string>
+    <string name="settings_pin_dialog_msg">Cold start par app kholne ke liye 4 digit PIN:</string>
+    <string name="settings_label_4digit_pin">4 Digit PIN</string>
+    <string name="settings_btn_set_pin">PIN Set Karein</string>
+    <string name="settings_btn_remove_pin">PIN Remove Karein</string>
+    <string name="settings_label_selected_language">Selected Language</string>
+    <string name="settings_trading_categories">Trading Categories (Product Types):</string>
+    <string name="settings_slow_stock_warning">Slow Stock Warning (Days)</string>
+    <string name="settings_slow_stock_sub">Default: 30 days old stock warning</string>
+    <string name="settings_receipt_footer_note">Receipt Footer Note</string>
+    <string name="restoration_overlay_title">Restoring Your Store &amp; Stock...</string>
+    <string name="restoration_overlay_sub">Please wait a moment while your devices and ledgers are synchronized.</string>
+    <string name="restoration_msg_records">Restoring shop records...</string>
+    <string name="restoration_msg_downloading">Downloading shop stock &amp; ledger records...</string>
+    <string name="restoration_msg_searching">Searching existing shop records...</string>
+    <string name="restoration_msg_parties">Downloading stock items, transactions &amp; parties...</string>
+    <string name="restoration_msg_finalizing">Finalizing store setup...</string>
+    <string name="help_topic_1_title">1. Pehli khareedari kaise likhein</string>
+    <string name="help_topic_1_desc">Home screen par \'Saman Khareedna\' tap karein. Category choose karein, Model aur IMEI daalein, Seller detail aur payment add kar ke Save karein.</string>
+    <string name="help_topic_2_title">2. Item kaise bechein</string>
+    <string name="help_topic_2_desc">Home screen par \'Saman Bechna\' tap karein. Stock se phone select karein, Customer detail, sale price aur received amount daal kar Save karein.</string>
+    <string name="help_topic_3_title">3. Baqi (udhaar) kaise rakhein</string>
+    <string name="help_topic_3_desc">Khareedate ya bechte waqt jab poori payment na aaye to baqi amount khud calculate ho jaati hai. Wahan \'Baqi kab denge?\' date set karein.</string>
+    <string name="help_topic_4_title">4. Customer se baad mein paisay kaise lein</string>
+    <string name="help_topic_4_desc">Home -&gt; \'Khata / Ledger\' kholein. Customer ke naam par tap karein aur \'Paisay lein\' button daba kar amount record karein.</string>
+    <string name="help_topic_5_title">5. Purana phone exchange</string>
+    <string name="help_topic_5_desc">Home par \'Exchange\' tap karein. Purana phone ki buy detail aur naya phone ki sale detail ek hi screen par bharein.</string>
+    <string name="help_topic_6_title">6. Staff code kaise add karein</string>
+    <string name="help_topic_6_desc">Settings -&gt; Team -&gt; \'Invite Code Copy\' karein aur staff ko WhatsApp par bhejein. Staff app mein code daal kar join karega.</string>
+    <string name="help_topic_7_title">7. Munafa kahan dikhega (Owner)</string>
+    <string name="help_topic_7_desc">Home top bar par Settings ke saath Dashboard icon tap karein. Un mein \'Is mahine ka munafa\' card par poora hisaab dikhega.</string>
+    <string name="dashboard_help_today_sales_title">Aaj ki sales ka matlab?</string>
+    <string name="dashboard_help_today_sales_msg">Aaj subah se le kar ab tak jitni bhi mobile sales hui hain un ka kul jor.</string>
+    <string name="dashboard_help_profit_title">Munafa (Profit) kaise banta hai?</string>
+    <string name="dashboard_help_profit_msg">Is mahine ki Kul Sale − Khareedari ki qeemat − Shop ke kharch (Rent, Bijli, Repair).</string>
+    <string name="dashboard_help_capital_title">Band paisa kya hai?</string>
+    <string name="dashboard_help_capital_msg">Shop ke available stock mein jitni phones paday hain un ki kul khareedari ki qeemat.</string>
+    <string name="dashboard_help_slow_stock_title">Slow Stock kya hai?</string>
+    <string name="dashboard_help_slow_stock_msg">Jo mobile phones 30 din se zyada shop mein paday hain aur bechay nahi gaye.</string>
+    <string name="party_phone_prefix">Tel: %1</string>
+    <string name="login_err_google_failed">Google sign-in failed</string>
+    <string name="login_err_google_cred">Google account credential error</string>
+    <string name="login_err_google_canceled">Google Sign-In canceled</string>
+    <string name="login_err_auth_failed">Authentication failed</string>
+    <string name="onboarding_select_lang_title">Choose App Language / Zaban Chunay</string>
+    <string name="onboarding_select_lang_sub">Dukan ka hisab chalane ke liye zaban chunay</string>
 </resources>

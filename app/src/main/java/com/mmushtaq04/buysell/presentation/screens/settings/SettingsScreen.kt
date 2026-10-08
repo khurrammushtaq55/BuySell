@@ -39,8 +39,6 @@ import com.mmushtaq04.buysell.util.AppPreferencesManager
 import com.mmushtaq04.buysell.util.DataExporter
 import kotlinx.coroutines.launch
 
-data class LanguageOption(val displayName: String, val tag: String)
-
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun SettingsScreen(
@@ -64,16 +62,7 @@ fun SettingsScreen(
     var editableShopAddress by remember(shopAddress) { mutableStateOf(shopAddress) }
     var isSavingShopProfile by remember { mutableStateOf(false) }
 
-    val languages = listOf(
-        LanguageOption("Roman Urdu / رومن اردو", "b+ur+Latn"),
-        LanguageOption("Urdu / اردو", "ur"),
-        LanguageOption("English", "en"),
-        LanguageOption("Spanish / Español", "es"),
-        LanguageOption("French / Français", "fr"),
-        LanguageOption("Hindi / हिंदी", "hi"),
-        LanguageOption("Arabic / العربية", "ar"),
-        LanguageOption("Chinese / 简体中文", "zh-CN")
-    )
+    val languages = AppPreferencesManager.supportedLanguages
 
     val currentTag = remember { AppPreferencesManager.getAppLanguageTag(context) }
     var selectedLanguageOption by remember {
