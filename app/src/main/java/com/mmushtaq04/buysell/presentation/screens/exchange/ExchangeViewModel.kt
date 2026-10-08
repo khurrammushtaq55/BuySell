@@ -41,10 +41,13 @@ class ExchangeViewModel(application: Application) : AndroidViewModel(application
 
     private fun loadInStockItems() {
         viewModelScope.launch {
+            val user = db.userDao().getPrimaryUser()
             val meta = db.appMetaDao().getAppMeta()
-            val shopId = meta?.activeShopId ?: "default_shop"
-            stockRepository.observeInStockItems(shopId).collect { items ->
-                _stockItems.value = items
+            val shopId = meta?.activeShopId?.ifBlank { null } ?: user?.shopId ?: ""
+            if (shopId.isNotBlank()) {
+                stockRepository.observeInStockItems(shopId).collect { items ->
+                    _stockItems.value = items
+                }
             }
         }
     }
@@ -71,8 +74,9 @@ class ExchangeViewModel(application: Application) : AndroidViewModel(application
     ) {
         viewModelScope.launch {
             Log.d(TAG, "Starting processExchange: SoldStockItemID=$soldStockItemId, OldPhone=$oldPhoneBrand $oldPhoneModel, Value=Rs $oldPhoneValueRs, NewPrice=Rs $newPhonePriceRs, Customer=$customerName")
+            val user = db.userDao().getPrimaryUser()
             val meta = db.appMetaDao().getAppMeta()
-            val activeShopId = meta?.activeShopId ?: "default_shop"
+            val activeShopId = meta?.activeShopId?.ifBlank { null } ?: user?.shopId ?: ""
             val now = System.currentTimeMillis()
             val exchangeGroupId = "EXG-${UUID.randomUUID().toString().take(8)}"
 

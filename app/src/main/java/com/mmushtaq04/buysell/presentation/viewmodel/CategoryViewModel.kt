@@ -28,26 +28,32 @@ class CategoryViewModel(application: Application) : AndroidViewModel(application
     private fun observeCategories() {
         viewModelScope.launch {
             db.appMetaDao().observeAppMeta().collect { meta ->
-                val activeShopId = meta?.activeShopId ?: "default_shop"
+                val user = db.userDao().getPrimaryUser()
+                val activeShopId = meta?.activeShopId?.ifBlank { null } ?: user?.shopId ?: ""
 
-                val existing = db.categoryDao().getCategories(activeShopId)
-                if (existing.isEmpty()) {
-                    val presets = CategoryPresets.getPresetCategories(activeShopId)
-                    db.categoryDao().insertCategories(presets)
-                }
+                if (activeShopId.isNotBlank()) {
+                    val existing = db.categoryDao().getCategories(activeShopId)
+                    if (existing.isEmpty()) {
+                        val presets = CategoryPresets.getPresetCategories(activeShopId)
+                        db.categoryDao().insertCategories(presets)
+                    }
 
-                db.categoryDao().observeCategories(activeShopId).collect { enabledList ->
-                    _enabledCategories.value = enabledList
+                    db.categoryDao().observeCategories(activeShopId).collect { enabledList ->
+                        _enabledCategories.value = enabledList
+                    }
                 }
             }
         }
 
         viewModelScope.launch {
             db.appMetaDao().observeAppMeta().collect { meta ->
-                val activeShopId = meta?.activeShopId ?: "default_shop"
+                val user = db.userDao().getPrimaryUser()
+                val activeShopId = meta?.activeShopId?.ifBlank { null } ?: user?.shopId ?: ""
 
-                db.categoryDao().observeAllCategories(activeShopId).collect { allList ->
-                    _allCategories.value = allList
+                if (activeShopId.isNotBlank()) {
+                    db.categoryDao().observeAllCategories(activeShopId).collect { allList ->
+                        _allCategories.value = allList
+                    }
                 }
             }
         }

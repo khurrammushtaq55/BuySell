@@ -1,22 +1,27 @@
 package com.mmushtaq04.buysell.presentation.screens.onboarding
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Badge
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.Key
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Store
+import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.Storefront
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -26,18 +31,20 @@ import androidx.compose.ui.unit.sp
 import com.mmushtaq04.buysell.R
 import com.mmushtaq04.buysell.ui.theme.BuySellTheme
 
-@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun ShopSetupScreen(
     onShopCreated: (
-        userName: String,
+        name: String,
         role: String,
         shopName: String,
         shopPhone: String,
         shopAddress: String,
-        selectedCategories: Set<String>
-    ) -> Unit = { _, _, _, _, _, _ -> }
+        selectedCategories: List<String>
+    ) -> Unit = { _, _, _, _, _, _ -> },
+    onJoinWithInvite: (inviteCode: String, userName: String, onError: (String) -> Unit) -> Unit = { _, _, _ -> }
 ) {
+    val context = LocalContext.current
     var selectedTab by remember { mutableIntStateOf(0) } // 0 = Owner, 1 = Staff, 2 = Partner
 
     // Owner Form States
@@ -81,43 +88,30 @@ fun ShopSetupScreen(
                     Tab(
                         selected = selectedTab == 0,
                         onClick = { selectedTab = 0 },
-                        text = {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(Icons.Default.Store, contentDescription = null, modifier = Modifier.size(16.dp))
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(stringResource(R.string.tab_owner), fontWeight = FontWeight.Bold, fontSize = 13.sp)
-                            }
-                        }
+                        text = { Text(stringResource(R.string.tab_owner), fontWeight = FontWeight.Bold) },
+                        icon = { Icon(Icons.Default.Storefront, contentDescription = null) }
                     )
                     Tab(
                         selected = selectedTab == 1,
                         onClick = { selectedTab = 1 },
-                        text = {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(Icons.Default.Group, contentDescription = null, modifier = Modifier.size(16.dp))
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(stringResource(R.string.tab_staff), fontWeight = FontWeight.Bold, fontSize = 13.sp)
-                            }
-                        }
+                        text = { Text(stringResource(R.string.tab_staff), fontWeight = FontWeight.Bold) },
+                        icon = { Icon(Icons.Default.Badge, contentDescription = null) }
                     )
                     Tab(
                         selected = selectedTab == 2,
                         onClick = { selectedTab = 2 },
-                        text = {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(Icons.Default.Visibility, contentDescription = null, modifier = Modifier.size(16.dp))
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(stringResource(R.string.tab_partner), fontWeight = FontWeight.Bold, fontSize = 13.sp)
-                            }
-                        }
+                        text = { Text(stringResource(R.string.tab_partner), fontWeight = FontWeight.Bold) },
+                        icon = { Icon(Icons.Default.Visibility, contentDescription = null) }
                     )
                 }
+
+                Spacer(modifier = Modifier.height(8.dp))
 
                 if (selectedTab == 0) {
                     // --- OWNER: CREATE NEW SHOP ---
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
-                            imageVector = Icons.Default.Store,
+                            imageVector = Icons.Default.Storefront,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(32.dp)
@@ -133,7 +127,7 @@ fun ShopSetupScreen(
                         value = userName,
                         onValueChange = { userName = it },
                         label = { Text(stringResource(R.string.label_owner_name)) },
-                        placeholder = { Text("e.g. Muhammad Ali") },
+                        placeholder = { Text("e.g. Malik Mushtaq") },
                         leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -141,17 +135,18 @@ fun ShopSetupScreen(
                     OutlinedTextField(
                         value = shopName,
                         onValueChange = { shopName = it },
-                        label = { Text(stringResource(R.string.label_shop_name)) },
-                        placeholder = { Text("e.g. Hafeez Center Mobiles") },
-                        leadingIcon = { Icon(Icons.Default.Store, contentDescription = null) },
+                        label = { Text(stringResource(R.string.label_owner_shop_name)) },
+                        placeholder = { Text("e.g. Mushtaq Mobile Trading") },
+                        leadingIcon = { Icon(Icons.Default.Storefront, contentDescription = null) },
                         modifier = Modifier.fillMaxWidth()
                     )
 
                     OutlinedTextField(
                         value = shopPhone,
                         onValueChange = { shopPhone = it },
-                        label = { Text(stringResource(R.string.label_shop_phone)) },
+                        label = { Text(stringResource(R.string.label_owner_shop_phone)) },
                         placeholder = { Text("03001234567") },
+                        leadingIcon = { Icon(Icons.Default.Phone, contentDescription = null) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -159,14 +154,15 @@ fun ShopSetupScreen(
                     OutlinedTextField(
                         value = shopNumberAddress,
                         onValueChange = { shopNumberAddress = it },
-                        label = { Text(stringResource(R.string.label_shop_address)) },
-                        placeholder = { Text("e.g. Shop #12, Hafeez Center, Lahore") },
+                        label = { Text(stringResource(R.string.label_owner_shop_address)) },
+                        placeholder = { Text("Shop #12, Ground Floor, Hafeez Center") },
+                        leadingIcon = { Icon(Icons.Default.LocationOn, contentDescription = null) },
                         modifier = Modifier.fillMaxWidth()
                     )
 
-                    HorizontalDivider()
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
 
-                    Text(stringResource(R.string.shop_setup_categories_prompt), fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                    Text(stringResource(R.string.shop_setup_categories_prompt), fontWeight = FontWeight.Bold, fontSize = 14.sp)
 
                     FlowRow(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -174,7 +170,7 @@ fun ShopSetupScreen(
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         presetCategories.forEach { category ->
-                            val isSelected = category in selectedCategories
+                            val isSelected = selectedCategories.contains(category)
                             FilterChip(
                                 selected = isSelected,
                                 onClick = {
@@ -192,10 +188,10 @@ fun ShopSetupScreen(
                         }
                     }
                 } else if (selectedTab == 1) {
-                    // --- STAFF: JOIN EXISTING SHOP WITH INVITE CODE ---
+                    // --- STAFF MEMBER: JOIN EXISTING SHOP ---
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
-                            imageVector = Icons.Default.Key,
+                            imageVector = Icons.Default.Group,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(32.dp)
@@ -283,25 +279,30 @@ fun ShopSetupScreen(
             Button(
                 onClick = {
                     isLoading = true
-                    val roleStr = when (selectedTab) {
-                        0 -> "Owner"
-                        1 -> "Staff"
-                        else -> "Partner"
+                    if (selectedTab == 0) {
+                        onShopCreated(
+                            userName.trim(),
+                            "Owner",
+                            shopName.trim(),
+                            shopPhone.trim(),
+                            shopNumberAddress.trim(),
+                            selectedCategories.toList()
+                        )
+                    } else {
+                        onJoinWithInvite(
+                            inviteCode.trim(),
+                            joinUserName.trim(),
+                            { errorMsg ->
+                                isLoading = false
+                                Toast.makeText(context, errorMsg, Toast.LENGTH_LONG).show()
+                            }
+                        )
                     }
-                    val nameToSave = if (selectedTab == 0) userName.trim() else joinUserName.trim()
-                    onShopCreated(
-                        nameToSave,
-                        roleStr,
-                        shopName.trim(),
-                        shopPhone.trim(),
-                        shopNumberAddress.trim(),
-                        selectedCategories
-                    )
                 },
                 enabled = if (selectedTab == 0) {
                     userName.isNotBlank() && shopName.isNotBlank() && shopPhone.isNotBlank() && shopNumberAddress.isNotBlank() && !isLoading
                 } else {
-                    joinUserName.isNotBlank() && joinPhone.isNotBlank() && inviteCode.length >= 6 && !isLoading
+                    joinUserName.isNotBlank() && joinPhone.isNotBlank() && inviteCode.length == 8 && !isLoading
                 },
                 modifier = Modifier
                     .fillMaxWidth()

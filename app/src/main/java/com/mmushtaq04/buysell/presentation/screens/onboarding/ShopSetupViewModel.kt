@@ -4,6 +4,8 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.Timestamp
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.gson.Gson
 import com.mmushtaq04.buysell.data.auth.FirebaseAuthManager
 import com.mmushtaq04.buysell.data.local.AppDatabase
@@ -18,6 +20,7 @@ import com.mmushtaq04.buysell.data.local.enums.Role
 import com.mmushtaq04.buysell.data.local.enums.SyncOp
 import com.mmushtaq04.buysell.data.sync.FirestoreSyncManager
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import java.util.UUID
 
 class ShopSetupViewModel(application: Application) : AndroidViewModel(application) {
@@ -40,7 +43,10 @@ class ShopSetupViewModel(application: Application) : AndroidViewModel(applicatio
     ) {
         viewModelScope.launch {
             Log.d(TAG, "Creating shop '$shopName' for user '$name' as role '$role'")
-            val shopId = "default_shop"
+            val shopId = "shop_" + UUID.randomUUID().toString()
+            val shopCode = "S" + (10000..99999).random().toString()
+            val deviceCode = "DEV" + (10..99).random().toString()
+
             val now = System.currentTimeMillis()
             val currentUserId = authManager.currentUser?.uid ?: UUID.randomUUID().toString()
             val registeredUserName = name.ifBlank { authManager.currentUser?.displayName ?: "Malik / Staff" }
@@ -54,6 +60,7 @@ class ShopSetupViewModel(application: Application) : AndroidViewModel(applicatio
                 phone = shopPhone,
                 role = roleEnum,
                 shopId = shopId,
+                activeSessionId = "session_active",
                 createdAt = now,
                 updatedAt = now,
                 createdBy = registeredUserName,
@@ -75,7 +82,7 @@ class ShopSetupViewModel(application: Application) : AndroidViewModel(applicatio
             val shopEntity = ShopEntity(
                 id = shopId,
                 name = shopName.ifBlank { "Hafeez Center Store" },
-                code = "SHOP01",
+                code = shopCode,
                 ownerUserId = currentUserId,
                 phone = shopPhone.ifBlank { "" },
                 address = shopAddress.ifBlank { "" },
@@ -140,21 +147,175 @@ class ShopSetupViewModel(application: Application) : AndroidViewModel(applicatio
                 )
             )
 
-            // 4. Save AppMetaEntity
-            val meta = db.appMetaDao().getAppMeta() ?: AppMetaEntity(
+            // 4. Save AppMetaEntity with unique device code
+            val existingMeta = db.appMetaDao().getAppMeta()
+            val finalDeviceCode = if (existingMeta?.deviceCode.isNullOrBlank() || existingMeta.deviceCode == "HC01") {
+                deviceCode
+            } else {
+                existingMeta.deviceCode
+            }
+
+            val meta = existingMeta ?: AppMetaEntity(
                 id = 1,
-                deviceCode = "HC01",
+                deviceCode = finalDeviceCode,
                 deviceId = UUID.randomUUID().toString()
             )
-            db.appMetaDao().insertOrUpdate(meta.copy(activeShopId = shopId))
+            db.appMetaDao().insertOrUpdate(meta.copy(activeShopId = shopId, deviceCode = finalDeviceCode))
 
             // 5. Trigger Firestore Sync
             runCatching {
                 FirestoreSyncManager(db).pushOutbox(shopId, roleEnum, "session_active")
             }
 
-            Log.i(TAG, "✓ Shop '$shopName' successfully created and initialized!")
+            Log.i(TAG, "✓ Shop '$shopName' ($shopId) successfully created with device code '$finalDeviceCode'!")
             onSuccess()
+        }
+    }
+
+    fun joinShopWithInvite(
+        inviteCode: String,
+        userName: String,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        viewModelScope.launch {
+            runCatching {
+                val codeClean = inviteCode.trim().uppercase()
+                if (codeClean.length != 8) {
+                    onError("Sahi 8-digit invite code darj karein")
+                    return@launch
+                }
+
+                Log.i(TAG, "Attempting to join shop with invite code: '$codeClean'")
+                val firestore = FirebaseFirestore.getInstance()
+
+                // 1. Fetch /invites/{codeClean}
+                val inviteDoc = firestore.collection("invites").document(codeClean).get().await()
+                if (!inviteDoc.exists()) {
+                    onError("Yeh invite code majood nahi hai. Dukan owner se naya code lein.")
+                    return@launch
+                }
+
+                val inviteData = inviteDoc.data ?: emptyMap()
+                val shopId = inviteData["shop_id"] as? String ?: inviteData["shopId"] as? String
+                val roleStr = inviteData["role"] as? String ?: "STAFF"
+                val isUsed = (inviteData["is_used"] as? Boolean) ?: false
+                val expiresAt = parseLongTimestamp(inviteData["expires_at"])
+
+                if (shopId.isNullOrBlank()) {
+                    onError("Invite code ghalat hai (Invalid shop ID).")
+                    return@launch
+                }
+
+                if (isUsed) {
+                    onError("Yeh invite code pehle se istemal ho chuka hai. Owner se naya code lein.")
+                    return@launch
+                }
+
+                if (expiresAt > 0L && System.currentTimeMillis() > expiresAt) {
+                    onError("Invite code ki 7 din ki muddat khatam ho chuki hai. Owner se naya code lein.")
+                    return@launch
+                }
+
+                val currentUserId = authManager.currentUser?.uid ?: UUID.randomUUID().toString()
+                val registeredUserName = userName.ifBlank { authManager.currentUser?.displayName ?: "Staff Member" }
+                val verifiedRole = Role.fromStr(roleStr)
+
+                // 2. Fetch Shop Document from Firestore to verify shop existence
+                val shopDoc = firestore.collection("shops").document(shopId).get().await()
+                val shopName = if (shopDoc.exists()) shopDoc.getString("name") ?: "Hafeez Center Store" else "Hafeez Center Store"
+                val shopCode = if (shopDoc.exists()) shopDoc.getString("code") ?: ("S" + (10000..99999).random().toString()) else ("S" + (10000..99999).random().toString())
+
+                val now = System.currentTimeMillis()
+
+                // 3. Create Member Document at /shops/{shopId}/members/{currentUserId}
+                val memberPayload = mapOf(
+                    "user_id" to currentUserId,
+                    "shop_id" to shopId,
+                    "role" to verifiedRole.name,
+                    "invite_code" to codeClean,
+                    "display_name" to registeredUserName,
+                    "joined_at" to now
+                )
+                firestore.collection("shops").document(shopId)
+                    .collection("members").document(currentUserId)
+                    .set(memberPayload)
+                    .await()
+
+                // 4. Mark Invite Document as Used
+                firestore.collection("invites").document(codeClean)
+                    .update(mapOf("is_used" to true, "used_by" to currentUserId, "used_at" to now))
+                    .await()
+
+                runCatching {
+                    firestore.collection("shops").document(shopId)
+                        .collection("invites").document(codeClean)
+                        .update(mapOf("is_used" to true, "used_by" to currentUserId, "used_at" to now))
+                        .await()
+                }
+
+                // 5. Store in Local Room DB
+                val userEntity = UserEntity(
+                    id = currentUserId,
+                    displayName = registeredUserName,
+                    email = authManager.currentUser?.email,
+                    role = verifiedRole,
+                    shopId = shopId,
+                    activeSessionId = "session_active",
+                    createdAt = now,
+                    updatedAt = now,
+                    createdBy = registeredUserName,
+                    updatedBy = registeredUserName
+                )
+                db.userDao().insertUser(userEntity)
+
+                val shopEntity = ShopEntity(
+                    id = shopId,
+                    name = shopName,
+                    code = shopCode,
+                    ownerUserId = shopDoc.getString("owner_user_id") ?: shopDoc.getString("ownerUserId") ?: "",
+                    phone = shopDoc.getString("phone") ?: "",
+                    address = shopDoc.getString("address") ?: "",
+                    createdAt = now,
+                    updatedAt = now,
+                    createdBy = registeredUserName,
+                    updatedBy = registeredUserName
+                )
+                db.shopDao().insertShop(shopEntity)
+
+                val deviceCode = "DEV" + (10..99).random().toString()
+                val existingMeta = db.appMetaDao().getAppMeta()
+                val finalDeviceCode = if (existingMeta?.deviceCode.isNullOrBlank() || existingMeta?.deviceCode == "HC01") {
+                    deviceCode
+                } else {
+                    existingMeta.deviceCode
+                }
+
+                val meta = existingMeta ?: AppMetaEntity(
+                    id = 1,
+                    deviceCode = finalDeviceCode,
+                    deviceId = UUID.randomUUID().toString()
+                )
+                db.appMetaDao().insertOrUpdate(meta.copy(activeShopId = shopId, deviceCode = finalDeviceCode))
+
+                // 6. Download Shop's Stock, Parties & Transactions
+                FirestoreSyncManager(db).restoreUserDataFromFirestore(currentUserId)
+
+                Log.i(TAG, "✓ Successfully joined shop '$shopId' as role '$verifiedRole' via invite code '$codeClean'!")
+                onSuccess()
+            }.onFailure { e ->
+                Log.e(TAG, "Failed to join shop with invite: ${e.localizedMessage}", e)
+                onError(e.localizedMessage ?: "Dukan join karne mein msla hua. Internet connection check karein.")
+            }
+        }
+    }
+
+    private fun parseLongTimestamp(valObj: Any?): Long {
+        return when (valObj) {
+            is Number -> valObj.toLong()
+            is Timestamp -> valObj.toDate().time
+            is String -> valObj.toLongOrNull() ?: 0L
+            else -> 0L
         }
     }
 }

@@ -15,14 +15,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.util.Calendar
+import java.util.UUID
 
 data class HomeUiState(
-    val shopName: String = "Mera Buy/Sell Store",
-    val userRole: String = "Owner",
+    val shopName: String = "Mera Store",
     val todaySalesCount: Int = 0,
-    val todaySalesAmountPaisa: Long = 0L,
-    val isSyncing: Boolean = false,
-    val isOnline: Boolean = true
+    val todaySalesAmountPaisa: Long = 0,
+    val isSyncing: Boolean = false
 )
 
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
@@ -44,16 +43,27 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     fun loadHomeData() {
         viewModelScope.launch {
             Log.d(TAG, "Loading home data from AppDatabase & AppMeta...")
-            val meta = db.appMetaDao().getAppMeta() ?: AppMetaEntity(
-                id = 1,
-                deviceCode = "HC01",
-                deviceId = "dev-01"
-            )
+            val primaryUser = db.userDao().getPrimaryUser()
+            val existingMeta = db.appMetaDao().getAppMeta()
+            val activeShopId = existingMeta?.activeShopId?.ifBlank { null }
+                ?: primaryUser?.shopId?.ifBlank { null }
+                ?: ""
 
-            val activeShopId = meta.activeShopId ?: "default_shop"
-            var localShop = db.shopDao().getShopById(activeShopId)
+            val deviceCode = if (existingMeta?.deviceCode.isNullOrBlank() || existingMeta.deviceCode == "HC01") {
+                "DEV" + (10..99).random().toString()
+            } else {
+                existingMeta.deviceCode
+            }
 
-            if (localShop == null) {
+            if (existingMeta == null || existingMeta.deviceCode != deviceCode || existingMeta.activeShopId != activeShopId) {
+                val updatedMeta = (existingMeta ?: AppMetaEntity(id = 1, deviceCode = deviceCode, deviceId = UUID.randomUUID().toString()))
+                    .copy(activeShopId = activeShopId, deviceCode = deviceCode)
+                db.appMetaDao().insertOrUpdate(updatedMeta)
+            }
+
+            var localShop = if (activeShopId.isNotBlank()) db.shopDao().getShopById(activeShopId) else null
+
+            if (localShop == null && activeShopId.isNotBlank()) {
                 runCatching {
                     val shopDoc = firestore.collection("shops").document(activeShopId).get().await()
                     if (shopDoc.exists()) {
@@ -89,18 +99,13 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             val startOfDay = cal.timeInMillis
             val endOfDay = startOfDay + 24 * 60 * 60 * 1000L - 1L
 
-            val todayCount = db.txnDao().getTodaySalesCount(activeShopId, startOfDay, endOfDay)
-            val todayAmount = db.txnDao().getTodaySalesAmountPaisa(activeShopId, startOfDay, endOfDay)
-
-            val user = db.userDao().getPrimaryUser()
-            val userRole = user?.role?.name ?: "Owner"
-            val shopTitle = localShop?.name ?: "Mera Buy/Sell Store"
+            val salesCount = if (activeShopId.isNotBlank()) db.txnDao().getTodaySalesCount(activeShopId, startOfDay, endOfDay) else 0
+            val salesAmountPaisa = if (activeShopId.isNotBlank()) db.txnDao().getTodaySalesAmountPaisa(activeShopId, startOfDay, endOfDay) else 0L
 
             _uiState.value = _uiState.value.copy(
-                shopName = shopTitle,
-                userRole = userRole,
-                todaySalesCount = todayCount,
-                todaySalesAmountPaisa = todayAmount
+                shopName = localShop?.name ?: "Mera Store",
+                todaySalesCount = salesCount,
+                todaySalesAmountPaisa = salesAmountPaisa
             )
         }
     }
@@ -108,16 +113,18 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     fun triggerSync() {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isSyncing = true)
+            val primaryUser = db.userDao().getPrimaryUser()
             val meta = db.appMetaDao().getAppMeta()
-            val shopId = meta?.activeShopId ?: "default_shop"
-            val user = db.userDao().getPrimaryUser()
-            val role = user?.role ?: com.mmushtaq04.buysell.data.local.enums.Role.STAFF
-            val sessionId = user?.activeSessionId ?: "session_active"
+            val shopId = meta?.activeShopId?.ifBlank { null } ?: primaryUser?.shopId ?: ""
+            val role = primaryUser?.role ?: com.mmushtaq04.buysell.data.local.enums.Role.STAFF
+            val sessionId = primaryUser?.activeSessionId ?: "session_active"
 
-            runCatching {
-                val syncManager = FirestoreSyncManager(db)
-                syncManager.pushOutbox(shopId, role, sessionId)
-                syncManager.pullChanges(shopId, role)
+            if (shopId.isNotBlank()) {
+                runCatching {
+                    val syncManager = FirestoreSyncManager(db)
+                    syncManager.pushOutbox(shopId, role, sessionId)
+                    syncManager.pullChanges(shopId, role)
+                }
             }
 
             _uiState.value = _uiState.value.copy(isSyncing = false)

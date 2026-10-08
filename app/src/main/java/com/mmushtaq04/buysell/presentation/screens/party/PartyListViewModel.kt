@@ -27,17 +27,20 @@ class PartyListViewModel(application: Application) : AndroidViewModel(applicatio
 
     private fun loadPartiesWithBalances() {
         viewModelScope.launch {
+            val user = db.userDao().getPrimaryUser()
             val meta = db.appMetaDao().getAppMeta()
-            val activeShopId = meta?.activeShopId ?: "default_shop"
+            val activeShopId = meta?.activeShopId?.ifBlank { null } ?: user?.shopId ?: ""
 
-            partyRepository.observePartiesWithBalances(activeShopId).collect { list ->
-                _parties.value = list.map { pb ->
-                    DisplayPartyBalance(
-                        id = pb.partyId,
-                        name = pb.name,
-                        phone = pb.phone ?: "",
-                        balance = pb.balance
-                    )
+            if (activeShopId.isNotBlank()) {
+                partyRepository.observePartiesWithBalances(activeShopId).collect { list ->
+                    _parties.value = list.map { pb ->
+                        DisplayPartyBalance(
+                            id = pb.partyId,
+                            name = pb.name,
+                            phone = pb.phone ?: "",
+                            balance = pb.balance
+                        )
+                    }
                 }
             }
         }
@@ -45,8 +48,9 @@ class PartyListViewModel(application: Application) : AndroidViewModel(applicatio
 
     fun addNewParty(name: String, phone: String, cnic: String) {
         viewModelScope.launch {
+            val user = db.userDao().getPrimaryUser()
             val meta = db.appMetaDao().getAppMeta()
-            val activeShopId = meta?.activeShopId ?: "default_shop"
+            val activeShopId = meta?.activeShopId?.ifBlank { null } ?: user?.shopId ?: ""
             val now = System.currentTimeMillis()
 
             val party = PartyEntity(

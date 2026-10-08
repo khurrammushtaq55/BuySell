@@ -44,10 +44,13 @@ class SellViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun loadInStockItems() {
         viewModelScope.launch {
+            val user = db.userDao().getPrimaryUser()
             val meta = db.appMetaDao().getAppMeta()
-            val shopId = meta?.activeShopId ?: "default_shop"
-            stockRepository.observeInStockItems(shopId).collect { items ->
-                _stockItems.value = items
+            val shopId = meta?.activeShopId?.ifBlank { null } ?: user?.shopId ?: ""
+            if (shopId.isNotBlank()) {
+                stockRepository.observeInStockItems(shopId).collect { items ->
+                    _stockItems.value = items
+                }
             }
         }
     }
@@ -73,8 +76,9 @@ class SellViewModel(application: Application) : AndroidViewModel(application) {
     ) {
         viewModelScope.launch {
             Log.d(TAG, "Starting saveSale: StockItemID=$stockItemId, SalePrice=Rs $priceRs, Buyer=$buyerName, Paid=Rs $paidAmountRs")
+            val user = db.userDao().getPrimaryUser()
             val meta = db.appMetaDao().getAppMeta()
-            val activeShopId = meta?.activeShopId ?: "default_shop"
+            val activeShopId = meta?.activeShopId?.ifBlank { null } ?: user?.shopId ?: ""
             val now = System.currentTimeMillis()
 
             // 1. Create or Find Buyer Party

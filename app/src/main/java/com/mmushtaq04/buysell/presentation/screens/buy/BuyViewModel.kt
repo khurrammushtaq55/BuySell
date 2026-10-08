@@ -55,8 +55,9 @@ class BuyViewModel(application: Application) : AndroidViewModel(application) {
     ) {
         viewModelScope.launch {
             Log.d(TAG, "Starting savePurchase: Category=$categoryName, Brand=$brand, Model=$model, Price=Rs $priceRs, Seller=$sellerName, RecordedBy=$recordedBy")
+            val user = db.userDao().getPrimaryUser()
             val meta = db.appMetaDao().getAppMeta()
-            val activeShopId = meta?.activeShopId ?: "default_shop"
+            val activeShopId = meta?.activeShopId?.ifBlank { null } ?: user?.shopId ?: ""
             val now = System.currentTimeMillis()
 
             // 1. Create or Find Seller Party

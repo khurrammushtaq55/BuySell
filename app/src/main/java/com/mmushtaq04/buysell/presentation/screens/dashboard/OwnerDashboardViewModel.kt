@@ -34,8 +34,9 @@ class OwnerDashboardViewModel(application: Application) : AndroidViewModel(appli
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
 
+            val user = db.userDao().getPrimaryUser()
             val meta = db.appMetaDao().getAppMeta()
-            val activeShopId = meta?.activeShopId ?: "default_shop"
+            val activeShopId = meta?.activeShopId?.ifBlank { null } ?: user?.shopId ?: ""
 
             // Today's range
             val cal = Calendar.getInstance().apply {

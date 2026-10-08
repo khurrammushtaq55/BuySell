@@ -38,6 +38,18 @@ fun NavGraphBuilder.authNavGraph(
                         }
                     }
                 )
+            },
+            onJoinWithInvite = { inviteCode, userName, onError ->
+                setupViewModel.joinShopWithInvite(
+                    inviteCode = inviteCode,
+                    userName = userName,
+                    onSuccess = {
+                        navController.navigate(NavRoutes.Home.route) {
+                            popUpTo(NavRoutes.ShopSetup.route) { inclusive = true }
+                        }
+                    },
+                    onError = onError
+                )
             }
         )
     }

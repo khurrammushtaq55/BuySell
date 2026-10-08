@@ -220,7 +220,13 @@ class FirestoreSyncManager(
             }
 
             if (shopId.isNullOrBlank()) {
-                shopId = "default_shop"
+                val primaryUser = db.userDao().getPrimaryUser()
+                shopId = primaryUser?.shopId
+            }
+
+            if (shopId.isNullOrBlank()) {
+                Log.w(TAG, "No shop ID found for restore, skipping restore step.")
+                return@runCatching ""
             }
 
             Log.i(TAG, "Restoring data for shopId '$shopId' from Firestore...")
@@ -230,12 +236,19 @@ class FirestoreSyncManager(
                 applyFirestoreDocToRoom("shops", shopDoc.data ?: emptyMap())
             }
 
-            val meta = db.appMetaDao().getAppMeta() ?: AppMetaEntity(
+            val existingMeta = db.appMetaDao().getAppMeta()
+            val deviceCode = if (existingMeta?.deviceCode.isNullOrBlank() || existingMeta?.deviceCode == "HC01") {
+                "DEV" + (10..99).random().toString()
+            } else {
+                existingMeta.deviceCode
+            }
+
+            val meta = existingMeta ?: AppMetaEntity(
                 id = 1,
-                deviceCode = "HC01",
+                deviceCode = deviceCode,
                 deviceId = UUID.randomUUID().toString()
             )
-            db.appMetaDao().insertOrUpdate(meta.copy(activeShopId = shopId))
+            db.appMetaDao().insertOrUpdate(meta.copy(activeShopId = shopId, deviceCode = deviceCode))
 
             pullChanges(shopId, userRole)
 
@@ -329,8 +342,7 @@ class FirestoreSyncManager(
     }
 
     private fun getCollectionName(entityType: String): String {
-        val clean = entityType.lowercase().trim()
-        return when (clean) {
+        return when (val clean = entityType.lowercase().trim()) {
             "party", "parties" -> "parties"
             "category", "categories" -> "categories"
             "stock_item", "stockitem", "stock_items", "stockitems" -> "stock_items"

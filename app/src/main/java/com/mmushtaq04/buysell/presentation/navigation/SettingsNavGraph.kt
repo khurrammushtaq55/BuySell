@@ -41,6 +41,9 @@ fun NavGraphBuilder.settingsNavGraph(
             onToggleCategory = { category ->
                 settingsViewModel.toggleCategory(category)
             },
+            onGenerateInvite = { role, onCodeGenerated ->
+                settingsViewModel.generateInviteCode(role, onCodeGenerated)
+            },
             onNavigateBack = { navController.popBackStack() },
             onNavigateToHelp = { navController.navigate(NavRoutes.Help.route) },
             onSignOutClick = {

@@ -49,10 +49,24 @@ service cloud.firestore {
     }
 
     match /invites/{code} {
-      allow read: if isAuthenticated();
-      allow create, update, delete: if isAuthenticated() && (
-        request.resource.data.shop_id != null && isOwner(request.resource.data.shop_id)
+      allow get: if isAuthenticated();
+
+      allow create: if isAuthenticated() &&
+        request.resource.data.shop_id != null &&
+        isOwner(request.resource.data.shop_id) &&
+        request.resource.data.code == code;
+
+      allow update: if isAuthenticated() && (
+        isOwner(resource.data.shop_id) ||
+        (
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['is_used', 'used_by', 'used_at']) &&
+          resource.data.is_used == false &&
+          request.resource.data.is_used == true &&
+          request.resource.data.used_by == request.auth.uid
+        )
       );
+
+      allow delete: if isAuthenticated() && isOwner(resource.data.shop_id);
     }
 
 
@@ -77,16 +91,20 @@ service cloud.firestore {
       match /members/{uid} {
         allow read: if isShopMember(shopId) || request.auth.uid == uid;
 
-        allow create: if isAuthenticated() && (
+        allow create: if isAuthenticated() && request.auth.uid == uid && (
           // Owner creating initial member record for a new shop
-          (request.auth.uid == uid &&
-           get(/databases/$(database)/documents/shops/$(shopId)).data.owner_user_id == request.auth.uid &&
+          (get(/databases/$(database)/documents/shops/$(shopId)).data.owner_user_id == request.auth.uid &&
            request.resource.data.role == 'OWNER') ||
           // Owner adding member
           isOwner(shopId) ||
-          // Joining via invite code
-          (request.auth.uid == uid && request.resource.data.role in ['STAFF', 'PARTNER'] &&
-           exists(/databases/$(database)/documents/shops/$(shopId)/invites/$(request.resource.data.invite_code)))
+          // Joining via valid invite code matching shop_id AND role!
+          (
+            exists(/databases/$(database)/documents/invites/$(request.resource.data.invite_code)) &&
+            get(/databases/$(database)/documents/invites/$(request.resource.data.invite_code)).data.shop_id == shopId &&
+            get(/databases/$(database)/documents/invites/$(request.resource.data.invite_code)).data.role == request.resource.data.role &&
+            get(/databases/$(database)/documents/invites/$(request.resource.data.invite_code)).data.is_used == false &&
+            get(/databases/$(database)/documents/invites/$(request.resource.data.invite_code)).data.expires_at > request.time.toMillis()
+          )
         );
 
         allow update: if isOwner(shopId);

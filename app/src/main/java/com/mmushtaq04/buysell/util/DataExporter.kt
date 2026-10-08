@@ -24,8 +24,9 @@ object DataExporter {
     suspend fun exportDataZip(context: Context) = withContext(Dispatchers.IO) {
         runCatching {
             val db = AppDatabase.getInstance(context)
+            val user = db.userDao().getPrimaryUser()
             val meta = db.appMetaDao().getAppMeta()
-            val shopId = meta?.activeShopId ?: "default_shop"
+            val shopId = meta?.activeShopId?.ifBlank { null } ?: user?.shopId ?: ""
 
             val stockList = db.stockItemDao().getAllStockItems(shopId)
             val txnList = db.txnDao().getAllTxns(shopId)

@@ -60,3 +60,15 @@
 	- [x] Packed RAM/Storage/Specs into `StockItem.attributes` JSON payload in `BuyViewModel` and `ExchangeViewModel`
 	- [x] Displayed RAM/Storage/Specs badges on stock cards in `StockListScreen.kt`
 	- [x] Updated Home Screen action cards and wizard titles to generic item wording ("Saman Khareedna" / "Saman Bechna") across all localized string files
+- [x] Default Prefill of Payment Amounts
+	- [x] `BuyWizardScreen`: `paidAmountText` pre-populates with `priceText` automatically
+	- [x] `SellWizardScreen`: `receivedAmountText` pre-populates with `salePriceText` automatically
+	- [x] `ExchangeWizardScreen`: `cashPaidText` pre-populates with net cash difference automatically
+- [x] Complete End-to-End Invite Generation, Verification, Joining & Hardened Security Rules
+	- [x] Updated code generation in `SettingsViewModel` & `SettingsScreen` to save `code`, `shop_id`, `role`, `created_by`, `created_at`, `expires_at` (7 days), and `is_used = false` to Firestore
+	- [x] Implemented `joinShopWithInvite(inviteCode, userName)` in `ShopSetupViewModel.kt` to validate the code, enforce role matching, check expiration, mark the invite as used, and download shop data
+	- [x] Hardened `firestore.rules` for `/invites/{code}` (disable listing) and `/shops/{shopId}/members/{uid}` (database-level role matching, expiration check, and `is_used == false` validation)
+- [x] Dynamic UUID Shop Isolation & Unique Device Codes Architecture
+	- [x] Generated `shop_<uuid>` and shop code (`S12345`) in `ShopSetupViewModel.kt` during store creation
+	- [x] Generated unique device codes (`DEV01`, `DEV02`, etc.) in `AppMetaEntity` to eliminate receipt sequence collisions between devices in the same shop
+	- [x] Updated all ViewModels (`HomeViewModel`, `SettingsViewModel`, `BuyViewModel`, `SellViewModel`, `ExchangeViewModel`, `StockListViewModel`, `PartyListViewModel`, `OwnerDashboardViewModel`, `CategoryViewModel`), `FirestoreSyncManager`, and `DataExporter` to resolve `activeShopId` dynamically from `AppMetaEntity` or `UserEntity.shopId`

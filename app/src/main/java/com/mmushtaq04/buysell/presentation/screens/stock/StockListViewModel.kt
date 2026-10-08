@@ -26,10 +26,12 @@ class StockListViewModel(application: Application) : AndroidViewModel(applicatio
 
     private fun loadStockItems() {
         viewModelScope.launch {
+            val user = db.userDao().getPrimaryUser()
             val meta = db.appMetaDao().getAppMeta()
-            val activeShopId = meta?.activeShopId ?: "default_shop"
+            val activeShopId = meta?.activeShopId?.ifBlank { null } ?: user?.shopId ?: ""
 
-            stockRepository.observeInStockItems(activeShopId).collect { list ->
+            if (activeShopId.isNotBlank()) {
+                stockRepository.observeInStockItems(activeShopId).collect { list ->
                 val displayList = list.map { item ->
                     val attrMap = runCatching {
                         item.attributes?.let { json ->
@@ -54,6 +56,7 @@ class StockListViewModel(application: Application) : AndroidViewModel(applicatio
                     )
                 }
                 _stockItems.value = displayList
+            }
             }
         }
     }

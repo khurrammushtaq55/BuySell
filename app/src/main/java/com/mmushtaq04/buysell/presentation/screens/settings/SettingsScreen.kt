@@ -31,10 +31,8 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.google.firebase.firestore.FirebaseFirestore
 import com.mmushtaq04.buysell.R
 import com.mmushtaq04.buysell.data.local.entity.CategoryEntity
-import com.mmushtaq04.buysell.domain.InviteManager
 import com.mmushtaq04.buysell.ui.theme.BuySellTheme
 import com.mmushtaq04.buysell.util.AppPinManager
 import com.mmushtaq04.buysell.util.AppPreferencesManager
@@ -53,6 +51,7 @@ fun SettingsScreen(
     allCategories: List<CategoryEntity> = emptyList(),
     onUpdateShopProfile: (name: String, phone: String, address: String) -> Unit = { _, _, _ -> },
     onToggleCategory: (CategoryEntity) -> Unit = {},
+    onGenerateInvite: (role: String, onCodeGenerated: (String) -> Unit) -> Unit = { _, _ -> },
     onNavigateBack: () -> Unit = {},
     onNavigateToHelp: () -> Unit = {},
     onSignOutClick: () -> Unit = {}
@@ -192,19 +191,10 @@ fun SettingsScreen(
                 Button(
                     onClick = {
                         isGeneratingCode = true
-                        val newCode = InviteManager.generateInviteCode()
-                        activeInviteCode = newCode
-
-                        runCatching {
-                            val db = FirebaseFirestore.getInstance()
-                            val inviteData = mapOf(
-                                "code" to newCode,
-                                "role" to inviteRole,
-                                "created_at" to System.currentTimeMillis()
-                            )
-                            db.collection("invites").document(newCode).set(inviteData)
+                        onGenerateInvite(inviteRole) { generatedCode ->
+                            activeInviteCode = generatedCode
+                            isGeneratingCode = false
                         }
-                        isGeneratingCode = false
                     },
                     enabled = !isGeneratingCode
                 ) {
