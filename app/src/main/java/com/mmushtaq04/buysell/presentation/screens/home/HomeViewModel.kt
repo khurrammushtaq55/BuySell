@@ -117,7 +117,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             val meta = db.appMetaDao().getAppMeta()
             val shopId = meta?.activeShopId?.ifBlank { null } ?: primaryUser?.shopId ?: ""
             val role = primaryUser?.role ?: com.mmushtaq04.buysell.data.local.enums.Role.STAFF
-            val sessionId = primaryUser?.activeSessionId ?: "session_active"
+            val sessionId = primaryUser?.activeSessionId?.ifBlank { null } ?: ("sess_" + UUID.randomUUID().toString().take(12))
 
             if (shopId.isNotBlank()) {
                 runCatching {

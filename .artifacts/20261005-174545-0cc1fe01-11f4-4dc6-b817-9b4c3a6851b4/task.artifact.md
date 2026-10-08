@@ -72,3 +72,14 @@
 	- [x] Generated `shop_<uuid>` and shop code (`S12345`) in `ShopSetupViewModel.kt` during store creation
 	- [x] Generated unique device codes (`DEV01`, `DEV02`, etc.) in `AppMetaEntity` to eliminate receipt sequence collisions between devices in the same shop
 	- [x] Updated all ViewModels (`HomeViewModel`, `SettingsViewModel`, `BuyViewModel`, `SellViewModel`, `ExchangeViewModel`, `StockListViewModel`, `PartyListViewModel`, `OwnerDashboardViewModel`, `CategoryViewModel`), `FirestoreSyncManager`, and `DataExporter` to resolve `activeShopId` dynamically from `AppMetaEntity` or `UserEntity.shopId`
+- [x] Privilege Escalation Fix: Catch-All Security Rule & Fallback Removal
+	- [x] Completely removed `match /{collection}/{docId}` catch-all block from `firestore.rules` so member document updates (`/shops/{shopId}/members/{uid}`) evaluate exclusively under `match /members/{uid}` (restricted to `isOwner(shopId)`)
+	- [x] Removed 4-segment fallback queries from `FirestoreSyncManager.kt` so all sync queries use pure 6-segment scoped paths
+- [x] Atomic Join Batch Write & Single-Source Invite Rules
+	- [x] Executed member document creation and invite document locking atomically in a single `WriteBatch` inside `ShopSetupViewModel.kt`
+	- [x] Added `getAfter(/invites/{code}).data.is_used == true` and `used_by == request.auth.uid` to `firestore.rules` under `/shops/{shopId}/members/{uid}`
+	- [x] Consolidated invites to single source of truth at root `/invites/{code}`
+- [x] Member-Doc Role Source of Truth & Dynamic Single-Device Session Tokens
+	- [x] Direct member document querying (`/shops/{shopId}/members/{userId}`) in `FirestoreSyncManager.kt` during restoration
+	- [x] Unified `STAFF` role fallback across `AppNavigation.kt`, `SyncWorker.kt`, `HomeViewModel.kt`, and `FirestoreSyncManager.kt`
+	- [x] Generated dynamic single-device session tokens (`sess_<uuid>`) in `ShopSetupViewModel.kt`

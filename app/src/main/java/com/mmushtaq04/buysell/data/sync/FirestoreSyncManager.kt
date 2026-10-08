@@ -122,16 +122,7 @@ class FirestoreSyncManager(
                         firestore.collection(path6Segment)
                     }
 
-                    var snapshot = runCatching { query.get().await() }.getOrNull()
-
-                    // Fallback: Check 4-segment path if 6-segment snapshot is null/empty and lastPulled == 0L
-                    if ((snapshot == null || snapshot.isEmpty) && lastPulled == 0L) {
-                        val path4Segment = "shops/$shopId/$colName"
-                        val fallbackSnapshot = runCatching { firestore.collection(path4Segment).get().await() }.getOrNull()
-                        if (fallbackSnapshot != null && !fallbackSnapshot.isEmpty) {
-                            snapshot = fallbackSnapshot
-                        }
-                    }
+                    val snapshot = runCatching { query.get().await() }.getOrNull()
 
                     if (snapshot != null && !snapshot.isEmpty) {
                         val firstPath = snapshot.documents.firstOrNull()?.reference?.path ?: path6Segment
@@ -163,15 +154,13 @@ class FirestoreSyncManager(
             Log.i(TAG, "--> Restoring user data from Firestore for userId: '$userId'")
 
             var shopId: String? = null
-            var userRole = Role.OWNER
+            var userRole = Role.STAFF
 
             val userDoc = runCatching { firestore.collection("users").document(userId).get().await() }.getOrNull()
             if (userDoc != null && userDoc.exists()) {
                 val userMap = userDoc.data ?: emptyMap()
                 applyFirestoreDocToRoom("users", userMap)
                 shopId = userDoc.getString("shop_id") ?: userDoc.getString("shopId")
-                val roleStr = userDoc.getString("role") ?: "OWNER"
-                userRole = Role.fromStr(roleStr)
             }
 
             if (shopId.isNullOrBlank()) {
@@ -185,6 +174,7 @@ class FirestoreSyncManager(
                 if (shopQuery1 != null && !shopQuery1.isEmpty) {
                     val shopDoc = shopQuery1.documents.first()
                     shopId = shopDoc.id
+                    userRole = Role.OWNER
                     applyFirestoreDocToRoom("shops", shopDoc.data ?: emptyMap())
                 } else {
                     val shopQuery2 = runCatching {
@@ -197,6 +187,7 @@ class FirestoreSyncManager(
                     if (shopQuery2 != null && !shopQuery2.isEmpty) {
                         val shopDoc = shopQuery2.documents.first()
                         shopId = shopDoc.id
+                        userRole = Role.OWNER
                         applyFirestoreDocToRoom("shops", shopDoc.data ?: emptyMap())
                     }
                 }
@@ -227,6 +218,18 @@ class FirestoreSyncManager(
             if (shopId.isNullOrBlank()) {
                 Log.w(TAG, "No shop ID found for restore, skipping restore step.")
                 return@runCatching ""
+            }
+
+            // Query member document directly for verified role
+            val memberDoc = runCatching {
+                firestore.collection("shops").document(shopId).collection("members").document(userId).get().await()
+            }.getOrNull()
+
+            if (memberDoc != null && memberDoc.exists()) {
+                val roleStr = memberDoc.getString("role")
+                if (!roleStr.isNullOrBlank()) {
+                    userRole = Role.fromStr(roleStr)
+                }
             }
 
             Log.i(TAG, "Restoring data for shopId '$shopId' from Firestore...")

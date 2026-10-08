@@ -97,25 +97,20 @@ service cloud.firestore {
            request.resource.data.role == 'OWNER') ||
           // Owner adding member
           isOwner(shopId) ||
-          // Joining via valid invite code matching shop_id AND role!
+          // Joining via valid invite code in an ATOMIC BATCH WRITE that marks the invite as used!
           (
             exists(/databases/$(database)/documents/invites/$(request.resource.data.invite_code)) &&
             get(/databases/$(database)/documents/invites/$(request.resource.data.invite_code)).data.shop_id == shopId &&
             get(/databases/$(database)/documents/invites/$(request.resource.data.invite_code)).data.role == request.resource.data.role &&
             get(/databases/$(database)/documents/invites/$(request.resource.data.invite_code)).data.is_used == false &&
-            get(/databases/$(database)/documents/invites/$(request.resource.data.invite_code)).data.expires_at > request.time.toMillis()
+            get(/databases/$(database)/documents/invites/$(request.resource.data.invite_code)).data.expires_at > request.time.toMillis() &&
+            getAfter(/databases/$(database)/documents/invites/$(request.resource.data.invite_code)).data.is_used == true &&
+            getAfter(/databases/$(database)/documents/invites/$(request.resource.data.invite_code)).data.used_by == request.auth.uid
           )
         );
 
         allow update: if isOwner(shopId);
         allow delete: if isOwner(shopId);
-      }
-
-
-      // Shop Invites Subcollection
-      match /invites/{code} {
-        allow read: if isAuthenticated();
-        allow create, update, delete: if isOwner(shopId);
       }
 
 
@@ -154,14 +149,6 @@ service cloud.firestore {
           request.resource.data.scope == 'VAULT';
 
         allow update: if isOwner(shopId) && collection != 'payments';
-        allow delete: if isOwner(shopId);
-      }
-
-
-      // --- Direct 4-Segment Collections (Legacy Compatibility) ---
-      match /{collection}/{docId} {
-        allow read: if isShopMember(shopId);
-        allow create, update: if isOwner(shopId) || isStaff(shopId);
         allow delete: if isOwner(shopId);
       }
     }

@@ -102,8 +102,6 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
 
                 val firestore = FirebaseFirestore.getInstance()
                 firestore.collection("invites").document(newCode).set(inviteData).await()
-                firestore.collection("shops").document(activeShopId)
-                    .collection("invites").document(newCode).set(inviteData).await()
 
                 Log.i(TAG, "✓ Successfully generated invite code '$newCode' for shop '$activeShopId' with role '$role'")
                 onCodeGenerated(newCode)

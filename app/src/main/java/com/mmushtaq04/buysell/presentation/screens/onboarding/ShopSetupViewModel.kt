@@ -52,6 +52,8 @@ class ShopSetupViewModel(application: Application) : AndroidViewModel(applicatio
             val registeredUserName = name.ifBlank { authManager.currentUser?.displayName ?: "Malik / Staff" }
             val roleEnum = Role.fromStr(role)
 
+            val activeSessionId = "sess_" + UUID.randomUUID().toString().take(12)
+
             // 0. Create & Insert User Entity
             val userEntity = UserEntity(
                 id = currentUserId,
@@ -60,7 +62,7 @@ class ShopSetupViewModel(application: Application) : AndroidViewModel(applicatio
                 phone = shopPhone,
                 role = roleEnum,
                 shopId = shopId,
-                activeSessionId = "session_active",
+                activeSessionId = activeSessionId,
                 createdAt = now,
                 updatedAt = now,
                 createdBy = registeredUserName,
@@ -164,7 +166,7 @@ class ShopSetupViewModel(application: Application) : AndroidViewModel(applicatio
 
             // 5. Trigger Firestore Sync
             runCatching {
-                FirestoreSyncManager(db).pushOutbox(shopId, roleEnum, "session_active")
+                FirestoreSyncManager(db).pushOutbox(shopId, roleEnum, activeSessionId)
             }
 
             Log.i(TAG, "✓ Shop '$shopName' ($shopId) successfully created with device code '$finalDeviceCode'!")
@@ -228,31 +230,34 @@ class ShopSetupViewModel(application: Application) : AndroidViewModel(applicatio
 
                 val now = System.currentTimeMillis()
 
-                // 3. Create Member Document at /shops/{shopId}/members/{currentUserId}
+                val activeSessionId = "sess_" + UUID.randomUUID().toString().take(12)
+
+                // 3 & 4. ATOMIC WRITE BATCH: Create Member Document + Mark Invite as Used
+                val batch = firestore.batch()
+
+                val memberRef = firestore.collection("shops").document(shopId)
+                    .collection("members").document(currentUserId)
                 val memberPayload = mapOf(
                     "user_id" to currentUserId,
                     "shop_id" to shopId,
                     "role" to verifiedRole.name,
                     "invite_code" to codeClean,
                     "display_name" to registeredUserName,
+                    "active_session_id" to activeSessionId,
                     "joined_at" to now
                 )
-                firestore.collection("shops").document(shopId)
-                    .collection("members").document(currentUserId)
-                    .set(memberPayload)
-                    .await()
+                batch.set(memberRef, memberPayload)
 
-                // 4. Mark Invite Document as Used
-                firestore.collection("invites").document(codeClean)
-                    .update(mapOf("is_used" to true, "used_by" to currentUserId, "used_at" to now))
-                    .await()
+                val inviteRef = firestore.collection("invites").document(codeClean)
+                val inviteUpdate = mapOf(
+                    "is_used" to true,
+                    "used_by" to currentUserId,
+                    "used_at" to now
+                )
+                batch.update(inviteRef, inviteUpdate)
 
-                runCatching {
-                    firestore.collection("shops").document(shopId)
-                        .collection("invites").document(codeClean)
-                        .update(mapOf("is_used" to true, "used_by" to currentUserId, "used_at" to now))
-                        .await()
-                }
+                // Atomically commit both operations in a single Firestore transaction
+                batch.commit().await()
 
                 // 5. Store in Local Room DB
                 val userEntity = UserEntity(
@@ -261,7 +266,7 @@ class ShopSetupViewModel(application: Application) : AndroidViewModel(applicatio
                     email = authManager.currentUser?.email,
                     role = verifiedRole,
                     shopId = shopId,
-                    activeSessionId = "session_active",
+                    activeSessionId = activeSessionId,
                     createdAt = now,
                     updatedAt = now,
                     createdBy = registeredUserName,

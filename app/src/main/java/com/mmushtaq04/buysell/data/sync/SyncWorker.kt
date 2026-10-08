@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.work.*
 import com.mmushtaq04.buysell.data.local.AppDatabase
 import com.mmushtaq04.buysell.data.local.enums.Role
+import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 class SyncWorker(
@@ -70,7 +71,7 @@ class SyncWorker(
 
         val user = db.userDao().getPrimaryUser()
         val role = user?.role ?: Role.STAFF
-        val sessionId = user?.activeSessionId?.ifBlank { "session_active" } ?: "session_active"
+        val sessionId = user?.activeSessionId?.ifBlank { null } ?: ("sess_" + UUID.randomUUID().toString().take(12))
 
         Log.d(TAG, "Executing background SyncWorker for active shop '$shopId' with Role '$role'...")
         val pushed = syncManager.pushOutbox(shopId, role, sessionId).getOrDefault(0)

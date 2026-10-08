@@ -56,7 +56,7 @@ fun AppNavigation(
     }
 
     val registeredUserRole = remember(primaryUser) {
-        primaryUser?.role?.name ?: "Owner"
+        primaryUser?.role?.name ?: "STAFF"
     }
 
     val categoryViewModel: CategoryViewModel = viewModel()
@@ -101,7 +101,7 @@ fun AppNavigation(
             if (!activeShopId.isNullOrBlank()) {
                 restorationMessage = "Finalizing store setup..."
                 val user = db.userDao().getPrimaryUser()
-                val role = user?.role ?: Role.OWNER
+                val role = user?.role ?: Role.STAFF
                 FirestoreSyncManager(db).pullChanges(activeShopId, role)
 
                 isRestoringData = false
