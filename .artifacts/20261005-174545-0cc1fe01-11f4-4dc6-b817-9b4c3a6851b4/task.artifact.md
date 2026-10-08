@@ -114,3 +114,9 @@
 - [x] App Name Rebranding to "BuySell360" & Adaptive Vector Logo Creation
 	- [x] Rebranded `app_name` to `"BuySell360"` across all 8 locale resource files (`en`, `ur`, `b+ur+Latn`, `es`, `fr`, `hi`, `ar`, `zh-rCN`)
 	- [x] Designed custom adaptive launcher vector icons (`ic_launcher_background.xml` & `ic_launcher_foreground.xml`) featuring Dark Slate background (`#0F172A`) and a central smartphone surrounded by a 360-degree dual-arrow exchange loop (Green `#22C55E` for Buy, Orange `#F97316` for Sell)
+- [x] Translation Audit & Synchronization of User Edits
+	- [x] Audited user's string edits in default `res/values/strings.xml` and synchronized format specifiers (`%1$s`, `%2$s`) across all translation files
+	- [x] Verified 100% parity across all 8 locale folders
+- [x] Comprehensive Data Layer & Core Logic Unit Test Suite
+	- [x] Added `CoreLogicTest.kt` with Robolectric unit tests covering `AppPinManager` SHA-256 salting, `InviteManager` format, `AppMetaEntity` device code persistence, Trade-in Exchange transactions, Staff Vault Purge DAO operations, Khata Ledger payment calculations, and `ConflictDetector` double-sale flagging
+	- [x] Verified **9/9 JVM unit tests passed cleanly**.
