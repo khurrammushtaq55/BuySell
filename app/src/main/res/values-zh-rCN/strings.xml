@@ -267,4 +267,8 @@
     <string name="theme_system">跟随系统</string>
     <string name="theme_light">浅色模式</string>
     <string name="theme_dark">深色模式</string>
+    <string name="settings_unsynced_warning_title">未同步数据警告</string>
+    <string name="settings_unsynced_warning_msg">您有 %1 条本地未同步的数据记录。现在退出登录将永久删除这些未同步的数据。请先连接网络进行同步，或确认放弃这些数据。</string>
+    <string name="settings_btn_try_sync">重新尝试同步</string>
+    <string name="settings_btn_discard_signout">放弃数据并退出登录</string>
 </resources>

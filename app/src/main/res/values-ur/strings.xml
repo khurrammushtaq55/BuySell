@@ -267,4 +267,8 @@
     <string name="theme_system">سسٹم ڈیفالٹ</string>
     <string name="theme_light">لائٹ تھیم</string>
     <string name="theme_dark">ڈارک تھیم</string>
+    <string name="settings_unsynced_warning_title">غیر سنک شدہ ڈیٹا کا انتباہ</string>
+    <string name="settings_unsynced_warning_msg">آپ کے پاس %1 لوکل ریکارڈز موجود ہیں جو ابھی کلاؤڈ پر سنک نہیں ہوئے۔ لاگ آؤٹ کرنے سے یہ ریکارڈز ہمیشہ کے لیے ضائع ہو جائیں گے۔ برائے مہربانی پہلے انٹرنیٹ سے کنیکٹ کر کے سنک کریں یا ضائع کرنے کی تصدیق کریں۔</string>
+    <string name="settings_btn_try_sync">دوبارہ سنک کی کوشش کریں</string>
+    <string name="settings_btn_discard_signout">ڈیٹا ضائع کریں اور لاگ آؤٹ کریں</string>
 </resources>

@@ -6,19 +6,24 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.gson.Gson
+import com.mmushtaq04.buysell.data.auth.FirebaseAuthManager
 import com.mmushtaq04.buysell.data.local.AppDatabase
 import com.mmushtaq04.buysell.data.local.CategoryPresets
 import com.mmushtaq04.buysell.data.local.entity.CategoryEntity
 import com.mmushtaq04.buysell.data.local.entity.ShopEntity
 import com.mmushtaq04.buysell.data.local.entity.SyncOutboxEntity
+import com.mmushtaq04.buysell.data.local.enums.Role
 import com.mmushtaq04.buysell.data.local.enums.SyncOp
+import com.mmushtaq04.buysell.data.sync.FirestoreSyncManager
 import com.mmushtaq04.buysell.data.sync.SyncWorker
 import com.mmushtaq04.buysell.domain.InviteManager
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import java.util.UUID
 
 class SettingsViewModel(application: Application) : AndroidViewModel(application) {
@@ -198,6 +203,50 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
             )
             SyncWorker.enqueueOneTimeSync(getApplication())
             Log.d(TAG, "Toggled Category '${category.name}' enabled status to ${updated.enabled}")
+        }
+    }
+
+    fun handleSignOut(
+        authManager: FirebaseAuthManager,
+        onRequireUnsyncedWarning: (pendingCount: Int) -> Unit,
+        onReadyToSignOut: () -> Unit
+    ) {
+        viewModelScope.launch {
+            val user = db.userDao().getPrimaryUser()
+            val meta = db.appMetaDao().getAppMeta()
+            val shopId = meta?.activeShopId?.ifBlank { null } ?: user?.shopId ?: ""
+            val role = user?.role ?: Role.STAFF
+            val activeSessionId = user?.activeSessionId ?: ""
+
+            // 1. Attempt pushing pending outbox items if shopId is present
+            if (shopId.isNotBlank()) {
+                runCatching {
+                    FirestoreSyncManager(db).pushOutbox(shopId, role, activeSessionId)
+                }
+            }
+
+            // 2. Check remaining pending outbox items
+            val pendingItems = db.syncDao().getPendingOutbox()
+            if (pendingItems.isNotEmpty()) {
+                Log.w(TAG, "Unsynced pending items remaining (${pendingItems.size}). Prompting user with warning.")
+                onRequireUnsyncedWarning(pendingItems.size)
+            } else {
+                Log.i(TAG, "All outbox items synced. Proceeding with clean sign-out.")
+                executeForceSignOut(authManager, onReadyToSignOut)
+            }
+        }
+    }
+
+    fun executeForceSignOut(
+        authManager: FirebaseAuthManager,
+        onReadyToSignOut: () -> Unit
+    ) {
+        viewModelScope.launch(Dispatchers.IO) {
+            authManager.signOut()
+            db.clearAllTables()
+            withContext(Dispatchers.Main) {
+                onReadyToSignOut()
+            }
         }
     }
 }

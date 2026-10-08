@@ -152,3 +152,7 @@
 	- [x] Expanded `match /members/{uid}` rules in `firestore.rules` to permit `create` and `update` (UPSERT) operations for shop members.
 - [x] Format Specifier %1$d Fix in login_pwd_char_count
 	- [x] Replaced `%1` with `%1$d` in `login_pwd_char_count` across all 8 locale `strings.xml` files (`values`, `values-ur`, `values-b+ur+Latn`, `values-es`, `values-fr`, `values-hi`, `values-ar`, `values-zh-rCN`), resolving the `UnknownFormatConversionException` crash during password typing.
+- [x] Pending Outbox Safeguard & Unsynced Data Warning on Sign Out
+	- [x] Implemented `handleSignOut` in `SettingsViewModel.kt` to trigger pre-logout sync push and check `sync_outbox`.
+	- [x] Added **Unsynced Data Warning Alert Dialog** in `SettingsScreen.kt` displaying unsynced count with options to retry sync or confirm data discard.
+	- [x] Added localized strings (`settings_unsynced_warning_title`, `settings_unsynced_warning_msg`, `settings_btn_try_sync`, `settings_btn_discard_signout`) across all 8 locale folders.

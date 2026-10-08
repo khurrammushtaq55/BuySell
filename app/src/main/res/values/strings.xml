@@ -266,4 +266,8 @@
     <string name="theme_system">System Default</string>
     <string name="theme_light">Light Theme</string>
     <string name="theme_dark">Dark Theme</string>
+    <string name="settings_unsynced_warning_title">Unsynced Data Warning</string>
+    <string name="settings_unsynced_warning_msg">You have %1 unsynced record(s) saved locally. Logging out now will permanently erase these unsynced records. Please connect to the internet to sync first, or confirm to discard.</string>
+    <string name="settings_btn_try_sync">Try Syncing Again</string>
+    <string name="settings_btn_discard_signout">Log Out &amp; Discard Unsynced Data</string>
 </resources>

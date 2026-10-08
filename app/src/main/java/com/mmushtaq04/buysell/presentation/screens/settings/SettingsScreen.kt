@@ -52,7 +52,8 @@ fun SettingsScreen(
     onGenerateInvite: (role: String, onCodeGenerated: (String) -> Unit) -> Unit = { _, _ -> },
     onNavigateBack: () -> Unit = {},
     onNavigateToHelp: () -> Unit = {},
-    onSignOutClick: () -> Unit = {}
+    onAttemptSignOut: (onRequireWarning: (Int) -> Unit, onReadyToSignOut: () -> Unit) -> Unit = { _, _ -> },
+    onForceSignOut: (onReadyToSignOut: () -> Unit) -> Unit = { _ -> }
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -84,6 +85,8 @@ fun SettingsScreen(
 
     var showPinDialog by remember { mutableStateOf(false) }
     var showSignOutDialog by remember { mutableStateOf(false) }
+    var showUnsyncedWarningDialog by remember { mutableStateOf(false) }
+    var unsyncedCount by remember { mutableIntStateOf(0) }
     var showTeamDialog by remember { mutableStateOf(false) }
 
     var activeInviteCode by remember { mutableStateOf("") }
@@ -265,7 +268,15 @@ fun SettingsScreen(
                 Button(
                     onClick = {
                         showSignOutDialog = false
-                        onSignOutClick()
+                        onAttemptSignOut(
+                            { count ->
+                                unsyncedCount = count
+                                showUnsyncedWarningDialog = true
+                            },
+                            {
+                                // Clean sign-out completed
+                            }
+                        )
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                 ) {
@@ -275,6 +286,69 @@ fun SettingsScreen(
             dismissButton = {
                 TextButton(onClick = { showSignOutDialog = false }) {
                     Text(stringResource(R.string.action_cancel))
+                }
+            }
+        )
+    }
+
+    if (showUnsyncedWarningDialog) {
+        AlertDialog(
+            onDismissRequest = { showUnsyncedWarningDialog = false },
+            title = {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Default.Warning,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.error
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = stringResource(R.string.settings_unsynced_warning_title),
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            },
+            text = {
+                Text(
+                    text = stringResource(R.string.settings_unsynced_warning_msg, unsyncedCount),
+                    fontSize = 14.sp
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showUnsyncedWarningDialog = false
+                        onForceSignOut {
+                            // Force sign-out completed
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                ) {
+                    Text(stringResource(R.string.settings_btn_discard_signout))
+                }
+            },
+            dismissButton = {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    TextButton(onClick = { showUnsyncedWarningDialog = false }) {
+                        Text(stringResource(R.string.action_cancel))
+                    }
+                    Button(
+                        onClick = {
+                            showUnsyncedWarningDialog = false
+                            onAttemptSignOut(
+                                { count ->
+                                    unsyncedCount = count
+                                    showUnsyncedWarningDialog = true
+                                },
+                                {
+                                    // Clean sign-out completed
+                                }
+                            )
+                        }
+                    ) {
+                        Text(stringResource(R.string.settings_btn_try_sync))
+                    }
                 }
             }
         )

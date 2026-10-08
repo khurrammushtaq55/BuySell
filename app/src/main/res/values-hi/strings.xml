@@ -267,4 +267,8 @@
     <string name="theme_system">सिस्टम डिफ़ॉल्ट</string>
     <string name="theme_light">लाइट थीम</string>
     <string name="theme_dark">डार्क थीम</string>
+    <string name="settings_unsynced_warning_title">अप्रत्यक्ष डेटा चेतावनी</string>
+    <string name="settings_unsynced_warning_msg">आपके पास %1 लोकल रिकॉर्ड हैं जो अभी क्लाउड पर सिंक नहीं हुए हैं। लॉग आउट करने से ये रिकॉर्ड हमेशा के लिए मिट जाएंगे। कृपया पहले इंटरनेट से कनेक्ट करके सिंक करें, या हटाने की पुष्टि करें।</string>
+    <string name="settings_btn_try_sync">पुनः सिंक का प्रयास करें</string>
+    <string name="settings_btn_discard_signout">डेटा हटाएं और लॉग आउट करें</string>
 </resources>
