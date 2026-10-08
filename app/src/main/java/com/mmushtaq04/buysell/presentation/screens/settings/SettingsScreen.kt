@@ -15,7 +15,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.HelpOutline
 import androidx.compose.material.icons.automirrored.filled.Logout
-import androidx.compose.material.icons.automirrored.filled.ReceiptLong
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -43,11 +42,12 @@ import kotlinx.coroutines.launch
 @Composable
 fun SettingsScreen(
     userRole: String = "Owner",
+    ownerName: String = "Malik / Staff",
     shopName: String = "Mera Buy/Sell Store",
     shopPhone: String = "",
     shopAddress: String = "",
     allCategories: List<CategoryEntity> = emptyList(),
-    onUpdateShopProfile: (name: String, phone: String, address: String) -> Unit = { _, _, _ -> },
+    onUpdateShopProfile: (ownerName: String, shopName: String, phone: String, address: String) -> Unit = { _, _, _, _ -> },
     onToggleCategory: (CategoryEntity) -> Unit = {},
     onGenerateInvite: (role: String, onCodeGenerated: (String) -> Unit) -> Unit = { _, _ -> },
     onNavigateBack: () -> Unit = {},
@@ -57,21 +57,26 @@ fun SettingsScreen(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
+    var editableOwnerName by remember(ownerName) { mutableStateOf(ownerName) }
     var editableShopName by remember(shopName) { mutableStateOf(shopName) }
     var editableShopPhone by remember(shopPhone) { mutableStateOf(shopPhone) }
     var editableShopAddress by remember(shopAddress) { mutableStateOf(shopAddress) }
     var isSavingShopProfile by remember { mutableStateOf(false) }
 
     val languages = AppPreferencesManager.supportedLanguages
-
     val currentTag = remember { AppPreferencesManager.getAppLanguageTag(context) }
     var selectedLanguageOption by remember {
         mutableStateOf(languages.find { it.tag.equals(currentTag, ignoreCase = true) } ?: languages.first())
     }
-
     var expandedLanguageDropdown by remember { mutableStateOf(false) }
-    var slowStockDaysText by remember { mutableStateOf("30") }
-    var receiptFooterText by remember { mutableStateOf("Shukriya! Visit again.") }
+
+    // Theme Selection State
+    val themeOptions = AppPreferencesManager.supportedThemes
+    val currentThemeMode = remember { AppPreferencesManager.getAppThemeMode(context) }
+    var selectedThemeOption by remember {
+        mutableStateOf(themeOptions.find { it.mode.equals(currentThemeMode, ignoreCase = true) } ?: themeOptions.first())
+    }
+    var expandedThemeDropdown by remember { mutableStateOf(false) }
 
     var showBuyCostInSell by remember {
         mutableStateOf(runCatching { AppPreferencesManager.isShowBuyCostInSellEnabled(context) }.getOrDefault(true))
@@ -161,7 +166,7 @@ fun SettingsScreen(
                             Button(
                                 onClick = {
                                     val roleLabel = if (inviteRole == "STAFF") "Staff Member" else "Sleeping Partner"
-                                    val shareMsg = "Aap ko Hafeez Center App par $roleLabel join karne ka Code bheja gaya hai: $activeInviteCode. App download karein aur 'Join with Code' chunay."
+                                    val shareMsg = "Aap ko BuySell360 App par $roleLabel join karne ka Code bheja gaya hai: $activeInviteCode."
                                     val intent = Intent(Intent.ACTION_SEND).apply {
                                         type = "text/plain"
                                         putExtra(Intent.EXTRA_TEXT, shareMsg)
@@ -307,6 +312,15 @@ fun SettingsScreen(
             ) {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     OutlinedTextField(
+                        value = editableOwnerName,
+                        onValueChange = { editableOwnerName = it },
+                        label = { Text(stringResource(R.string.label_owner_name)) },
+                        readOnly = !isOwner,
+                        leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    OutlinedTextField(
                         value = editableShopName,
                         onValueChange = { editableShopName = it },
                         label = { Text(stringResource(R.string.label_shop_name)) },
@@ -337,9 +351,10 @@ fun SettingsScreen(
                     if (isOwner) {
                         Button(
                             onClick = {
-                                if (editableShopName.isNotBlank()) {
+                                if (editableShopName.isNotBlank() && editableOwnerName.isNotBlank()) {
                                     isSavingShopProfile = true
                                     onUpdateShopProfile(
+                                        editableOwnerName.trim(),
                                         editableShopName.trim(),
                                         editableShopPhone.trim(),
                                         editableShopAddress.trim()
@@ -348,7 +363,7 @@ fun SettingsScreen(
                                     Toast.makeText(context, "Dukan details updated ✓", Toast.LENGTH_SHORT).show()
                                 }
                             },
-                            enabled = editableShopName.isNotBlank() && !isSavingShopProfile,
+                            enabled = editableShopName.isNotBlank() && editableOwnerName.isNotBlank() && !isSavingShopProfile,
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Text(stringResource(R.string.action_save), fontWeight = FontWeight.Bold)
@@ -391,6 +406,41 @@ fun SettingsScreen(
                                         expandedLanguageDropdown = false
                                         AppPreferencesManager.setAppLanguageTag(context, option.tag)
                                         Toast.makeText(context, "Language updated: ${option.displayName}", Toast.LENGTH_SHORT).show()
+                                    }
+                                )
+                            }
+                        }
+                    }
+
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+
+                    Text(stringResource(R.string.settings_app_theme), fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+
+                    Box {
+                        OutlinedTextField(
+                            value = stringResource(selectedThemeOption.displayNameResId),
+                            onValueChange = {},
+                            label = { Text(stringResource(R.string.settings_app_theme)) },
+                            modifier = Modifier.fillMaxWidth().clickable { expandedThemeDropdown = true },
+                            readOnly = true,
+                            trailingIcon = {
+                                IconButton(onClick = { expandedThemeDropdown = true }) {
+                                    Icon(Icons.Default.ArrowDropDown, contentDescription = null)
+                                }
+                            }
+                        )
+
+                        DropdownMenu(
+                            expanded = expandedThemeDropdown,
+                            onDismissRequest = { expandedThemeDropdown = false }
+                        ) {
+                            themeOptions.forEach { option ->
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(option.displayNameResId)) },
+                                    onClick = {
+                                        selectedThemeOption = option
+                                        expandedThemeDropdown = false
+                                        AppPreferencesManager.setAppThemeMode(context, option.mode)
                                     }
                                 )
                             }
@@ -464,7 +514,7 @@ fun SettingsScreen(
                             allCategories.forEach { categoryItem ->
                                 FilterChip(
                                     selected = categoryItem.enabled,
-                                    enabled = true,
+                                    enabled = isOwner,
                                     onClick = { onToggleCategory(categoryItem) },
                                     label = { Text(categoryItem.name, fontSize = 13.sp) },
                                     leadingIcon = if (categoryItem.enabled) {
@@ -474,29 +524,6 @@ fun SettingsScreen(
                             }
                         }
                     }
-                }
-            }
-
-            // CARD 4: Receipt & Stock Rules
-            SettingsSectionCard(
-                title = stringResource(R.string.settings_section_receipt),
-                icon = Icons.AutoMirrored.Filled.ReceiptLong
-            ) {
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    OutlinedTextField(
-                        value = slowStockDaysText,
-                        onValueChange = { slowStockDaysText = it },
-                        label = { Text(stringResource(R.string.settings_slow_stock_warning)) },
-                        supportingText = { Text(stringResource(R.string.settings_slow_stock_sub)) },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-
-                    OutlinedTextField(
-                        value = receiptFooterText,
-                        onValueChange = { receiptFooterText = it },
-                        label = { Text(stringResource(R.string.settings_receipt_footer_note)) },
-                        modifier = Modifier.fillMaxWidth()
-                    )
                 }
             }
 
@@ -544,7 +571,7 @@ fun SettingsScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "Hafeez Center Tracker v1.0 (Build 1) • Role: $userRole",
+                    text = "BuySell360 v1.0 (Build 1) • Role: $userRole",
                     fontSize = 12.sp,
                     color = Color.Gray
                 )

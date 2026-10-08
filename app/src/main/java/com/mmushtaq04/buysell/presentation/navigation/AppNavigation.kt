@@ -1,5 +1,6 @@
 package com.mmushtaq04.buysell.presentation.navigation
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -53,6 +54,9 @@ fun AppNavigation(
     val primaryUserFlow = remember { db.userDao().observePrimaryUser() }
     val primaryUser by primaryUserFlow.collectAsState(initial = null)
 
+    val appMetaFlow = remember { db.appMetaDao().observeAppMeta() }
+    val appMeta by appMetaFlow.collectAsState(initial = null)
+
     val firebaseUser = authManager.currentUser
     val registeredUserName = remember(primaryUser, firebaseUser) {
         when {
@@ -77,15 +81,23 @@ fun AppNavigation(
             if (meta?.activeShopId.isNullOrBlank()) {
                 isRestoringData = true
                 restorationMessage = msgDownloading
-                FirestoreSyncManager(db).restoreUserDataFromFirestore(userId)
+                val restoredId = FirestoreSyncManager(db).restoreUserDataFromFirestore(userId).getOrDefault("")
                 isRestoringData = false
+                if (restoredId.isBlank()) {
+                    // Logged in user has no active shop -> Ensure user stays on ShopSetupScreen
+                    navController.navigate(NavRoutes.ShopSetup.route) {
+                        popUpTo(NavRoutes.Home.route) { inclusive = true }
+                        popUpTo(NavRoutes.Welcome.route) { inclusive = true }
+                    }
+                }
             }
         }
     }
 
     val startDest = when {
-        !isUserLoggedIn -> NavRoutes.Login.route
+        !isUserLoggedIn -> NavRoutes.Welcome.route
         isPinSet -> NavRoutes.AppLock.route
+        appMeta?.activeShopId.isNullOrBlank() && primaryUser?.shopId.isNullOrBlank() -> NavRoutes.ShopSetup.route
         else -> NavRoutes.Home.route
     }
 
@@ -94,6 +106,13 @@ fun AppNavigation(
         scope.launch {
             isRestoringData = true
             restorationMessage = msgSearching
+
+            // If local DB user ID doesn't match current logged-in userId, wipe stale local DB state
+            val localUser = db.userDao().getPrimaryUser()
+            if (localUser != null && localUser.id != userId) {
+                Log.i("AppNavigation", "New user login detected ($userId vs local ${localUser.id}). Clearing stale local Room DB tables.")
+                db.clearAllTables()
+            }
 
             val meta = db.appMetaDao().getAppMeta()
             var activeShopId = meta?.activeShopId
@@ -114,12 +133,12 @@ fun AppNavigation(
 
                 isRestoringData = false
                 navController.navigate(NavRoutes.Home.route) {
-                    popUpTo(NavRoutes.Login.route) { inclusive = true }
+                    popUpTo(NavRoutes.Welcome.route) { inclusive = true }
                 }
             } else {
                 isRestoringData = false
                 navController.navigate(NavRoutes.ShopSetup.route) {
-                    popUpTo(NavRoutes.Login.route) { inclusive = true }
+                    popUpTo(NavRoutes.Welcome.route) { inclusive = true }
                 }
             }
         }

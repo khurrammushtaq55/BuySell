@@ -9,9 +9,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Mail
-import androidx.compose.material.icons.filled.Storefront
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
@@ -25,6 +25,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -40,6 +41,8 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(
+    initialRegisterMode: Boolean = false,
+    onNavigateBackToWelcome: () -> Unit = {},
     onGoogleSignInClick: () -> Unit = {},
     onEmailAuthSuccess: () -> Unit = {}
 ) {
@@ -47,7 +50,7 @@ fun LoginScreen(
     val scope = rememberCoroutineScope()
     val authManager = remember { FirebaseAuthManager() }
 
-    var isRegisterMode by remember { mutableStateOf(false) }
+    var isRegisterMode by remember(initialRegisterMode) { mutableStateOf(initialRegisterMode) }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var isPasswordVisible by remember { mutableStateOf(false) }
@@ -63,139 +66,121 @@ fun LoginScreen(
     val errGoogleCanceled = stringResource(R.string.login_err_google_canceled)
     val errAuthFailed = stringResource(R.string.login_err_auth_failed)
 
+    fun launchGoogleSignIn() {
+        isLoading = true
+        errorMessage = null
+        scope.launch {
+            runCatching {
+                Log.d("LoginScreen", "Starting Google Sign-In flow...")
+                val webClientIdResId = context.resources.getIdentifier("default_web_client_id", "string", context.packageName)
+                val webClientId = if (webClientIdResId != 0) {
+                    context.getString(webClientIdResId)
+                } else {
+                    runCatching { context.getString(R.string.default_web_client_id) }.getOrDefault("")
+                }
+
+                Log.i("LoginScreen", "Resolved Web Client ID: '$webClientId'")
+
+                val googleIdOption = GetGoogleIdOption.Builder()
+                    .setFilterByAuthorizedAccounts(false)
+                    .setAutoSelectEnabled(false)
+                    .apply {
+                        if (webClientId.isNotBlank()) setServerClientId(webClientId)
+                    }
+                    .build()
+
+                val request = GetCredentialRequest.Builder()
+                    .addCredentialOption(googleIdOption)
+                    .build()
+
+                val result = credentialManager.getCredential(context, request)
+                val credential = result.credential
+
+                val googleIdTokenCredential = when (credential) {
+                    is GoogleIdTokenCredential -> credential
+                    else -> runCatching { GoogleIdTokenCredential.createFrom(credential.data) }.getOrNull()
+                }
+
+                if (googleIdTokenCredential != null) {
+                    val idToken = googleIdTokenCredential.idToken
+                    val authResult = authManager.signInWithGoogleCredential(idToken)
+                    isLoading = false
+                    if (authResult.isSuccess) {
+                        onGoogleSignInClick()
+                    } else {
+                        val exception = authResult.exceptionOrNull()
+                        val err = exception?.localizedMessage ?: errGoogleFailed
+                        errorMessage = err
+                        Toast.makeText(context, err, Toast.LENGTH_LONG).show()
+                    }
+                } else {
+                    isLoading = false
+                    val err = "$errGoogleCred (${credential.type})"
+                    errorMessage = err
+                    Toast.makeText(context, err, Toast.LENGTH_LONG).show()
+                }
+            }.onFailure { e ->
+                isLoading = false
+                val msg = if (e is GetCredentialException && e.message?.contains("cancel", ignoreCase = true) == true) {
+                    errGoogleCanceled
+                } else {
+                    "Google Sign-In Error: ${e.localizedMessage ?: errGoogleFailed}"
+                }
+                errorMessage = msg
+                Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
     Scaffold { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
-                .padding(24.dp),
+                .padding(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Spacer(modifier = Modifier.height(20.dp))
-
-            // Header Icon
-            Surface(
-                shape = RoundedCornerShape(16.dp),
-                color = MaterialTheme.colorScheme.primaryContainer,
-                modifier = Modifier.size(80.dp)
-            ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Icon(
-                        imageVector = Icons.Default.Storefront,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(48.dp)
-                    )
-                }
-            }
-
-            Text(
-                text = stringResource(R.string.app_name),
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold
-            )
-
-            Text(
-                text = stringResource(R.string.login_tagline),
-                fontSize = 13.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Primary Google Sign-In Button
-            OutlinedButton(
-                onClick = {
-                    isLoading = true
-                    errorMessage = null
-                    scope.launch {
-                        runCatching {
-                            val webClientIdResId = context.resources.getIdentifier("default_web_client_id", "string", context.packageName)
-                            val webClientId = if (webClientIdResId != 0) {
-                                context.getString(webClientIdResId)
-                            } else {
-                                runCatching { context.getString(R.string.default_web_client_id) }.getOrDefault("")
-                            }
-
-                            Log.d("LoginScreen", "Verifying Web Client ID: '$webClientId'")
-
-                            val googleIdOption = GetGoogleIdOption.Builder()
-                                .setFilterByAuthorizedAccounts(false)
-                                .apply {
-                                    if (webClientId.isNotBlank()) setServerClientId(webClientId)
-                                }
-                                .build()
-
-                            val request = GetCredentialRequest.Builder()
-                                .addCredentialOption(googleIdOption)
-                                .build()
-
-                            val result = credentialManager.getCredential(context, request)
-                            val credential = result.credential
-
-                            if (credential is GoogleIdTokenCredential) {
-                                val idToken = credential.idToken
-                                val authResult = authManager.signInWithGoogleCredential(idToken)
-                                isLoading = false
-                                if (authResult.isSuccess) {
-                                    onGoogleSignInClick()
-                                } else {
-                                    val err = authResult.exceptionOrNull()?.localizedMessage ?: errGoogleFailed
-                                    errorMessage = err
-                                    Toast.makeText(context, err, Toast.LENGTH_LONG).show()
-                                }
-                            } else {
-                                isLoading = false
-                                val err = errGoogleCred
-                                errorMessage = err
-                                Toast.makeText(context, err, Toast.LENGTH_LONG).show()
-                            }
-                        }.onFailure { e ->
-                            isLoading = false
-                            val msg = if (e is GetCredentialException && e.message?.contains("cancel", ignoreCase = true) == true) {
-                                errGoogleCanceled
-                            } else {
-                                "Google Sign-In Error: ${e.localizedMessage ?: errGoogleFailed}"
-                            }
-                            errorMessage = msg
-                            Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
-                        }
-                    }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(52.dp),
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.onSurface)
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        text = "G  ${stringResource(R.string.login_btn_google)}",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp
-                    )
-                }
-            }
-
+            // Top Back Arrow Button
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp),
+                modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                HorizontalDivider(modifier = Modifier.weight(1f))
-                Text(
-                    text = "  ${stringResource(R.string.login_or_email)}  ",
-                    fontSize = 12.sp,
-                    color = Color.Gray
-                )
-                HorizontalDivider(modifier = Modifier.weight(1f))
+                TextButton(onClick = onNavigateBackToWelcome) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = stringResource(R.string.action_back),
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 14.sp
+                    )
+                }
             }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Explicit Header Text
+            Text(
+                text = if (isRegisterMode) stringResource(R.string.login_header_signup) else stringResource(R.string.login_header_login),
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onBackground,
+                textAlign = TextAlign.Center
+            )
+
+            Text(
+                text = stringResource(R.string.login_subtitle),
+                fontSize = 13.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
 
             // Email Field
             OutlinedTextField(
@@ -210,7 +195,7 @@ fun LoginScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // Password Field with Show/Hide Toggle
+            // Password Field
             OutlinedTextField(
                 value = password,
                 onValueChange = {
@@ -220,15 +205,15 @@ fun LoginScreen(
                 label = { Text(stringResource(R.string.label_password)) },
                 supportingText = {
                     Text(
-                        text = if (password.isNotEmpty() && password.length < 4) {
+                        text = if (password.isNotEmpty() && password.length < 6) {
                             stringResource(R.string.login_pwd_char_count, password.length)
                         } else {
                             stringResource(R.string.login_pwd_min_length)
                         },
-                        color = if (password.isNotEmpty() && password.length < 4) MaterialTheme.colorScheme.error else Color.Unspecified
+                        color = if (password.isNotEmpty() && password.length < 6) MaterialTheme.colorScheme.error else Color.Unspecified
                     )
                 },
-                isError = password.isNotEmpty() && password.length < 4,
+                isError = password.isNotEmpty() && password.length < 6,
                 leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
                 trailingIcon = {
                     val image = if (isPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff
@@ -257,7 +242,7 @@ fun LoginScreen(
                         errorMessage = errInvalidEmail
                         return@Button
                     }
-                    if (password.length < 4) {
+                    if (password.length < 6) {
                         errorMessage = errPwdShort
                         return@Button
                     }
@@ -280,7 +265,7 @@ fun LoginScreen(
                         }
                     }
                 },
-                enabled = email.isNotBlank() && password.length >= 4 && !isLoading,
+                enabled = email.isNotBlank() && password.length >= 6 && !isLoading,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(52.dp),
@@ -297,7 +282,39 @@ fun LoginScreen(
                 }
             }
 
-            // Mode Toggle Text
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                HorizontalDivider(modifier = Modifier.weight(1f))
+                Text(
+                    text = "  ${stringResource(R.string.login_or_email)}  ",
+                    fontSize = 12.sp,
+                    color = Color.Gray
+                )
+                HorizontalDivider(modifier = Modifier.weight(1f))
+            }
+
+            // Google Sign-In Option
+            OutlinedButton(
+                onClick = { launchGoogleSignIn() },
+                enabled = !isLoading,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.onSurface)
+            ) {
+                Text(
+                    text = "G  ${stringResource(R.string.login_btn_google)}",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 15.sp
+                )
+            }
+
+            // Toggle Mode Link
             Text(
                 text = if (isRegisterMode) stringResource(R.string.login_toggle_login) else stringResource(R.string.login_toggle_register),
                 color = MaterialTheme.colorScheme.primary,

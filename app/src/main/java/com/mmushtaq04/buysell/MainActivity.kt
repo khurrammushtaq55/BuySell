@@ -32,6 +32,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
+        // Apply saved theme preference (System, Light, Dark)
+        val themeMode = AppPreferencesManager.getAppThemeMode(this)
+        AppPreferencesManager.applyAppThemeMode(themeMode)
+
         // Initialize local database instance
         AppDatabase.getInstance(this)
 

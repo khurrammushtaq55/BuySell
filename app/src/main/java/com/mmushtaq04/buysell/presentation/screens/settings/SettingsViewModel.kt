@@ -111,7 +111,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-    fun updateShopProfile(name: String, phone: String, address: String) {
+    fun updateShopProfile(ownerName: String, shopName: String, phone: String, address: String) {
         viewModelScope.launch {
             val user = db.userDao().getPrimaryUser()
             val meta = db.appMetaDao().getAppMeta()
@@ -119,11 +119,30 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
 
             if (shopId.isBlank()) return@launch
 
-            val existingShop = db.shopDao().getShopById(shopId)
             val now = System.currentTimeMillis()
 
+            if (user != null && ownerName.isNotBlank() && ownerName != user.displayName) {
+                val updatedUser = user.copy(
+                    displayName = ownerName,
+                    updatedAt = now,
+                    rev = user.rev + 1L
+                )
+                db.userDao().insertUser(updatedUser)
+                db.syncDao().enqueueOutbox(
+                    SyncOutboxEntity(
+                        id = UUID.randomUUID().toString(),
+                        entityType = "users",
+                        entityId = updatedUser.id,
+                        op = SyncOp.UPSERT,
+                        payloadJson = Gson().toJson(updatedUser),
+                        createdAt = now
+                    )
+                )
+            }
+
+            val existingShop = db.shopDao().getShopById(shopId)
             val updatedShop = existingShop?.copy(
-                name = name,
+                name = shopName,
                 phone = phone.ifBlank { null },
                 address = address.ifBlank { null },
                 updatedAt = now,
@@ -131,15 +150,15 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
             )
                 ?: ShopEntity(
                     id = shopId,
-                    name = name,
+                    name = shopName,
                     code = "SHOP",
                     ownerUserId = user?.id ?: "",
                     phone = phone.ifBlank { null },
                     address = address.ifBlank { null },
                     createdAt = now,
                     updatedAt = now,
-                    createdBy = user?.displayName ?: "Owner",
-                    updatedBy = user?.displayName ?: "Owner"
+                    createdBy = ownerName.ifBlank { user?.displayName ?: "Owner" },
+                    updatedBy = ownerName.ifBlank { user?.displayName ?: "Owner" }
                 )
 
             db.shopDao().insertShop(updatedShop)
@@ -155,7 +174,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
             )
 
             SyncWorker.enqueueOneTimeSync(getApplication())
-            Log.i(TAG, "✓ Updated Shop Profile in Room DB & Enqueued Background Sync: ${updatedShop.name}")
+            Log.i(TAG, "✓ Updated Shop Profile & Owner Name in Room DB & Enqueued Background Sync: ${updatedShop.name}")
         }
     }
 

@@ -120,3 +120,30 @@
 - [x] Comprehensive Data Layer & Core Logic Unit Test Suite
 	- [x] Added `CoreLogicTest.kt` with Robolectric unit tests covering `AppPinManager` SHA-256 salting, `InviteManager` format, `AppMetaEntity` device code persistence, Trade-in Exchange transactions, Staff Vault Purge DAO operations, Khata Ledger payment calculations, and `ConflictDetector` double-sale flagging
 	- [x] Verified **9/9 JVM unit tests passed cleanly**.
+- [x] Google Sign-In CredentialManager Fix & Detailed Diagnostics
+	- [x] Implemented `CustomCredential` fallback in `LoginScreen.kt` via `GoogleIdTokenCredential.createFrom(credential.data)` to fix silent Google Sign-In failure on Android 14+ devices
+	- [x] Added detailed Logcat logging under tags `LoginScreen` and `FirebaseAuthManager` for Web Client ID resolution, credential class types, ID token extraction, and full exception stack traces (`Log.e`)
+- [x] Standalone WelcomeLandingScreen & Auth Navigation Architecture
+	- [x] Created `WelcomeLandingScreen.kt` as dedicated start destination (`NavRoutes.Welcome`) with App Logo, 3 feature highlight cards, Create New Shop, Log In to Existing Account, and Google Sign-In buttons
+	- [x] Streamlined `LoginScreen.kt` for pure Email/Password form entry with top `← Back to Welcome` action
+- [x] Password Length Validation Update to 6 Characters
+	- [x] Updated `LoginScreen.kt` form validation and button enablement to require a minimum **6-character password**.
+	- [x] Updated string resources (`login_pwd_min_length`, `login_pwd_char_count`, `login_err_pwd_short`) across all 8 locale folders (`values`, `values-ur`, `values-b+ur+Latn`, `values-es`, `values-fr`, `values-hi`, `values-ar`, `values-zh-rCN`).
+- [x] Sign Out Cloud Assurance Dialog & Local Cache Cleanup
+	- [x] Updated `settings_signout_dialog_msg` across all 8 locale folders reassuring users that their store records and stock are safely backed up to the cloud.
+	- [x] Updated `SettingsNavGraph.kt` to execute `db.clearAllTables()` upon sign-out.
+- [x] Persistent Shop Setup Relaunch & Language Selection Card Position
+	- [x] Updated `AppNavigation.kt` start destination and restoration logic so logged-in users who close the app on `ShopSetupScreen` without completing setup automatically land directly back on `ShopSetupScreen` upon reopening the app.
+	- [x] Repositioned the **Language Selection Card** on `ShopSetupScreen.kt` below the address field and right above the product categories.
+- [x] ShopSetupScreen Language Selection Card Removal & Help Icon Addition
+	- [x] Completely removed Language Selection Card from `ShopSetupScreen.kt`.
+	- [x] Added TopAppBar Help action icon (`IconButton` with `Icons.AutoMirrored.Filled.HelpOutline`) in `ShopSetupScreen.kt` and wired `onNavigateToHelp = { navController.navigate(NavRoutes.Help.route) }` in `AuthNavGraph.kt`.
+- [x] App Theme Selection Feature (System Default, Light, Dark)
+	- [x] Added `getAppThemeMode`, `setAppThemeMode`, and `applyAppThemeMode` to `AppPreferencesManager.kt` and `MainActivity.kt`.
+	- [x] Dynamically bound `BuySellTheme` in `Theme.kt` to the selected theme mode.
+	- [x] Added **App Theme** dropdown selector in `SettingsScreen.kt` with 3 options: System Default, Light Theme, Dark Theme.
+	- [x] Added string resources (`settings_app_theme`, `theme_system`, `theme_light`, `theme_dark`) across all 8 locale resource folders.
+- [x] Owner Name Editing & Settings Cleanup
+	- [x] Added editable **Owner Name** `OutlinedTextField` to `SettingsScreen.kt` Store Profile section.
+	- [x] Updated `SettingsViewModel.kt` `updateShopProfile` to update both shop details and the user's `displayName` in Room DB and enqueued outbox sync to Firestore.
+	- [x] Confirmed footer note displays `"BuySell360 v1.0 (Build 1) • Role: [Role]"`.

@@ -4,13 +4,16 @@ import android.app.Activity
 import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
+import com.mmushtaq04.buysell.R
 
 data class LanguageOption(val displayName: String, val tag: String)
+data class ThemeOption(val mode: String, val displayNameResId: Int)
 
 object AppPreferencesManager {
     private const val PREFS_NAME = "buysell_app_prefs"
     private const val KEY_SHOW_BUY_COST_IN_SELL = "show_buy_cost_in_sell"
     private const val KEY_APP_LANGUAGE_TAG = "app_language_tag"
+    private const val KEY_APP_THEME_MODE = "app_theme_mode"
 
     val supportedLanguages = listOf(
         LanguageOption("English", "en"),
@@ -23,6 +26,12 @@ object AppPreferencesManager {
         LanguageOption("Chinese / 简体中文", "zh-CN")
     )
 
+    val supportedThemes = listOf(
+        ThemeOption("system", R.string.theme_system),
+        ThemeOption("light", R.string.theme_light),
+        ThemeOption("dark", R.string.theme_dark)
+    )
+
     fun isShowBuyCostInSellEnabled(context: Context): Boolean {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         return prefs.getBoolean(KEY_SHOW_BUY_COST_IN_SELL, true)
@@ -31,6 +40,27 @@ object AppPreferencesManager {
     fun setShowBuyCostInSellEnabled(context: Context, enabled: Boolean) {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         prefs.edit().putBoolean(KEY_SHOW_BUY_COST_IN_SELL, enabled).apply()
+    }
+
+    fun getAppThemeMode(context: Context): String {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        return prefs.getString(KEY_APP_THEME_MODE, "system") ?: "system"
+    }
+
+    fun setAppThemeMode(context: Context, themeMode: String) {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit().putString(KEY_APP_THEME_MODE, themeMode).apply()
+
+        applyAppThemeMode(themeMode)
+        (context as? Activity)?.recreate()
+    }
+
+    fun applyAppThemeMode(themeMode: String) {
+        when (themeMode.lowercase().trim()) {
+            "light" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            "dark" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            else -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+        }
     }
 
     fun getAppLanguageTag(context: Context): String {
