@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import java.util.UUID
 
 class SettingsViewModel(application: Application) : AndroidViewModel(application) {
@@ -218,10 +219,12 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
             val role = user?.role ?: Role.STAFF
             val activeSessionId = user?.activeSessionId ?: ""
 
-            // 1. Attempt pushing pending outbox items if shopId is present
+            // 1. Attempt pushing pending outbox items if shopId is present (bounded by 5-second timeout)
             if (shopId.isNotBlank()) {
-                runCatching {
-                    FirestoreSyncManager(db).pushOutbox(shopId, role, activeSessionId)
+                withTimeoutOrNull(5_000L) {
+                    runCatching {
+                        FirestoreSyncManager(db).pushOutbox(shopId, role, activeSessionId)
+                    }
                 }
             }
 

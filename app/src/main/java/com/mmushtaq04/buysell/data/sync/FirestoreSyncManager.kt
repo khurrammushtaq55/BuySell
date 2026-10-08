@@ -11,9 +11,9 @@ import com.mmushtaq04.buysell.data.local.AppDatabase
 import com.mmushtaq04.buysell.data.local.entity.*
 import com.mmushtaq04.buysell.data.local.enums.*
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeout
 import java.util.UUID
 
 class FirestoreSyncManager(private val db: AppDatabase) {
@@ -24,13 +24,14 @@ class FirestoreSyncManager(private val db: AppDatabase) {
 
     companion object {
         private const val TAG = "FirestoreSync"
+        private const val NETWORK_TIMEOUT_MS = 5_000L
     }
 
     suspend fun pushOutbox(
         shopId: String,
         userRole: Role,
         activeSessionId: String
-    ): Result<Int> = withContext(Dispatchers.IO + NonCancellable) {
+    ): Result<Int> = withContext(Dispatchers.IO) {
         runCatching {
             Log.d(TAG, "--> Starting pushOutbox for shopId: '$shopId' (Role: $userRole)")
             val pendingList = syncDao.getPendingOutbox()
@@ -71,11 +72,13 @@ class FirestoreSyncManager(private val db: AppDatabase) {
 
                     val docRef = firestore.document(docPath)
 
-                    if (item.op == SyncOp.UPSERT) {
-                        docRef.set(payloadMap, SetOptions.merge()).await()
-                    } else if (item.op == SyncOp.DELETE) {
-                        val now = System.currentTimeMillis()
-                        docRef.update(mapOf("deleted_at" to now, "updated_at" to now)).await()
+                    withTimeout(NETWORK_TIMEOUT_MS) {
+                        if (item.op == SyncOp.UPSERT) {
+                            docRef.set(payloadMap, SetOptions.merge()).await()
+                        } else if (item.op == SyncOp.DELETE) {
+                            val now = System.currentTimeMillis()
+                            docRef.update(mapOf("deleted_at" to now, "updated_at" to now)).await()
+                        }
                     }
 
                     // Remove from local outbox after ACK
@@ -88,7 +91,9 @@ class FirestoreSyncManager(private val db: AppDatabase) {
                         purgeLocalVaultRow(item.entityType, item.entityId)
                     }
                 } catch (e: Exception) {
-                    Log.e(TAG, "✗ [SYNC ERROR] Failed to push '${item.entityType}' ID: '${item.entityId}' to Firestore: ${e.message}", e)
+                    Log.e(TAG, "✗ [SYNC TIMEOUT/ERROR] Failed to push '${item.entityType}' ID: '${item.entityId}' to Firestore: ${e.message}")
+                    // Timeout or network error -> Stop loop and return current pushed count so unsynced item remains in outbox
+                    break
                 }
             }
 
@@ -100,7 +105,7 @@ class FirestoreSyncManager(private val db: AppDatabase) {
     suspend fun pullChanges(
         shopId: String,
         userRole: Role
-    ): Result<Int> = withContext(Dispatchers.IO + NonCancellable) {
+    ): Result<Int> = withContext(Dispatchers.IO) {
         runCatching {
             Log.d(TAG, "--> Starting pullChanges for shopId: '$shopId' (Role: $userRole)")
             var pulledCount = 0
@@ -120,7 +125,11 @@ class FirestoreSyncManager(private val db: AppDatabase) {
                         firestore.collection(path6Segment)
                     }
 
-                    val snapshot = runCatching { query.get().await() }.getOrNull()
+                    val snapshot = runCatching {
+                        withTimeout(NETWORK_TIMEOUT_MS) {
+                            query.get().await()
+                        }
+                    }.getOrNull()
 
                     if (snapshot != null && !snapshot.isEmpty) {
                         val firstPath = snapshot.documents.firstOrNull()?.reference?.path ?: path6Segment
@@ -147,14 +156,19 @@ class FirestoreSyncManager(private val db: AppDatabase) {
         }
     }
 
-    suspend fun restoreUserDataFromFirestore(userId: String): Result<String> = withContext(Dispatchers.IO + NonCancellable) {
+    suspend fun restoreUserDataFromFirestore(userId: String): Result<String> = withContext(Dispatchers.IO) {
         runCatching {
             Log.i(TAG, "--> Restoring user data from Firestore for userId: '$userId'")
 
             var shopId: String? = null
             var userRole = Role.STAFF
 
-            val userDoc = runCatching { firestore.collection("users").document(userId).get().await() }.getOrNull()
+            val userDoc = runCatching {
+                withTimeout(NETWORK_TIMEOUT_MS) {
+                    firestore.collection("users").document(userId).get().await()
+                }
+            }.getOrNull()
+
             if (userDoc != null && userDoc.exists()) {
                 val userMap = userDoc.data ?: emptyMap()
 
@@ -174,10 +188,12 @@ class FirestoreSyncManager(private val db: AppDatabase) {
 
             if (shopId.isNullOrBlank()) {
                 val shopQuery1 = runCatching {
-                    firestore.collection("shops")
-                        .whereEqualTo("owner_user_id", userId)
-                        .get()
-                        .await()
+                    withTimeout(NETWORK_TIMEOUT_MS) {
+                        firestore.collection("shops")
+                            .whereEqualTo("owner_user_id", userId)
+                            .get()
+                            .await()
+                    }
                 }.getOrNull()
 
                 if (shopQuery1 != null && !shopQuery1.isEmpty) {
@@ -187,10 +203,12 @@ class FirestoreSyncManager(private val db: AppDatabase) {
                     applyFirestoreDocToRoom("shops", shopDoc.data ?: emptyMap())
                 } else {
                     val shopQuery2 = runCatching {
-                        firestore.collection("shops")
-                            .whereEqualTo("ownerUserId", userId)
-                            .get()
-                            .await()
+                        withTimeout(NETWORK_TIMEOUT_MS) {
+                            firestore.collection("shops")
+                                .whereEqualTo("ownerUserId", userId)
+                                .get()
+                                .await()
+                        }
                     }.getOrNull()
 
                     if (shopQuery2 != null && !shopQuery2.isEmpty) {
@@ -204,10 +222,12 @@ class FirestoreSyncManager(private val db: AppDatabase) {
 
             if (shopId.isNullOrBlank()) {
                 runCatching {
-                    val memberQuery = firestore.collectionGroup("members")
-                        .whereEqualTo("user_id", userId)
-                        .get()
-                        .await()
+                    val memberQuery = withTimeout(NETWORK_TIMEOUT_MS) {
+                        firestore.collectionGroup("members")
+                            .whereEqualTo("user_id", userId)
+                            .get()
+                            .await()
+                    }
 
                     if (!memberQuery.isEmpty) {
                         val memberDoc = memberQuery.documents.first()
@@ -226,7 +246,9 @@ class FirestoreSyncManager(private val db: AppDatabase) {
 
             // Query member document directly for verified role
             val memberDoc = runCatching {
-                firestore.collection("shops").document(shopId).collection("members").document(userId).get().await()
+                withTimeout(NETWORK_TIMEOUT_MS) {
+                    firestore.collection("shops").document(shopId).collection("members").document(userId).get().await()
+                }
             }.getOrNull()
 
             if (memberDoc != null && memberDoc.exists()) {
@@ -238,7 +260,12 @@ class FirestoreSyncManager(private val db: AppDatabase) {
 
             Log.i(TAG, "Restoring data for shopId '$shopId' from Firestore...")
 
-            val shopDoc = runCatching { firestore.collection("shops").document(shopId).get().await() }.getOrNull()
+            val shopDoc = runCatching {
+                withTimeout(NETWORK_TIMEOUT_MS) {
+                    firestore.collection("shops").document(shopId).get().await()
+                }
+            }.getOrNull()
+
             if (shopDoc != null && shopDoc.exists()) {
                 applyFirestoreDocToRoom("shops", shopDoc.data ?: emptyMap())
             }

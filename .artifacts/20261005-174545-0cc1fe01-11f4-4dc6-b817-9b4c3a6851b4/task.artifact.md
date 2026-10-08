@@ -166,3 +166,7 @@
 	- [x] Keyed `ShopMemberEntity.id = currentUserId` in `ShopSetupViewModel.kt`.
 	- [x] Replaced synchronous `pushOutbox` awaiting with asynchronous `SyncWorker.enqueueOneTimeSync(getApplication())` in `ShopSetupViewModel.kt` for instant (< 10 ms) offline shop creation and joining.
 	- [x] Added single-device `active_session_id` validation in `FirestoreSyncManager.kt` during data restoration.
+- [x] Offline Sign-Out Sync Timeout & NonCancellable Removal
+	- [x] Removed `NonCancellable` from `FirestoreSyncManager.kt` `pushOutbox` and `pullChanges`.
+	- [x] Wrapped all Firestore `.await()` network tasks in `kotlinx.coroutines.withTimeout(5_000L)`.
+	- [x] Wrapped `pushOutbox` in `withTimeoutOrNull(5_000L)` inside `SettingsViewModel.kt` `handleSignOut` so offline sign-out attempts time out in 5 seconds and display the **Unsynced Data Warning Dialog** immediately without freezing the UI.
