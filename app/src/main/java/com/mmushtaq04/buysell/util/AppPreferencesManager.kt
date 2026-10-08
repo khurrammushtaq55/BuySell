@@ -17,7 +17,7 @@ object AppPreferencesManager {
 
     val supportedLanguages = listOf(
         LanguageOption("English", "en"),
-        LanguageOption("Roman Urdu / رومن اردو", "b+ur+Latn"),
+        LanguageOption("Roman Urdu / رومن اردو", "ur-Latn"),
         LanguageOption("Urdu / اردو", "ur"),
         LanguageOption("Spanish / Español", "es"),
         LanguageOption("French / Français", "fr"),
@@ -65,8 +65,19 @@ object AppPreferencesManager {
 
     fun getAppLanguageTag(context: Context): String {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        if (prefs.contains(KEY_APP_LANGUAGE_TAG)) {
-            return prefs.getString(KEY_APP_LANGUAGE_TAG, "en") ?: "en"
+        val rawTag = prefs.getString(KEY_APP_LANGUAGE_TAG, null)
+
+        if (!rawTag.isNullOrBlank()) {
+            // Map legacy folder qualifiers or tags to standard BCP-47 tags
+            val cleanTag = when (rawTag) {
+                "b+ur+Latn" -> "ur-Latn"
+                "zh-Hans" -> "zh-CN"
+                else -> rawTag
+            }
+            if (cleanTag != rawTag) {
+                prefs.edit().putString(KEY_APP_LANGUAGE_TAG, cleanTag).apply()
+            }
+            return cleanTag
         }
 
         // Auto-detect Mobile System Locale on first launch (minSdk = 24)
@@ -75,7 +86,7 @@ object AppPreferencesManager {
         val script = deviceLocale?.script ?: ""
 
         val matchedTag = when {
-            language.equals("ur", ignoreCase = true) && script.equals("Latn", ignoreCase = true) -> "b+ur+Latn"
+            language.equals("ur", ignoreCase = true) && script.equals("Latn", ignoreCase = true) -> "ur-Latn"
             language.equals("ur", ignoreCase = true) -> "ur"
             language.equals("es", ignoreCase = true) -> "es"
             language.equals("fr", ignoreCase = true) -> "fr"
@@ -86,14 +97,21 @@ object AppPreferencesManager {
             else -> "en" // Default fallback if mobile locale is unsupported
         }
 
+        prefs.edit().putString(KEY_APP_LANGUAGE_TAG, matchedTag).apply()
         return matchedTag
     }
 
     fun setAppLanguageTag(context: Context, languageTag: String) {
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        prefs.edit().putString(KEY_APP_LANGUAGE_TAG, languageTag).apply()
+        val cleanTag = when (languageTag) {
+            "b+ur+Latn" -> "ur-Latn"
+            "zh-Hans" -> "zh-CN"
+            else -> languageTag
+        }
 
-        val localeList = LocaleListCompat.forLanguageTags(languageTag)
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit().putString(KEY_APP_LANGUAGE_TAG, cleanTag).apply()
+
+        val localeList = LocaleListCompat.forLanguageTags(cleanTag)
         AppCompatDelegate.setApplicationLocales(localeList)
 
         (context as? Activity)?.recreate()

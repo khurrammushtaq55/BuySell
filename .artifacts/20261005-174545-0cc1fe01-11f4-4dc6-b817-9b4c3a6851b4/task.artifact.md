@@ -156,3 +156,8 @@
 	- [x] Implemented `handleSignOut` in `SettingsViewModel.kt` to trigger pre-logout sync push and check `sync_outbox`.
 	- [x] Added **Unsynced Data Warning Alert Dialog** in `SettingsScreen.kt` displaying unsynced count with options to retry sync or confirm data discard.
 	- [x] Added localized strings (`settings_unsynced_warning_title`, `settings_unsynced_warning_msg`, `settings_btn_try_sync`, `settings_btn_discard_signout`) across all 8 locale folders.
+- [x] Unified Language Management & BCP-47 Tag Fix (ur-Latn & zh-CN)
+	- [x] Normalized Roman Urdu language tag from `"b+ur+Latn"` to standard BCP-47 `"ur-Latn"`, and Chinese tag to `"zh-CN"`.
+	- [x] Added automatic migration logic in `AppPreferencesManager.kt` to seamlessly convert legacy saved `"b+ur+Latn"` / `"zh-Hans"` preferences to `"ur-Latn"` / `"zh-CN"`.
+	- [x] Unified `supportedLanguages` in `AppPreferencesManager` as single source of truth and delegated `LocaleManagerUtil` to it.
+	- [x] Updated `locales_config.xml` entries to `<locale android:name="ur-Latn"/>` and `<locale android:name="zh-CN"/>`.
