@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">حفیظ سینٹر خرید و فروخت</string>
+    <string name="app_name">BuySell360</string>
     <string name="login_tagline">اپنی دکان کا حساب اور اسٹاک محفوظ رکھیں</string>
     <string name="login_btn_google">گوگل سے لاگ ان کریں</string>
     <string name="login_or_email">یا ای میل سے لاگ ان کریں</string>

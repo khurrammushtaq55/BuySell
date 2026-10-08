@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">حفيظ سنتر للبيع والشراء</string>
+    <string name="app_name">BuySell360</string>
     <string name="login_tagline">حافظ على سلامة حساباتك ومخزونك</string>
     <string name="login_btn_google">تسجيل الدخول باستخدام Google</string>
     <string name="login_or_email">أو تسجيل الدخول بالبريد الإلكتروني</string>

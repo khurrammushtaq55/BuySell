@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Hafeez Center Achat/Vente</string>
+    <string name="app_name">BuySell360</string>
     <string name="login_tagline">Gardez vos comptes et votre stock en sécurité</string>
     <string name="login_btn_google">Se connecter avec Google</string>
     <string name="login_or_email">ou Se connecter par e-mail</string>

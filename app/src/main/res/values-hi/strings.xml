@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">हफ़ीज़ सेंटर खरीद/बिक्री</string>
+    <string name="app_name">BuySell360</string>
     <string name="login_tagline">अपनी दुकान का हिसाब और स्टॉक सुरक्षित रखें</string>
     <string name="login_btn_google">गूगल से लॉगिन करें</string>
     <string name="login_or_email">या ईमेल से लॉगिन करें</string>

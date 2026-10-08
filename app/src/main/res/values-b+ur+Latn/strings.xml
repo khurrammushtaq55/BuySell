@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Hafeez Center Buy/Sell</string>
+    <string name="app_name">BuySell360</string>
     <string name="login_tagline">Apni dukan ka hisaab aur stock mehfooz rakhein</string>
     <string name="login_btn_google">Google se login karein</string>
     <string name="login_or_email">ya Email se login karein</string>
