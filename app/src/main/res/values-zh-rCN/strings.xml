@@ -131,7 +131,7 @@
     <string name="settings_team_code">团队邀请码</string>
     <string name="settings_app_pin">应用 PIN 码锁</string>
     <string name="settings_sign_out">退出登录</string>
-    <string name="login_welcome">欢迎使用 Hafeez Center 设备追踪器</string>
+    <string name="login_welcome">欢迎使用 %1$s</string>
     <string name="login_subtitle">将您的店铺账oon与买卖业务数字化</string>
     <string name="login_email">电子邮箱地址</string>
     <string name="login_password">密码</string>
@@ -151,7 +151,7 @@
     <string name="stock_close_dialog">关闭</string>
     <string name="stock_qty_label">数量: %1$s</string>
     <string name="stock_in_stock_label">现货</string>
-    <string name="home_title">Hafeez Center 追踪器</string>
+    <string name="home_title">%1$s</string>
     <string name="home_welcome_role">已作为 %1$s 登录</string>
     <string name="dashboard_total_profit">总净利润</string>
     <string name="dashboard_total_stock_value">库存总价值</string>
@@ -250,7 +250,7 @@
     <string name="login_err_auth_failed">身份验证失败</string>
     <string name="onboarding_select_lang_title">选择应用语言 / Choose Language</string>
     <string name="onboarding_select_lang_sub">选择您偏好的店铺管理语言</string>
-    <string name="welcome_landing_title">欢迎使用 BuySell360</string>
+    <string name="welcome_landing_title">欢迎使用 %1$s</string>
     <string name="welcome_landing_sub">您的全功能店铺账本、库存与团队管理应用</string>
     <string name="welcome_feature_1_title">即时买卖记录</string>
     <string name="welcome_feature_1_sub">支持带收据的设备采购、销售与置换记录</string>
@@ -276,4 +276,13 @@
     <string name="settings_partner_invite_title">非执行合伙人邀请码</string>
     <string name="settings_partner_invite_sub">生成 8 位邀请码以允许合伙人查看仪表板与利润</string>
     <string name="settings_shop_profile_owner_only_notice">仅限店员/店主：只有店主才能修改店铺资料</string>
+    <string name="rating_dialog_title">喜欢 %1$s 吗？</string>
+    <string name="rating_dialog_sub">您的反馈能帮助我们为店主提供更优秀的功能！请在 Google Play 上为我们评分。</string>
+    <string name="rating_btn_rate">前往 Google Play 评分</string>
+    <string name="rating_btn_later">稍后再说</string>
+    <string name="rating_checkbox_never_show">不再提示</string>
+    <string name="rating_toast_thank_you">非常感谢您的评分与反馈！</string>
+    <string name="settings_invite_share_msg">您已收到加入 %1$s 应用程序 (%2$s) 的邀请码: %3$s。</string>
+    <string name="export_backup_data_title">%1$s 导出备份数据</string>
+    <string name="settings_footer_version">%1$s v1.0 (Build 1) • 身份: %2$s</string>
 </resources>

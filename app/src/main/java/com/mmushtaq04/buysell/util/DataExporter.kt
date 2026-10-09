@@ -100,8 +100,8 @@ object DataExporter {
                 val shareIntent = Intent(Intent.ACTION_SEND).apply {
                     type = "application/zip"
                     putExtra(Intent.EXTRA_STREAM, contentUri)
-                    putExtra(Intent.EXTRA_SUBJECT, "BuySell Data Backup ZIP ($timeStamp)")
-                    putExtra(Intent.EXTRA_TEXT, "Hafeez Center BuySell App Export Backup Data")
+                    putExtra(Intent.EXTRA_SUBJECT, "${context.getString(com.mmushtaq04.buysell.R.string.app_name)} Backup Data ZIP ($timeStamp)")
+                    putExtra(Intent.EXTRA_TEXT, context.getString(com.mmushtaq04.buysell.R.string.export_backup_data_title, context.getString(com.mmushtaq04.buysell.R.string.app_name)))
                     addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 }
                 context.startActivity(Intent.createChooser(shareIntent, "Share or Save ZIP Backup"))

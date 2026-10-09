@@ -180,6 +180,7 @@ class BuyViewModel(application: Application) : AndroidViewModel(application) {
             }
 
             SyncWorker.enqueueOneTimeSync(getApplication())
+            com.mmushtaq04.buysell.util.RatingManager.recordInteraction(getApplication())
             Log.i(TAG, "✓ savePurchase completed and background sync enqueued.")
             onSuccess()
         }

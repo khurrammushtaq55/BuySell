@@ -131,7 +131,7 @@
     <string name="settings_team_code">Code d\'Invitation de l\'Équipe</string>
     <string name="settings_app_pin">Verrouillage par Code PIN</string>
     <string name="settings_sign_out">Se Déconnecter</string>
-    <string name="login_welcome">Bienvenue sur Hafeez Center Device Tracker</string>
+    <string name="login_welcome">Bienvenue sur %1$s</string>
     <string name="login_subtitle">Numérisez la comptabilité et les ventes de votre magasin</string>
     <string name="login_email">Adresse e-mail</string>
     <string name="login_password">Mot de passe</string>
@@ -151,7 +151,7 @@
     <string name="stock_close_dialog">Fermer</string>
     <string name="stock_qty_label">Qté: %1$s</string>
     <string name="stock_in_stock_label">En stock</string>
-    <string name="home_title">Hafeez Center Tracker</string>
+    <string name="home_title">%1$s</string>
     <string name="home_welcome_role">Connecté en tant que %1$s</string>
     <string name="dashboard_total_profit">Bénéfice net total</string>
     <string name="dashboard_total_stock_value">Valeur du stock</string>
@@ -250,7 +250,7 @@
     <string name="login_err_auth_failed">Échec de l\'authentification</string>
     <string name="onboarding_select_lang_title">Choisir la langue / Choose Language</string>
     <string name="onboarding_select_lang_sub">Choisissez votre langue préférée pour la gestion du magasin</string>
-    <string name="welcome_landing_title">Bienvenue sur BuySell360</string>
+    <string name="welcome_landing_title">Bienvenue sur %1$s</string>
     <string name="welcome_landing_sub">Votre application complète de livre de comptes, stock et gestion d\'équipe</string>
     <string name="welcome_feature_1_title">Enregistrement Instantané des Achats et Ventes</string>
     <string name="welcome_feature_1_sub">Enregistrez vos achats, ventes et échanges avec des reçus instantanés</string>
@@ -276,4 +276,13 @@
     <string name="settings_partner_invite_title">Code d\'Invitation Associé</string>
     <string name="settings_partner_invite_sub">Générez un code à 8 chiffres pour l\'accès au tableau de bord associé</string>
     <string name="settings_shop_profile_owner_only_notice">Seul le propriétaire de la boutique peut modifier les détails</string>
+    <string name="rating_dialog_title">Vous aimez %1$s ?</string>
+    <string name="rating_dialog_sub">Vos avis nous aident à améliorer l\'application pour les commerçants ! Donnez-nous une note sur Google Play.</string>
+    <string name="rating_btn_rate">Noter sur Google Play</string>
+    <string name="rating_btn_later">Plus tard</string>
+    <string name="rating_checkbox_never_show">Ne plus afficher</string>
+    <string name="rating_toast_thank_you">Merci beaucoup pour votre note et votre avis !</string>
+    <string name="settings_invite_share_msg">Vous avez reçu un code pour rejoindre %1$s en tant que %2$s: %3$s.</string>
+    <string name="export_backup_data_title">Données de sauvegarde %1$s</string>
+    <string name="settings_footer_version">%1$s v1.0 (Build 1) • Rôle: %2$s</string>
 </resources>

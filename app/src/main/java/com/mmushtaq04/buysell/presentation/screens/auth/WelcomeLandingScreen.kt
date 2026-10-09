@@ -141,7 +141,7 @@ fun WelcomeLandingScreen(
             }
 
             Text(
-                text = stringResource(R.string.welcome_landing_title),
+                text = stringResource(R.string.welcome_landing_title, stringResource(R.string.app_name)),
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center

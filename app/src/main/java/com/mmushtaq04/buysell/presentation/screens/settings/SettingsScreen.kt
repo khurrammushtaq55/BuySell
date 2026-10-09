@@ -151,7 +151,8 @@ fun SettingsScreen(
                             Button(
                                 onClick = {
                                     val roleLabel = if (isStaffInvite) "Staff Member" else "Sleeping Partner"
-                                    val shareMsg = "Aap ko BuySell360 App par $roleLabel join karne ka Code bheja gaya hai: $activeInviteCode."
+                                    val appNameStr = context.getString(R.string.app_name)
+                                    val shareMsg = context.getString(R.string.settings_invite_share_msg, appNameStr, roleLabel, activeInviteCode)
                                     val intent = Intent(Intent.ACTION_SEND).apply {
                                         type = "text/plain"
                                         putExtra(Intent.EXTRA_TEXT, shareMsg)
@@ -669,7 +670,7 @@ fun SettingsScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "BuySell360 v1.0 (Build 1) • Role: $userRole",
+                    text = stringResource(R.string.settings_footer_version, stringResource(R.string.app_name), userRole),
                     fontSize = 12.sp,
                     color = Color.Gray
                 )

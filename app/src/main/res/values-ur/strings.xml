@@ -131,7 +131,7 @@
     <string name="settings_team_code">ٹیم ممبر کا جوائن کوڈ</string>
     <string name="settings_app_pin">ایپ پن لاک</string>
     <string name="settings_sign_out">لاگ آؤٹ</string>
-    <string name="login_welcome">حفیظ سینٹر ڈیوائس ٹریکر میں خوش آمدید</string>
+    <string name="login_welcome">%1$s میں خوش آمدید</string>
     <string name="login_subtitle">دکان کا حساب کتاب اور خرید و فروخت ڈیجیٹل کریں</string>
     <string name="login_email">ای میل ایڈریس</string>
     <string name="login_password">پاس ورڈ</string>
@@ -151,7 +151,7 @@
     <string name="stock_close_dialog">بند کریں (Close)</string>
     <string name="stock_qty_label">تعداد: %1$s</string>
     <string name="stock_in_stock_label">سٹاک میں موجود</string>
-    <string name="home_title">حفیظ سینٹر ٹریکر</string>
+    <string name="home_title">%1$s</string>
     <string name="home_welcome_role">لاگ ان بطور %1$s</string>
     <string name="dashboard_total_profit">کل صافی منافع (Net Profit)</string>
     <string name="dashboard_total_stock_value">سٹاک کی مالیت (Stock Value)</string>
@@ -250,7 +250,7 @@
     <string name="login_err_auth_failed">تصدیق ناکام ہو گئی</string>
     <string name="onboarding_select_lang_title">زبان منتخب کریں / Choose Language</string>
     <string name="onboarding_select_lang_sub">دکان کا حساب کتاب چلانے کے لیے اپنی پسندیدہ زبان منتخب کریں</string>
-    <string name="welcome_landing_title">BuySell360 میں خوش آمدید</string>
+    <string name="welcome_landing_title">%1$s میں خوش آمدید</string>
     <string name="welcome_landing_sub">آپ کی دکان کا مکمل کھاتہ، سٹاک اور ٹیم مینجمنٹ ایپ</string>
     <string name="welcome_feature_1_title">فوری خرید و فروخت کا اندراج</string>
     <string name="welcome_feature_1_sub">ڈیوائس کی خرید، فروخت اور ایکسچینج کا فوری حساب بذریعہ رسید</string>
@@ -276,4 +276,13 @@
     <string name="settings_partner_invite_title">سلیپنگ پارٹنر انوائٹ کوڈ</string>
     <string name="settings_partner_invite_sub">سلیپنگ پارٹنر کو ڈیش بورڈ اور منافع دکھانے کے لیے کوڈ بنائیں</string>
     <string name="settings_shop_profile_owner_only_notice">صرف دکان کا مالک شاپ کی تفصیلات تبدیل کر سکتا ہے</string>
+    <string name="rating_dialog_title">%1$s ایپ کیسی لگی؟</string>
+    <string name="rating_dialog_sub">آپ کی رائے ہمیں شاپ اونرز کے لیے ایپ کو مزید بہتر بنانے میں مدد دیتی ہے! براہ کرم گوگل پلے اسٹور پر ریٹنگ دیں۔</string>
+    <string name="rating_btn_rate">گوگل پلے پر ریٹنگ دیں</string>
+    <string name="rating_btn_later">بعد میں</string>
+    <string name="rating_checkbox_never_show">دوبارہ نہ دکھائیں</string>
+    <string name="rating_toast_thank_you">آپ کی ریٹنگ اور رائے کا بہت شکریہ!</string>
+    <string name="settings_invite_share_msg">آپ کو %1$s ایپ پر %2$s جوائن کرنے کا کوڈ بھیجا گیا ہے: %3$s۔</string>
+    <string name="export_backup_data_title">%1$s ایپ ایکسپورٹ بیک اپ ڈیٹا</string>
+    <string name="settings_footer_version">%1$s v1.0 (Build 1) • عہدہ: %2$s</string>
 </resources>

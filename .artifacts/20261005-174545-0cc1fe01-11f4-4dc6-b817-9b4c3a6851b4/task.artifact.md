@@ -189,3 +189,10 @@
 - [x] Clear 4-Digit PIN Lock on Sign Out
 	- [x] Added `AppPinManager.clearPin(getApplication())` inside `executeForceSignOut` in `SettingsViewModel.kt`.
 	- [x] Guaranteed complete teardown of PIN lock hash/salt, local database cache, and Firebase Auth session upon sign-out.
+- [x] Google In-App Review & Custom Rating Dialog Integration
+	- [x] Integrated `ReviewManagerFactory` in `RatingManager.kt` with `KEY_NEVER_SHOW_AGAIN` SharedPreferences persistence.
+	- [x] Created Material 3 `InAppRatingDialog.kt` with gold 5-star interactive rating, Google Play button, "Maybe Later", and "Don't show again" checkbox.
+	- [x] Added high-frequency milestone triggers after Buy, Sell, and Exchange transactions and on HomeScreen visits.
+- [x] Dynamic App Name Architecture (R.string.app_name Single Source of Truth)
+	- [x] Refactored all XML string resources (`login_welcome`, `home_title`, `welcome_landing_title`, `rating_dialog_title`, `settings_footer_version`, `settings_invite_share_msg`, `export_backup_data_title`) across all 8 locale folders to use `%1$s` specifiers for `R.string.app_name`.
+	- [x] Updated `WelcomeLandingScreen`, `LoginScreen`, `HomeScreen`, `SettingsScreen`, `InAppRatingDialog`, and `DataExporter` to dynamically format `R.string.app_name`.

@@ -15,8 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.HelpOutline
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,9 +26,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import android.app.Activity
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import com.mmushtaq04.buysell.R
+import com.mmushtaq04.buysell.presentation.components.InAppRatingDialog
 import com.mmushtaq04.buysell.ui.theme.BuySellTheme
+import com.mmushtaq04.buysell.util.RatingManager
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,6 +52,36 @@ fun HomeScreen(
 ) {
     val context = LocalContext.current
     val isPartner = userRole.equals("Partner", ignoreCase = true)
+
+    var showRatingDialog by remember {
+        mutableStateOf(RatingManager.shouldShowRatingPrompt(context))
+    }
+
+    if (showRatingDialog) {
+        InAppRatingDialog(
+            onRateClick = { ratingStars, neverShowAgain ->
+                showRatingDialog = false
+                RatingManager.resetInteractionCount(context)
+                if (neverShowAgain) {
+                    RatingManager.setNeverShowAgain(context, true)
+                }
+                Toast.makeText(context, context.getString(R.string.rating_toast_thank_you), Toast.LENGTH_SHORT).show()
+                val activity = context as? Activity
+                if (activity != null) {
+                    RatingManager.launchGoogleInAppReview(activity)
+                } else {
+                    RatingManager.openPlayStorePage(context)
+                }
+            },
+            onDismiss = { neverShowAgain ->
+                showRatingDialog = false
+                RatingManager.resetInteractionCount(context)
+                if (neverShowAgain) {
+                    RatingManager.setNeverShowAgain(context, true)
+                }
+            }
+        )
+    }
 
     // Android 13+ (API 33+) Runtime Notification Permission Request
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {

@@ -174,6 +174,7 @@ class SellViewModel(application: Application) : AndroidViewModel(application) {
 
             // 5. Enqueue Non-Blocking Background SyncWorker
             SyncWorker.enqueueOneTimeSync(getApplication())
+            com.mmushtaq04.buysell.util.RatingManager.recordInteraction(getApplication())
             Log.i(TAG, "✓ saveSale completed and background sync enqueued.")
             onSuccess()
         }

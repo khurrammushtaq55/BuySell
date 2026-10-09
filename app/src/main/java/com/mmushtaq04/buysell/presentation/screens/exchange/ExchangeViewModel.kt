@@ -195,6 +195,7 @@ class ExchangeViewModel(application: Application) : AndroidViewModel(application
             }
 
             SyncWorker.enqueueOneTimeSync(getApplication())
+            com.mmushtaq04.buysell.util.RatingManager.recordInteraction(getApplication())
             Log.i(TAG, "✓ processExchange completed and background sync enqueued.")
             onSuccess()
         }

@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="app_name">BuySell360</string>
-    <string name="login_welcome">Welcome to Hafeez Center Device Tracker</string>
+    <string name="login_welcome">Welcome to %1$s</string>
     <string name="login_subtitle">Digitize your shop ledger, purchases, and sales</string>
     <string name="login_email">Email Address</string>
     <string name="login_password">Password</string>
@@ -118,7 +118,7 @@
     <string name="label_old_phone_price">Old Item Agreed Value (Rs) *</string>
     <string name="label_customer_name">Customer Name *</string>
     <string name="label_cash_paid">Cash Received / Paid (Rs)</string>
-    <string name="home_title">Hafeez Center Tracker</string>
+    <string name="home_title">%1$s</string>
     <string name="home_welcome_role">Logged in as %1$s</string>
     <string name="home_today_sales">Today Total Sales:</string>
     <string name="home_role_cloud_sync">Role: %1$s • Cloud Sync Active ✓</string>
@@ -250,7 +250,7 @@
     <string name="login_err_auth_failed">Authentication failed</string>
     <string name="onboarding_select_lang_title">Choose App Language</string>
     <string name="onboarding_select_lang_sub">Select your preferred language for store management</string>
-    <string name="welcome_landing_title">Welcome to BuySell360</string>
+    <string name="welcome_landing_title">Welcome to %1$s</string>
     <string name="welcome_landing_sub">Your complete shop ledger, stock, and team management app</string>
     <string name="welcome_feature_1_title">Instant Buy &amp; Sell Recording</string>
     <string name="welcome_feature_1_sub">Record purchases, sales, and trade-ins with instant receipts</string>
@@ -275,4 +275,13 @@
     <string name="settings_partner_invite_title">Sleeping Partner Invite Code</string>
     <string name="settings_partner_invite_sub">Generate an 8-digit invite code for sleeping partners to view dashboard and profits</string>
     <string name="settings_shop_profile_owner_only_notice">Only the Shop Owner can edit store details</string>
+    <string name="rating_dialog_title">Enjoying %1$s?</string>
+    <string name="rating_dialog_sub">Your feedback helps us make device tracking even better for shop owners! Please give us a rating on Google Play Store.</string>
+    <string name="rating_btn_rate">Rate on Google Play</string>
+    <string name="rating_btn_later">Maybe Later</string>
+    <string name="rating_checkbox_never_show">Don\'t show this again</string>
+    <string name="rating_toast_thank_you">Thank you for your rating and feedback!</string>
+    <string name="settings_invite_share_msg">You have been sent an invite code to join %1$s App as %2$s: %3$s.</string>
+    <string name="export_backup_data_title">%1$s App Export Backup Data</string>
+    <string name="settings_footer_version">%1$s v1.0 (Build 1) • Role: %2$s</string>
 </resources>
