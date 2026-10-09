@@ -210,6 +210,10 @@
 	- [x] Resolved stock purchase cost = 0 issue in Sell and Exchange wizards by resolving real purchase cost from `TxnDao.getUnitPriceByLineId(purchaseLineId)` in `SellViewModel` & `ExchangeViewModel`.
 	- [x] Added reactive Flow observation for txns, expenses, and stock items in `OwnerDashboardViewModel` so newly added expenses reflect instantly.
 	- [x] Added reactive Flow observation for txns in `HomeViewModel` so Today Sales count and amount update instantly upon recording a sale.
-- [x] Loan Client Payment Collection & Khata Ledger System
-	- [x] Built `PartyLedgerScreen.kt` and `PartyLedgerViewModel.kt` displaying net udhaar balance ("Lene Hain" / "Dene Hain"), chronological ledger history, and Wasooli / Payment Entry dialog.
-	- [x] Added `+ Naya Customer / Supplier` dialog on `PartyListScreen.kt` and wired `NavRoutes.PartyLedger` in `MainNavGraph.kt`.
+- [x] Contextual Party Ledger & Payment Wasooli Enhancements
+	- [x] Implemented contextual button rendering on `PartyLedgerScreen.kt`: shows ONLY `Wasooli (+)` when customer owes shop (`balance > 0`), shows ONLY `Payment Di (-)` when shop owes customer (`balance < 0`), and hides payment buttons showing `Account Settled` badge when balance is `0`.
+	- [x] Added TopAppBar direct phone dialer and WhatsApp statement & udhaar reminder sharing.
+	- [x] Added Compose `@Preview` functions for both `Owed` and `Settled` states in `PartyLedgerScreen.kt`.
+- [x] Pure Locale String Separation & Hardcoded String Clean-Up
+	- [x] Converted default `res/values/strings.xml` to pure, professional English text without slashes or mixed Roman Urdu.
+	- [x] Extracted all remaining string literals in `PartyLedgerScreen.kt` and `PartyLedgerViewModel.kt` into localized string resources across all 8 locale folders.
