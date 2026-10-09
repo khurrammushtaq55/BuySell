@@ -38,6 +38,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     init {
         loadHomeData()
+        observeTodaySales()
     }
 
     fun loadHomeData() {
@@ -90,23 +91,40 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 }
             }
 
-            val cal = Calendar.getInstance().apply {
-                set(Calendar.HOUR_OF_DAY, 0)
-                set(Calendar.MINUTE, 0)
-                set(Calendar.SECOND, 0)
-                set(Calendar.MILLISECOND, 0)
-            }
-            val startOfDay = cal.timeInMillis
-            val endOfDay = startOfDay + 24 * 60 * 60 * 1000L - 1L
-
-            val salesCount = if (activeShopId.isNotBlank()) db.txnDao().getTodaySalesCount(activeShopId, startOfDay, endOfDay) else 0
-            val salesAmountPaisa = if (activeShopId.isNotBlank()) db.txnDao().getTodaySalesAmountPaisa(activeShopId, startOfDay, endOfDay) else 0L
-
             _uiState.value = _uiState.value.copy(
-                shopName = localShop?.name ?: "Mera Store",
-                todaySalesCount = salesCount,
-                todaySalesAmountPaisa = salesAmountPaisa
+                shopName = localShop?.name ?: "Mera Store"
             )
+        }
+    }
+
+    private fun observeTodaySales() {
+        viewModelScope.launch {
+            val primaryUser = db.userDao().getPrimaryUser()
+            val existingMeta = db.appMetaDao().getAppMeta()
+            val activeShopId = existingMeta?.activeShopId?.ifBlank { null }
+                ?: primaryUser?.shopId?.ifBlank { null }
+                ?: ""
+
+            if (activeShopId.isBlank()) return@launch
+
+            db.txnDao().observeTxns(activeShopId).collect {
+                val cal = Calendar.getInstance().apply {
+                    set(Calendar.HOUR_OF_DAY, 0)
+                    set(Calendar.MINUTE, 0)
+                    set(Calendar.SECOND, 0)
+                    set(Calendar.MILLISECOND, 0)
+                }
+                val startOfDay = cal.timeInMillis
+                val endOfDay = startOfDay + 24 * 60 * 60 * 1000L - 1L
+
+                val salesCount = db.txnDao().getTodaySalesCount(activeShopId, startOfDay, endOfDay)
+                val salesAmountPaisa = db.txnDao().getTodaySalesAmountPaisa(activeShopId, startOfDay, endOfDay)
+
+                _uiState.value = _uiState.value.copy(
+                    todaySalesCount = salesCount,
+                    todaySalesAmountPaisa = salesAmountPaisa
+                )
+            }
         }
     }
 

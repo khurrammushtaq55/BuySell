@@ -13,6 +13,7 @@ import com.mmushtaq04.buysell.data.local.enums.*
 import com.mmushtaq04.buysell.data.repository.*
 import com.mmushtaq04.buysell.data.sync.SyncWorker
 import com.mmushtaq04.buysell.domain.model.*
+import com.mmushtaq04.buysell.presentation.screens.sell.SimpleStockItem
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,6 +27,9 @@ class ExchangeViewModel(application: Application) : AndroidViewModel(application
 
     private val _stockItems = MutableStateFlow<List<StockItem>>(emptyList())
     val stockItems: StateFlow<List<StockItem>> = _stockItems.asStateFlow()
+
+    private val _simpleStockList = MutableStateFlow<List<SimpleStockItem>>(emptyList())
+    val simpleStockList: StateFlow<List<SimpleStockItem>> = _simpleStockList.asStateFlow()
 
     companion object {
         private const val TAG = "ExchangeViewModel"
@@ -43,6 +47,20 @@ class ExchangeViewModel(application: Application) : AndroidViewModel(application
             if (shopId.isNotBlank()) {
                 stockRepository.observeInStockItems(shopId).collect { items ->
                     _stockItems.value = items
+
+                    val simpleList = items.map { item ->
+                        val costPaisa = if (item.purchaseLineId != null) {
+                            db.txnDao().getUnitPriceByLineId(item.purchaseLineId) ?: 0L
+                        } else 0L
+
+                        SimpleStockItem(
+                            id = item.id,
+                            title = "${item.brand} ${item.model}".trim(),
+                            imei = item.identifier ?: "N/A",
+                            cost = costPaisa / 100
+                        )
+                    }
+                    _simpleStockList.value = simpleList
                 }
             }
         }

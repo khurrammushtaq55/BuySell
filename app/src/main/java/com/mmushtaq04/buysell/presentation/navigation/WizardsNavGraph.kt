@@ -58,15 +58,7 @@ fun NavGraphBuilder.wizardsNavGraph(
 
     composable(NavRoutes.SellWizard.route) {
         val sellViewModel: SellViewModel = viewModel()
-        val stockItems by sellViewModel.stockItems.collectAsState()
-        val simpleStockList = stockItems.map {
-            SimpleStockItem(
-                id = it.id,
-                title = "${it.brand} ${it.model}",
-                imei = it.identifier ?: "N/A",
-                cost = 0L
-            )
-        }
+        val simpleStockList by sellViewModel.simpleStockList.collectAsState()
 
         SellWizardScreen(
             stockList = simpleStockList,
@@ -97,15 +89,7 @@ fun NavGraphBuilder.wizardsNavGraph(
         val activeCategories by categoryViewModel.enabledCategories.collectAsState()
         val enabledCategoryNames = activeCategories.filter { it.enabled }.map { it.name }
 
-        val stockItems by exchangeViewModel.stockItems.collectAsState()
-        val simpleStockList = stockItems.map {
-            SimpleStockItem(
-                id = it.id,
-                title = "${it.brand} ${it.model}",
-                imei = it.identifier ?: "N/A",
-                cost = 0L
-            )
-        }
+        val simpleStockList by exchangeViewModel.simpleStockList.collectAsState()
 
         ExchangeWizardScreen(
             stockList = simpleStockList,

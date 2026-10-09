@@ -25,7 +25,7 @@
 - [x] Phase 4 (P4 & P4b): Dashboard, Reports, Export & UX Pass
 	- [x] Owner/Partner Dashboard metrics (`OwnerDashboardScreen.kt`)
 	- [x] On-device PDF receipt generator (`PdfReceiptGenerator.kt` + WhatsApp share)
-	- [x] In-app Help screen (`HelpScreen.kt` - 7 core topics)
+	- [x] In-app Help screen (`HelpScreen.kt` - 10 topics)
 	- [x] §19 UX Pass: Plain language UI, big touch targets
 	- [x] Compose UI Screens (Home, Buy Wizard, Sell Wizard, Stock List, Khata/Party List, Settings)
 - [x] Phase 5 (P5): Notifications, Localization & Release Polish
@@ -204,3 +204,9 @@
 	- [x] Capital Locked in Stock and Slow Moving Stock (>30 days).
 	- [x] Dedicated `ExpenseListScreen` with `ExpenseViewModel`, category filtering (Rent, Electricity, Salary, Repair, Refreshment, Other), and `+ Naya Kharcha` dialog with instant Room DB write + outbox sync (`Scope.VAULT`).
 	- [x] Full multi-locale translation across all 8 language folders.
+- [x] Expanded Help Center Articles
+	- [x] Added Topic 8 (Shop Expenses & Operational Costs), Topic 9 (Financial Dashboard & Time Filters), and Topic 10 (App Security PIN & Themes) to `HelpScreen.kt` and all 8 locale resource files.
+- [x] Fix Stock Purchase Price, Expense Dashboard Reflection & Today Sales Counter
+	- [x] Resolved stock purchase cost = 0 issue in Sell and Exchange wizards by resolving real purchase cost from `TxnDao.getUnitPriceByLineId(purchaseLineId)` in `SellViewModel` & `ExchangeViewModel`.
+	- [x] Added reactive Flow observation for txns, expenses, and stock items in `OwnerDashboardViewModel` so newly added expenses reflect instantly.
+	- [x] Added reactive Flow observation for txns in `HomeViewModel` so Today Sales count and amount update instantly upon recording a sale.

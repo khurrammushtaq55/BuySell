@@ -52,7 +52,33 @@ class OwnerDashboardViewModel(application: Application) : AndroidViewModel(appli
     val uiState: StateFlow<DashboardUiState> = _uiState.asStateFlow()
 
     init {
-        loadMetrics(TimeRange.THIS_MONTH)
+        observeDatabaseChanges()
+    }
+
+    private fun observeDatabaseChanges() {
+        viewModelScope.launch {
+            val user = db.userDao().getPrimaryUser()
+            val meta = db.appMetaDao().getAppMeta()
+            val activeShopId = meta?.activeShopId?.ifBlank { null } ?: user?.shopId ?: ""
+
+            if (activeShopId.isBlank()) return@launch
+
+            launch {
+                db.txnDao().observeTxns(activeShopId).collect {
+                    loadMetrics(_uiState.value.timeRange)
+                }
+            }
+            launch {
+                db.expenseDao().observeExpenses(activeShopId).collect {
+                    loadMetrics(_uiState.value.timeRange)
+                }
+            }
+            launch {
+                db.stockItemDao().observeInStockItems(activeShopId).collect {
+                    loadMetrics(_uiState.value.timeRange)
+                }
+            }
+        }
     }
 
     fun setTimeRange(range: TimeRange) {

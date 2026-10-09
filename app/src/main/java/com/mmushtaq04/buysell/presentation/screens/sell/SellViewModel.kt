@@ -27,6 +27,9 @@ class SellViewModel(application: Application) : AndroidViewModel(application) {
     private val _stockItems = MutableStateFlow<List<StockItem>>(emptyList())
     val stockItems: StateFlow<List<StockItem>> = _stockItems.asStateFlow()
 
+    private val _simpleStockList = MutableStateFlow<List<SimpleStockItem>>(emptyList())
+    val simpleStockList: StateFlow<List<SimpleStockItem>> = _simpleStockList.asStateFlow()
+
     companion object {
         private const val TAG = "SellViewModel"
     }
@@ -43,6 +46,20 @@ class SellViewModel(application: Application) : AndroidViewModel(application) {
             if (shopId.isNotBlank()) {
                 stockRepository.observeInStockItems(shopId).collect { items ->
                     _stockItems.value = items
+
+                    val simpleList = items.map { item ->
+                        val costPaisa = if (item.purchaseLineId != null) {
+                            db.txnDao().getUnitPriceByLineId(item.purchaseLineId) ?: 0L
+                        } else 0L
+
+                        SimpleStockItem(
+                            id = item.id,
+                            title = "${item.brand} ${item.model}".trim(),
+                            imei = item.identifier ?: "N/A",
+                            cost = costPaisa / 100
+                        )
+                    }
+                    _simpleStockList.value = simpleList
                 }
             }
         }
