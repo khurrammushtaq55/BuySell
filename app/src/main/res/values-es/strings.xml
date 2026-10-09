@@ -338,4 +338,6 @@
     <string name="settings_store_currency_sub">Elija el símbolo de moneda utilizado en recibos, informes y transacciones</string>
     <string name="settings_custom_currency_dialog_title">Ingrese un símbolo de moneda personalizado</string>
     <string name="settings_custom_currency_label">Símbolo de moneda (ej. KSh, Tk, QAR, $)</string>
+    <string name="notif_overdue_title">Alerta de Pagos Vencidos</string>
+    <string name="notif_overdue_msg">%1$d compromisos de pago han vencido. Por favor revise el registro de cuentas.</string>
 </resources>

@@ -338,4 +338,6 @@
     <string name="settings_store_currency_sub">Receipts, reports aur history ke liye currency symbol choose karein</string>
     <string name="settings_custom_currency_dialog_title">Apni Currency Symbol Darj Karein</string>
     <string name="settings_custom_currency_label">Currency Symbol (e.g. KSh, Tk, QAR, $)</string>
+    <string name="notif_overdue_title">Late Udhaar Payments Warning</string>
+    <string name="notif_overdue_msg">%1$d payments ki date nikal gayi hai. Khata check karein.</string>
 </resources>

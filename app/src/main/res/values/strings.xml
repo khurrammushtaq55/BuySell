@@ -337,4 +337,6 @@
     <string name="settings_store_currency_sub">Choose currency symbol used across transactions, receipts and reports</string>
     <string name="settings_custom_currency_dialog_title">Enter Custom Currency Symbol</string>
     <string name="settings_custom_currency_label">Currency Symbol (e.g. KSh, Tk, QAR, $)</string>
+    <string name="notif_overdue_title">Overdue Payment Alert</string>
+    <string name="notif_overdue_msg">%1$d payment promises are past due date. Please check Khata ledger.</string>
 </resources>

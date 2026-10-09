@@ -338,4 +338,6 @@
     <string name="settings_store_currency_sub">रसीद, रिपोर्ट और इतिहास के लिए मुद्रा प्रतीक चुनें</string>
     <string name="settings_custom_currency_dialog_title">कस्टम मुद्रा प्रतीक दर्ज करें</string>
     <string name="settings_custom_currency_label">मुद्रा प्रतीक (जैसे KSh, Tk, QAR, $)</string>
+    <string name="notif_overdue_title">बकाया भुगतान चेतावनी</string>
+    <string name="notif_overdue_msg">%1$d भुगतानों की समय सीमा समाप्त हो गई है। कृपया खाता जांचें।</string>
 </resources>

@@ -229,3 +229,6 @@
 - [x] Complete Removal of Hardcoded Currency Strings Across All Locales
 	- [x] Removed all hardcoded `"Rs"`, `"Rs "`, `"(Rs)"` text from form labels, summary strings, and debt messages across all 8 locale resource files.
 	- [x] Refactored `SellWizardScreen` cost reveal and `ExpenseListScreen` cards to use `CurrencyFormatter`.
+- [x] Udhaar Reminder Notification Strings Extraction
+	- [x] Extracted `notif_overdue_title` and `notif_overdue_msg` across all 8 locale `strings.xml` files.
+	- [x] Updated `UdhaarReminderWorker.kt` to load string resources dynamically via `applicationContext.getString(R.string.notif_overdue_msg, overduePromises.size)`.

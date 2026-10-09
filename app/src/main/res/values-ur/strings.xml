@@ -338,4 +338,6 @@
     <string name="settings_store_currency_sub">رسیدوں، رپورٹس اور ہسٹری کے لیے کرنسی کی علامت منتخب کریں</string>
     <string name="settings_custom_currency_dialog_title">اپنی کرنسی کی علامت درج کریں</string>
     <string name="settings_custom_currency_label">کرنسی سمبل (مثلاً KSh, Tk, QAR, $)</string>
+    <string name="notif_overdue_title">باقی ادھار ادائیگیوں کی الرٹ</string>
+    <string name="notif_overdue_msg">%1$d ادائیگیوں کی تاریخ گزر چکی ہے۔ برائے مہربانی کھاتہ چیک کریں۔</string>
 </resources>

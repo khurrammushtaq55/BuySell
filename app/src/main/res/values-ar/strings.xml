@@ -338,4 +338,6 @@
     <string name="settings_store_currency_sub">اختر رمز العملة المستخدم في الفواتير والتقارير المعاملات</string>
     <string name="settings_custom_currency_dialog_title">إدخال رمز عملة مخصص</string>
     <string name="settings_custom_currency_label">رمز العملة (مثال: KSh, Tk, QAR, $)</string>
+    <string name="notif_overdue_title">تنبيه المدفوعات المتأخرة</string>
+    <string name="notif_overdue_msg">تجاوزت %1$d من المدفوعات تاريخ الاستحقاق. يرجى التحقق من دفتر الحسابات.</string>
 </resources>

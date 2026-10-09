@@ -338,4 +338,6 @@
     <string name="settings_store_currency_sub">选择交易、小票及报表中使用的货币符号</string>
     <string name="settings_custom_currency_dialog_title">输入自定义货币符号</string>
     <string name="settings_custom_currency_label">货币符号（例如：KSh、Tk、QAR、$）</string>
+    <string name="notif_overdue_title">逾期款项提醒</string>
+    <string name="notif_overdue_msg">有 %1$d 笔付款已超过约定日期，请检查账目记录。</string>
 </resources>

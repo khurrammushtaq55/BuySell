@@ -338,4 +338,6 @@
     <string name="settings_store_currency_sub">Choisissez le symbole de devise utilisé dans les reçus, rapports et transactions</string>
     <string name="settings_custom_currency_dialog_title">Entrez un symbole de devise personnalisé</string>
     <string name="settings_custom_currency_label">Symbole de devise (ex. KSh, Tk, QAR, $)</string>
+    <string name="notif_overdue_title">Alerte de Paiements en Retard</string>
+    <string name="notif_overdue_msg">%1$d promesses de paiement sont arrivées à échéance. Veuillez vérifier le livre de comptes.</string>
 </resources>

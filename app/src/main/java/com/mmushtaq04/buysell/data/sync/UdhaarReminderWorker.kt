@@ -48,10 +48,13 @@ class UdhaarReminderWorker(
         val overduePromises = db.paymentPromiseDao().observeOverduePromises(shopId, now).firstOrNull() ?: emptyList()
 
         if (overduePromises.isNotEmpty()) {
+            val title = applicationContext.getString(R.string.notif_overdue_title)
+            val msg = applicationContext.getString(R.string.notif_overdue_msg, overduePromises.size)
+
             val notification = NotificationCompat.Builder(applicationContext, AppNotificationManager.CHANNEL_REMINDERS)
                 .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle("Late Udhaar Payments Warning")
-                .setContentText("${overduePromises.size} payments date nikal gayi hain. Khata check karein.")
+                .setContentTitle(title)
+                .setContentText(msg)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .build()
 
