@@ -65,7 +65,7 @@
     <string name="label_brand_name">برانڈ کا نام *</string>
     <string name="label_model_name">ماڈل کا نام *</string>
     <string name="label_imei">آئی ایم ای آئی نمبر</string>
-    <string name="btn_save_purchase">محفوظ کریں ✓</string>
+    <string name="btn_save_purchase">محفوظ کریں</string>
     <string name="buy_select_category">کیٹیگری منتخب کریں:</string>
     <string name="buy_fill_device_details">ڈیوائس کی تفصیلات درج کریں:</string>
     <string name="buy_select_brand">برانڈ منتخب کریں:</string>
@@ -297,7 +297,7 @@
     <string name="dashboard_top_models">سب سے زیادہ فروخت ہونے والے ماڈل</string>
     <string name="dashboard_units_sold">%1$d فروخت • منافع: Rs %2$s</string>
     <string name="expense_title">دکان کے اخراجات</string>
-    <string name="expense_btn_add">+ نیا خرچہ درج کریں</string>
+    <string name="expense_btn_add">نیا خرچہ درج کریں</string>
     <string name="expense_dialog_title">نیا خرچہ درج کریں</string>
     <string name="expense_label_amount">خرچہ رقم (Rs) *</string>
     <string name="expense_label_category">کیٹیگری انتخاب کریں *</string>
@@ -309,4 +309,10 @@
     <string name="expense_category_refreshment">چائے اور کھانا</string>
     <string name="expense_category_other">دیگر اخراجات</string>
     <string name="expense_empty_msg">اس مدت کے لیے کوئی اخراجات درج نہیں ہیں۔</string>
+    <string name="help_topic_8_title">8. دکان کے اخراجات (کرایہ، بجلی بل، تنخواہ) کیسے درج کریں؟</string>
+    <string name="help_topic_8_desc">ڈیش بورڈ -&gt; \'دکان کے اخراجات\' کارڈ پر ٹیپ کریں۔ \'+ نیا خرچہ درج کریں\' بٹن دبائیں، رقم درج کریں اور کیٹیگری (کرایہ، بجلی بل، تنخواہ، مرمت، چائے) منتخب کر کے سیو کریں۔</string>
+    <string name="help_topic_9_title">9. ڈیش بورڈ پر خالص منافع (Net Profit) کیسے حساب ہوتا ہے؟</string>
+    <string name="help_topic_9_desc">ہوم ٹاپ بار پر ڈیش بورڈ آئیکن پر ٹیپ کریں۔ فلٹر منتخب کریں (آج، اس ہفتے، اس مہینے، اب تک)۔ خالص منافع = کل آمدنی منفی سامان کی خریداری لاگت منفی دکان کے اخراجات۔</string>
+    <string name="help_topic_10_title">10. ایپ کا 4 ہندسوں کا پن (PIN) اور ڈارک تھیم کیسے آن کریں؟</string>
+    <string name="help_topic_10_desc">سیٹنگز -&gt; \'زبان اور ترجیحات\' کھولیں اور لائٹ یا ڈارک تھیم منتخب کریں۔ سیٹنگز -&gt; \'سیکیورٹی\' پر جائیں اور ایپ لاک کے لیے 4 ہندسوں کا پن سیٹ کریں۔</string>
 </resources>

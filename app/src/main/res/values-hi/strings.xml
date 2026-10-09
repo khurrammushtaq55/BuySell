@@ -65,7 +65,7 @@
     <string name="label_brand_name">ब्रांड *</string>
     <string name="label_model_name">मॉडल *</string>
     <string name="label_imei">आईएमईआई / सीरियल नंबर</string>
-    <string name="btn_save_purchase">सेव करें ✓</string>
+    <string name="btn_save_purchase">सेव करें</string>
     <string name="buy_select_category">कैटेगरी चुनें:</string>
     <string name="buy_fill_device_details">डिवाइस की जानकारी भरें:</string>
     <string name="buy_select_brand">ब्रांड चुनें:</string>
@@ -297,7 +297,7 @@
     <string name="dashboard_top_models">सबसे ज्यादा बिकने वाले मॉडल</string>
     <string name="dashboard_units_sold">%1$d बिके • लाभ: Rs %2$s</string>
     <string name="expense_title">दुकान के खर्चे</string>
-    <string name="expense_btn_add">+ नया खर्चा जोड़ें</string>
+    <string name="expense_btn_add">नया खर्चा जोड़ें</string>
     <string name="expense_dialog_title">नया खर्चा दर्ज करें</string>
     <string name="expense_label_amount">खर्चा राशि (Rs) *</string>
     <string name="expense_label_category">श्रेणी चुनें *</string>
@@ -309,4 +309,10 @@
     <string name="expense_category_refreshment">चाय और नाश्ता</string>
     <string name="expense_category_other">अन्य खर्चे</string>
     <string name="expense_empty_msg">इस अवधि के लिए कोई खर्चे दर्ज नहीं हैं।</string>
+    <string name="help_topic_8_title">8. दुकान के खर्चे (किराया, बिजली, वेतन) कैसे दर्ज करें?</string>
+    <string name="help_topic_8_desc">डैशबोर्ड -&gt; \'दुकान के खर्चे\' कार्ड पर टैप करें। \'+ नया खर्चा जोड़ें\' बटन दबाएं, राशि दर्ज करें और श्रेणी (किराया, बिजली, वेतन, मरम्मत) चुनकर सेव करें।</string>
+    <string name="help_topic_9_title">9. डैशबोर्ड पर शुद्ध लाभ (Net Profit) की गणना कैसे होती है?</string>
+    <string name="help_topic_9_desc">होम टॉप बार पर डैशबोर्ड आइकन पर टैप करें। समय फ़िल्टर चुनें (आज, इस सप्ताह, इस महीने, अब तक)। शुद्ध लाभ = कुल बिक्री - खरीद लागत - दुकान के खर्चे।</string>
+    <string name="help_topic_10_title">10. ऐप सिक्योरिटी पिन (PIN) और थीम कैसे बदलें?</string>
+    <string name="help_topic_10_desc">सेटिंग्स -&gt; \'भाषा और प्राथमिकताएं\' में जाकर लाइट या डार्क थीम चुनें। सेटिंग्स -&gt; \'सुरक्षा\' में जाकर 4-अंकों का सिक्योरिटी पिन (PIN) सेट करें।</string>
 </resources>

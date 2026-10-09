@@ -65,7 +65,7 @@
     <string name="label_brand_name">Marca *</string>
     <string name="label_model_name">Modelo *</string>
     <string name="label_imei">Número IMEI / Serie</string>
-    <string name="btn_save_purchase">Guardar Compra ✓</string>
+    <string name="btn_save_purchase">Guardar Compra</string>
     <string name="buy_select_category">Seleccionar categoría:</string>
     <string name="buy_fill_device_details">Detalles del dispositivo:</string>
     <string name="buy_select_brand">Seleccionar marca:</string>
@@ -297,7 +297,7 @@
     <string name="dashboard_top_models">Modelos Más Vendidos</string>
     <string name="dashboard_units_sold">%1$d vendidos • Ganancia: Rs %2$s</string>
     <string name="expense_title">Gastos de la Tienda</string>
-    <string name="expense_btn_add">+ Agregar Gasto</string>
+    <string name="expense_btn_add">Agregar Gasto</string>
     <string name="expense_dialog_title">Registrar Nuevo Gasto</string>
     <string name="expense_label_amount">Monto del Gasto (Rs) *</string>
     <string name="expense_label_category">Seleccionar Categoría *</string>
@@ -309,4 +309,10 @@
     <string name="expense_category_refreshment">Refrigerios</string>
     <string name="expense_category_other">Otros Gastos</string>
     <string name="expense_empty_msg">No hay gastos registrados para este período.</string>
+    <string name="help_topic_8_title">8. ¿Cómo registrar los gastos de la tienda (alquiler, luz, sueldos)?</string>
+    <string name="help_topic_8_desc">Vaya a Panel -&gt; tarjeta \'Gastos Operativos\'. Toque \'+ Agregar Gasto\', ingrese el monto y seleccione la categoría (Alquiler, Luz, Sueldo, Reparación) y guarde.</string>
+    <string name="help_topic_9_title">9. ¿Cómo se calcula la ganancia neta en el Panel?</string>
+    <string name="help_topic_9_desc">Toque el icono de Panel en la barra superior. Elija el filtro (Hoy, Semana, Mes, Todo). Ganancia Neta = Ingresos Netos menos Costo de Ventas menos Gastos Operativos.</string>
+    <string name="help_topic_10_title">10. ¿Cómo configurar el PIN de seguridad y el tema?</string>
+    <string name="help_topic_10_desc">Vaya a Configuración -&gt; Preferencias para elegir el tema Claro u Oscuro. Vaya a Seguridad -&gt; PIN de la aplicación para establecer un PIN de 4 dígitos.</string>
 </resources>

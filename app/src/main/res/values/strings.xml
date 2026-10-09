@@ -73,7 +73,7 @@
     <string name="label_brand_name">Brand Name *</string>
     <string name="label_model_name">Model Name *</string>
     <string name="label_imei">IMEI / Serial Number</string>
-    <string name="btn_save_purchase">Save Purchase ✓</string>
+    <string name="btn_save_purchase">Save Purchase</string>
     <string name="buy_select_category">Select category:</string>
     <string name="buy_fill_device_details">Enter device details (Mandatory fields *):</string>
     <string name="buy_select_brand">Select brand:</string>
@@ -296,7 +296,7 @@
     <string name="dashboard_top_models">Top Selling Models</string>
     <string name="dashboard_units_sold">%1$d sold • Profit: Rs %2$s</string>
     <string name="expense_title">Shop Expenses</string>
-    <string name="expense_btn_add">+ Add Expense</string>
+    <string name="expense_btn_add">Add Expense</string>
     <string name="expense_dialog_title">Record New Expense</string>
     <string name="expense_label_amount">Expense Amount (Rs) *</string>
     <string name="expense_label_category">Category *</string>
@@ -308,4 +308,10 @@
     <string name="expense_category_refreshment">Tea &amp; Refreshments</string>
     <string name="expense_category_other">Other Expense</string>
     <string name="expense_empty_msg">No operational expenses recorded for this period.</string>
+    <string name="help_topic_8_title">8. How to record shop expenses (Rent, Electricity, Salary)?</string>
+    <string name="help_topic_8_desc">Go to Dashboard -&gt; Operational Expenses or tap Expenses card. Tap \'+ Add Expense\' button to enter amount and select category (Rent, Electricity, Salary, Repair, Refreshment, Other).</string>
+    <string name="help_topic_9_title">9. How is Net Profit calculated in Dashboard?</string>
+    <string name="help_topic_9_desc">Tap Dashboard on Home top bar. Choose filter (Today, Week, Month, All Time). Net Profit = Net Revenue (Sales minus Returns) minus COGS (Purchase Costs) minus Operational Expenses.</string>
+    <string name="help_topic_10_title">10. How to set App Security PIN &amp; Theme?</string>
+    <string name="help_topic_10_desc">Go to Settings -&gt; Language &amp; Preferences to choose System, Light, or Dark Theme. Go to Security -&gt; App PIN Lock to set a 4-digit PIN for cold start protection.</string>
 </resources>

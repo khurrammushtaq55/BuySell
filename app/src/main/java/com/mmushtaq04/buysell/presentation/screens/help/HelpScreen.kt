@@ -36,7 +36,10 @@ fun HelpScreen(
         HelpTopic(stringResource(R.string.help_topic_4_title), stringResource(R.string.help_topic_4_desc)),
         HelpTopic(stringResource(R.string.help_topic_5_title), stringResource(R.string.help_topic_5_desc)),
         HelpTopic(stringResource(R.string.help_topic_6_title), stringResource(R.string.help_topic_6_desc)),
-        HelpTopic(stringResource(R.string.help_topic_7_title), stringResource(R.string.help_topic_7_desc))
+        HelpTopic(stringResource(R.string.help_topic_7_title), stringResource(R.string.help_topic_7_desc)),
+        HelpTopic(stringResource(R.string.help_topic_8_title), stringResource(R.string.help_topic_8_desc)),
+        HelpTopic(stringResource(R.string.help_topic_9_title), stringResource(R.string.help_topic_9_desc)),
+        HelpTopic(stringResource(R.string.help_topic_10_title), stringResource(R.string.help_topic_10_desc))
     )
 
     if (selectedTopic != null) {

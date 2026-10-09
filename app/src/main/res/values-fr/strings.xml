@@ -65,7 +65,7 @@
     <string name="label_brand_name">Marque *</string>
     <string name="label_model_name">Modèle *</string>
     <string name="label_imei">Numéro IMEI / Série</string>
-    <string name="btn_save_purchase">Enregistrer l\'Achat ✓</string>
+    <string name="btn_save_purchase">Enregistrer l\'Achat</string>
     <string name="buy_select_category">Choisir la catégorie:</string>
     <string name="buy_fill_device_details">Détails de l\'appareil:</string>
     <string name="buy_select_brand">Choisir la marque:</string>
@@ -297,7 +297,7 @@
     <string name="dashboard_top_models">Modèles Les Plus Vendus</string>
     <string name="dashboard_units_sold">%1$d vendus • Bénéfice: Rs %2$s</string>
     <string name="expense_title">Dépenses du Magasin</string>
-    <string name="expense_btn_add">+ Ajouter une Dépense</string>
+    <string name="expense_btn_add">Ajouter une Dépense</string>
     <string name="expense_dialog_title">Enregistrer une Dépense</string>
     <string name="expense_label_amount">Montant de la Dépense (Rs) *</string>
     <string name="expense_label_category">Sélectionner la Catégorie *</string>
@@ -309,4 +309,10 @@
     <string name="expense_category_refreshment">Rafraîchissements</string>
     <string name="expense_category_other">Autres Dépenses</string>
     <string name="expense_empty_msg">Aucune dépense enregistrée pour cette période.</string>
+    <string name="help_topic_8_title">8. Comment enregistrer les dépenses du magasin (loyer, électricité, salaires) ?</string>
+    <string name="help_topic_8_desc">Allez dans Tableau de bord -&gt; \'Dépenses Opérationnelles\'. Appuyez sur \'+ Ajouter une Dépense\', saisissez le montant, sélectionnez la catégorie et enregistrez.</string>
+    <string name="help_topic_9_title">9. Comment le bénéfice net est-il calculé dans le tableau de bord ?</string>
+    <string name="help_topic_9_desc">Appuyez sur Tableau de bord dans la barre supérieure. Choisissez le filtre (Aujourd\'hui, Semaine, Mois, Tout). Bénéfice Net = Revenu Net moins Coût d\'Achat moins Dépenses.</string>
+    <string name="help_topic_10_title">10. Comment configurer le code PIN et le thème ?</string>
+    <string name="help_topic_10_desc">Allez dans Paramètres -&gt; Préférences pour choisir le thème Clair ou Sombre. Allez dans Sécurité -&gt; Code PIN pour définir un code à 4 chiffres.</string>
 </resources>
