@@ -316,4 +316,19 @@
     <string name="help_topic_10_title">10. App ka Security PIN aur Theme kaise badlein?</string>
     <string name="help_topic_10_desc">Settings -&gt; \'Language &amp; Preferences\' mein System, Light ya Dark Theme select karein. Settings -&gt; \'Security\' mein ja kar 4-digit PIN lock set karein.</string>
     <string name="party_btn_add">+ Naya Customer / Khata Shamil Karein</string>
+    <string name="party_ledger_default_title">Customer Khata</string>
+    <string name="party_ledger_net_balance_status">Kul Udhaar Balance Status</string>
+    <string name="party_ledger_lene_hain">Rs %1$s (Lene Hain)</string>
+    <string name="party_ledger_dene_hain">Rs %1$s (Dene Hain)</string>
+    <string name="party_ledger_settled_nil">Settled</string>
+    <string name="party_ledger_btn_record_wasooli">Wasooli Record Karein (+)</string>
+    <string name="party_ledger_btn_record_payment_given">Payment Di Record Karein (-)</string>
+    <string name="party_ledger_settled_badge">Hisaab Barabar </string>
+    <string name="party_ledger_history_title">Khata History &amp; Transactions</string>
+    <string name="party_ledger_history_empty">Iss customer ke liye abhi tak koi txn darj nahi hai.</string>
+    <string name="party_ledger_dialog_wasooli_title">Udhaar Wasooli Darj Karein (+)</string>
+    <string name="party_ledger_dialog_payment_given_title">Payment Di Darj Karein (-)</string>
+    <string name="party_ledger_dialog_amount_label">Payment Raqam (Rs) *</string>
+    <string name="party_ledger_dialog_method_label">Payment Method</string>
+    <string name="party_ledger_dialog_note_label">Tafseel / Note (Optional)</string>
 </resources>

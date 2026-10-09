@@ -315,4 +315,19 @@
     <string name="help_topic_10_title">10. How to set App Security PIN &amp; Theme?</string>
     <string name="help_topic_10_desc">Go to Settings -&gt; Language &amp; Preferences to choose System, Light, or Dark Theme. Go to Security -&gt; App PIN Lock to set a 4-digit PIN for cold start protection.</string>
     <string name="party_btn_add">+ Add Customer / Party</string>
+    <string name="party_ledger_default_title">Customer Ledger</string>
+    <string name="party_ledger_net_balance_status">Net Balance Status</string>
+    <string name="party_ledger_lene_hain">Rs %1$s (Receivable)</string>
+    <string name="party_ledger_dene_hain">Rs %1$s (Payable)</string>
+    <string name="party_ledger_settled_nil">Settled</string>
+    <string name="party_ledger_btn_record_wasooli">Record Payment Received (+)</string>
+    <string name="party_ledger_btn_record_payment_given">Record Payment Given (-)</string>
+    <string name="party_ledger_settled_badge">Account Settled</string>
+    <string name="party_ledger_history_title">Ledger History &amp; Transactions</string>
+    <string name="party_ledger_history_empty">No transactions or payments recorded for this customer yet.</string>
+    <string name="party_ledger_dialog_wasooli_title">Record Payment Received (+)</string>
+    <string name="party_ledger_dialog_payment_given_title">Record Payment Given (-)</string>
+    <string name="party_ledger_dialog_amount_label">Payment Amount (Rs) *</string>
+    <string name="party_ledger_dialog_method_label">Payment Method</string>
+    <string name="party_ledger_dialog_note_label">Description / Note (Optional)</string>
 </resources>

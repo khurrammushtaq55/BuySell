@@ -316,4 +316,19 @@
     <string name="help_topic_10_title">10. ऐप सिक्योरिटी पिन (PIN) और थीम कैसे बदलें?</string>
     <string name="help_topic_10_desc">सेटिंग्स -&gt; \'भाषा और प्राथमिकताएं\' में जाकर लाइट या डार्क थीम चुनें। सेटिंग्स -&gt; \'सुरक्षा\' में जाकर 4-अंकों का सिक्योरिटी पिन (PIN) सेट करें।</string>
     <string name="party_btn_add">+ नया ग्राहक / खाता जोड़ें</string>
+    <string name="party_ledger_default_title">ग्राहक खाता</string>
+    <string name="party_ledger_net_balance_status">कुल बकाया स्थिति</string>
+    <string name="party_ledger_lene_hain">Rs %1$s (लेने हैं)</string>
+    <string name="party_ledger_dene_hain">Rs %1$s (देने हैं)</string>
+    <string name="party_ledger_settled_nil">खाता बराबर</string>
+    <string name="party_ledger_btn_record_wasooli">वसूल राशि दर्ज करें (+)</string>
+    <string name="party_ledger_btn_record_payment_given">भुगतान राशि दर्ज करें (-)</string>
+    <string name="party_ledger_settled_badge">खाता बराबर</string>
+    <string name="party_ledger_history_title">खाता इतिहास और लेनदेन</string>
+    <string name="party_ledger_history_empty">इस ग्राहक के लिए अभी तक कोई लेनदेन दर्ज नहीं है।</string>
+    <string name="party_ledger_dialog_wasooli_title">वसूल राशि दर्ज करें (+)</string>
+    <string name="party_ledger_dialog_payment_given_title">भुगतान राशि दर्ज करें (-)</string>
+    <string name="party_ledger_dialog_amount_label">भुगतान राशि (Rs) *</string>
+    <string name="party_ledger_dialog_method_label">भुगतान का तरीका</string>
+    <string name="party_ledger_dialog_note_label">विवरण / नोट (वैकल्पिक)</string>
 </resources>

@@ -77,11 +77,18 @@ interface PartyDao {
     @Query("SELECT * FROM parties WHERE id = :partyId LIMIT 1")
     suspend fun getPartyById(partyId: String): PartyEntity?
 
-    // Total Party Balance = Total (Txn Line Total) - Total Payments Made
+    // Total Party Balance = (Sales - SaleReturns - PaymentsIn) - (Purchases - PurchaseReturns - PaymentsOut)
     @Query("""
         SELECT p.id, p.name, p.phone, p.cnic,
-               (COALESCE((SELECT SUM(t.total_amount) FROM txns t WHERE t.party_id = p.id AND t.type = 'SALE'), 0) -
-                COALESCE((SELECT SUM(pay.amount) FROM payments pay WHERE pay.party_id = p.id AND pay.direction = 'IN'), 0)) AS balance
+               (
+                (COALESCE((SELECT SUM(t.total_amount) FROM txns t WHERE t.party_id = p.id AND t.type = 'SALE'), 0) -
+                 COALESCE((SELECT SUM(t.total_amount) FROM txns t WHERE t.party_id = p.id AND t.type = 'SALE_RETURN'), 0) -
+                 COALESCE((SELECT SUM(pay.amount) FROM payments pay WHERE pay.party_id = p.id AND pay.direction = 'IN'), 0))
+                -
+                (COALESCE((SELECT SUM(t.total_amount) FROM txns t WHERE t.party_id = p.id AND t.type = 'PURCHASE'), 0) -
+                 COALESCE((SELECT SUM(t.total_amount) FROM txns t WHERE t.party_id = p.id AND t.type = 'PURCHASE_RETURN'), 0) -
+                 COALESCE((SELECT SUM(pay.amount) FROM payments pay WHERE pay.party_id = p.id AND pay.direction = 'OUT'), 0))
+               ) AS balance
         FROM parties p
         WHERE p.shop_id = :shopId
         ORDER BY p.name ASC
@@ -90,8 +97,15 @@ interface PartyDao {
 
     @Query("""
         SELECT p.id, p.name, p.phone, p.cnic,
-               (COALESCE((SELECT SUM(t.total_amount) FROM txns t WHERE t.party_id = p.id AND t.type = 'SALE'), 0) -
-                COALESCE((SELECT SUM(pay.amount) FROM payments pay WHERE pay.party_id = p.id AND pay.direction = 'IN'), 0)) AS balance
+               (
+                (COALESCE((SELECT SUM(t.total_amount) FROM txns t WHERE t.party_id = p.id AND t.type = 'SALE'), 0) -
+                 COALESCE((SELECT SUM(t.total_amount) FROM txns t WHERE t.party_id = p.id AND t.type = 'SALE_RETURN'), 0) -
+                 COALESCE((SELECT SUM(pay.amount) FROM payments pay WHERE pay.party_id = p.id AND pay.direction = 'IN'), 0))
+                -
+                (COALESCE((SELECT SUM(t.total_amount) FROM txns t WHERE t.party_id = p.id AND t.type = 'PURCHASE'), 0) -
+                 COALESCE((SELECT SUM(t.total_amount) FROM txns t WHERE t.party_id = p.id AND t.type = 'PURCHASE_RETURN'), 0) -
+                 COALESCE((SELECT SUM(pay.amount) FROM payments pay WHERE pay.party_id = p.id AND pay.direction = 'OUT'), 0))
+               ) AS balance
         FROM parties p
         WHERE p.shop_id = :shopId AND p.id = :partyId
         LIMIT 1
@@ -100,8 +114,15 @@ interface PartyDao {
 
     @Query("""
         SELECT p.id, p.name, p.phone, p.cnic,
-               (COALESCE((SELECT SUM(t.total_amount) FROM txns t WHERE t.party_id = p.id AND t.type = 'SALE'), 0) -
-                COALESCE((SELECT SUM(pay.amount) FROM payments pay WHERE pay.party_id = p.id AND pay.direction = 'IN'), 0)) AS balance
+               (
+                (COALESCE((SELECT SUM(t.total_amount) FROM txns t WHERE t.party_id = p.id AND t.type = 'SALE'), 0) -
+                 COALESCE((SELECT SUM(t.total_amount) FROM txns t WHERE t.party_id = p.id AND t.type = 'SALE_RETURN'), 0) -
+                 COALESCE((SELECT SUM(pay.amount) FROM payments pay WHERE pay.party_id = p.id AND pay.direction = 'IN'), 0))
+                -
+                (COALESCE((SELECT SUM(t.total_amount) FROM txns t WHERE t.party_id = p.id AND t.type = 'PURCHASE'), 0) -
+                 COALESCE((SELECT SUM(t.total_amount) FROM txns t WHERE t.party_id = p.id AND t.type = 'PURCHASE_RETURN'), 0) -
+                 COALESCE((SELECT SUM(pay.amount) FROM payments pay WHERE pay.party_id = p.id AND pay.direction = 'OUT'), 0))
+               ) AS balance
         FROM parties p
         WHERE p.shop_id = :shopId AND p.id = :partyId
         LIMIT 1
@@ -110,8 +131,15 @@ interface PartyDao {
 
     @Query("""
         SELECT p.id, p.name, p.phone, p.cnic,
-               (COALESCE((SELECT SUM(t.total_amount) FROM txns t WHERE t.party_id = p.id AND t.type = 'SALE' AND t.scope = 'PUBLIC'), 0) -
-                COALESCE((SELECT SUM(pay.amount) FROM payments pay WHERE pay.party_id = p.id AND pay.direction = 'IN' AND pay.scope = 'PUBLIC'), 0)) AS balance
+               (
+                (COALESCE((SELECT SUM(t.total_amount) FROM txns t WHERE t.party_id = p.id AND t.type = 'SALE' AND t.scope = 'PUBLIC'), 0) -
+                 COALESCE((SELECT SUM(t.total_amount) FROM txns t WHERE t.party_id = p.id AND t.type = 'SALE_RETURN' AND t.scope = 'PUBLIC'), 0) -
+                 COALESCE((SELECT SUM(pay.amount) FROM payments pay WHERE pay.party_id = p.id AND pay.direction = 'IN' AND pay.scope = 'PUBLIC'), 0))
+                -
+                (COALESCE((SELECT SUM(t.total_amount) FROM txns t WHERE t.party_id = p.id AND t.type = 'PURCHASE' AND t.scope = 'PUBLIC'), 0) -
+                 COALESCE((SELECT SUM(t.total_amount) FROM txns t WHERE t.party_id = p.id AND t.type = 'PURCHASE_RETURN' AND t.scope = 'PUBLIC'), 0) -
+                 COALESCE((SELECT SUM(pay.amount) FROM payments pay WHERE pay.party_id = p.id AND pay.direction = 'OUT' AND pay.scope = 'PUBLIC'), 0))
+               ) AS balance
         FROM parties p
         WHERE p.shop_id = :shopId AND p.id = :partyId
         LIMIT 1

@@ -56,7 +56,7 @@ fun PartyLedgerScreen(
             TopAppBar(
                 title = {
                     Column {
-                        Text(uiState.partyName.ifBlank { "Customer Khata" }, fontWeight = FontWeight.Bold)
+                        Text(uiState.partyName.ifBlank { stringResource(R.string.party_ledger_default_title) }, fontWeight = FontWeight.Bold)
                         if (uiState.partyPhone.isNotBlank()) {
                             Text(uiState.partyPhone, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
@@ -132,15 +132,15 @@ fun PartyLedgerScreen(
                     verticalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
                     Text(
-                        text = "Net Udhaar Balance / Khata Status",
+                        text = stringResource(R.string.party_ledger_net_balance_status),
                         fontSize = 12.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
 
                     val balanceText = when {
-                        isOwedToShop -> "Rs ${uiState.netBalanceRs} (Lene Hain)"
-                        isShopOwes -> "Rs ${-uiState.netBalanceRs} (Dene Hain)"
-                        else -> "Settled / Nill (0 Rs)"
+                        isOwedToShop -> stringResource(R.string.party_ledger_lene_hain, uiState.netBalanceRs.toString())
+                        isShopOwes -> stringResource(R.string.party_ledger_dene_hain, (-uiState.netBalanceRs).toString())
+                        else -> stringResource(R.string.party_ledger_settled_nil)
                     }
 
                     Text(
@@ -171,7 +171,7 @@ fun PartyLedgerScreen(
                     ) {
                         Icon(Icons.Default.Payments, contentDescription = null, modifier = Modifier.size(20.dp))
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Record Wasooli / Payment Received (+)", fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                        Text(stringResource(R.string.party_ledger_btn_record_wasooli), fontWeight = FontWeight.Bold, fontSize = 15.sp)
                     }
                 }
                 isShopOwes -> {
@@ -188,7 +188,7 @@ fun PartyLedgerScreen(
                     ) {
                         Icon(Icons.Default.MoneyOff, contentDescription = null, modifier = Modifier.size(20.dp))
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Record Payment Given / Clear Debt (-)", fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                        Text(stringResource(R.string.party_ledger_btn_record_payment_given), fontWeight = FontWeight.Bold, fontSize = 15.sp)
                     }
                 }
                 else -> {
@@ -206,13 +206,13 @@ fun PartyLedgerScreen(
                         ) {
                             Icon(Icons.Default.CheckCircle, contentDescription = null, tint = Color(0xFF2E7D32), modifier = Modifier.size(20.dp))
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Account Settled — No Pending Udhaar / Balance", fontWeight = FontWeight.SemiBold, fontSize = 14.sp, color = Color(0xFF2E7D32))
+                            Text(stringResource(R.string.party_ledger_settled_badge), fontWeight = FontWeight.SemiBold, fontSize = 14.sp, color = Color(0xFF2E7D32))
                         }
                     }
                 }
             }
 
-            Text("Khata History / Transactions", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+            Text(stringResource(R.string.party_ledger_history_title), fontWeight = FontWeight.Bold, fontSize = 16.sp)
 
             if (uiState.ledgerHistory.isEmpty()) {
                 Box(
@@ -221,7 +221,7 @@ fun PartyLedgerScreen(
                         .weight(1f),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("No transactions or payments recorded for this customer yet.", color = Color.Gray)
+                    Text(stringResource(R.string.party_ledger_history_empty), color = Color.Gray)
                 }
             } else {
                 LazyColumn(
@@ -321,7 +321,11 @@ private fun RecordWasooliDialog(
         "OTHER" to "Other"
     )
 
-    val dialogTitle = if (direction == PaymentDirection.IN) "Record Wasooli / Cash Received (+)" else "Record Payment Given (-)"
+    val dialogTitle = if (direction == PaymentDirection.IN) {
+        stringResource(R.string.party_ledger_dialog_wasooli_title)
+    } else {
+        stringResource(R.string.party_ledger_dialog_payment_given_title)
+    }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -334,12 +338,12 @@ private fun RecordWasooliDialog(
                 OutlinedTextField(
                     value = amountText,
                     onValueChange = { if (it.all { char -> char.isDigit() }) amountText = it },
-                    label = { Text("Payment Amount (Rs) *") },
+                    label = { Text(stringResource(R.string.party_ledger_dialog_amount_label)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                Text("Payment Method", fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
+                Text(stringResource(R.string.party_ledger_dialog_method_label), fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
 
                 FlowRow(
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
@@ -358,7 +362,7 @@ private fun RecordWasooliDialog(
                 OutlinedTextField(
                     value = noteText,
                     onValueChange = { noteText = it },
-                    label = { Text("Description / Note (Optional)") },
+                    label = { Text(stringResource(R.string.party_ledger_dialog_note_label)) },
                     modifier = Modifier.fillMaxWidth()
                 )
             }

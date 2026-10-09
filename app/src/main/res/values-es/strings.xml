@@ -316,4 +316,19 @@
     <string name="help_topic_10_title">10. ¿Cómo configurar el PIN de seguridad y el tema?</string>
     <string name="help_topic_10_desc">Vaya a Configuración -&gt; Preferencias para elegir el tema Claro u Oscuro. Vaya a Seguridad -&gt; PIN de la aplicación para establecer un PIN de 4 dígitos.</string>
     <string name="party_btn_add">+ Agregar cliente</string>
+    <string name="party_ledger_default_title">Libro del cliente</string>
+    <string name="party_ledger_net_balance_status">Estado de saldo neto</string>
+    <string name="party_ledger_lene_hain">Rs %1$s (Por cobrar)</string>
+    <string name="party_ledger_dene_hain">Rs %1$s (Por pagar)</string>
+    <string name="party_ledger_settled_nil">Saldado</string>
+    <string name="party_ledger_btn_record_wasooli">Registrar cobro (+)</string>
+    <string name="party_ledger_btn_record_payment_given">Registrar pago realizado (-)</string>
+    <string name="party_ledger_settled_badge">Cuenta saldada</string>
+    <string name="party_ledger_history_title">Historial del libro y transacciones</string>
+    <string name="party_ledger_history_empty">Aún no hay transacciones o pagos registrados para este cliente.</string>
+    <string name="party_ledger_dialog_wasooli_title">Registrar cobro de pago (+)</string>
+    <string name="party_ledger_dialog_payment_given_title">Registrar pago otorgado (-)</string>
+    <string name="party_ledger_dialog_amount_label">Monto del pago (Rs) *</string>
+    <string name="party_ledger_dialog_method_label">Método de pago</string>
+    <string name="party_ledger_dialog_note_label">Descripción / Nota (Opcional)</string>
 </resources>

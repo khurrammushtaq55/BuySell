@@ -316,4 +316,19 @@
     <string name="help_topic_10_title">10. كيفية تعيين رمز PIN والألوان في التطبيق؟</string>
     <string name="help_topic_10_desc">انتقل إلى الإعدادات -&gt; التفضيلات لاختيار المظهر الفاتح أو الداكن. انتقل إلى الأمان لتعيين رمز PIN المكون من 4 أرقام لحماية التطبيق.</string>
     <string name="party_btn_add">+ إضافة عميل جديد</string>
+    <string name="party_ledger_default_title">دفتر العميل</string>
+    <string name="party_ledger_net_balance_status">حالة الرصيد الصافي</string>
+    <string name="party_ledger_lene_hain">Rs %1$s (مستحق للتحصيل)</string>
+    <string name="party_ledger_dene_hain">Rs %1$s (مستحق للدفع)</string>
+    <string name="party_ledger_settled_nil">الحساب خالص </string>
+    <string name="party_ledger_btn_record_wasooli">تسجيل تحصيل المبلغ (+)</string>
+    <string name="party_ledger_btn_record_payment_given">تسجيل المبلغ المدفوع (-)</string>
+    <string name="party_ledger_settled_badge">الحساب خالص </string>
+    <string name="party_ledger_history_title">سجل الحساب والمعاملات</string>
+    <string name="party_ledger_history_empty">لم يتم تسجيل أي معاملات أو مدفوعات لهذا العميل بعد.</string>
+    <string name="party_ledger_dialog_wasooli_title">تسجيل استلام مبلغ (+)</string>
+    <string name="party_ledger_dialog_payment_given_title">تسجيل دفع مبلغ (-)</string>
+    <string name="party_ledger_dialog_amount_label">مبلغ الدفع (روبية) *</string>
+    <string name="party_ledger_dialog_method_label">طريقة الدفع</string>
+    <string name="party_ledger_dialog_note_label">الوصف / ملاحظة (اختياري)</string>
 </resources>

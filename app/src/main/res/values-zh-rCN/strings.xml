@@ -316,4 +316,19 @@
     <string name="help_topic_10_title">10. 如何设置应用安全 PIN 码与主题模式？</string>
     <string name="help_topic_10_desc">前往设置 -&gt; 语言与显示，选择跟随系统、浅色或深色主题。前往安全与账户 -&gt; 应用 PIN 码锁设置 4 位安全密码。</string>
     <string name="party_btn_add">+ 添加新客户</string>
+    <string name="party_ledger_default_title">客户账本</string>
+    <string name="party_ledger_net_balance_status">净余额状态</string>
+    <string name="party_ledger_lene_hain">Rs %1$s (应收款)</string>
+    <string name="party_ledger_dene_hain">Rs %1$s (应付款)</string>
+    <string name="party_ledger_settled_nil">账目平</string>
+    <string name="party_ledger_btn_record_wasooli">记录收到的款项 (+)</string>
+    <string name="party_ledger_btn_record_payment_given">记录付出的款项 (-)</string>
+    <string name="party_ledger_settled_badge">账目已结清 </string>
+    <string name="party_ledger_history_title">账本历史与交易明细</string>
+    <string name="party_ledger_history_empty">该客户暂无交易或付款记录。</string>
+    <string name="party_ledger_dialog_wasooli_title">记录收到的款项 (+)</string>
+    <string name="party_ledger_dialog_payment_given_title">记录付出的款项 (-)</string>
+    <string name="party_ledger_dialog_amount_label">付款金额 (Rs) *</string>
+    <string name="party_ledger_dialog_method_label">付款方式</string>
+    <string name="party_ledger_dialog_note_label">说明 / 备注（可选）</string>
 </resources>

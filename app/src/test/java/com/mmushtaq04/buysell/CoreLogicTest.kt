@@ -161,24 +161,6 @@ class CoreLogicTest {
             createdByUserId = userId
         )
 
-        // Record Trade-In Exchange Payment Credit
-        val now = System.currentTimeMillis()
-        val tradeInPayment = PaymentEntity(
-            id = UUID.randomUUID().toString(),
-            shopId = shopId,
-            partyId = customer.id,
-            direction = PaymentDirection.IN,
-            amount = 6000000L, // 60,000 PKR trade-in credit
-            method = PaymentMethod.EXCHANGE,
-            payDate = now,
-            scope = Scope.VAULT,
-            createdAt = now,
-            updatedAt = now,
-            createdBy = userId,
-            updatedBy = userId
-        )
-        db.paymentDao().insertPayment(tradeInPayment)
-
         assertNotNull(saleTxn)
         assertNotNull(purchaseTxn)
 
@@ -192,7 +174,7 @@ class CoreLogicTest {
         assertEquals(ItemStatus.IN_STOCK, boughtOld?.status)
         assertEquals(1, boughtOld?.remainingQty)
 
-        // Verify Net Customer Balance: 200,000 (Sale) - 60,000 (Trade-In Payment Credit) = 140,000 PKR
+        // Verify Net Customer Balance: 200,000 (Sale) - 60,000 (Trade-In Purchase) = 140,000 PKR
         val partyBal = partyRepo.getPartyBalance(shopId, customer.id)
         assertNotNull(partyBal)
         assertEquals(14000000L, partyBal?.balance)

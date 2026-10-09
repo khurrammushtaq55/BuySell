@@ -40,20 +40,9 @@ fun PartyListScreen(
     onAddParty: (name: String, phone: String, cnic: String) -> Unit = { _, _, _ -> }
 ) {
     var searchQuery by remember { mutableStateOf("") }
-    var showAddPartyDialog by remember { mutableStateOf(false) }
 
     val filtered = parties.filter {
         it.name.contains(searchQuery, ignoreCase = true) || it.phone.contains(searchQuery)
-    }
-
-    if (showAddPartyDialog) {
-        AddPartyDialog(
-            onDismiss = { showAddPartyDialog = false },
-            onConfirm = { name, phone, cnic ->
-                showAddPartyDialog = false
-                onAddParty(name, phone, cnic)
-            }
-        )
     }
 
     Scaffold(
@@ -72,13 +61,6 @@ fun PartyListScreen(
                 }
             )
         },
-        floatingActionButton = {
-            ExtendedFloatingActionButton(
-                onClick = { showAddPartyDialog = true },
-                icon = { Icon(Icons.Default.Add, contentDescription = null) },
-                text = { Text(stringResource(R.string.party_btn_add), fontWeight = FontWeight.Bold) }
-            )
-        }
     ) { padding ->
         Column(
             modifier = Modifier
@@ -151,66 +133,6 @@ fun PartyListScreen(
             }
         }
     }
-}
-
-@Composable
-private fun AddPartyDialog(
-    onDismiss: () -> Unit,
-    onConfirm: (name: String, phone: String, cnic: String) -> Unit
-) {
-    var nameText by remember { mutableStateOf("") }
-    var phoneText by remember { mutableStateOf("") }
-    var cnicText by remember { mutableStateOf("") }
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Add Naya Customer / Party", fontWeight = FontWeight.Bold) },
-        text = {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                OutlinedTextField(
-                    value = nameText,
-                    onValueChange = { nameText = it },
-                    label = { Text("Customer Name *") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                OutlinedTextField(
-                    value = phoneText,
-                    onValueChange = { phoneText = it },
-                    label = { Text("Phone Number *") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                OutlinedTextField(
-                    value = cnicText,
-                    onValueChange = { cnicText = it },
-                    label = { Text("CNIC / Notes (Optional)") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-        },
-        confirmButton = {
-            Button(
-                onClick = {
-                    if (nameText.isNotBlank() && phoneText.isNotBlank()) {
-                        onConfirm(nameText.trim(), phoneText.trim(), cnicText.trim())
-                    }
-                },
-                enabled = nameText.isNotBlank() && phoneText.isNotBlank()
-            ) {
-                Text(stringResource(R.string.action_save), fontWeight = FontWeight.Bold)
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.action_cancel))
-            }
-        }
-    )
 }
 
 @Preview(showBackground = true)

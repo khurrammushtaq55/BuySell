@@ -316,4 +316,19 @@
     <string name="help_topic_10_title">10. Comment configurer le code PIN et le thème ?</string>
     <string name="help_topic_10_desc">Allez dans Paramètres -&gt; Préférences pour choisir le thème Clair ou Sombre. Allez dans Sécurité -&gt; Code PIN pour définir un code à 4 chiffres.</string>
     <string name="party_btn_add">+ Ajouter un client</string>
+    <string name="party_ledger_default_title">Grand livre client</string>
+    <string name="party_ledger_net_balance_status">Statut du solde net</string>
+    <string name="party_ledger_lene_hain">Rs %1$s (À recevoir)</string>
+    <string name="party_ledger_dene_hain">Rs %1$s (À payer)</string>
+    <string name="party_ledger_settled_nil">Compte réglé</string>
+    <string name="party_ledger_btn_record_wasooli">Enregistrer le paiement reçu (+)</string>
+    <string name="party_ledger_btn_record_payment_given">Enregistrer le paiement effectué (-)</string>
+    <string name="party_ledger_settled_badge">Compte réglé</string>
+    <string name="party_ledger_history_title">Historique du grand livre et transactions</string>
+    <string name="party_ledger_history_empty">Aucune transaction ou paiement enregistré pour ce client.</string>
+    <string name="party_ledger_dialog_wasooli_title">Enregistrer le paiement reçu (+)</string>
+    <string name="party_ledger_dialog_payment_given_title">Enregistrer le paiement effectué (-)</string>
+    <string name="party_ledger_dialog_amount_label">Montant du paiement (Rs) *</string>
+    <string name="party_ledger_dialog_method_label">Moyen de paiement</string>
+    <string name="party_ledger_dialog_note_label">Description / Note (Optionnel)</string>
 </resources>

@@ -316,4 +316,19 @@
     <string name="help_topic_10_title">10. ایپ کا 4 ہندسوں کا پن (PIN) اور ڈارک تھیم کیسے آن کریں؟</string>
     <string name="help_topic_10_desc">سیٹنگز -&gt; \'زبان اور ترجیحات\' کھولیں اور لائٹ یا ڈارک تھیم منتخب کریں۔ سیٹنگز -&gt; \'سیکیورٹی\' پر جائیں اور ایپ لاک کے لیے 4 ہندسوں کا پن سیٹ کریں۔</string>
     <string name="party_btn_add">+ نیا کسٹمر / کھاتہ شامل کریں</string>
+    <string name="party_ledger_default_title">کسٹمر کھاتہ</string>
+    <string name="party_ledger_net_balance_status">کل بقایا رقم</string>
+    <string name="party_ledger_lene_hain">Rs %1$s (وصول کرنے ہیں)</string>
+    <string name="party_ledger_dene_hain">Rs %1$s (دینے ہیں)</string>
+    <string name="party_ledger_settled_nil">حساب برابر</string>
+    <string name="party_ledger_btn_record_wasooli">وسولی درج کریں (+)</string>
+    <string name="party_ledger_btn_record_payment_given">ادائیگی درج کریں (-)</string>
+    <string name="party_ledger_settled_badge">حساب برابر</string>
+    <string name="party_ledger_history_title">کھاتہ ہسٹری اور لین دین</string>
+    <string name="party_ledger_history_empty">اس کسٹمر کے لیے ابھی تک کوئی لین دین درج نہیں ہے۔</string>
+    <string name="party_ledger_dialog_wasooli_title">رقم وصولی درج کریں (+)</string>
+    <string name="party_ledger_dialog_payment_given_title">رقم کی ادائیگی درج کریں (-)</string>
+    <string name="party_ledger_dialog_amount_label">ادائیگی رقم (Rs) *</string>
+    <string name="party_ledger_dialog_method_label">ادائیگی کا طریقہ</string>
+    <string name="party_ledger_dialog_note_label">تفصیل / نوٹ (اختیاری)</string>
 </resources>

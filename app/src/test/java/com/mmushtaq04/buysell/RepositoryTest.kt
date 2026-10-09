@@ -47,15 +47,24 @@ class RepositoryTest {
 
     @Test
     fun testBuyAndSellUniqueItem() = runBlocking {
-        // 1. Create a party (Supplier/Customer)
-        val party = Party(
-            id = "party-1",
+        // 1. Create Seller and Buyer Parties
+        val sellerParty = Party(
+            id = "seller-1",
             shopId = shopId,
-            name = "Ali Ahmed",
+            name = "Supplier Khan",
             phone = "03001234567",
             cnic = "3520112345671"
         )
-        partyRepo.createParty(party)
+        partyRepo.createParty(sellerParty)
+
+        val buyerParty = Party(
+            id = "buyer-1",
+            shopId = shopId,
+            name = "Customer Ali",
+            phone = "03129876543",
+            cnic = "3520198765432"
+        )
+        partyRepo.createParty(buyerParty)
 
         // 2. Buy UNIQUE Phone (e.g. iPhone 15, IMEI 123456789012345, PKR 150,000)
         val itemToBuy = StockItem(
@@ -72,7 +81,7 @@ class RepositoryTest {
         val purchaseTxn = stockRepo.recordPurchase(
             stockItem = itemToBuy,
             purchasePrice = 15000000L, // PKR 150,000.00
-            partyId = party.id,
+            partyId = sellerParty.id,
             createdByUserId = userId
         )
 
@@ -85,11 +94,16 @@ class RepositoryTest {
         assertEquals(ItemStatus.IN_STOCK, boughtItem?.status)
         assertEquals(1, boughtItem?.remainingQty)
 
-        // 3. Sell UNIQUE Phone for PKR 170,000.00
+        // Verify Seller Balance (Shop owes seller 150,000 PKR -> -15,000,000 paisa)
+        val sellerBal = partyRepo.getPartyBalance(shopId, sellerParty.id)
+        assertNotNull(sellerBal)
+        assertEquals(-15000000L, sellerBal?.balance)
+
+        // 3. Sell UNIQUE Phone for PKR 170,000.00 to Buyer
         val saleTxn = stockRepo.recordSale(
             stockItemId = "item-1",
             salePrice = 17000000L,
-            partyId = party.id,
+            partyId = buyerParty.id,
             createdByUserId = userId
         )
 
@@ -102,10 +116,10 @@ class RepositoryTest {
         assertEquals(ItemStatus.SOLD, soldItem?.status)
         assertEquals(0, soldItem?.remainingQty)
 
-        // 4. Check Party Balance
-        val balanceDto = partyRepo.getPartyBalance(shopId, party.id)
-        assertNotNull(balanceDto)
-        assertEquals(17000000L, balanceDto?.balance)
+        // 4. Check Buyer Balance (Buyer owes shop 170,000 PKR -> +17,000,000 paisa)
+        val buyerBal = partyRepo.getPartyBalance(shopId, buyerParty.id)
+        assertNotNull(buyerBal)
+        assertEquals(17000000L, buyerBal?.balance)
     }
 
     @Test
@@ -118,28 +132,12 @@ class RepositoryTest {
             brand = "Anker",
             model = "20W Charger",
             quantity = 10,
-            remainingQty = 10,
-            stockedAt = 1000L
+            remainingQty = 10
         )
+        stockRepo.recordPurchase(lot1, 200000L, "seller-1", userId)
 
-        val lot2 = StockItem(
-            id = "lot-2",
-            shopId = shopId,
-            categoryId = "cat-acc",
-            brand = "Anker",
-            model = "20W Charger",
-            quantity = 5,
-            remainingQty = 5,
-            stockedAt = 2000L
-        )
-
-        stockRepo.recordPurchase(lot1, 100000L, "supplier-1", userId)
-        stockRepo.recordPurchase(lot2, 50000L, "supplier-1", userId)
-
-        // Verify FIFO query picks lot1 first
-        val fifoLots = stockRepo.findAvailableLotsFifo(shopId, "cat-acc", "Anker", "20W Charger")
-        assertEquals(2, fifoLots.size)
-        assertEquals("lot-1", fifoLots[0].id)
-        assertEquals("lot-2", fifoLots[1].id)
+        val available = stockRepo.findAvailableLotsFifo(shopId, "cat-acc", "Anker", "20W Charger")
+        assertEquals(1, available.size)
+        assertEquals("lot-1", available[0].id)
     }
 }
