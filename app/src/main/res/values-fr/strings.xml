@@ -331,4 +331,7 @@
     <string name="party_ledger_dialog_amount_label">Montant du paiement (Rs) *</string>
     <string name="party_ledger_dialog_method_label">Moyen de paiement</string>
     <string name="party_ledger_dialog_note_label">Description / Note (Optionnel)</string>
+    <string name="party_ledger_whatsapp_remind_owed">Bonjour %1$s, selon les dossiers de %2$s, votre solde impayé est de Rs %3$s. Veuillez effectuer le paiement. Merci !</string>
+    <string name="party_ledger_whatsapp_remind_pay">Bonjour %1$s, selon les dossiers de %2$s, nous vous devons Rs %3$s. Le paiement sera effectué sous peu. Merci !</string>
+    <string name="party_ledger_whatsapp_remind_settled">Bonjour %1$s, selon les dossiers de %2$s, votre compte est entièrement réglé (Rs 0). Merci !</string>
 </resources>

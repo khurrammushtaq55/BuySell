@@ -331,4 +331,7 @@
     <string name="party_ledger_dialog_amount_label">Payment Raqam (Rs) *</string>
     <string name="party_ledger_dialog_method_label">Payment Method</string>
     <string name="party_ledger_dialog_note_label">Tafseel / Note (Optional)</string>
+    <string name="party_ledger_whatsapp_remind_owed">%1$s bhai, %2$s record ke mutabiq aap ka Rs %3$s udhaar baqi hai. Baraye meherbani Wasooli ada kar dein. Shukriya!</string>
+    <string name="party_ledger_whatsapp_remind_pay">%1$s bhai, %2$s record ke mutabiq hum ne aap ke Rs %3$s dene hain. Payment jald ada kar di jaye gi. Shukriya!</string>
+    <string name="party_ledger_whatsapp_remind_settled">%1$s bhai, %2$s record ke mutabiq aap ka hisaab poora (0 Rs) settled hai. Shukriya!</string>
 </resources>

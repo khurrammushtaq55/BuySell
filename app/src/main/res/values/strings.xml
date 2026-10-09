@@ -330,4 +330,7 @@
     <string name="party_ledger_dialog_amount_label">Payment Amount (Rs) *</string>
     <string name="party_ledger_dialog_method_label">Payment Method</string>
     <string name="party_ledger_dialog_note_label">Description / Note (Optional)</string>
+    <string name="party_ledger_whatsapp_remind_owed">Hello %1$s, according to %2$s records, your outstanding balance is Rs %3$s. Please arrange the payment. Thank you!</string>
+    <string name="party_ledger_whatsapp_remind_pay">Hello %1$s, according to %2$s records, we owe you Rs %3$s. The payment will be cleared soon. Thank you!</string>
+    <string name="party_ledger_whatsapp_remind_settled">Hello %1$s, according to %2$s records, your account is fully settled (Rs 0). Thank you!</string>
 </resources>

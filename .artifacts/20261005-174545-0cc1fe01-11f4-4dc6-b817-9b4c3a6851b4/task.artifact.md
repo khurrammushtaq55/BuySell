@@ -217,3 +217,7 @@
 - [x] Pure Locale String Separation & Hardcoded String Clean-Up
 	- [x] Converted default `res/values/strings.xml` to pure, professional English text without slashes or mixed Roman Urdu.
 	- [x] Extracted all remaining string literals in `PartyLedgerScreen.kt` and `PartyLedgerViewModel.kt` into localized string resources across all 8 locale folders.
+- [x] Direct WhatsApp Chat & Dynamic Shop Name Statement Reminders
+	- [x] Formatted customer phone numbers to international format (`923001234567`) and launched WhatsApp directly into their chat window via `https://api.whatsapp.com/send?phone=...`.
+	- [x] Replaced static "BuySell360 Store" with dynamic `uiState.shopName`.
+	- [x] Removed "Assalam-o-Alaikum" greeting and added localized statement templates across all 8 locale resource files.

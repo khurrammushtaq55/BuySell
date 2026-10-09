@@ -77,26 +77,58 @@ fun PartyLedgerScreen(
                             Icon(Icons.Default.Call, contentDescription = "Call Customer", tint = MaterialTheme.colorScheme.primary)
                         }
 
-                        // WhatsApp Udhaar Reminder Share Action
+                        // Direct WhatsApp Chat & Statement Share Action
                         IconButton(onClick = {
-                            val msg = if (uiState.netBalanceRs > 0) {
-                                "Assalam-o-Alaikum ${uiState.partyName} bhai, BuySell360 Store record ke mutabiq aap ka Rs ${uiState.netBalanceRs} udhaar baqi hai. Baraye meherbani Wasooli ada kar dein. Shukriya!"
-                            } else {
-                                "Assalam-o-Alaikum ${uiState.partyName} bhai, Khata statement for BuySell360 Store."
+                            val msg = when {
+                                uiState.netBalanceRs > 0 -> {
+                                    context.getString(
+                                        R.string.party_ledger_whatsapp_remind_owed,
+                                        uiState.partyName,
+                                        uiState.shopName,
+                                        uiState.netBalanceRs.toString()
+                                    )
+                                }
+                                uiState.netBalanceRs < 0 -> {
+                                    context.getString(
+                                        R.string.party_ledger_whatsapp_remind_pay,
+                                        uiState.partyName,
+                                        uiState.shopName,
+                                        (-uiState.netBalanceRs).toString()
+                                    )
+                                }
+                                else -> {
+                                    context.getString(
+                                        R.string.party_ledger_whatsapp_remind_settled,
+                                        uiState.partyName,
+                                        uiState.shopName
+                                    )
+                                }
                             }
-                            val intent = Intent(Intent.ACTION_SEND).apply {
-                                type = "text/plain"
-                                putExtra(Intent.EXTRA_TEXT, msg)
+
+                            // Clean phone number (e.g. 03001234567 -> 923001234567)
+                            val cleanPhone = uiState.partyPhone.replace(Regex("[^0-9]"), "").let { digits ->
+                                if (digits.startsWith("0")) "92" + digits.substring(1) else digits
+                            }
+
+                            val encodedMsg = Uri.encode(msg)
+                            val whatsappUri = Uri.parse("https://api.whatsapp.com/send?phone=$cleanPhone&text=$encodedMsg")
+                            val intent = Intent(Intent.ACTION_VIEW, whatsappUri).apply {
                                 setPackage("com.whatsapp")
                             }
+
                             runCatching {
                                 context.startActivity(intent)
                             }.onFailure {
-                                val fallbackIntent = Intent(Intent.ACTION_SEND).apply {
-                                    type = "text/plain"
-                                    putExtra(Intent.EXTRA_TEXT, msg)
+                                val fallbackIntent = Intent(Intent.ACTION_VIEW, whatsappUri)
+                                runCatching {
+                                    context.startActivity(fallbackIntent)
+                                }.onFailure {
+                                    val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                                        type = "text/plain"
+                                        putExtra(Intent.EXTRA_TEXT, msg)
+                                    }
+                                    context.startActivity(Intent.createChooser(shareIntent, "Share Statement"))
                                 }
-                                context.startActivity(Intent.createChooser(fallbackIntent, "Share Statement"))
                             }
                         }) {
                             Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Share Udhaar Reminder", tint = Color(0xFF25D366))
@@ -396,6 +428,7 @@ fun PartyLedgerScreenOwedPreview() {
             uiState = PartyLedgerUiState(
                 partyName = "Ali Ahmed",
                 partyPhone = "03001234567",
+                shopName = "Hafeez Center Electronics",
                 netBalanceRs = 15000L,
                 ledgerHistory = listOf(
                     LedgerItem("1", System.currentTimeMillis() - 86400000L, "Device Sale / Saman Becha", "iPhone 13 128GB", 85000L, false, PaymentDirection.IN),
@@ -414,6 +447,7 @@ fun PartyLedgerScreenSettledPreview() {
             uiState = PartyLedgerUiState(
                 partyName = "Bilal Khan",
                 partyPhone = "03335554433",
+                shopName = "Hafeez Center Electronics",
                 netBalanceRs = 0L,
                 ledgerHistory = listOf(
                     LedgerItem("1", System.currentTimeMillis(), "Udhaar Wasooli / Cash Received (+)", "EasyPaisa", 15000L, true, PaymentDirection.IN)

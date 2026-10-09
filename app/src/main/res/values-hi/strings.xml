@@ -331,4 +331,7 @@
     <string name="party_ledger_dialog_amount_label">भुगतान राशि (Rs) *</string>
     <string name="party_ledger_dialog_method_label">भुगतान का तरीका</string>
     <string name="party_ledger_dialog_note_label">विवरण / नोट (वैकल्पिक)</string>
+    <string name="party_ledger_whatsapp_remind_owed">%1$s जी, %2$s रिकॉर्ड के अनुसार आपका Rs %3$s बकाया है। कृपया भुगतान करने का कष्ट करें। धन्यवाद!</string>
+    <string name="party_ledger_whatsapp_remind_pay">%1$s जी, %2$s रिकॉर्ड के अनुसार हमारे पास आपका Rs %3$s बकाया है। भुगतान जल्द कर दिया जाएगा। धन्यवाद!</string>
+    <string name="party_ledger_whatsapp_remind_settled">%1$s जी, %2$s रिकॉर्ड के अनुसार आपका खाता पूरी तरह बराबर (Rs 0) है। धन्यवाद!</string>
 </resources>

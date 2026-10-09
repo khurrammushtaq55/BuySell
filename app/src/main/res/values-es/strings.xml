@@ -331,4 +331,7 @@
     <string name="party_ledger_dialog_amount_label">Monto del pago (Rs) *</string>
     <string name="party_ledger_dialog_method_label">Método de pago</string>
     <string name="party_ledger_dialog_note_label">Descripción / Nota (Opcional)</string>
+    <string name="party_ledger_whatsapp_remind_owed">Hola %1$s, según los registros de %2$s, su saldo pendiente es de Rs %3$s. Por favor realice el pago. ¡Gracias!</string>
+    <string name="party_ledger_whatsapp_remind_pay">Hola %1$s, según los registros de %2$s, le debemos Rs %3$s. El pago se realizará pronto. ¡Gracias!</string>
+    <string name="party_ledger_whatsapp_remind_settled">Hola %1$s, según los registros de %2$s, su cuenta está completamente saldada (Rs 0). ¡Gracias!</string>
 </resources>

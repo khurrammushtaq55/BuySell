@@ -331,4 +331,7 @@
     <string name="party_ledger_dialog_amount_label">مبلغ الدفع (روبية) *</string>
     <string name="party_ledger_dialog_method_label">طريقة الدفع</string>
     <string name="party_ledger_dialog_note_label">الوصف / ملاحظة (اختياري)</string>
+    <string name="party_ledger_whatsapp_remind_owed">مرحباً %1$s، وفقاً لسجلات متجر %2$s، فإن المبلغ المستحق عليكم هو %3$s روبية. يرجى التكرم بالسداد. شكراً لكم!</string>
+    <string name="party_ledger_whatsapp_remind_pay">مرحباً %1$s، وفقاً لسجلات متجر %2$s، لدينا مبلغ مستحق لكم بقيمة %3$s روبية. سيتم السداد قريباً. شكراً لكم!</string>
+    <string name="party_ledger_whatsapp_remind_settled">مرحباً %1$s، وفقاً لسجلات متجر %2$s، حسابكم خالص تماماً (0 روبية). شكراً لكم!</string>
 </resources>

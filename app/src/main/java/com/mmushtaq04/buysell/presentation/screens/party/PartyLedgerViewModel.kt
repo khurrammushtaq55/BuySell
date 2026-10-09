@@ -29,6 +29,7 @@ data class PartyLedgerUiState(
     val partyName: String = "",
     val partyPhone: String = "",
     val partyCnic: String = "",
+    val shopName: String = "Mera Store",
     val netBalanceRs: Long = 0L,
     val ledgerHistory: List<LedgerItem> = emptyList(),
     val isLoading: Boolean = false
@@ -53,6 +54,8 @@ class PartyLedgerViewModel(application: Application) : AndroidViewModel(applicat
             if (activeShopId.isBlank()) return@launch
 
             val partyEntity = db.partyDao().getPartyById(partyId)
+            val shopEntity = db.shopDao().getShopById(activeShopId)
+            val activeShopName = shopEntity?.name?.ifBlank { "Mera Store" } ?: "Mera Store"
 
             combine(
                 db.partyDao().observePartyBalance(activeShopId, partyId),
@@ -110,6 +113,7 @@ class PartyLedgerViewModel(application: Application) : AndroidViewModel(applicat
                     partyName = balanceDto?.name ?: partyEntity?.name ?: "Customer",
                     partyPhone = balanceDto?.phone ?: partyEntity?.phone ?: "N/A",
                     partyCnic = balanceDto?.cnic ?: partyEntity?.cnic ?: "",
+                    shopName = activeShopName,
                     netBalanceRs = (balanceDto?.balance ?: 0L) / 100,
                     ledgerHistory = ledgerList,
                     isLoading = false

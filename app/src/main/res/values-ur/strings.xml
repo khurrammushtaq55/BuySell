@@ -331,4 +331,7 @@
     <string name="party_ledger_dialog_amount_label">ادائیگی رقم (Rs) *</string>
     <string name="party_ledger_dialog_method_label">ادائیگی کا طریقہ</string>
     <string name="party_ledger_dialog_note_label">تفصیل / نوٹ (اختیاری)</string>
+    <string name="party_ledger_whatsapp_remind_owed">%1$s صاحب، %2$s ریکارڈ کے مطابق آپ کا %3$s روپے ادھار باقی ہے۔ برائے مہربانی رقم ادا کر دیں۔ شکریہ!</string>
+    <string name="party_ledger_whatsapp_remind_pay">%1$s صاحب، %2$s ریکارڈ کے مطابق ہم نے آپ کے %3$s روپے دینے ہیں۔ ادائیگی جلد کر دی جائے گی۔ شکریہ!</string>
+    <string name="party_ledger_whatsapp_remind_settled">%1$s صاحب، %2$s ریکارڈ کے مطابق آپ کا حساب پورا (0 Rs) سیٹل ہے۔ شکریہ!</string>
 </resources>

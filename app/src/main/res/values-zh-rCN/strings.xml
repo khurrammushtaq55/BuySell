@@ -331,4 +331,7 @@
     <string name="party_ledger_dialog_amount_label">付款金额 (Rs) *</string>
     <string name="party_ledger_dialog_method_label">付款方式</string>
     <string name="party_ledger_dialog_note_label">说明 / 备注（可选）</string>
+    <string name="party_ledger_whatsapp_remind_owed">您好 %1$s，根据 %2$s 的记录，您的待结欠款为 Rs %3$s。请协助安排付款，谢谢！</string>
+    <string name="party_ledger_whatsapp_remind_pay">您好 %1$s，根据 %2$s 的记录，我们应付给您 Rs %3$s。款项将很快支付，谢谢！</string>
+    <string name="party_ledger_whatsapp_remind_settled">您好 %1$s，根据 %2$s 的记录，您的账目已完全结清（Rs 0），谢谢！</string>
 </resources>
