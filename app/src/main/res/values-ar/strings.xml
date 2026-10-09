@@ -275,4 +275,5 @@
     <string name="settings_staff_invite_sub">إنشاء رمز انضمام مكون من 8 أرقام لإضافة موظف للمتجر</string>
     <string name="settings_partner_invite_title">رمز دعوة الشريك غير التنفيذي</string>
     <string name="settings_partner_invite_sub">إنشاء رمز انضمام مكون من 8 أرقام للشريك لعرض الأرباح واللوحة</string>
+    <string name="settings_shop_profile_owner_only_notice">يمكن لمالك المتجر فقط تعديل تفاصيل المتجر</string>
 </resources>

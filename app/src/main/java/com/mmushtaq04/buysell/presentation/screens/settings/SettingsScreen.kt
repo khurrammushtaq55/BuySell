@@ -367,11 +367,38 @@ fun SettingsScreen(
                 icon = Icons.Default.Store
             ) {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    if (!isOwner) {
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(12.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Lock,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                                Text(
+                                    text = stringResource(R.string.settings_shop_profile_owner_only_notice),
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                    }
+
                     OutlinedTextField(
                         value = editableOwnerName,
                         onValueChange = { editableOwnerName = it },
                         label = { Text(stringResource(R.string.label_owner_name)) },
                         readOnly = !isOwner,
+                        enabled = isOwner,
                         leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -381,6 +408,7 @@ fun SettingsScreen(
                         onValueChange = { editableShopName = it },
                         label = { Text(stringResource(R.string.label_shop_name)) },
                         readOnly = !isOwner,
+                        enabled = isOwner,
                         leadingIcon = { Icon(Icons.Default.Storefront, contentDescription = null) },
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -390,6 +418,7 @@ fun SettingsScreen(
                         onValueChange = { editableShopPhone = it },
                         label = { Text(stringResource(R.string.label_shop_phone)) },
                         readOnly = !isOwner,
+                        enabled = isOwner,
                         leadingIcon = { Icon(Icons.Default.Phone, contentDescription = null) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                         modifier = Modifier.fillMaxWidth()
@@ -400,6 +429,7 @@ fun SettingsScreen(
                         onValueChange = { editableShopAddress = it },
                         label = { Text(stringResource(R.string.label_shop_address)) },
                         readOnly = !isOwner,
+                        enabled = isOwner,
                         leadingIcon = { Icon(Icons.Default.LocationOn, contentDescription = null) },
                         modifier = Modifier.fillMaxWidth()
                     )

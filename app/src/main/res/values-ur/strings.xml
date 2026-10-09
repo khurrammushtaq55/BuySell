@@ -275,4 +275,5 @@
     <string name="settings_staff_invite_sub">اسٹاف ممبر کو شاپ میں شامل کرنے کے لیے 8 ہندسوں کا کوڈ بنائیں</string>
     <string name="settings_partner_invite_title">سلیپنگ پارٹنر انوائٹ کوڈ</string>
     <string name="settings_partner_invite_sub">سلیپنگ پارٹنر کو ڈیش بورڈ اور منافع دکھانے کے لیے کوڈ بنائیں</string>
+    <string name="settings_shop_profile_owner_only_notice">صرف دکان کا مالک شاپ کی تفصیلات تبدیل کر سکتا ہے</string>
 </resources>

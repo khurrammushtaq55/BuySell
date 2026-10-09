@@ -182,3 +182,10 @@
 - [x] Firestore Security Rule Fix for Staff Join
 	- [x] Updated `match /shops/{shopId}` read rule in `firestore.rules` to `allow read: if isAuthenticated()`.
 	- [x] Unblocked new staff members from encountering `PERMISSION_DENIED` when fetching store metadata (`shops/{shopId}`) prior to joining.
+- [x] Restrict Shop Profile Edits for Staff Members
+	- [x] Added `user?.role == Role.OWNER` guard in `SettingsViewModel.kt` `updateShopProfile`.
+	- [x] Rendered `"🔒 Only the Shop Owner can edit store details"` notice banner in `SettingsScreen.kt` when `!isOwner`, set store text fields to `readOnly = true` and `enabled = false`, and hid the Save button.
+	- [x] Added `settings_shop_profile_owner_only_notice` across all 8 locale resource folders.
+- [x] Clear 4-Digit PIN Lock on Sign Out
+	- [x] Added `AppPinManager.clearPin(getApplication())` inside `executeForceSignOut` in `SettingsViewModel.kt`.
+	- [x] Guaranteed complete teardown of PIN lock hash/salt, local database cache, and Firebase Auth session upon sign-out.

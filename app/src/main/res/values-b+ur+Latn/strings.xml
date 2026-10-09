@@ -275,4 +275,5 @@
     <string name="settings_staff_invite_sub">Staff member ko shop mein shamil karne ke liye 8-digit code banayein</string>
     <string name="settings_partner_invite_title">Sleeping Partner Invite Code</string>
     <string name="settings_partner_invite_sub">Sleeping Partner ko dashboard aur munafa dikhane ke liye code banayein</string>
+    <string name="settings_shop_profile_owner_only_notice">Sirf Shop Owner dukan ki details badal sakta hai</string>
 </resources>

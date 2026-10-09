@@ -275,4 +275,5 @@
     <string name="settings_staff_invite_sub">Genere un código de 8 dígitos para agregar miembros del personal</string>
     <string name="settings_partner_invite_title">Código de Invitación para Socio</string>
     <string name="settings_partner_invite_sub">Genere un código de 8 dígitos para acceso al panel de socio</string>
+    <string name="settings_shop_profile_owner_only_notice">Solo el propietario puede editar los detalles de la tienda</string>
 </resources>

@@ -17,6 +17,7 @@ import com.mmushtaq04.buysell.data.local.enums.SyncOp
 import com.mmushtaq04.buysell.data.sync.FirestoreSyncManager
 import com.mmushtaq04.buysell.data.sync.SyncWorker
 import com.mmushtaq04.buysell.domain.InviteManager
+import com.mmushtaq04.buysell.util.AppPinManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -120,14 +121,19 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     fun updateShopProfile(ownerName: String, shopName: String, phone: String, address: String) {
         viewModelScope.launch {
             val user = db.userDao().getPrimaryUser()
+            if (user?.role != Role.OWNER) {
+                Log.w(TAG, "Non-owner user (${user?.role}) attempted to update shop profile. Operation blocked.")
+                return@launch
+            }
+
             val meta = db.appMetaDao().getAppMeta()
-            val shopId = meta?.activeShopId?.ifBlank { null } ?: user?.shopId ?: ""
+            val shopId = meta?.activeShopId?.ifBlank { null } ?: user.shopId
 
             if (shopId.isBlank()) return@launch
 
             val now = System.currentTimeMillis()
 
-            if (user != null && ownerName.isNotBlank() && ownerName != user.displayName) {
+            if (ownerName.isNotBlank() && ownerName != user.displayName) {
                 val updatedUser = user.copy(
                     displayName = ownerName,
                     updatedAt = now,
@@ -158,7 +164,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
                     id = shopId,
                     name = shopName,
                     code = "SHOP",
-                    ownerUserId = user?.id ?: "",
+                    ownerUserId = user.id,
                     phone = phone.ifBlank { null },
                     address = address.ifBlank { null },
                     createdAt = now,
@@ -247,6 +253,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         viewModelScope.launch(Dispatchers.IO) {
             authManager.signOut()
             db.clearAllTables()
+            AppPinManager.clearPin(getApplication())
             withContext(Dispatchers.Main) {
                 onReadyToSignOut()
             }

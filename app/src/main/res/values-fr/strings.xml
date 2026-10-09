@@ -275,4 +275,5 @@
     <string name="settings_staff_invite_sub">Générez un code à 8 chiffres pour ajouter des membres du personnel</string>
     <string name="settings_partner_invite_title">Code d\'Invitation Associé</string>
     <string name="settings_partner_invite_sub">Générez un code à 8 chiffres pour l\'accès au tableau de bord associé</string>
+    <string name="settings_shop_profile_owner_only_notice">Seul le propriétaire de la boutique peut modifier les détails</string>
 </resources>
