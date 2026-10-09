@@ -177,8 +177,10 @@ fun HomeScreen(
                 ) {
                     Column {
                         Text(text = stringResource(R.string.home_today_sales), fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        val formattedAmount = com.mmushtaq04.buysell.util.CurrencyFormatter.formatPaisa(context, todaySalesAmountPaisa)
+                        val zeroFormatted = com.mmushtaq04.buysell.util.CurrencyFormatter.formatAmount(context, 0L)
                         Text(
-                            text = if (todaySalesCount > 0) "$todaySalesCount sales • Rs ${todaySalesAmountPaisa / 100}" else "Rs 0",
+                            text = if (todaySalesCount > 0) "$todaySalesCount sales • $formattedAmount" else zeroFormatted,
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
                             color = if (todaySalesCount > 0) Color(0xFF2E7D32) else MaterialTheme.colorScheme.onSurfaceVariant

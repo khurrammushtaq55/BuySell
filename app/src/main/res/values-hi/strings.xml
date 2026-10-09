@@ -84,7 +84,7 @@
     <string name="sell_title">फोन बेचें</string>
     <string name="label_buyer_name">खरीदार का नाम *</string>
     <string name="label_sale_price">बिक्री मूल्य (रु) *</string>
-    <string name="label_buy_price">खरीद मूल्य: </string>
+    <string name="label_buy_price">खरीद मूल्य:</string>
     <string name="btn_save_sale">बिक्री दर्ज करें ✓</string>
     <string name="exchange_title">पुराना देकर नया (एक्सचेंज)</string>
     <string name="exchange_explainer_title">एक्सचेंज प्रक्रिया</string>
@@ -117,8 +117,8 @@
     <string name="party_subtitle">किसके पास कितना बकाया है</string>
     <string name="party_search_label">नाम या मोबाइल नंबर खोजें</string>
     <string name="party_empty_msg">बकाया राशि यहां दिखाई देगी</string>
-    <string name="party_owes_shop">दुकान को Rs %1$d देने हैं</string>
-    <string name="party_shop_owes">दुकान पर Rs %1$d बकाया है</string>
+    <string name="party_owes_shop">दुकान को %1$d देने हैं</string>
+    <string name="party_shop_owes">दुकान पर %1$d बकाया है</string>
     <string name="party_settled">खाता बराबर ✓</string>
     <string name="settings_section_store">दुकान की जानकारी</string>
     <string name="settings_section_lang">भाषा और डिस्प्ले</string>
@@ -295,11 +295,11 @@
     <string name="dashboard_total_expenses">दुकान के खर्चे (Expenses)</string>
     <string name="dashboard_returns_refunds">वापसी और रिफंड</string>
     <string name="dashboard_top_models">सबसे ज्यादा बिकने वाले मॉडल</string>
-    <string name="dashboard_units_sold">%1$d बिके • लाभ: Rs %2$s</string>
+    <string name="dashboard_units_sold">%1$d बिके • लाभ: %2$s</string>
     <string name="expense_title">दुकान के खर्चे</string>
     <string name="expense_btn_add">नया खर्चा जोड़ें</string>
     <string name="expense_dialog_title">नया खर्चा दर्ज करें</string>
-    <string name="expense_label_amount">खर्चा राशि (Rs) *</string>
+    <string name="expense_label_amount">खर्चा राशि *</string>
     <string name="expense_label_category">श्रेणी चुनें *</string>
     <string name="expense_label_note">विवरण / विवरण (वैकल्पिक)</string>
     <string name="expense_category_rent">दुकान का किराया</string>
@@ -318,8 +318,8 @@
     <string name="party_btn_add">+ नया ग्राहक / खाता जोड़ें</string>
     <string name="party_ledger_default_title">ग्राहक खाता</string>
     <string name="party_ledger_net_balance_status">कुल बकाया स्थिति</string>
-    <string name="party_ledger_lene_hain">Rs %1$s (लेने हैं)</string>
-    <string name="party_ledger_dene_hain">Rs %1$s (देने हैं)</string>
+    <string name="party_ledger_lene_hain">%1$s (लेने हैं)</string>
+    <string name="party_ledger_dene_hain">%1$s (देने हैं)</string>
     <string name="party_ledger_settled_nil">खाता बराबर</string>
     <string name="party_ledger_btn_record_wasooli">वसूल राशि दर्ज करें (+)</string>
     <string name="party_ledger_btn_record_payment_given">भुगतान राशि दर्ज करें (-)</string>
@@ -328,10 +328,14 @@
     <string name="party_ledger_history_empty">इस ग्राहक के लिए अभी तक कोई लेनदेन दर्ज नहीं है।</string>
     <string name="party_ledger_dialog_wasooli_title">वसूल राशि दर्ज करें (+)</string>
     <string name="party_ledger_dialog_payment_given_title">भुगतान राशि दर्ज करें (-)</string>
-    <string name="party_ledger_dialog_amount_label">भुगतान राशि (Rs) *</string>
+    <string name="party_ledger_dialog_amount_label">भुगतान राशि *</string>
     <string name="party_ledger_dialog_method_label">भुगतान का तरीका</string>
     <string name="party_ledger_dialog_note_label">विवरण / नोट (वैकल्पिक)</string>
-    <string name="party_ledger_whatsapp_remind_owed">%1$s जी, %2$s रिकॉर्ड के अनुसार आपका Rs %3$s बकाया है। कृपया भुगतान करने का कष्ट करें। धन्यवाद!</string>
-    <string name="party_ledger_whatsapp_remind_pay">%1$s जी, %2$s रिकॉर्ड के अनुसार हमारे पास आपका Rs %3$s बकाया है। भुगतान जल्द कर दिया जाएगा। धन्यवाद!</string>
-    <string name="party_ledger_whatsapp_remind_settled">%1$s जी, %2$s रिकॉर्ड के अनुसार आपका खाता पूरी तरह बराबर (Rs 0) है। धन्यवाद!</string>
+    <string name="party_ledger_whatsapp_remind_owed">%1$s जी, %2$s रिकॉर्ड के अनुसार आपका %3$s बकाया है। कृपया भुगतान करने का कष्ट करें। धन्यवाद!</string>
+    <string name="party_ledger_whatsapp_remind_pay">%1$s जी, %2$s रिकॉर्ड के अनुसार हमारे पास आपका %3$s बकाया है। भुगतान जल्द कर दिया जाएगा। धन्यवाद!</string>
+    <string name="party_ledger_whatsapp_remind_settled">%1$s जी, %2$s रिकॉर्ड के अनुसार आपका खाता पूरी तरह बराबर (0) है। धन्यवाद!</string>
+    <string name="settings_store_currency">दुकान की मुद्रा (Currency)</string>
+    <string name="settings_store_currency_sub">रसीद, रिपोर्ट और इतिहास के लिए मुद्रा प्रतीक चुनें</string>
+    <string name="settings_custom_currency_dialog_title">कस्टम मुद्रा प्रतीक दर्ज करें</string>
+    <string name="settings_custom_currency_label">मुद्रा प्रतीक (जैसे KSh, Tk, QAR, $)</string>
 </resources>

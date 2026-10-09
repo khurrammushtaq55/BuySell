@@ -325,7 +325,7 @@ private fun LedgerItemCard(item: LedgerItem) {
             }
 
             Text(
-                text = "Rs ${item.amountRs}",
+                text = com.mmushtaq04.buysell.util.CurrencyFormatter.formatAmount(LocalContext.current, item.amountRs),
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp,
                 color = color

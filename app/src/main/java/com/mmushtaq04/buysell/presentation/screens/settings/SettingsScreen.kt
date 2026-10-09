@@ -47,6 +47,8 @@ fun SettingsScreen(
     shopPhone: String = "",
     shopAddress: String = "",
     allCategories: List<CategoryEntity> = emptyList(),
+    currencySymbol: String = "Rs",
+    onUpdateCurrency: (symbol: String, code: String) -> Unit = { _, _ -> },
     onUpdateShopProfile: (ownerName: String, shopName: String, phone: String, address: String) -> Unit = { _, _, _, _ -> },
     onToggleCategory: (CategoryEntity) -> Unit = {},
     onGenerateInvite: (role: String, onCodeGenerated: (String) -> Unit) -> Unit = { _, _ -> },
@@ -532,6 +534,87 @@ fun SettingsScreen(
                                 )
                             }
                         }
+                    }
+
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+
+                    Text(stringResource(R.string.settings_store_currency), fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+                    Text(stringResource(R.string.settings_store_currency_sub), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+
+                    var expandedCurrencyDropdown by remember { mutableStateOf(false) }
+                    var showCustomCurrencyDialog by remember { mutableStateOf(false) }
+                    var customCurrencyInput by remember { mutableStateOf("") }
+
+                    Box {
+                        OutlinedTextField(
+                            value = currencySymbol,
+                            onValueChange = {},
+                            label = { Text(stringResource(R.string.settings_store_currency)) },
+                            modifier = Modifier.fillMaxWidth().clickable { expandedCurrencyDropdown = true },
+                            readOnly = true,
+                            trailingIcon = {
+                                IconButton(onClick = { expandedCurrencyDropdown = true }) {
+                                    Icon(Icons.Default.ArrowDropDown, contentDescription = null)
+                                }
+                            }
+                        )
+
+                        DropdownMenu(
+                            expanded = expandedCurrencyDropdown,
+                            onDismissRequest = { expandedCurrencyDropdown = false }
+                        ) {
+                            AppPreferencesManager.supportedCurrencies.forEach { preset ->
+                                DropdownMenuItem(
+                                    text = { Text("${preset.flag} ${preset.name} (${preset.symbol})") },
+                                    onClick = {
+                                        expandedCurrencyDropdown = false
+                                        onUpdateCurrency(preset.symbol, preset.code)
+                                    }
+                                )
+                            }
+                            HorizontalDivider()
+                            DropdownMenuItem(
+                                text = { Text("✍️ Custom Symbol...") },
+                                onClick = {
+                                    expandedCurrencyDropdown = false
+                                    showCustomCurrencyDialog = true
+                                }
+                            )
+                        }
+                    }
+
+                    if (showCustomCurrencyDialog) {
+                        AlertDialog(
+                            onDismissRequest = { showCustomCurrencyDialog = false },
+                            title = { Text(stringResource(R.string.settings_custom_currency_dialog_title), fontWeight = FontWeight.Bold) },
+                            text = {
+                                OutlinedTextField(
+                                    value = customCurrencyInput,
+                                    onValueChange = { customCurrencyInput = it },
+                                    label = { Text(stringResource(R.string.settings_custom_currency_label)) },
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            },
+                            confirmButton = {
+                                Button(
+                                    onClick = {
+                                        if (customCurrencyInput.isNotBlank()) {
+                                            onUpdateCurrency(customCurrencyInput.trim(), "CUSTOM")
+                                            showCustomCurrencyDialog = false
+                                            customCurrencyInput = ""
+                                        }
+                                    },
+                                    enabled = customCurrencyInput.isNotBlank()
+                                ) {
+                                    Text(stringResource(R.string.action_save))
+                                }
+                            },
+                            dismissButton = {
+                                TextButton(onClick = { showCustomCurrencyDialog = false }) {
+                                    Text(stringResource(R.string.action_cancel))
+                                }
+                            }
+                        )
                     }
 
                     HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))

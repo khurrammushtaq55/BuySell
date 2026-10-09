@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -39,6 +40,7 @@ fun ExpenseListScreen(
 ) {
     var showAddDialog by remember { mutableStateOf(false) }
     var deleteCandidateId by remember { mutableStateOf<String?>(null) }
+    val context = LocalContext.current
 
     if (showAddDialog) {
         AddExpenseDialog(
@@ -121,7 +123,7 @@ fun ExpenseListScreen(
                         color = MaterialTheme.colorScheme.onErrorContainer
                     )
                     Text(
-                        text = "Rs $totalExpenseRs",
+                        text = com.mmushtaq04.buysell.util.CurrencyFormatter.formatAmount(context, totalExpenseRs),
                         fontSize = 26.sp,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.error
@@ -252,7 +254,7 @@ private fun ExpenseItemCard(
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    text = "Rs $amountRs",
+                    text = com.mmushtaq04.buysell.util.CurrencyFormatter.formatAmount(LocalContext.current, amountRs),
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
                     color = MaterialTheme.colorScheme.error

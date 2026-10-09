@@ -221,3 +221,11 @@
 	- [x] Formatted customer phone numbers to international format (`923001234567`) and launched WhatsApp directly into their chat window via `https://api.whatsapp.com/send?phone=...`.
 	- [x] Replaced static "BuySell360 Store" with dynamic `uiState.shopName`.
 	- [x] Removed "Assalam-o-Alaikum" greeting and added localized statement templates across all 8 locale resource files.
+- [x] Multi-National Dynamic Currency System (Option 1 + Option 2)
+	- [x] Created `CurrencyFormatter.kt` utility for dynamic price formatting (`$15,000`, `AED 15,000`, `€15,000`, `£15,000`, `Rs 15,000`, `₹15,000`).
+	- [x] Implemented device locale country auto-detection in `AppPreferencesManager.kt` on first setup.
+	- [x] Added **Store Currency** selector in `SettingsScreen.kt` & `SettingsViewModel.kt` with presets (PKR, USD, EUR, GBP, AED, SAR, INR, CAD, AUD) and Custom Symbol entry.
+	- [x] Refactored `HomeScreen`, `StockListScreen`, `OwnerDashboardScreen`, `ExpenseListScreen`, `PartyLedgerScreen`, and `PdfReceiptGenerator` to format prices dynamically.
+- [x] Complete Removal of Hardcoded Currency Strings Across All Locales
+	- [x] Removed all hardcoded `"Rs"`, `"Rs "`, `"(Rs)"` text from form labels, summary strings, and debt messages across all 8 locale resource files.
+	- [x] Refactored `SellWizardScreen` cost reveal and `ExpenseListScreen` cards to use `CurrencyFormatter`.

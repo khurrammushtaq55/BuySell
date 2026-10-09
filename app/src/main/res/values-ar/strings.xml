@@ -84,7 +84,7 @@
     <string name="sell_title">بيع هاتف</string>
     <string name="label_buyer_name">اسم المشتري *</string>
     <string name="label_sale_price">سعر البيع (روبية) *</string>
-    <string name="label_buy_price">سعر الشراء: </string>
+    <string name="label_buy_price">سعر الشراء:</string>
     <string name="btn_save_sale">تسجيل عملية البيع ✓</string>
     <string name="exchange_title">استبدال هاتف</string>
     <string name="exchange_explainer_title">عملية الاستبدال</string>
@@ -117,8 +117,8 @@
     <string name="party_subtitle">الذمم والديون المستحقة</string>
     <string name="party_search_label">ابحث باسم أو رقم الهاتف</string>
     <string name="party_empty_msg">ستظهر الذمم المالية هنا</string>
-    <string name="party_owes_shop">يدين للمتجر بمبلغ Rs %1$d</string>
-    <string name="party_shop_owes">المتجر يدين بمبلغ Rs %1$d</string>
+    <string name="party_owes_shop">يدين للمتجر بمبلغ %1$d</string>
+    <string name="party_shop_owes">المتجر يدين بمبلغ %1$d</string>
     <string name="party_settled">الحساب خالص ✓</string>
     <string name="settings_section_store">ملف المتجر</string>
     <string name="settings_section_lang">اللغة والعرض</string>
@@ -295,9 +295,9 @@
     <string name="dashboard_total_expenses">المصاريف التشغيلية</string>
     <string name="dashboard_returns_refunds">المرتجعات والمبالغ المستردة</string>
     <string name="dashboard_top_models">الأجهزة الأكثر مبيعاً</string>
-    <string name="dashboard_units_sold">تم بيع %1$d • الربح: Rs %2$s</string>
+    <string name="dashboard_units_sold">تم بيع %1$d • الربح: %2$s</string>
     <string name="expense_title">مصاريف المحل</string>
-    <string name="expense_btn_add"> إضافة مصروف جديد</string>
+    <string name="expense_btn_add">إضافة مصروف جديد</string>
     <string name="expense_dialog_title">تسجيل مصروف جديد</string>
     <string name="expense_label_amount">مبلغ المصروف (روبية) *</string>
     <string name="expense_label_category">اختر الفئة *</string>
@@ -318,12 +318,12 @@
     <string name="party_btn_add">+ إضافة عميل جديد</string>
     <string name="party_ledger_default_title">دفتر العميل</string>
     <string name="party_ledger_net_balance_status">حالة الرصيد الصافي</string>
-    <string name="party_ledger_lene_hain">Rs %1$s (مستحق للتحصيل)</string>
-    <string name="party_ledger_dene_hain">Rs %1$s (مستحق للدفع)</string>
-    <string name="party_ledger_settled_nil">الحساب خالص </string>
+    <string name="party_ledger_lene_hain">%1$s (مستحق للتحصيل)</string>
+    <string name="party_ledger_dene_hain">%1$s (مستحق للدفع)</string>
+    <string name="party_ledger_settled_nil">الحساب خالص</string>
     <string name="party_ledger_btn_record_wasooli">تسجيل تحصيل المبلغ (+)</string>
     <string name="party_ledger_btn_record_payment_given">تسجيل المبلغ المدفوع (-)</string>
-    <string name="party_ledger_settled_badge">الحساب خالص </string>
+    <string name="party_ledger_settled_badge">الحساب خالص</string>
     <string name="party_ledger_history_title">سجل الحساب والمعاملات</string>
     <string name="party_ledger_history_empty">لم يتم تسجيل أي معاملات أو مدفوعات لهذا العميل بعد.</string>
     <string name="party_ledger_dialog_wasooli_title">تسجيل استلام مبلغ (+)</string>
@@ -334,4 +334,8 @@
     <string name="party_ledger_whatsapp_remind_owed">مرحباً %1$s، وفقاً لسجلات متجر %2$s، فإن المبلغ المستحق عليكم هو %3$s روبية. يرجى التكرم بالسداد. شكراً لكم!</string>
     <string name="party_ledger_whatsapp_remind_pay">مرحباً %1$s، وفقاً لسجلات متجر %2$s، لدينا مبلغ مستحق لكم بقيمة %3$s روبية. سيتم السداد قريباً. شكراً لكم!</string>
     <string name="party_ledger_whatsapp_remind_settled">مرحباً %1$s، وفقاً لسجلات متجر %2$s، حسابكم خالص تماماً (0 روبية). شكراً لكم!</string>
+    <string name="settings_store_currency">عملة المتجر</string>
+    <string name="settings_store_currency_sub">اختر رمز العملة المستخدم في الفواتير والتقارير المعاملات</string>
+    <string name="settings_custom_currency_dialog_title">إدخال رمز عملة مخصص</string>
+    <string name="settings_custom_currency_label">رمز العملة (مثال: KSh, Tk, QAR, $)</string>
 </resources>

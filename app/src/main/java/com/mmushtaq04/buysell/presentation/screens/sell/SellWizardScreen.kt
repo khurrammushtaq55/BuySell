@@ -208,8 +208,10 @@ fun SellWizardScreen(
                                             fontSize = 13.sp,
                                             fontWeight = FontWeight.Bold
                                         )
+                                        val currSym = com.mmushtaq04.buysell.util.CurrencyFormatter.getSymbol(LocalContext.current)
+                                        val formattedCost = com.mmushtaq04.buysell.util.CurrencyFormatter.formatAmount(LocalContext.current, selectedItem?.cost ?: 0L)
                                         Text(
-                                            text = if (isCostVisible) "Rs ${selectedItem?.cost ?: 0}" else "Rs ••••••",
+                                            text = if (isCostVisible) formattedCost else "$currSym ••••••",
                                             fontSize = 14.sp,
                                             fontWeight = FontWeight.Bold,
                                             color = if (isCostVisible) MaterialTheme.colorScheme.primary else Color.Gray

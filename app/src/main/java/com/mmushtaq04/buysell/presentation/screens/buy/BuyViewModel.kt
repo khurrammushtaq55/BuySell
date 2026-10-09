@@ -47,7 +47,7 @@ class BuyViewModel(application: Application) : AndroidViewModel(application) {
         onSuccess: () -> Unit
     ) {
         viewModelScope.launch {
-            Log.d(TAG, "Starting savePurchase: Category=$categoryName, Brand=$brand, Model=$model, Price=Rs $priceRs, Seller=$sellerName, RecordedBy=$recordedBy")
+            Log.d(TAG, "Starting savePurchase: Category=$categoryName, Brand=$brand, Model=$model, Price= $priceRs, Seller=$sellerName, RecordedBy=$recordedBy")
             val user = db.userDao().getPrimaryUser()
             val meta = db.appMetaDao().getAppMeta()
             val activeShopId = meta?.activeShopId?.ifBlank { null } ?: user?.shopId ?: ""

@@ -35,6 +35,7 @@ fun OwnerDashboardScreen(
 ) {
     var showHelpDialogTitle by remember { mutableStateOf<String?>(null) }
     var showHelpDialogMsg by remember { mutableStateOf<String?>(null) }
+    val context = androidx.compose.ui.platform.LocalContext.current
 
     if (showHelpDialogTitle != null && showHelpDialogMsg != null) {
         AlertDialog(
@@ -144,7 +145,7 @@ fun OwnerDashboardScreen(
                     }
 
                     Text(
-                        text = "Rs ${uiState.netProfitRs}",
+                        text = com.mmushtaq04.buysell.util.CurrencyFormatter.formatAmount(context, uiState.netProfitRs),
                         fontSize = 32.sp,
                         fontWeight = FontWeight.Bold,
                         color = profitColor
@@ -161,7 +162,7 @@ fun OwnerDashboardScreen(
                     // Net Revenue Card
                     DashboardSmallCard(
                         title = stringResource(R.string.dashboard_net_revenue),
-                        value = "Rs ${uiState.netRevenueRs}",
+                        value = com.mmushtaq04.buysell.util.CurrencyFormatter.formatAmount(context, uiState.netRevenueRs),
                         icon = Icons.Default.AttachMoney,
                         iconColor = Color(0xFF2E7D32),
                         modifier = Modifier.weight(1f)
@@ -170,7 +171,7 @@ fun OwnerDashboardScreen(
                     // Cost of Goods Card
                     DashboardSmallCard(
                         title = stringResource(R.string.dashboard_cost_goods),
-                        value = "Rs ${uiState.cogsRs}",
+                        value = com.mmushtaq04.buysell.util.CurrencyFormatter.formatAmount(context, uiState.cogsRs),
                         icon = Icons.Default.Inventory2,
                         iconColor = Color(0xFF1565C0),
                         modifier = Modifier.weight(1f)
@@ -184,7 +185,7 @@ fun OwnerDashboardScreen(
                     // Operational Expenses Card (Clickable)
                     DashboardSmallCard(
                         title = stringResource(R.string.dashboard_total_expenses),
-                        value = "Rs ${uiState.expensesRs}",
+                        value = com.mmushtaq04.buysell.util.CurrencyFormatter.formatAmount(context, uiState.expensesRs),
                         icon = Icons.AutoMirrored.Filled.ReceiptLong,
                         iconColor = MaterialTheme.colorScheme.error,
                         subtitle = "Tap to view/add expenses →",
@@ -195,7 +196,7 @@ fun OwnerDashboardScreen(
                     // Returns & Refunds Card
                     DashboardSmallCard(
                         title = stringResource(R.string.dashboard_returns_refunds),
-                        value = "Rs ${uiState.returnsRefundsRs}",
+                        value = com.mmushtaq04.buysell.util.CurrencyFormatter.formatAmount(context, uiState.returnsRefundsRs),
                         icon = Icons.AutoMirrored.Filled.AssignmentReturn,
                         iconColor = Color(0xFFE65100),
                         modifier = Modifier.weight(1f)
@@ -259,7 +260,7 @@ fun OwnerDashboardScreen(
                                 }
 
                                 Text(
-                                    text = "Rs ${model.revenueRs}",
+                                    text = com.mmushtaq04.buysell.util.CurrencyFormatter.formatAmount(context, model.revenueRs),
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 14.sp
                                 )
@@ -272,7 +273,7 @@ fun OwnerDashboardScreen(
             // Capital Locked in Stock
             DashboardMetricCard(
                 title = stringResource(R.string.dashboard_capital_stock),
-                value = "Rs ${uiState.capitalInStockRs}",
+                value = com.mmushtaq04.buysell.util.CurrencyFormatter.formatAmount(context, uiState.capitalInStockRs),
                 valueColor = Color(0xFF7B1FA2),
                 helpTitle = stringResource(R.string.dashboard_help_capital_title),
                 helpMsg = stringResource(R.string.dashboard_help_capital_msg),
@@ -283,9 +284,10 @@ fun OwnerDashboardScreen(
             )
 
             // Slow Stock Warning
+            val formattedSlowVal = com.mmushtaq04.buysell.util.CurrencyFormatter.formatAmount(context, uiState.slowStockValueRs)
             DashboardMetricCard(
                 title = stringResource(R.string.dashboard_slow_stock),
-                value = if (uiState.slowStockCount > 0) "${uiState.slowStockCount} items • Rs ${uiState.slowStockValueRs}" else "0 items",
+                value = if (uiState.slowStockCount > 0) "${uiState.slowStockCount} items • $formattedSlowVal" else "0 items",
                 valueColor = if (uiState.slowStockCount > 0) MaterialTheme.colorScheme.error else Color(0xFF2E7D32),
                 helpTitle = stringResource(R.string.dashboard_help_slow_stock_title),
                 helpMsg = stringResource(R.string.dashboard_help_slow_stock_msg),

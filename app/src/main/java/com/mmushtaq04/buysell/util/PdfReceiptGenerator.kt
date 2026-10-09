@@ -73,18 +73,22 @@ object PdfReceiptGenerator {
         y += 25f
 
         // Payment Details
+        val totalFormatted = CurrencyFormatter.formatAmount(context, data.totalAmountRs)
+        val paidFormatted = CurrencyFormatter.formatAmount(context, data.paidAmountRs)
+        val remaining = (data.totalAmountRs - data.paidAmountRs).coerceAtLeast(0L)
+        val remFormatted = CurrencyFormatter.formatAmount(context, remaining)
+
         canvas.drawText("Total Amount:", 40f, y, paint)
-        canvas.drawText("Rs ${data.totalAmountRs}", 400f, y, paint)
+        canvas.drawText(totalFormatted, 400f, y, paint)
         y += 20f
 
         canvas.drawText("Paid Amount:", 40f, y, paint)
-        canvas.drawText("Rs ${data.paidAmountRs}", 400f, y, paint)
+        canvas.drawText(paidFormatted, 400f, y, paint)
         y += 20f
 
-        val remaining = (data.totalAmountRs - data.paidAmountRs).coerceAtLeast(0L)
         paint.isFakeBoldText = true
         canvas.drawText("Remaining Balance:", 40f, y, paint)
-        canvas.drawText("Rs $remaining", 400f, y, paint)
+        canvas.drawText(remFormatted, 400f, y, paint)
         y += 40f
 
         // Footer

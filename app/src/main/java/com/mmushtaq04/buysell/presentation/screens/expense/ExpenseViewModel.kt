@@ -111,7 +111,7 @@ class ExpenseViewModel(application: Application) : AndroidViewModel(application)
             )
 
             SyncWorker.enqueueOneTimeSync(getApplication())
-            Log.i(TAG, "✓ Added new Expense: Rs $amountRs for category '$category'")
+            Log.i(TAG, "✓ Added new Expense:  $amountRs for category '$category'")
         }
     }
 

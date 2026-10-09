@@ -18,6 +18,7 @@ import com.mmushtaq04.buysell.data.sync.FirestoreSyncManager
 import com.mmushtaq04.buysell.data.sync.SyncWorker
 import com.mmushtaq04.buysell.domain.InviteManager
 import com.mmushtaq04.buysell.util.AppPinManager
+import com.mmushtaq04.buysell.util.AppPreferencesManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -37,6 +38,18 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
 
     private val _primaryShop = MutableStateFlow<ShopEntity?>(null)
     val primaryShop: StateFlow<ShopEntity?> = _primaryShop.asStateFlow()
+
+    private val _currencySymbol = MutableStateFlow(AppPreferencesManager.getCurrencySymbol(application))
+    val currencySymbol: StateFlow<String> = _currencySymbol.asStateFlow()
+
+    private val _currencyCode = MutableStateFlow(AppPreferencesManager.getCurrencyCode(application))
+    val currencyCode: StateFlow<String> = _currencyCode.asStateFlow()
+
+    fun updateCurrency(symbol: String, code: String) {
+        AppPreferencesManager.setCurrency(getApplication(), symbol, code)
+        _currencySymbol.value = symbol
+        _currencyCode.value = code
+    }
 
     companion object {
         private const val TAG = "SettingsViewModel"

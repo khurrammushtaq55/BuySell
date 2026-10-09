@@ -24,6 +24,7 @@ fun NavGraphBuilder.settingsNavGraph(
         val settingsViewModel: SettingsViewModel = viewModel()
         val shopEntity by settingsViewModel.primaryShop.collectAsState()
         val categories by settingsViewModel.categories.collectAsState()
+        val currencySymbol by settingsViewModel.currencySymbol.collectAsState()
 
         SettingsScreen(
             userRole = registeredUserRole,
@@ -32,6 +33,10 @@ fun NavGraphBuilder.settingsNavGraph(
             shopPhone = shopEntity?.phone ?: "",
             shopAddress = shopEntity?.address ?: "",
             allCategories = categories,
+            currencySymbol = currencySymbol,
+            onUpdateCurrency = { symbol, code ->
+                settingsViewModel.updateCurrency(symbol, code)
+            },
             onUpdateShopProfile = { newOwnerName, newShopName, newPhone, newAddress ->
                 settingsViewModel.updateShopProfile(
                     ownerName = newOwnerName,
