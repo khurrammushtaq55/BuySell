@@ -1,5 +1,7 @@
 package com.mmushtaq04.buysell.presentation.screens.party
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -7,19 +9,23 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mmushtaq04.buysell.R
 import com.mmushtaq04.buysell.data.local.enums.PaymentDirection
+import com.mmushtaq04.buysell.ui.theme.BuySellTheme
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -30,6 +36,7 @@ fun PartyLedgerScreen(
     onNavigateBack: () -> Unit = {},
     onRecordPayment: (amountRs: Long, methodStr: String, note: String, direction: PaymentDirection) -> Unit = { _, _, _, _ -> }
 ) {
+    val context = LocalContext.current
     var showWasooliDialog by remember { mutableStateOf(false) }
     var paymentDirectionToRecord by remember { mutableStateOf(PaymentDirection.IN) }
 
@@ -58,6 +65,42 @@ fun PartyLedgerScreen(
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    }
+                },
+                actions = {
+                    if (uiState.partyPhone.isNotBlank()) {
+                        // Direct Phone Call Action
+                        IconButton(onClick = {
+                            val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:${uiState.partyPhone}"))
+                            context.startActivity(intent)
+                        }) {
+                            Icon(Icons.Default.Call, contentDescription = "Call Customer", tint = MaterialTheme.colorScheme.primary)
+                        }
+
+                        // WhatsApp Udhaar Reminder Share Action
+                        IconButton(onClick = {
+                            val msg = if (uiState.netBalanceRs > 0) {
+                                "Assalam-o-Alaikum ${uiState.partyName} bhai, BuySell360 Store record ke mutabiq aap ka Rs ${uiState.netBalanceRs} udhaar baqi hai. Baraye meherbani Wasooli ada kar dein. Shukriya!"
+                            } else {
+                                "Assalam-o-Alaikum ${uiState.partyName} bhai, Khata statement for BuySell360 Store."
+                            }
+                            val intent = Intent(Intent.ACTION_SEND).apply {
+                                type = "text/plain"
+                                putExtra(Intent.EXTRA_TEXT, msg)
+                                setPackage("com.whatsapp")
+                            }
+                            runCatching {
+                                context.startActivity(intent)
+                            }.onFailure {
+                                val fallbackIntent = Intent(Intent.ACTION_SEND).apply {
+                                    type = "text/plain"
+                                    putExtra(Intent.EXTRA_TEXT, msg)
+                                }
+                                context.startActivity(Intent.createChooser(fallbackIntent, "Share Statement"))
+                            }
+                        }) {
+                            Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Share Udhaar Reminder", tint = Color(0xFF25D366))
+                        }
                     }
                 }
             )
@@ -109,40 +152,63 @@ fun PartyLedgerScreen(
                 }
             }
 
-            // Action Buttons Row: Wasooli / Receive Cash (+) vs Pay Cash (-)
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Button(
-                    onClick = {
-                        paymentDirectionToRecord = PaymentDirection.IN
-                        showWasooliDialog = true
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7D32)),
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(48.dp)
-                ) {
-                    Icon(Icons.Default.Payments, contentDescription = null, modifier = Modifier.size(18.dp))
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text("Wasooli (+)", fontWeight = FontWeight.Bold)
+            // Contextual Action Button Logic:
+            // 1. Customer Owes Shop (balance > 0) -> Show ONLY "Wasooli (+)"
+            // 2. Shop Owes Customer/Supplier (balance < 0) -> Show ONLY "Payment Di (-)"
+            // 3. Settled (balance == 0) -> Show Settled Badge (Hide Payment Buttons!)
+            when {
+                isOwedToShop -> {
+                    Button(
+                        onClick = {
+                            paymentDirectionToRecord = PaymentDirection.IN
+                            showWasooliDialog = true
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7D32)),
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp)
+                    ) {
+                        Icon(Icons.Default.Payments, contentDescription = null, modifier = Modifier.size(20.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Record Wasooli / Payment Received (+)", fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                    }
                 }
-
-                OutlinedButton(
-                    onClick = {
-                        paymentDirectionToRecord = PaymentDirection.OUT
-                        showWasooliDialog = true
-                    },
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(48.dp)
-                ) {
-                    Icon(Icons.Default.MoneyOff, contentDescription = null, modifier = Modifier.size(18.dp))
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text("Payment Di (-)", fontWeight = FontWeight.Bold)
+                isShopOwes -> {
+                    Button(
+                        onClick = {
+                            paymentDirectionToRecord = PaymentDirection.OUT
+                            showWasooliDialog = true
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp)
+                    ) {
+                        Icon(Icons.Default.MoneyOff, contentDescription = null, modifier = Modifier.size(20.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Record Payment Given / Clear Debt (-)", fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                    }
+                }
+                else -> {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(14.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Icon(Icons.Default.CheckCircle, contentDescription = null, tint = Color(0xFF2E7D32), modifier = Modifier.size(20.dp))
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Account Settled — No Pending Udhaar / Balance", fontWeight = FontWeight.SemiBold, fontSize = 14.sp, color = Color(0xFF2E7D32))
+                        }
+                    }
                 }
             }
 
@@ -316,4 +382,39 @@ private fun RecordWasooliDialog(
             }
         }
     )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PartyLedgerScreenOwedPreview() {
+    BuySellTheme {
+        PartyLedgerScreen(
+            uiState = PartyLedgerUiState(
+                partyName = "Ali Ahmed",
+                partyPhone = "03001234567",
+                netBalanceRs = 15000L,
+                ledgerHistory = listOf(
+                    LedgerItem("1", System.currentTimeMillis() - 86400000L, "Device Sale / Saman Becha", "iPhone 13 128GB", 85000L, false, PaymentDirection.IN),
+                    LedgerItem("2", System.currentTimeMillis(), "Udhaar Wasooli / Cash Received (+)", "Cash • Part Payment", 70000L, true, PaymentDirection.IN)
+                )
+            )
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PartyLedgerScreenSettledPreview() {
+    BuySellTheme {
+        PartyLedgerScreen(
+            uiState = PartyLedgerUiState(
+                partyName = "Bilal Khan",
+                partyPhone = "03335554433",
+                netBalanceRs = 0L,
+                ledgerHistory = listOf(
+                    LedgerItem("1", System.currentTimeMillis(), "Udhaar Wasooli / Cash Received (+)", "EasyPaisa", 15000L, true, PaymentDirection.IN)
+                )
+            )
+        )
+    }
 }
