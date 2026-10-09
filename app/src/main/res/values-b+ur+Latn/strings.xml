@@ -310,9 +310,10 @@
     <string name="expense_category_other">Digar Akhrajat (Other)</string>
     <string name="expense_empty_msg">Iss muddat ke liye koi akhrajat darj nahi hain.</string>
     <string name="help_topic_8_title">8. Dukan ke akhrajat (Rent, Bijli, Salary) kaise darj karein?</string>
-    <string name="help_topic_8_desc">Dashboard -&gt; \'Dukan ke Akhrajat\' card par tap karein. \'+ Naya Kharcha\' button dabayein, raqam aur category (Rent, Bijli, Salary, Repair, Chai) select karke save karein.</string>
+    <string name="help_topic_8_desc">Dashboard -&gt; \'Dukan ke Akhrajat\' card par tap karein. \'Naya Kharcha\' button dabayein, raqam aur category (Rent, Bijli, Salary, Repair, Chai) select karke save karein.</string>
     <string name="help_topic_9_title">9. Dashboard par Net Profit kaise calculate hota hai?</string>
     <string name="help_topic_9_desc">Home top bar par Dashboard icon tap karein. Filter choose karein (Aaj, Iss Hafta, Iss Mahina, Ab Tak). Net Profit = Net Revenue (Sales minus Returns) minus COGS minus Expenses.</string>
     <string name="help_topic_10_title">10. App ka Security PIN aur Theme kaise badlein?</string>
     <string name="help_topic_10_desc">Settings -&gt; \'Language &amp; Preferences\' mein System, Light ya Dark Theme select karein. Settings -&gt; \'Security\' mein ja kar 4-digit PIN lock set karein.</string>
+    <string name="party_btn_add">+ Naya Customer / Khata Shamil Karein</string>
 </resources>

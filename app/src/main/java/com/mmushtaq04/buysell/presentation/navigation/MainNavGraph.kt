@@ -1,11 +1,14 @@
 package com.mmushtaq04.buysell.presentation.navigation
 
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.mmushtaq04.buysell.presentation.screens.dashboard.OwnerDashboardScreen
 import com.mmushtaq04.buysell.presentation.screens.dashboard.OwnerDashboardViewModel
 import com.mmushtaq04.buysell.presentation.screens.expense.ExpenseListScreen
@@ -13,6 +16,8 @@ import com.mmushtaq04.buysell.presentation.screens.expense.ExpenseViewModel
 import com.mmushtaq04.buysell.presentation.screens.help.HelpScreen
 import com.mmushtaq04.buysell.presentation.screens.home.HomeScreen
 import com.mmushtaq04.buysell.presentation.screens.home.HomeViewModel
+import com.mmushtaq04.buysell.presentation.screens.party.PartyLedgerScreen
+import com.mmushtaq04.buysell.presentation.screens.party.PartyLedgerViewModel
 import com.mmushtaq04.buysell.presentation.screens.party.PartyListScreen
 import com.mmushtaq04.buysell.presentation.screens.party.PartyListViewModel
 import com.mmushtaq04.buysell.presentation.screens.stock.StockListScreen
@@ -60,7 +65,34 @@ fun NavGraphBuilder.mainNavGraph(
         PartyListScreen(
             parties = parties,
             onNavigateBack = { navController.popBackStack() },
-            onSelectParty = { /* Open party ledger */ }
+            onSelectParty = { partyId ->
+                navController.navigate(NavRoutes.PartyLedger.createRoute(partyId))
+            },
+            onAddParty = { name, phone, cnic ->
+                partyListViewModel.addNewParty(name, phone, cnic)
+            }
+        )
+    }
+
+    composable(
+        route = NavRoutes.PartyLedger.route,
+        arguments = listOf(navArgument("partyId") { type = NavType.StringType })
+    ) { backStackEntry ->
+        val partyId = backStackEntry.arguments?.getString("partyId") ?: ""
+        val partyLedgerViewModel: PartyLedgerViewModel = viewModel()
+
+        LaunchedEffect(partyId) {
+            partyLedgerViewModel.loadLedger(partyId)
+        }
+
+        val ledgerUiState by partyLedgerViewModel.uiState.collectAsState()
+
+        PartyLedgerScreen(
+            uiState = ledgerUiState,
+            onNavigateBack = { navController.popBackStack() },
+            onRecordPayment = { amountRs, methodStr, note, direction ->
+                partyLedgerViewModel.recordWasooliPayment(partyId, amountRs, methodStr, note, direction)
+            }
         )
     }
 

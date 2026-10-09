@@ -100,6 +100,16 @@ interface PartyDao {
 
     @Query("""
         SELECT p.id, p.name, p.phone, p.cnic,
+               (COALESCE((SELECT SUM(t.total_amount) FROM txns t WHERE t.party_id = p.id AND t.type = 'SALE'), 0) -
+                COALESCE((SELECT SUM(pay.amount) FROM payments pay WHERE pay.party_id = p.id AND pay.direction = 'IN'), 0)) AS balance
+        FROM parties p
+        WHERE p.shop_id = :shopId AND p.id = :partyId
+        LIMIT 1
+    """)
+    fun observePartyBalance(shopId: String, partyId: String): Flow<PartyBalanceDto?>
+
+    @Query("""
+        SELECT p.id, p.name, p.phone, p.cnic,
                (COALESCE((SELECT SUM(t.total_amount) FROM txns t WHERE t.party_id = p.id AND t.type = 'SALE' AND t.scope = 'PUBLIC'), 0) -
                 COALESCE((SELECT SUM(pay.amount) FROM payments pay WHERE pay.party_id = p.id AND pay.direction = 'IN' AND pay.scope = 'PUBLIC'), 0)) AS balance
         FROM parties p
@@ -176,6 +186,9 @@ interface TxnDao {
 
     @Query("SELECT * FROM txns WHERE shop_id = :shopId ORDER BY txn_date DESC")
     fun observeTxns(shopId: String): Flow<List<TxnEntity>>
+
+    @Query("SELECT * FROM txns WHERE shop_id = :shopId AND party_id = :partyId ORDER BY txn_date DESC")
+    fun observeTxnsByParty(shopId: String, partyId: String): Flow<List<TxnEntity>>
 
     @Query("SELECT * FROM txns WHERE shop_id = :shopId AND txn_date >= :startTimeMs AND txn_date <= :endTimeMs ORDER BY txn_date DESC")
     suspend fun getTxnsInTimeRange(shopId: String, startTimeMs: Long, endTimeMs: Long): List<TxnEntity>

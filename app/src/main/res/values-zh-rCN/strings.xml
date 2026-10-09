@@ -310,9 +310,10 @@
     <string name="expense_category_other">其他杂项支出</string>
     <string name="expense_empty_msg">当前时间段内暂无费用支出记录。</string>
     <string name="help_topic_8_title">8. 如何记录店铺费用（租金、电费、工资）？</string>
-    <string name="help_topic_8_desc">前往仪表板 -&gt; 点击“店铺运营费用”卡片。点击“+ 记录新费用”按钮，输入金额并选择类别（租金、电费、工资、维修、餐饮），然后保存。</string>
+    <string name="help_topic_8_desc">前往仪表板 -&gt; 点击“店铺运营费用”卡片。点击“记录新费用”按钮，输入金额并选择类别（租金、电费、工资、维修、餐饮），然后保存。</string>
     <string name="help_topic_9_title">9. 仪表板中的净利润是如何计算的？</string>
     <string name="help_topic_9_desc">点击顶部栏的仪表板图标。选择时间范围（今天、本周、本月、全部）。净利润 = 净收入（扣除退货）减去采购成本减去店铺运营费用。</string>
     <string name="help_topic_10_title">10. 如何设置应用安全 PIN 码与主题模式？</string>
     <string name="help_topic_10_desc">前往设置 -&gt; 语言与显示，选择跟随系统、浅色或深色主题。前往安全与账户 -&gt; 应用 PIN 码锁设置 4 位安全密码。</string>
+    <string name="party_btn_add">+ 添加新客户</string>
 </resources>

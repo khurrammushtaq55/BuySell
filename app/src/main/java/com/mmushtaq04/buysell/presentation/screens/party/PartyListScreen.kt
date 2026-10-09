@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
@@ -16,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -34,12 +36,24 @@ data class DisplayPartyBalance(
 fun PartyListScreen(
     parties: List<DisplayPartyBalance> = emptyList(),
     onNavigateBack: () -> Unit = {},
-    onSelectParty: (String) -> Unit = {}
+    onSelectParty: (String) -> Unit = {},
+    onAddParty: (name: String, phone: String, cnic: String) -> Unit = { _, _, _ -> }
 ) {
     var searchQuery by remember { mutableStateOf("") }
+    var showAddPartyDialog by remember { mutableStateOf(false) }
 
     val filtered = parties.filter {
         it.name.contains(searchQuery, ignoreCase = true) || it.phone.contains(searchQuery)
+    }
+
+    if (showAddPartyDialog) {
+        AddPartyDialog(
+            onDismiss = { showAddPartyDialog = false },
+            onConfirm = { name, phone, cnic ->
+                showAddPartyDialog = false
+                onAddParty(name, phone, cnic)
+            }
+        )
     }
 
     Scaffold(
@@ -59,9 +73,11 @@ fun PartyListScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { /* Add party */ }) {
-                Icon(Icons.Default.Add, contentDescription = "Add Party")
-            }
+            ExtendedFloatingActionButton(
+                onClick = { showAddPartyDialog = true },
+                icon = { Icon(Icons.Default.Add, contentDescription = null) },
+                text = { Text(stringResource(R.string.party_btn_add), fontWeight = FontWeight.Bold) }
+            )
         }
     ) { padding ->
         Column(
@@ -135,6 +151,66 @@ fun PartyListScreen(
             }
         }
     }
+}
+
+@Composable
+private fun AddPartyDialog(
+    onDismiss: () -> Unit,
+    onConfirm: (name: String, phone: String, cnic: String) -> Unit
+) {
+    var nameText by remember { mutableStateOf("") }
+    var phoneText by remember { mutableStateOf("") }
+    var cnicText by remember { mutableStateOf("") }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Add Naya Customer / Party", fontWeight = FontWeight.Bold) },
+        text = {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                OutlinedTextField(
+                    value = nameText,
+                    onValueChange = { nameText = it },
+                    label = { Text("Customer Name *") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                OutlinedTextField(
+                    value = phoneText,
+                    onValueChange = { phoneText = it },
+                    label = { Text("Phone Number *") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                OutlinedTextField(
+                    value = cnicText,
+                    onValueChange = { cnicText = it },
+                    label = { Text("CNIC / Notes (Optional)") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    if (nameText.isNotBlank() && phoneText.isNotBlank()) {
+                        onConfirm(nameText.trim(), phoneText.trim(), cnicText.trim())
+                    }
+                },
+                enabled = nameText.isNotBlank() && phoneText.isNotBlank()
+            ) {
+                Text(stringResource(R.string.action_save), fontWeight = FontWeight.Bold)
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.action_cancel))
+            }
+        }
+    )
 }
 
 @Preview(showBackground = true)

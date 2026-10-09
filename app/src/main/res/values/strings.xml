@@ -309,9 +309,10 @@
     <string name="expense_category_other">Other Expense</string>
     <string name="expense_empty_msg">No operational expenses recorded for this period.</string>
     <string name="help_topic_8_title">8. How to record shop expenses (Rent, Electricity, Salary)?</string>
-    <string name="help_topic_8_desc">Go to Dashboard -&gt; Operational Expenses or tap Expenses card. Tap \'+ Add Expense\' button to enter amount and select category (Rent, Electricity, Salary, Repair, Refreshment, Other).</string>
+    <string name="help_topic_8_desc">Go to Dashboard -&gt; Operational Expenses or tap Expenses card. Tap \'Add Expense\' button to enter amount and select category (Rent, Electricity, Salary, Repair, Refreshment, Other).</string>
     <string name="help_topic_9_title">9. How is Net Profit calculated in Dashboard?</string>
     <string name="help_topic_9_desc">Tap Dashboard on Home top bar. Choose filter (Today, Week, Month, All Time). Net Profit = Net Revenue (Sales minus Returns) minus COGS (Purchase Costs) minus Operational Expenses.</string>
     <string name="help_topic_10_title">10. How to set App Security PIN &amp; Theme?</string>
     <string name="help_topic_10_desc">Go to Settings -&gt; Language &amp; Preferences to choose System, Light, or Dark Theme. Go to Security -&gt; App PIN Lock to set a 4-digit PIN for cold start protection.</string>
+    <string name="party_btn_add">+ Add Customer / Party</string>
 </resources>

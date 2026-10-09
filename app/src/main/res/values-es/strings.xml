@@ -310,9 +310,10 @@
     <string name="expense_category_other">Otros Gastos</string>
     <string name="expense_empty_msg">No hay gastos registrados para este período.</string>
     <string name="help_topic_8_title">8. ¿Cómo registrar los gastos de la tienda (alquiler, luz, sueldos)?</string>
-    <string name="help_topic_8_desc">Vaya a Panel -&gt; tarjeta \'Gastos Operativos\'. Toque \'+ Agregar Gasto\', ingrese el monto y seleccione la categoría (Alquiler, Luz, Sueldo, Reparación) y guarde.</string>
+    <string name="help_topic_8_desc">Vaya a Panel -&gt; tarjeta \'Gastos Operativos\'. Toque \'Agregar Gasto\', ingrese el monto y seleccione la categoría (Alquiler, Luz, Sueldo, Reparación) y guarde.</string>
     <string name="help_topic_9_title">9. ¿Cómo se calcula la ganancia neta en el Panel?</string>
     <string name="help_topic_9_desc">Toque el icono de Panel en la barra superior. Elija el filtro (Hoy, Semana, Mes, Todo). Ganancia Neta = Ingresos Netos menos Costo de Ventas menos Gastos Operativos.</string>
     <string name="help_topic_10_title">10. ¿Cómo configurar el PIN de seguridad y el tema?</string>
     <string name="help_topic_10_desc">Vaya a Configuración -&gt; Preferencias para elegir el tema Claro u Oscuro. Vaya a Seguridad -&gt; PIN de la aplicación para establecer un PIN de 4 dígitos.</string>
+    <string name="party_btn_add">+ Agregar cliente</string>
 </resources>

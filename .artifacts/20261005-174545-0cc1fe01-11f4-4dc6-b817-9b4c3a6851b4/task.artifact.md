@@ -210,3 +210,6 @@
 	- [x] Resolved stock purchase cost = 0 issue in Sell and Exchange wizards by resolving real purchase cost from `TxnDao.getUnitPriceByLineId(purchaseLineId)` in `SellViewModel` & `ExchangeViewModel`.
 	- [x] Added reactive Flow observation for txns, expenses, and stock items in `OwnerDashboardViewModel` so newly added expenses reflect instantly.
 	- [x] Added reactive Flow observation for txns in `HomeViewModel` so Today Sales count and amount update instantly upon recording a sale.
+- [x] Loan Client Payment Collection & Khata Ledger System
+	- [x] Built `PartyLedgerScreen.kt` and `PartyLedgerViewModel.kt` displaying net udhaar balance ("Lene Hain" / "Dene Hain"), chronological ledger history, and Wasooli / Payment Entry dialog.
+	- [x] Added `+ Naya Customer / Supplier` dialog on `PartyListScreen.kt` and wired `NavRoutes.PartyLedger` in `MainNavGraph.kt`.
