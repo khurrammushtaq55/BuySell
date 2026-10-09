@@ -170,7 +170,7 @@ class PartyLedgerViewModel(application: Application) : AndroidViewModel(applicat
             )
 
             SyncWorker.enqueueOneTimeSync(getApplication())
-            Log.i(TAG, "✓ Recorded Wasooli Payment: Rs $amountRs for PartyID: $partyId (Direction: $direction)")
+            Log.i(TAG, "✓ Recorded Wasooli Payment: $amountRs for PartyID: $partyId (Direction: $direction)")
         }
     }
 }

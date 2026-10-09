@@ -87,7 +87,7 @@ class ExchangeViewModel(application: Application) : AndroidViewModel(application
         onSuccess: () -> Unit
     ) {
         viewModelScope.launch {
-            Log.d(TAG, "Starting processExchange: SoldStockItemID=$soldStockItemId, OldPhone=$oldPhoneBrand $oldPhoneModel, Value=Rs $oldPhoneValueRs, NewPrice=Rs $newPhonePriceRs, Customer=$customerName")
+            Log.d(TAG, "Starting processExchange: SoldStockItemID=$soldStockItemId, OldPhone=$oldPhoneBrand $oldPhoneModel, Value= $oldPhoneValueRs, NewPrice=Rs $newPhonePriceRs, Customer=$customerName")
             val user = db.userDao().getPrimaryUser()
             val meta = db.appMetaDao().getAppMeta()
             val activeShopId = meta?.activeShopId?.ifBlank { null } ?: user?.shopId ?: ""
