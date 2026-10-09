@@ -8,6 +8,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.LocaleListCompat
 import com.mmushtaq04.buysell.data.local.AppDatabase
+import com.mmushtaq04.buysell.data.sync.DailySummaryWorker
 import com.mmushtaq04.buysell.presentation.navigation.AppNavigation
 import com.mmushtaq04.buysell.ui.theme.BuySellTheme
 import com.mmushtaq04.buysell.util.AppPreferencesManager
@@ -38,6 +39,9 @@ class MainActivity : AppCompatActivity() {
 
         // Initialize local database instance
         AppDatabase.getInstance(this)
+
+        // Schedule daily summary worker (10:00 PM default)
+        DailySummaryWorker.scheduleDailySummary(this)
 
         setContent {
             BuySellTheme {

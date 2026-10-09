@@ -340,4 +340,9 @@
     <string name="settings_custom_currency_label">رمز العملة (مثال: KSh, Tk, QAR, $)</string>
     <string name="notif_overdue_title">تنبيه المدفوعات المتأخرة</string>
     <string name="notif_overdue_msg">تجاوزت %1$d من المدفوعات تاريخ الاستحقاق. يرجى التحقق من دفتر الحسابات.</string>
+    <string name="settings_daily_summary_title">إشعار ملخص الأعمال اليومي</string>
+    <string name="settings_daily_summary_sub">تلقي ملخص يومي للمبيعات والأرباح في وقت إغلاق متجرك</string>
+    <string name="settings_daily_summary_time_label">وقت الإشعار</string>
+    <string name="notif_daily_summary_title">ملخص المبيعات اليومية لـ %1$s</string>
+    <string name="notif_daily_summary_msg">اليوم: %1$d مبيعات (%2$s) • المصروفات: %3$s • صافي الربح: %4$s</string>
 </resources>

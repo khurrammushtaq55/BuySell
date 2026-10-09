@@ -340,4 +340,9 @@
     <string name="settings_custom_currency_label">货币符号（例如：KSh、Tk、QAR、$）</string>
     <string name="notif_overdue_title">逾期款项提醒</string>
     <string name="notif_overdue_msg">有 %1$d 笔付款已超过约定日期，请检查账目记录。</string>
+    <string name="settings_daily_summary_title">每日营业摘要通知</string>
+    <string name="settings_daily_summary_sub">在打烊时间接收每日销售与利润摘要</string>
+    <string name="settings_daily_summary_time_label">通知推送时间</string>
+    <string name="notif_daily_summary_title">%1$s 每日销售摘要</string>
+    <string name="notif_daily_summary_msg">今日：%1$d 笔销售（%2$s）• 支出：%3$s • 净利润：%4$s</string>
 </resources>

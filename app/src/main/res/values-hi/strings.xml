@@ -340,4 +340,9 @@
     <string name="settings_custom_currency_label">मुद्रा प्रतीक (जैसे KSh, Tk, QAR, $)</string>
     <string name="notif_overdue_title">बकाया भुगतान चेतावनी</string>
     <string name="notif_overdue_msg">%1$d भुगतानों की समय सीमा समाप्त हो गई है। कृपया खाता जांचें।</string>
+    <string name="settings_daily_summary_title">दैनिक व्यवसाय सारांश अधिसूचना</string>
+    <string name="settings_daily_summary_sub">दुकान बंद होने के समय दैनिक बिक्री और लाभ का सारांश प्राप्त करें</string>
+    <string name="settings_daily_summary_time_label">अधिसूचना समय</string>
+    <string name="notif_daily_summary_title">%1$s दैनिक बिक्री सारांश</string>
+    <string name="notif_daily_summary_msg">आज: %1$d बिक्री (%2$s) • खर्च: %3$s • शुद्ध लाभ: %4$s</string>
 </resources>

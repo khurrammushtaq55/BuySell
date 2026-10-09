@@ -232,3 +232,8 @@
 - [x] Udhaar Reminder Notification Strings Extraction
 	- [x] Extracted `notif_overdue_title` and `notif_overdue_msg` across all 8 locale `strings.xml` files.
 	- [x] Updated `UdhaarReminderWorker.kt` to load string resources dynamically via `applicationContext.getString(R.string.notif_overdue_msg, overduePromises.size)`.
+- [x] Daily Business Summary Notification Feature
+	- [x] Implemented `DailySummaryWorker.kt` scheduled at 10:00 PM (22:00) by default to calculate Today's Sales Count, Total Revenue, Expenses, and Net Profit formatted in store currency.
+	- [x] Added `CHANNEL_DAILY_SUMMARY` in `AppNotificationManager.kt`.
+	- [x] Added Daily Summary Enable/Disable toggle switch and native `android.app.TimePickerDialog` in `SettingsScreen.kt` for picking any custom hour (0-23) and minute (0-59).
+	- [x] Added notification and settings string resources across all 8 locale folders.

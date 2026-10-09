@@ -340,4 +340,9 @@
     <string name="settings_custom_currency_label">Símbolo de moneda (ej. KSh, Tk, QAR, $)</string>
     <string name="notif_overdue_title">Alerta de Pagos Vencidos</string>
     <string name="notif_overdue_msg">%1$d compromisos de pago han vencido. Por favor revise el registro de cuentas.</string>
+    <string name="settings_daily_summary_title">Notificación de Resumen Diario del Negocio</string>
+    <string name="settings_daily_summary_sub">Reciba un resumen diario de ventas y ganancias a la hora de cierre preferida</string>
+    <string name="settings_daily_summary_time_label">Hora de la Notificación</string>
+    <string name="notif_daily_summary_title">Resumen Diario de Ventas - %1$s</string>
+    <string name="notif_daily_summary_msg">Hoy: %1$d Ventas (%2$s) • Gastos: %3$s • Ganancia Neta: %4$s</string>
 </resources>

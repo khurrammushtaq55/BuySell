@@ -339,4 +339,9 @@
     <string name="settings_custom_currency_label">Currency Symbol (e.g. KSh, Tk, QAR, $)</string>
     <string name="notif_overdue_title">Overdue Payment Alert</string>
     <string name="notif_overdue_msg">%1$d payment promises are past due date. Please check Khata ledger.</string>
+    <string name="settings_daily_summary_title">Daily Business Summary Notification</string>
+    <string name="settings_daily_summary_sub">Receive a daily sales &amp; profit summary at your preferred closing time</string>
+    <string name="settings_daily_summary_time_label">Summary Notification Time</string>
+    <string name="notif_daily_summary_title">%1$s Daily Sales Summary</string>
+    <string name="notif_daily_summary_msg">Today: %1$d Sales (%2$s) • Expenses: %3$s • Net Profit: %4$s</string>
 </resources>

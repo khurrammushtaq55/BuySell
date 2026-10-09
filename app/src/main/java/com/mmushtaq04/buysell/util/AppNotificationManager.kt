@@ -8,6 +8,7 @@ import android.os.Build
 object AppNotificationManager {
     const val CHANNEL_HIGH_PRIORITY = "channel_high_priority"
     const val CHANNEL_REMINDERS = "channel_reminders"
+    const val CHANNEL_DAILY_SUMMARY = "channel_daily_summary"
 
     fun createNotificationChannels(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -27,8 +28,16 @@ object AppNotificationManager {
                 description = "Business due dates and payment reminders"
             }
 
+            val summaryChannel = NotificationChannel(
+                CHANNEL_DAILY_SUMMARY,
+                "Daily Business Summaries",
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                description = "Daily sales, expenses, and profit notifications"
+            }
+
             val manager = context.getSystemService(NotificationManager::class.java)
-            manager?.createNotificationChannels(listOf(highChannel, reminderChannel))
+            manager?.createNotificationChannels(listOf(highChannel, reminderChannel, summaryChannel))
         }
     }
 }

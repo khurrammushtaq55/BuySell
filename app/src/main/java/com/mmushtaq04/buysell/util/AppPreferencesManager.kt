@@ -177,4 +177,30 @@ object AppPreferencesManager {
             }
         }
     }
+
+    private const val KEY_DAILY_SUMMARY_ENABLED = "daily_summary_enabled"
+    private const val KEY_DAILY_SUMMARY_HOUR = "daily_summary_hour"
+    private const val KEY_DAILY_SUMMARY_MINUTE = "daily_summary_minute"
+
+    fun isDailySummaryEnabled(context: Context): Boolean {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        return prefs.getBoolean(KEY_DAILY_SUMMARY_ENABLED, true)
+    }
+
+    fun setDailySummaryEnabled(context: Context, enabled: Boolean) {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit().putBoolean(KEY_DAILY_SUMMARY_ENABLED, enabled).apply()
+    }
+
+    fun getDailySummaryTime(context: Context): Pair<Int, Int> {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val hour = prefs.getInt(KEY_DAILY_SUMMARY_HOUR, 22) // 10 PM default
+        val minute = prefs.getInt(KEY_DAILY_SUMMARY_MINUTE, 0)
+        return hour to minute
+    }
+
+    fun setDailySummaryTime(context: Context, hour: Int, minute: Int) {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit().putInt(KEY_DAILY_SUMMARY_HOUR, hour).putInt(KEY_DAILY_SUMMARY_MINUTE, minute).apply()
+    }
 }

@@ -340,4 +340,9 @@
     <string name="settings_custom_currency_label">Symbole de devise (ex. KSh, Tk, QAR, $)</string>
     <string name="notif_overdue_title">Alerte de Paiements en Retard</string>
     <string name="notif_overdue_msg">%1$d promesses de paiement sont arrivées à échéance. Veuillez vérifier le livre de comptes.</string>
+    <string name="settings_daily_summary_title">Notification du Résumé Quotidien de l\'Activité</string>
+    <string name="settings_daily_summary_sub">Recevez un résumé quotidien des ventes et bénéfices à l\'heure de fermeture souhaitée</string>
+    <string name="settings_daily_summary_time_label">Heure de la Notification</string>
+    <string name="notif_daily_summary_title">Résumé Quotidien des Ventes - %1$s</string>
+    <string name="notif_daily_summary_msg">Aujourd\'hui : %1$d Ventes (%2$s) • Dépenses : %3$s • Bénéfice Net : %4$s</string>
 </resources>
