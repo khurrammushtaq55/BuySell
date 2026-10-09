@@ -8,6 +8,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.mmushtaq04.buysell.presentation.screens.dashboard.OwnerDashboardScreen
 import com.mmushtaq04.buysell.presentation.screens.dashboard.OwnerDashboardViewModel
+import com.mmushtaq04.buysell.presentation.screens.expense.ExpenseListScreen
+import com.mmushtaq04.buysell.presentation.screens.expense.ExpenseViewModel
 import com.mmushtaq04.buysell.presentation.screens.help.HelpScreen
 import com.mmushtaq04.buysell.presentation.screens.home.HomeScreen
 import com.mmushtaq04.buysell.presentation.screens.home.HomeViewModel
@@ -67,11 +69,28 @@ fun NavGraphBuilder.mainNavGraph(
         val dashboardState by ownerDashboardViewModel.uiState.collectAsState()
 
         OwnerDashboardScreen(
-            todaySalesCount = dashboardState.todaySalesCount,
-            todaySalesTotalRs = dashboardState.todaySalesTotalRs,
-            monthlyNetProfitRs = dashboardState.monthlyNetProfitRs,
-            capitalInStockRs = dashboardState.capitalInStockRs,
-            slowStockCount = dashboardState.slowStockCount,
+            uiState = dashboardState,
+            onTimeRangeSelect = { range ->
+                ownerDashboardViewModel.setTimeRange(range)
+            },
+            onNavigateToExpenses = { navController.navigate(NavRoutes.Expenses.route) },
+            onNavigateBack = { navController.popBackStack() }
+        )
+    }
+
+    composable(NavRoutes.Expenses.route) {
+        val expenseViewModel: ExpenseViewModel = viewModel()
+        val expenseUiState by expenseViewModel.uiState.collectAsState()
+
+        ExpenseListScreen(
+            expenses = expenseUiState.expenses,
+            totalExpenseRs = expenseUiState.totalExpenseRs,
+            selectedCategory = expenseUiState.selectedCategoryFilter,
+            onCategoryFilterSelect = { cat -> expenseViewModel.setCategoryFilter(cat) },
+            onAddExpense = { amountRs, category, note ->
+                expenseViewModel.addExpense(amountRs, category, note)
+            },
+            onDeleteExpense = { id -> expenseViewModel.deleteExpense(id) },
             onNavigateBack = { navController.popBackStack() }
         )
     }

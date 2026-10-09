@@ -196,3 +196,11 @@
 - [x] Dynamic App Name Architecture (R.string.app_name Single Source of Truth)
 	- [x] Refactored all XML string resources (`login_welcome`, `home_title`, `welcome_landing_title`, `rating_dialog_title`, `settings_footer_version`, `settings_invite_share_msg`, `export_backup_data_title`) across all 8 locale folders to use `%1$s` specifiers for `R.string.app_name`.
 	- [x] Updated `WelcomeLandingScreen`, `LoginScreen`, `HomeScreen`, `SettingsScreen`, `InAppRatingDialog`, and `DataExporter` to dynamically format `R.string.app_name`.
+- [x] Financial Dashboard & Expenses Management System
+	- [x] Time range filter tabs: `Aaj` (Today), `Iss Hafta` (This Week), `Iss Mahina` (This Month), `Ab Tak` (All Time).
+	- [x] Accurate Net Profit calculation with Return & Refund adjustments (`Net Revenue - COGS - Expenses`).
+	- [x] 4-card financial summary grid (Net Revenue, COGS, Operational Expenses, Returns/Refunds).
+	- [x] Top 5 selling device models ranking card.
+	- [x] Capital Locked in Stock and Slow Moving Stock (>30 days).
+	- [x] Dedicated `ExpenseListScreen` with `ExpenseViewModel`, category filtering (Rent, Electricity, Salary, Repair, Refreshment, Other), and `+ Naya Kharcha` dialog with instant Room DB write + outbox sync (`Scope.VAULT`).
+	- [x] Full multi-locale translation across all 8 language folders.

@@ -177,6 +177,9 @@ interface TxnDao {
     @Query("SELECT * FROM txns WHERE shop_id = :shopId ORDER BY txn_date DESC")
     fun observeTxns(shopId: String): Flow<List<TxnEntity>>
 
+    @Query("SELECT * FROM txns WHERE shop_id = :shopId AND txn_date >= :startTimeMs AND txn_date <= :endTimeMs ORDER BY txn_date DESC")
+    suspend fun getTxnsInTimeRange(shopId: String, startTimeMs: Long, endTimeMs: Long): List<TxnEntity>
+
     @Query("SELECT * FROM txns WHERE shop_id = :shopId")
     suspend fun getAllTxns(shopId: String): List<TxnEntity>
 
@@ -258,6 +261,12 @@ interface ExpenseDao {
 
     @Query("SELECT * FROM expenses WHERE shop_id = :shopId ORDER BY expense_date DESC")
     fun observeExpenses(shopId: String): Flow<List<ExpenseEntity>>
+
+    @Query("SELECT * FROM expenses WHERE shop_id = :shopId AND expense_date >= :startTimeMs AND expense_date <= :endTimeMs ORDER BY expense_date DESC")
+    suspend fun getExpensesInTimeRange(shopId: String, startTimeMs: Long, endTimeMs: Long): List<ExpenseEntity>
+
+    @Query("SELECT COALESCE(SUM(amount), 0) FROM expenses WHERE shop_id = :shopId AND expense_date >= :startTimeMs AND expense_date <= :endTimeMs")
+    suspend fun getTotalExpensesPaisa(shopId: String, startTimeMs: Long, endTimeMs: Long): Long
 }
 
 @Dao
