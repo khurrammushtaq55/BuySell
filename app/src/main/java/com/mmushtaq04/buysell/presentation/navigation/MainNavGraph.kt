@@ -1,8 +1,7 @@
 package com.mmushtaq04.buysell.presentation.navigation
 
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
+import kotlinx.coroutines.launch
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -97,11 +96,41 @@ fun NavGraphBuilder.mainNavGraph(
     }
 
     composable(NavRoutes.OwnerDashboard.route) {
+        val context = androidx.compose.ui.platform.LocalContext.current
+        val scope = rememberCoroutineScope()
+        val db = com.mmushtaq04.buysell.data.local.AppDatabase.getInstance(context)
+        val featureRepo = remember { com.mmushtaq04.buysell.data.repository.FeatureAccessRepositoryImpl(context, db) }
+
         val ownerDashboardViewModel: OwnerDashboardViewModel = viewModel()
         val dashboardState by ownerDashboardViewModel.uiState.collectAsState()
 
+        var showPaywallDialog by remember { mutableStateOf(false) }
+
+        if (showPaywallDialog) {
+            com.mmushtaq04.buysell.presentation.components.PremiumPaywallDialog(
+                onDismiss = { showPaywallDialog = false },
+                onUpgradeClick = { _ ->
+                    featureRepo.unlockLocallyForTesting(context)
+                    showPaywallDialog = false
+                },
+                onRestoreClick = {
+                    featureRepo.unlockLocallyForTesting(context)
+                    showPaywallDialog = false
+                },
+                onRedeemPromoCode = { code, onSuccess, onError ->
+                    scope.launch {
+                        val user = db.userDao().getPrimaryUser()
+                        val success = featureRepo.redeemAdminPromoCode(code, user?.shopId ?: "")
+                        if (success) onSuccess() else onError()
+                    }
+                }
+            )
+        }
+
         OwnerDashboardScreen(
             uiState = dashboardState,
+            isDashboardLocked = featureRepo.isFeatureLocked(com.mmushtaq04.buysell.data.repository.PremiumFeature.OWNER_DASHBOARD),
+            onUnlockClick = { showPaywallDialog = true },
             onTimeRangeSelect = { range ->
                 ownerDashboardViewModel.setTimeRange(range)
             },

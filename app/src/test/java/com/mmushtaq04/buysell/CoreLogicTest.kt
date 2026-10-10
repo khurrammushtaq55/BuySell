@@ -2,17 +2,15 @@ package com.mmushtaq04.buysell
 
 import android.content.Context
 import androidx.room.Room
+import androidx.room.withTransaction
 import androidx.test.core.app.ApplicationProvider
 import com.mmushtaq04.buysell.data.local.AppDatabase
-import com.mmushtaq04.buysell.data.local.entity.AppMetaEntity
-import com.mmushtaq04.buysell.data.local.entity.PaymentEntity
-import com.mmushtaq04.buysell.data.local.enums.ItemStatus
-import com.mmushtaq04.buysell.data.local.enums.PaymentDirection
-import com.mmushtaq04.buysell.data.local.enums.PaymentMethod
-import com.mmushtaq04.buysell.data.local.enums.Scope
+import com.mmushtaq04.buysell.data.local.entity.*
+import com.mmushtaq04.buysell.data.local.enums.*
 import com.mmushtaq04.buysell.data.repository.PartyRepositoryImpl
 import com.mmushtaq04.buysell.data.repository.StockRepositoryImpl
 import com.mmushtaq04.buysell.data.sync.ConflictDetector
+import com.mmushtaq04.buysell.data.sync.scopeFor
 import com.mmushtaq04.buysell.domain.InviteManager
 import com.mmushtaq04.buysell.domain.model.Party
 import com.mmushtaq04.buysell.domain.model.StockItem
@@ -292,6 +290,175 @@ class CoreLogicTest {
         assertNotNull(updatedItem)
         assertTrue(updatedItem?.hasConflict == true)
         assertTrue(conflictDetector.checkConflictForStockItem(shopId, item.id))
+    }
+
+    @Test
+    fun testStandalonePaymentScope() {
+        assertEquals(Scope.PUBLIC, standalonePaymentScope(PaymentDirection.IN))
+        assertEquals(Scope.VAULT, standalonePaymentScope(PaymentDirection.OUT))
+    }
+
+    @Test
+    fun testScopeForResolution() {
+        assertEquals(Scope.VAULT, scopeFor("expenses", null))
+        assertEquals(Scope.VAULT, scopeFor("expense", "PUBLIC"))
+        assertEquals(Scope.VAULT, scopeFor("audit_logs", null))
+        assertEquals(Scope.VAULT, scopeFor("parties", "VAULT"))
+        assertEquals(Scope.PUBLIC, scopeFor("parties", null))
+        assertEquals(Scope.PUBLIC, scopeFor("parties", "PUBLIC"))
+    }
+
+    @Test
+    fun testDaoSoftDeleteExclusion() = runBlocking {
+        val now = System.currentTimeMillis()
+
+        // 1. Party
+        val p = PartyEntity(id = "p1", shopId = shopId, name = "Soft Party", createdAt = now, updatedAt = now, createdBy = userId, updatedBy = userId, deletedAt = now)
+        db.partyDao().insertParty(p)
+        assertTrue(db.partyDao().getAllParties(shopId).isEmpty())
+        assertNull(db.partyDao().getPartyBalance(shopId, "p1"))
+
+        // 2. Txn
+        val t = TxnEntity(id = "t1", shopId = shopId, partyId = "p1", type = TxnType.SALE, totalAmount = 1000L, txnDate = now, scope = Scope.PUBLIC, createdAt = now, updatedAt = now, createdBy = userId, updatedBy = userId, deletedAt = now)
+        db.txnDao().insertTxn(t)
+        assertTrue(db.txnDao().getAllTxns(shopId).isEmpty())
+        assertTrue(db.txnDao().getTxnsInTimeRange(shopId, 0L, now + 1000L).isEmpty())
+
+        // 3. Payment
+        val pay = PaymentEntity(id = "pay1", shopId = shopId, partyId = "p1", direction = PaymentDirection.IN, amount = 500L, method = PaymentMethod.CASH, payDate = now, scope = Scope.PUBLIC, createdAt = now, updatedAt = now, createdBy = userId, updatedBy = userId, deletedAt = now)
+        db.paymentDao().insertPayment(pay)
+        assertTrue(db.paymentDao().getAllPayments(shopId).isEmpty())
+
+        // 4. Expense
+        val exp = ExpenseEntity(id = "e1", shopId = shopId, categoryId = "RENT", amount = 2000L, expenseDate = now, createdAt = now, updatedAt = now, createdBy = userId, updatedBy = userId, deletedAt = now)
+        db.expenseDao().insertExpense(exp)
+        assertTrue(db.expenseDao().getExpensesInTimeRange(shopId, 0L, now + 1000L).isEmpty())
+        assertEquals(0L, db.expenseDao().getTotalExpensesPaisa(shopId, 0L, now + 1000L))
+    }
+
+    @Test
+    fun testStaffPurgeHardDelete() = runBlocking {
+        val syncManager = com.mmushtaq04.buysell.data.sync.FirestoreSyncManager(db)
+        val now = System.currentTimeMillis()
+
+        val t = TxnEntity(id = "purge-t1", shopId = shopId, partyId = "p1", type = TxnType.PURCHASE, totalAmount = 5000L, txnDate = now, scope = Scope.VAULT, createdAt = now, updatedAt = now, createdBy = userId, updatedBy = userId)
+        val line = TxnLineEntity(id = "purge-l1", shopId = shopId, txnId = "purge-t1", stockItemId = "item1", quantity = 1, unitPrice = 5000L, lineTotal = 5000L, createdAt = now, updatedAt = now, createdBy = userId, updatedBy = userId)
+
+        db.txnDao().insertTxnWithLines(t, listOf(line))
+        assertNotNull(db.txnDao().getTxnById("purge-t1"))
+        assertFalse(db.txnDao().getTxnLinesForTxn("purge-t1").isEmpty())
+
+        syncManager.purgeLocalVaultRow("txns", "purge-t1")
+
+        assertNull(db.txnDao().getTxnById("purge-t1"))
+        assertTrue(db.txnDao().getTxnLinesForTxn("purge-t1").isEmpty())
+    }
+
+    @Test
+    fun testExpenseSoftDeleteAndOutboxUpsert() = runBlocking {
+        val now = System.currentTimeMillis()
+        val exp = ExpenseEntity(id = "exp-soft-1", shopId = shopId, categoryId = "RENT", amount = 10000L, expenseDate = now, createdAt = now, updatedAt = now, createdBy = userId, updatedBy = userId, rev = 1)
+        db.expenseDao().insertExpense(exp)
+
+        val expense = db.expenseDao().getExpenseById("exp-soft-1")
+        assertNotNull(expense)
+
+        val updatedExpense = expense!!.copy(
+            deletedAt = now,
+            deletedBy = userId,
+            updatedAt = now,
+            updatedBy = userId,
+            rev = expense.rev + 1,
+            syncState = SyncState.PENDING
+        )
+
+        db.withTransaction {
+            db.expenseDao().insertExpense(updatedExpense)
+            db.syncDao().enqueueOutbox(
+                SyncOutboxEntity(
+                    id = UUID.randomUUID().toString(),
+                    entityType = "expenses",
+                    entityId = updatedExpense.id,
+                    op = SyncOp.UPSERT,
+                    payloadJson = com.google.gson.Gson().toJson(updatedExpense),
+                    createdAt = now
+                )
+            )
+        }
+
+        val stored = db.expenseDao().getExpenseById("exp-soft-1")
+        assertNotNull(stored)
+        assertNotNull(stored?.deletedAt)
+        assertEquals(2L, stored?.rev)
+
+        val pendingOutbox = db.syncDao().getPendingOutbox()
+        val outboxItem = pendingOutbox.find { it.entityId == "exp-soft-1" }
+        assertNotNull(outboxItem)
+        assertEquals(com.mmushtaq04.buysell.data.local.enums.SyncOp.UPSERT, outboxItem?.op)
+        assertTrue(outboxItem?.payloadJson?.contains("deleted_at") == true)
+    }
+
+    @Test
+    fun testLedgerRecordWasooliPaymentWithOutDirection() = runBlocking {
+        val now = System.currentTimeMillis()
+
+        val paymentEntity = PaymentEntity(
+            id = UUID.randomUUID().toString(),
+            shopId = shopId,
+            txnId = null,
+            partyId = "party-1",
+            direction = PaymentDirection.OUT,
+            amount = 500000L,
+            method = PaymentMethod.CASH,
+            referenceNo = null,
+            note = "Payment to Supplier",
+            payDate = now,
+            createdAt = now,
+            updatedAt = now,
+            createdBy = userId,
+            updatedBy = userId,
+            scope = standalonePaymentScope(PaymentDirection.OUT)
+        )
+
+        db.withTransaction {
+            db.paymentDao().insertPayment(paymentEntity)
+            db.syncDao().enqueueOutbox(
+                SyncOutboxEntity(
+                    id = UUID.randomUUID().toString(),
+                    entityType = "payments",
+                    entityId = paymentEntity.id,
+                    op = SyncOp.UPSERT,
+                    payloadJson = com.google.gson.Gson().toJson(paymentEntity),
+                    createdAt = now
+                )
+            )
+        }
+
+        val pendingOutbox = db.syncDao().getPendingOutbox()
+        val outboxItem = pendingOutbox.find { it.entityType == "payments" }
+        assertNotNull(outboxItem)
+
+        val payment = db.paymentDao().getAllPayments(shopId).firstOrNull()
+        assertNotNull(payment)
+        assertEquals(Scope.VAULT, payment?.scope)
+        assertEquals("Payment to Supplier", payment?.note)
+        assertNull(payment?.referenceNo)
+    }
+
+    @Test
+    fun testFeatureAccessRepositoryAndLocking() {
+        val repo = com.mmushtaq04.buysell.data.repository.FeatureAccessRepositoryImpl(context, db)
+
+        // Initially locked for default locked features
+        assertTrue(repo.isFeatureLocked(com.mmushtaq04.buysell.data.repository.PremiumFeature.OWNER_DASHBOARD))
+        assertTrue(repo.isFeatureLocked(com.mmushtaq04.buysell.data.repository.PremiumFeature.DATA_EXPORT))
+
+        // Test local unlock simulation
+        repo.unlockLocallyForTesting(context)
+
+        assertFalse(repo.isFeatureLocked(com.mmushtaq04.buysell.data.repository.PremiumFeature.OWNER_DASHBOARD))
+        assertFalse(repo.isFeatureLocked(com.mmushtaq04.buysell.data.repository.PremiumFeature.DATA_EXPORT))
+        assertTrue(repo.isPremiumUnlocked.value)
     }
 
     @Test

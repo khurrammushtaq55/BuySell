@@ -18,3 +18,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "BuySell"
 include(":app")
+include(":shared")

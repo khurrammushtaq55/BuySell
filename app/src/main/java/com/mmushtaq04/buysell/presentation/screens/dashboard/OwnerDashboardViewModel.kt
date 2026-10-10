@@ -7,9 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.mmushtaq04.buysell.data.local.AppDatabase
 import com.mmushtaq04.buysell.data.local.enums.ItemStatus
 import com.mmushtaq04.buysell.data.local.enums.TxnType
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -40,6 +38,8 @@ data class DashboardUiState(
     val slowStockCount: Int = 0,
     val slowStockValueRs: Long = 0L,
     val topSellingModels: List<TopSellingModel> = emptyList(),
+    val missingCostCount: Int = 0,
+    val hasMissingCosts: Boolean = false,
     val isLoading: Boolean = false
 )
 
@@ -48,14 +48,16 @@ class OwnerDashboardViewModel(application: Application) : AndroidViewModel(appli
     private val TAG = "OwnerDashboardVM"
     private val db = AppDatabase.getInstance(application)
 
+    private val _selectedTimeRange = MutableStateFlow(TimeRange.THIS_MONTH)
+
     private val _uiState = MutableStateFlow(DashboardUiState())
     val uiState: StateFlow<DashboardUiState> = _uiState.asStateFlow()
 
     init {
-        observeDatabaseChanges()
+        observeMetricsStream()
     }
 
-    private fun observeDatabaseChanges() {
+    private fun observeMetricsStream() {
         viewModelScope.launch {
             val user = db.userDao().getPrimaryUser()
             val meta = db.appMetaDao().getAppMeta()
@@ -63,170 +65,172 @@ class OwnerDashboardViewModel(application: Application) : AndroidViewModel(appli
 
             if (activeShopId.isBlank()) return@launch
 
-            launch {
-                db.txnDao().observeTxns(activeShopId).collect {
-                    loadMetrics(_uiState.value.timeRange)
-                }
-            }
-            launch {
-                db.expenseDao().observeExpenses(activeShopId).collect {
-                    loadMetrics(_uiState.value.timeRange)
-                }
-            }
-            launch {
-                db.stockItemDao().observeInStockItems(activeShopId).collect {
-                    loadMetrics(_uiState.value.timeRange)
-                }
+            combine(
+                db.txnDao().observeTxns(activeShopId),
+                db.expenseDao().observeExpenses(activeShopId),
+                db.stockItemDao().observeInStockItems(activeShopId),
+                _selectedTimeRange
+            ) { _, _, _, range ->
+                computeMetricsForRange(activeShopId, range)
+            }.collect { newState ->
+                _uiState.value = newState
             }
         }
     }
 
     fun setTimeRange(range: TimeRange) {
-        _uiState.value = _uiState.value.copy(timeRange = range)
-        loadMetrics(range)
+        _selectedTimeRange.value = range
     }
 
-    fun loadMetrics(range: TimeRange = _uiState.value.timeRange) {
-        viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true)
+    fun loadMetrics(range: TimeRange = _selectedTimeRange.value) {
+        _selectedTimeRange.value = range
+    }
 
-            val user = db.userDao().getPrimaryUser()
-            val meta = db.appMetaDao().getAppMeta()
-            val activeShopId = meta?.activeShopId?.ifBlank { null } ?: user?.shopId ?: ""
+    private suspend fun computeMetricsForRange(activeShopId: String, range: TimeRange): DashboardUiState {
+        val now = System.currentTimeMillis()
+        val (startTimeMs, endTimeMs) = getTimeRangeBounds(range, now)
 
-            if (activeShopId.isBlank()) {
-                _uiState.value = _uiState.value.copy(isLoading = false)
-                return@launch
-            }
+        // Today's range for Today's Sales Card
+        val (todayStart, todayEnd) = getTimeRangeBounds(TimeRange.TODAY, now)
+        val todayCount = db.txnDao().getTodaySalesCount(activeShopId, todayStart, todayEnd)
+        val todayPaisa = db.txnDao().getTodaySalesAmountPaisa(activeShopId, todayStart, todayEnd)
 
-            val now = System.currentTimeMillis()
-            val (startTimeMs, endTimeMs) = getTimeRangeBounds(range, now)
+        // Pre-fetch all lines and stock items into in-memory maps (eliminates N+1 DB loop queries)
+        val allTxns = db.txnDao().getTxnsInTimeRange(activeShopId, startTimeMs, endTimeMs)
+        val allLines = db.txnDao().getAllTxnLines(activeShopId)
+        val lineMapByTxn = allLines.groupBy { it.txnId }
+        val linePriceMap = allLines.associate { it.id to it.unitPrice }
 
-            // Today's range for Today's Sales Card
-            val (todayStart, todayEnd) = getTimeRangeBounds(TimeRange.TODAY, now)
-            val todayCount = db.txnDao().getTodaySalesCount(activeShopId, todayStart, todayEnd)
-            val todayPaisa = db.txnDao().getTodaySalesAmountPaisa(activeShopId, todayStart, todayEnd)
+        val allStock = db.stockItemDao().getAllStockItems(activeShopId)
+        val stockMap = allStock.associateBy { it.id }
 
-            // Transactions in selected time range
-            val txns = db.txnDao().getTxnsInTimeRange(activeShopId, startTimeMs, endTimeMs)
+        var grossRevenuePaisa = 0L
+        var returnsRefundsPaisa = 0L
+        var netCogsPaisa = 0L
+        var missingCostCount = 0
 
-            var grossRevenuePaisa = 0L
-            var returnsRefundsPaisa = 0L
-            var grossCogsPaisa = 0L
+        val modelMap = mutableMapOf<String, ModelStat>()
 
-            val modelMap = mutableMapOf<String, ModelStat>()
+        for (txn in allTxns) {
+            when (txn.type) {
+                TxnType.SALE -> {
+                    grossRevenuePaisa += txn.totalAmount
+                    val lines = lineMapByTxn[txn.id] ?: emptyList()
+                    for (line in lines) {
+                        val stockItem = stockMap[line.stockItemId]
+                        val purchaseUnitPrice = stockItem?.purchaseLineId?.let { linePriceMap[it] }
 
-            for (txn in txns) {
-                when (txn.type) {
-                    TxnType.SALE -> {
-                        grossRevenuePaisa += txn.totalAmount
-                        val lines = db.txnDao().getTxnLinesForTxn(txn.id)
-                        for (line in lines) {
-                            val stockItem = db.stockItemDao().getStockItemById(line.stockItemId)
-                            val unitCost = if (stockItem?.purchaseLineId != null) {
-                                db.txnDao().getUnitPriceByLineId(stockItem.purchaseLineId) ?: line.unitPrice
-                            } else {
-                                line.unitPrice
-                            }
+                        val unitCost = if (purchaseUnitPrice != null) {
+                            purchaseUnitPrice
+                        } else {
+                            missingCostCount++
+                            0L // Do not assume sale price as purchase cost
+                        }
 
-                            val lineCogs = unitCost * line.quantity
-                            grossCogsPaisa += lineCogs
+                        val lineCogs = unitCost * line.quantity
+                        netCogsPaisa += lineCogs
 
-                            val modelName = if (stockItem != null) {
-                                "${stockItem.brand} ${stockItem.model}".trim()
-                            } else {
-                                "Device Item"
-                            }
+                        val modelName = if (stockItem != null) {
+                            "${stockItem.brand} ${stockItem.model}".trim()
+                        } else {
+                            "Device Item"
+                        }
 
-                            val lineRevenue = line.unitPrice * line.quantity
-                            val lineProfit = lineRevenue - lineCogs
+                        val lineRevenue = line.lineTotal
+                        val lineProfit = lineRevenue - lineCogs
 
-                            val stat = modelMap.getOrPut(modelName) { ModelStat() }
-                            stat.unitsSold += line.quantity
-                            stat.revenuePaisa += lineRevenue
-                            stat.profitPaisa += lineProfit
+                        val stat = modelMap.getOrPut(modelName) { ModelStat() }
+                        stat.unitsSold += line.quantity
+                        stat.revenuePaisa += lineRevenue
+                        stat.profitPaisa += lineProfit
+                    }
+                }
+                TxnType.SALE_RETURN -> {
+                    returnsRefundsPaisa += txn.totalAmount
+                    // Deduct COGS for returned sold items
+                    val lines = lineMapByTxn[txn.id] ?: emptyList()
+                    for (line in lines) {
+                        val stockItem = stockMap[line.stockItemId]
+                        val purchaseUnitPrice = stockItem?.purchaseLineId?.let { linePriceMap[it] }
+                        if (purchaseUnitPrice != null) {
+                            netCogsPaisa -= (purchaseUnitPrice * line.quantity)
                         }
                     }
-                    TxnType.SALE_RETURN -> {
-                        returnsRefundsPaisa += txn.totalAmount
-                    }
-                    TxnType.PURCHASE_RETURN -> {
-                        // Supplier refund reduces COGS
-                        grossCogsPaisa = (grossCogsPaisa - txn.totalAmount).coerceAtLeast(0L)
-                    }
-                    else -> {}
                 }
+                else -> {}
             }
-
-            val netRevenuePaisa = (grossRevenuePaisa - returnsRefundsPaisa).coerceAtLeast(0L)
-            val totalExpensesPaisa = db.expenseDao().getTotalExpensesPaisa(activeShopId, startTimeMs, endTimeMs)
-
-            val netRevenueRs = netRevenuePaisa / 100
-            val cogsRs = grossCogsPaisa / 100
-            val expensesRs = totalExpensesPaisa / 100
-            val returnsRefundsRs = returnsRefundsPaisa / 100
-
-            val grossProfitRs = (netRevenuePaisa - grossCogsPaisa) / 100
-            val netProfitRs = grossProfitRs - expensesRs
-
-            // Top Selling Models
-            val topModels = modelMap.entries
-                .sortedByDescending { it.value.unitsSold }
-                .take(5)
-                .map { (name, stat) ->
-                    TopSellingModel(
-                        modelName = name,
-                        unitsSold = stat.unitsSold,
-                        revenueRs = stat.revenuePaisa / 100,
-                        profitRs = stat.profitPaisa / 100
-                    )
-                }
-
-            // Capital Locked in Stock
-            val allStock = db.stockItemDao().getAllStockItems(activeShopId)
-            val inStockItems = allStock.filter { it.status == ItemStatus.IN_STOCK || it.remainingQty > 0 }
-
-            var totalCapitalLockedPaisa = 0L
-            for (item in inStockItems) {
-                val unitCostPaisa = if (item.purchaseLineId != null) {
-                    db.txnDao().getUnitPriceByLineId(item.purchaseLineId) ?: 0L
-                } else 0L
-                totalCapitalLockedPaisa += unitCostPaisa * item.remainingQty
-            }
-            val capitalLockedRs = totalCapitalLockedPaisa / 100
-
-            // Slow Moving Stock (> 30 days)
-            val thirtyDaysMs = 30L * 24 * 60 * 60 * 1000L
-            val slowItems = inStockItems.filter { (now - it.stockedAt) >= thirtyDaysMs }
-            val slowCount = slowItems.sumOf { it.remainingQty }
-
-            var totalSlowValuePaisa = 0L
-            for (item in slowItems) {
-                val unitCostPaisa = if (item.purchaseLineId != null) {
-                    db.txnDao().getUnitPriceByLineId(item.purchaseLineId) ?: 0L
-                } else 0L
-                totalSlowValuePaisa += unitCostPaisa * item.remainingQty
-            }
-            val slowValueRs = totalSlowValuePaisa / 100
-
-            _uiState.value = DashboardUiState(
-                timeRange = range,
-                netRevenueRs = netRevenueRs,
-                cogsRs = cogsRs,
-                expensesRs = expensesRs,
-                netProfitRs = netProfitRs,
-                returnsRefundsRs = returnsRefundsRs,
-                todaySalesCount = todayCount,
-                todaySalesTotalRs = todayPaisa / 100,
-                capitalInStockRs = capitalLockedRs,
-                slowStockCount = slowCount,
-                slowStockValueRs = slowValueRs,
-                topSellingModels = topModels,
-                isLoading = false
-            )
-
-            Log.i(TAG, "✓ Computed Dashboard Metrics for range '$range': Revenue=Rs $netRevenueRs, COGS=Rs $cogsRs, Expenses=Rs $expensesRs, NetProfit=Rs $netProfitRs")
         }
+
+        val netRevenuePaisa = (grossRevenuePaisa - returnsRefundsPaisa).coerceAtLeast(0L)
+        val finalCogsPaisa = netCogsPaisa.coerceAtLeast(0L)
+        val totalExpensesPaisa = db.expenseDao().getTotalExpensesPaisa(activeShopId, startTimeMs, endTimeMs)
+
+        val netRevenueRs = netRevenuePaisa / 100
+        val cogsRs = finalCogsPaisa / 100
+        val expensesRs = totalExpensesPaisa / 100
+        val returnsRefundsRs = returnsRefundsPaisa / 100
+
+        val grossProfitRs = (netRevenuePaisa - finalCogsPaisa) / 100
+        val netProfitRs = grossProfitRs - expensesRs
+
+        // Top Selling Models
+        val topModels = modelMap.entries
+            .sortedByDescending { it.value.unitsSold }
+            .take(5)
+            .map { (name, stat) ->
+                TopSellingModel(
+                    modelName = name,
+                    unitsSold = stat.unitsSold,
+                    revenueRs = stat.revenuePaisa / 100,
+                    profitRs = stat.profitPaisa / 100
+                )
+            }
+
+        // Capital Locked in Stock
+        val inStockItems = allStock.filter { it.status == ItemStatus.IN_STOCK || it.remainingQty > 0 }
+
+        var totalCapitalLockedPaisa = 0L
+        for (item in inStockItems) {
+            val unitCostPaisa = item.purchaseLineId?.let { linePriceMap[it] }
+            if (unitCostPaisa != null) {
+                totalCapitalLockedPaisa += unitCostPaisa * item.remainingQty
+            } else {
+                missingCostCount++
+            }
+        }
+        val capitalLockedRs = totalCapitalLockedPaisa / 100
+
+        // Slow Moving Stock (> 30 days)
+        val thirtyDaysMs = 30L * 24 * 60 * 60 * 1000L
+        val slowItems = inStockItems.filter { (now - it.stockedAt) >= thirtyDaysMs }
+        val slowCount = slowItems.sumOf { it.remainingQty }
+
+        var totalSlowValuePaisa = 0L
+        for (item in slowItems) {
+            val unitCostPaisa = item.purchaseLineId?.let { linePriceMap[it] } ?: 0L
+            totalSlowValuePaisa += unitCostPaisa * item.remainingQty
+        }
+        val slowValueRs = totalSlowValuePaisa / 100
+
+        Log.i(TAG, "✓ Computed Dashboard Metrics for '$range': Revenue=$netRevenueRs, COGS=$cogsRs, Expenses=$expensesRs, NetProfit=$netProfitRs, MissingCostsCount=$missingCostCount")
+
+        return DashboardUiState(
+            timeRange = range,
+            netRevenueRs = netRevenueRs,
+            cogsRs = cogsRs,
+            expensesRs = expensesRs,
+            netProfitRs = netProfitRs,
+            returnsRefundsRs = returnsRefundsRs,
+            todaySalesCount = todayCount,
+            todaySalesTotalRs = todayPaisa / 100,
+            capitalInStockRs = capitalLockedRs,
+            slowStockCount = slowCount,
+            slowStockValueRs = slowValueRs,
+            topSellingModels = topModels,
+            missingCostCount = missingCostCount,
+            hasMissingCosts = missingCostCount > 0,
+            isLoading = false
+        )
     }
 
     private fun getTimeRangeBounds(range: TimeRange, nowMs: Long): Pair<Long, Long> {

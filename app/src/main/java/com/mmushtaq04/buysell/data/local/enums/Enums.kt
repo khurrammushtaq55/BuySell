@@ -73,6 +73,9 @@ enum class PaymentDirection {
     OUT
 }
 
+fun standalonePaymentScope(direction: PaymentDirection): Scope =
+    if (direction == PaymentDirection.IN) Scope.PUBLIC else Scope.VAULT
+
 enum class PaymentMethod {
     CASH,
     BANK,

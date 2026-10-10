@@ -23,6 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mmushtaq04.buysell.R
+import com.mmushtaq04.buysell.presentation.components.PremiumFeatureGate
 import com.mmushtaq04.buysell.ui.theme.BuySellTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -30,6 +31,8 @@ import com.mmushtaq04.buysell.ui.theme.BuySellTheme
 fun OwnerDashboardScreen(
     onNavigateBack: () -> Unit = {},
     onNavigateToExpenses: () -> Unit = {},
+    isDashboardLocked: Boolean = false,
+    onUnlockClick: () -> Unit = {},
     uiState: DashboardUiState = DashboardUiState(),
     onTimeRangeSelect: (TimeRange) -> Unit = {}
 ) {
@@ -96,60 +99,92 @@ fun OwnerDashboardScreen(
                 }
             }
 
+            if (uiState.hasMissingCosts) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)
+                ) {
+                    Row(
+                        modifier = Modifier.padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Warning,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.error
+                        )
+                        Text(
+                            text = stringResource(R.string.dashboard_warning_missing_costs, uiState.missingCostCount),
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onErrorContainer
+                        )
+                    }
+                }
+            }
+
             // Hero Net Profit Card
             val isProfitPositive = uiState.netProfitRs >= 0
             val profitColor = if (isProfitPositive) Color(0xFF2E7D32) else MaterialTheme.colorScheme.error
 
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+            PremiumFeatureGate(
+                isLocked = isDashboardLocked,
+                featureName = stringResource(R.string.dashboard_net_profit),
+                onUnlockClick = onUnlockClick
             ) {
-                Column(
-                    modifier = Modifier.padding(18.dp),
-                    verticalArrangement = Arrangement.spacedBy(6.dp)
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
                 ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                    Column(
+                        modifier = Modifier.padding(18.dp),
+                        verticalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
                         Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.TrendingUp,
-                                contentDescription = null,
-                                tint = profitColor
-                            )
-                            Text(
-                                text = stringResource(R.string.dashboard_net_profit),
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.TrendingUp,
+                                    contentDescription = null,
+                                    tint = profitColor
+                                )
+                                Text(
+                                    text = stringResource(R.string.dashboard_net_profit),
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+
+                            IconButton(onClick = {
+                                showHelpDialogTitle = "Net Profit Calculation"
+                                showHelpDialogMsg = "Net Profit = Net Revenue (Aamdani) - COGS (Saman ki Lagat) - Expenses (Dukan ke Akhrajat).\n\nReturns & Refunds are already adjusted!"
+                            }) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.HelpOutline,
+                                    contentDescription = "Help",
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
                         }
 
-                        IconButton(onClick = {
-                            showHelpDialogTitle = "Net Profit Calculation"
-                            showHelpDialogMsg = "Net Profit = Net Revenue (Aamdani) - COGS (Saman ki Lagat) - Expenses (Dukan ke Akhrajat).\n\nReturns & Refunds are already adjusted!"
-                        }) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.HelpOutline,
-                                contentDescription = "Help",
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.size(18.dp)
-                            )
-                        }
+                        Text(
+                            text = com.mmushtaq04.buysell.util.CurrencyFormatter.formatAmount(context, uiState.netProfitRs),
+                            fontSize = 32.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = profitColor
+                        )
                     }
-
-                    Text(
-                        text = com.mmushtaq04.buysell.util.CurrencyFormatter.formatAmount(context, uiState.netProfitRs),
-                        fontSize = 32.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = profitColor
-                    )
                 }
             }
 

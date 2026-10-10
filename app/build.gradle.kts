@@ -39,6 +39,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":shared"))
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.appcompat)
     implementation(libs.material.components)
@@ -70,6 +71,7 @@ dependencies {
     implementation(libs.firebase.storage.ktx)
     implementation(libs.firebase.messaging)
     implementation(libs.firebase.crashlytics.ktx)
+    implementation("com.google.firebase:firebase-functions-ktx")
     implementation(libs.play.services.auth)
     implementation(libs.credentials.main)
     implementation(libs.credentials.play)
@@ -81,8 +83,9 @@ dependencies {
     // Gson
     implementation(libs.gson)
 
-    // Play Review
+    // Play Review & Play Billing
     implementation(libs.play.review.ktx)
+    implementation("com.android.billingclient:billing-ktx:7.0.0")
 
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)

@@ -248,3 +248,24 @@
 - [x] Expanded In-App Help Center (Topics 11 & 12)
 	- [x] Added Topic 11 (Store Currency Selection) and Topic 12 (Daily & Monthly Summary Notifications) across all 8 locale resource files (`en`, `ur`, `ur-Latn`, `hi`, `ar`, `es`, `fr`, `zh-CN`).
 	- [x] Updated `HelpScreen.kt` to render 12 total comprehensive help articles.
+- [x] Owner Dashboard Financial Logic Refactoring & N+1 Optimization
+	- [x] Deducted original purchase cost of returned items from Net COGS on `SALE_RETURN` transactions.
+	- [x] Added `hasMissingCosts` and `missingCostCount` tracking with explicit warning banner on `OwnerDashboardScreen.kt`.
+	- [x] Replaced $O(3N)$ DB queries inside calculation loops with in-memory map pre-fetching (`lineMapByTxn`, `linePriceMap`, `stockMap`).
+	- [x] Unified all reactive Room DB observers into a single `combine` Flow pipeline to prevent coroutine race conditions.
+- [x] Tasks D, E, F: Expense Scope, Soft Delete & Generic DELETE Push Robustness
+	- [x] Task D: Added `scopeFor(entityType, payloadScope)` in `FirestoreSyncManager.kt` forcing expenses to sync to `scopes/vault/expenses`.
+	- [x] Task E: Implemented expense soft delete (`deletedAt = now`, `rev = expense.rev + 1`, `SyncOp.UPSERT` payload with `deleted_at`), renamed hard delete to `hardDeleteExpense` in `ExpenseDao`, and restricted expense add/delete to `Role.OWNER`.
+	- [x] Task F: Handled `NOT_FOUND` on generic `SyncOp.DELETE` remote updates gracefully by removing outbox item without throwing errors.
+	- [x] Added 6 new JVM unit tests in `CoreLogicTest.kt` (16/16 tests passing).
+- [x] SettingsScreen Modularization
+	- [x] Split 1000+ line `SettingsScreen.kt` into 5 clean, focused component files under `presentation/screens/settings/components/` (`SettingsCommonComponents`, `StoreProfileSection`, `LanguageAndPreferencesSection`, `TeamAndCategoriesSection`, `SecurityAndAccountSection`).
+- [x] Phase 1 Freemium Feature-Lock System
+	- [x] Added `billing-ktx:7.0.0` dependency.
+	- [x] Built `PlayBillingManager.kt` (`buysell_pro_monthly`, `buysell_pro_annual`, purchase restoration).
+	- [x] Built `FeatureAccessRepository.kt` & `FeatureAccessRepositoryImpl.kt` (cross-device shop entitlement sync, dynamic cloud config, admin promo code grant).
+	- [x] Built `PremiumFeatureGate.kt` (frosted blur overlay, lock icon, unlock action button).
+	- [x] Built `PremiumPaywallDialog.kt` (pricing options, feature highlights, upgrade action, restore purchases, admin promo code input).
+	- [x] Added 19 paywall string resources across all 8 locale folders.
+	- [x] Integrated `PremiumFeatureGate` across `OwnerDashboardScreen`, `SecurityAndAccountSection`, `TeamAndCategoriesSection`, and `LanguageAndPreferencesSection`.
+	- [x] Verified 17/17 JVM unit tests passing cleanly and debug APK assembled with 0 errors.

@@ -4,10 +4,12 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.room.withTransaction
 import com.google.gson.Gson
 import com.mmushtaq04.buysell.data.local.AppDatabase
 import com.mmushtaq04.buysell.data.local.entity.ExpenseEntity
 import com.mmushtaq04.buysell.data.local.entity.SyncOutboxEntity
+import com.mmushtaq04.buysell.data.local.enums.Role
 import com.mmushtaq04.buysell.data.local.enums.SyncOp
 import com.mmushtaq04.buysell.data.local.enums.SyncState
 import com.mmushtaq04.buysell.data.sync.SyncWorker
@@ -73,15 +75,17 @@ class ExpenseViewModel(application: Application) : AndroidViewModel(application)
         note: String,
         expenseDateMs: Long = System.currentTimeMillis()
     ) {
-        viewModelScope.launch {
-            val user = db.userDao().getPrimaryUser()
-            val meta = db.appMetaDao().getAppMeta()
-            val activeShopId = meta?.activeShopId?.ifBlank { null } ?: user?.shopId ?: ""
+        if (amountRs <= 0L) return
 
+        viewModelScope.launch {
+            val user = db.userDao().getPrimaryUser() ?: return@launch
+            if (user.role != Role.OWNER) return@launch
+
+            val meta = db.appMetaDao().getAppMeta()
+            val activeShopId = meta?.activeShopId?.ifBlank { null } ?: user.shopId
             if (activeShopId.isBlank()) return@launch
 
             val now = System.currentTimeMillis()
-            val recordedBy = user?.displayName ?: "Owner"
 
             val expenseEntity = ExpenseEntity(
                 id = UUID.randomUUID().toString(),
@@ -92,48 +96,69 @@ class ExpenseViewModel(application: Application) : AndroidViewModel(application)
                 note = note.ifBlank { null },
                 createdAt = now,
                 updatedAt = now,
-                createdBy = recordedBy,
-                updatedBy = recordedBy,
+                createdBy = user.id,
+                updatedBy = user.id,
                 syncState = SyncState.PENDING
             )
 
-            db.expenseDao().insertExpense(expenseEntity)
+            db.withTransaction {
+                db.expenseDao().insertExpense(expenseEntity)
 
-            db.syncDao().enqueueOutbox(
-                SyncOutboxEntity(
-                    id = UUID.randomUUID().toString(),
-                    entityType = "expenses",
-                    entityId = expenseEntity.id,
-                    op = SyncOp.UPSERT,
-                    payloadJson = Gson().toJson(expenseEntity),
-                    createdAt = now
+                db.syncDao().enqueueOutbox(
+                    SyncOutboxEntity(
+                        id = UUID.randomUUID().toString(),
+                        entityType = "expenses",
+                        entityId = expenseEntity.id,
+                        op = SyncOp.UPSERT,
+                        payloadJson = Gson().toJson(expenseEntity),
+                        createdAt = now
+                    )
                 )
-            )
+            }
 
             SyncWorker.enqueueOneTimeSync(getApplication())
-            Log.i(TAG, "✓ Added new Expense:  $amountRs for category '$category'")
+            Log.d(TAG, "✓ Added new Expense: $amountRs for category '$category'")
         }
     }
 
     fun deleteExpense(expenseId: String) {
         viewModelScope.launch {
-            val expense = db.expenseDao().getExpenseById(expenseId) ?: return@launch
-            db.expenseDao().deleteExpense(expenseId)
+            val user = db.userDao().getPrimaryUser() ?: return@launch
+            if (user.role != Role.OWNER) return@launch
 
+            val meta = db.appMetaDao().getAppMeta()
+            val activeShopId = meta?.activeShopId?.ifBlank { null } ?: user.shopId
+            if (activeShopId.isBlank()) return@launch
+
+            val expense = db.expenseDao().getExpenseById(expenseId) ?: return@launch
             val now = System.currentTimeMillis()
-            db.syncDao().enqueueOutbox(
-                SyncOutboxEntity(
-                    id = UUID.randomUUID().toString(),
-                    entityType = "expenses",
-                    entityId = expenseId,
-                    op = SyncOp.DELETE,
-                    payloadJson = Gson().toJson(expense),
-                    createdAt = now
-                )
+
+            val updatedExpense = expense.copy(
+                deletedAt = now,
+                deletedBy = user.id,
+                updatedAt = now,
+                updatedBy = user.id,
+                rev = expense.rev + 1,
+                syncState = SyncState.PENDING
             )
 
+            db.withTransaction {
+                db.expenseDao().insertExpense(updatedExpense)
+
+                db.syncDao().enqueueOutbox(
+                    SyncOutboxEntity(
+                        id = UUID.randomUUID().toString(),
+                        entityType = "expenses",
+                        entityId = updatedExpense.id,
+                        op = SyncOp.UPSERT,
+                        payloadJson = Gson().toJson(updatedExpense),
+                        createdAt = now
+                    )
+                )
+            }
+
             SyncWorker.enqueueOneTimeSync(getApplication())
-            Log.i(TAG, "✓ Deleted Expense ID: $expenseId")
+            Log.d(TAG, "✓ Soft-deleted Expense ID: $expenseId")
         }
     }
 }

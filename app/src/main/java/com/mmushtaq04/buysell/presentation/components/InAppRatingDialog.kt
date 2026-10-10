@@ -21,6 +21,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mmushtaq04.buysell.R
 
+import androidx.compose.foundation.Image
+import androidx.compose.ui.res.painterResource
+
 val GoldStarColor = Color(0xFFFFC107)
 
 @Composable
@@ -37,15 +40,16 @@ fun InAppRatingDialog(
         icon = {
             Surface(
                 shape = CircleShape,
-                color = MaterialTheme.colorScheme.primaryContainer,
+                color = Color.Transparent,
                 modifier = Modifier.size(56.dp)
             ) {
                 Box(contentAlignment = Alignment.Center) {
-                    Icon(
-                        imageVector = Icons.Default.Star,
+                    Image(
+                        painter = painterResource(id = R.mipmap.ic_launcher_round),
                         contentDescription = null,
-                        tint = GoldStarColor,
-                        modifier = Modifier.size(32.dp)
+                        modifier = Modifier
+                            .size(52.dp)
+                            .clip(CircleShape)
                     )
                 }
             }

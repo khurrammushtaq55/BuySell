@@ -4,12 +4,14 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.room.withTransaction
 import com.google.gson.Gson
 import com.mmushtaq04.buysell.data.local.AppDatabase
 import com.mmushtaq04.buysell.data.local.entity.PaymentEntity
 import com.mmushtaq04.buysell.data.local.entity.SyncOutboxEntity
 import com.mmushtaq04.buysell.data.local.enums.*
 import com.mmushtaq04.buysell.data.sync.SyncWorker
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.util.UUID
@@ -43,21 +45,27 @@ class PartyLedgerViewModel(application: Application) : AndroidViewModel(applicat
     private val _uiState = MutableStateFlow(PartyLedgerUiState())
     val uiState: StateFlow<PartyLedgerUiState> = _uiState.asStateFlow()
 
-    fun loadLedger(partyId: String) {
-        viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(partyId = partyId, isLoading = true)
+    private var ledgerJob: Job? = null
 
+    fun loadLedger(partyId: String) {
+        ledgerJob?.cancel()
+        _uiState.update { it.copy(partyId = partyId, isLoading = true) }
+
+        viewModelScope.launch {
             val user = db.userDao().getPrimaryUser()
             val meta = db.appMetaDao().getAppMeta()
             val activeShopId = meta?.activeShopId?.ifBlank { null } ?: user?.shopId ?: ""
 
-            if (activeShopId.isBlank()) return@launch
+            if (activeShopId.isBlank()) {
+                _uiState.update { it.copy(isLoading = false) }
+                return@launch
+            }
 
             val partyEntity = db.partyDao().getPartyById(partyId)
             val shopEntity = db.shopDao().getShopById(activeShopId)
             val activeShopName = shopEntity?.name?.ifBlank { "Mera Store" } ?: "Mera Store"
 
-            combine(
+            ledgerJob = combine(
                 db.partyDao().observePartyBalance(activeShopId, partyId),
                 db.txnDao().observeTxnsByParty(activeShopId, partyId),
                 db.paymentDao().observePaymentsByParty(activeShopId, partyId)
@@ -90,7 +98,7 @@ class PartyLedgerViewModel(application: Application) : AndroidViewModel(applicat
                     val isWasooli = pay.direction == PaymentDirection.IN
                     val title = if (isWasooli) "Udhaar Wasooli / Cash Received (+)" else "Payment Paid / Cash Given (-)"
                     val methodStr = pay.method.toDisplayName()
-                    val subtitle = listOfNotNull(methodStr, pay.referenceNo).joinToString(" • ")
+                    val subtitle = listOfNotNull(methodStr, pay.referenceNo, pay.note).filter { it.isNotBlank() }.joinToString(" • ").ifBlank { null }
 
                     ledgerList.add(
                         LedgerItem(
@@ -108,7 +116,7 @@ class PartyLedgerViewModel(application: Application) : AndroidViewModel(applicat
                 // Sort chronological newest first
                 ledgerList.sortByDescending { it.dateMs }
 
-                _uiState.value = PartyLedgerUiState(
+                PartyLedgerUiState(
                     partyId = partyId,
                     partyName = balanceDto?.name ?: partyEntity?.name ?: "Customer",
                     partyPhone = balanceDto?.phone ?: partyEntity?.phone ?: "N/A",
@@ -118,7 +126,9 @@ class PartyLedgerViewModel(application: Application) : AndroidViewModel(applicat
                     ledgerHistory = ledgerList,
                     isLoading = false
                 )
-            }.collect()
+            }.onEach { newState ->
+                _uiState.update { newState }
+            }.launchIn(viewModelScope)
         }
     }
 
@@ -129,15 +139,16 @@ class PartyLedgerViewModel(application: Application) : AndroidViewModel(applicat
         note: String,
         direction: PaymentDirection = PaymentDirection.IN
     ) {
+        if (amountRs <= 0L) return
+
         viewModelScope.launch {
-            val user = db.userDao().getPrimaryUser()
+            val user = db.userDao().getPrimaryUser() ?: return@launch
             val meta = db.appMetaDao().getAppMeta()
-            val activeShopId = meta?.activeShopId?.ifBlank { null } ?: user?.shopId ?: ""
+            val activeShopId = meta?.activeShopId?.ifBlank { null } ?: user.shopId
 
             if (activeShopId.isBlank()) return@launch
 
             val now = System.currentTimeMillis()
-            val recordedBy = user?.displayName ?: "Owner"
 
             val paymentEntity = PaymentEntity(
                 id = UUID.randomUUID().toString(),
@@ -147,30 +158,33 @@ class PartyLedgerViewModel(application: Application) : AndroidViewModel(applicat
                 direction = direction,
                 amount = amountRs * 100,
                 method = PaymentMethod.fromStr(paymentMethodStr),
-                referenceNo = note.ifBlank { null },
+                referenceNo = null,
+                note = note.ifBlank { null },
                 payDate = now,
                 createdAt = now,
                 updatedAt = now,
-                createdBy = recordedBy,
-                updatedBy = recordedBy,
-                scope = Scope.PUBLIC
+                createdBy = user.id,
+                updatedBy = user.id,
+                scope = standalonePaymentScope(direction)
             )
 
-            db.paymentDao().insertPayment(paymentEntity)
+            db.withTransaction {
+                db.paymentDao().insertPayment(paymentEntity)
 
-            db.syncDao().enqueueOutbox(
-                SyncOutboxEntity(
-                    id = UUID.randomUUID().toString(),
-                    entityType = "payments",
-                    entityId = paymentEntity.id,
-                    op = SyncOp.UPSERT,
-                    payloadJson = Gson().toJson(paymentEntity),
-                    createdAt = now
+                db.syncDao().enqueueOutbox(
+                    SyncOutboxEntity(
+                        id = UUID.randomUUID().toString(),
+                        entityType = "payments",
+                        entityId = paymentEntity.id,
+                        op = SyncOp.UPSERT,
+                        payloadJson = Gson().toJson(paymentEntity),
+                        createdAt = now
+                    )
                 )
-            )
+            }
 
             SyncWorker.enqueueOneTimeSync(getApplication())
-            Log.i(TAG, "✓ Recorded Wasooli Payment: $amountRs for PartyID: $partyId (Direction: $direction)")
+            Log.d(TAG, "✓ Recorded Wasooli Payment for PartyID: $partyId")
         }
     }
 }

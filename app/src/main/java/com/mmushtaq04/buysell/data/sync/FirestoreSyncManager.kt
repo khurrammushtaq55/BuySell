@@ -16,9 +16,17 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import java.util.UUID
 
+fun scopeFor(entityType: String, payloadScope: String?): Scope {
+    val normType = entityType.lowercase().trim()
+    if (normType in listOf("expenses", "expense", "audit_logs", "audit_log", "audit", "payment_accounts", "paymentaccount")) {
+        return Scope.VAULT
+    }
+    return runCatching { enumValueOf<Scope>(payloadScope ?: "") }.getOrDefault(Scope.PUBLIC)
+}
+
 class FirestoreSyncManager(private val db: AppDatabase) {
 
-    private val firestore = FirebaseFirestore.getInstance()
+    private val firestore by lazy { FirebaseFirestore.getInstance() }
     private val syncDao = db.syncDao()
     private val gson = Gson()
 
@@ -54,8 +62,8 @@ class FirestoreSyncManager(private val db: AppDatabase) {
                     // Attach session info
                     payloadMap["active_session_id"] = activeSessionId
 
-                    val scopeString = (payloadMap["scope"] as? String) ?: Scope.PUBLIC.name
-                    val scope = runCatching { enumValueOf<Scope>(scopeString) }.getOrDefault(Scope.PUBLIC)
+                    val rawScope = payloadMap["scope"] as? String
+                    val scope = scopeFor(item.entityType, rawScope)
                     val scopeFolder = if (scope == Scope.VAULT) "vault" else "public"
 
                     val collectionName = getCollectionName(item.entityType)
@@ -77,7 +85,16 @@ class FirestoreSyncManager(private val db: AppDatabase) {
                             docRef.set(payloadMap, SetOptions.merge()).await()
                         } else if (item.op == SyncOp.DELETE) {
                             val now = System.currentTimeMillis()
-                            docRef.update(mapOf("deleted_at" to now, "updated_at" to now)).await()
+                            try {
+                                docRef.update(mapOf("deleted_at" to now, "updated_at" to now)).await()
+                            } catch (e: Exception) {
+                                val errMsg = e.message ?: ""
+                                if (errMsg.contains("NOT_FOUND", ignoreCase = true) || errMsg.contains("No document to update", ignoreCase = true)) {
+                                    Log.w(TAG, "Document path '$docPath' not found remotely on DELETE. Treating as success.")
+                                } else {
+                                    throw e
+                                }
+                            }
                         }
                     }
 
@@ -291,14 +308,14 @@ class FirestoreSyncManager(private val db: AppDatabase) {
         }
     }
 
-    private suspend fun purgeLocalVaultRow(entityType: String, entityId: String) {
+    internal suspend fun purgeLocalVaultRow(entityType: String, entityId: String) {
         runCatching {
             when (entityType.lowercase().trim()) {
                 "parties", "party" -> db.partyDao().getPartyById(entityId)?.let { db.partyDao().insertParty(it.copy(deletedAt = System.currentTimeMillis())) }
                 "payments", "payment" -> db.paymentDao().deletePayment(entityId)
-                "expenses", "expense" -> db.expenseDao().deleteExpense(entityId)
+                "expenses", "expense" -> db.expenseDao().hardDeleteExpense(entityId)
                 "txns", "txn" -> {
-                    db.txnDao().getTxnById(entityId)?.let { db.txnDao().insertTxn(it.copy(deletedAt = System.currentTimeMillis())) }
+                    db.txnDao().deleteTxnById(entityId)
                     db.txnDao().deleteTxnLinesByTxnId(entityId)
                 }
             }

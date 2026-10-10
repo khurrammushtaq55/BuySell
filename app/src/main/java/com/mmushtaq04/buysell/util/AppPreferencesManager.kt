@@ -235,4 +235,16 @@ object AppPreferencesManager {
             .putInt(KEY_MONTHLY_SUMMARY_MINUTE, minute)
             .apply()
     }
+
+    private const val KEY_IS_PREMIUM_UNLOCKED = "is_premium_unlocked"
+
+    fun isPremiumUnlocked(context: Context): Boolean {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        return prefs.getBoolean(KEY_IS_PREMIUM_UNLOCKED, false)
+    }
+
+    fun setPremiumUnlocked(context: Context, unlocked: Boolean) {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit().putBoolean(KEY_IS_PREMIUM_UNLOCKED, unlocked).apply()
+    }
 }
