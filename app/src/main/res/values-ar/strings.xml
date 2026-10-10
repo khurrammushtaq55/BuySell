@@ -350,4 +350,8 @@
     <string name="settings_monthly_summary_day_label">يوم الشهر والوقت</string>
     <string name="notif_monthly_summary_title">التقرير التجاري الشهري لـ %1$s</string>
     <string name="notif_monthly_summary_msg">هذا الشهر: %1$d مبيعات (%2$s) • المصروفات: %3$s • صافي الربح: %4$s</string>
+    <string name="help_topic_11_title">11. كيفية تغيير عملة المتجر؟</string>
+    <string name="help_topic_11_desc">انتقل إلى الإعدادات -&gt; عملة المتجر. اختر عملتك المحلية (USD $, AED, EUR €, GBP £, SAR, INR ₹) أو أدخل رمزًا مخصصًا. ستتم إعادة تنسيق جميع الفواتير والتقارير فورًا بعملك المحددة.</string>
+    <string name="help_topic_12_title">12. كيفية ضبط إشعارات الملخص اليومي والشهري؟</string>
+    <string name="help_topic_12_desc">انتقل إلى الإعدادات -&gt; ملخص الأعمال اليومي أو التقرير الشهري. قم بتفعيل الخيار وحدد وقت إغلاق المحل واليوم المفضل لتلقي الإشعارات.</string>
 </resources>

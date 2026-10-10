@@ -245,3 +245,6 @@
 - [x] Independent Day (1-31) & Time Selectors for Monthly Summary
 	- [x] Updated `MonthlySummaryWorker.kt` to support Days 1 to 31 with Calendar `getActualMaximum(Calendar.DAY_OF_MONTH)` coercion so February/April fire safely on the month's last day without rolling over.
 	- [x] Updated `SettingsScreen.kt` to render 2 completely separate, independent clickable rows: **Summary Day of Month** (Day 1 to 31) and **Summary Notification Time** (native `TimePickerDialog`).
+- [x] Expanded In-App Help Center (Topics 11 & 12)
+	- [x] Added Topic 11 (Store Currency Selection) and Topic 12 (Daily & Monthly Summary Notifications) across all 8 locale resource files (`en`, `ur`, `ur-Latn`, `hi`, `ar`, `es`, `fr`, `zh-CN`).
+	- [x] Updated `HelpScreen.kt` to render 12 total comprehensive help articles.

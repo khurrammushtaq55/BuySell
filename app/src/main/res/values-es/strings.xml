@@ -350,4 +350,8 @@
     <string name="settings_monthly_summary_day_label">Día del Mes y Hora</string>
     <string name="notif_monthly_summary_title">Informe Mensual del Negocio - %1$s</string>
     <string name="notif_monthly_summary_msg">Este Mes: %1$d Ventas (%2$s) • Gastos: %3$s • Ganancia Neta: %4$s</string>
+    <string name="help_topic_11_title">11. ¿Cómo cambiar la moneda de la tienda?</string>
+    <string name="help_topic_11_desc">Vaya a Configuración -&gt; Moneda de la Tienda. Seleccione su moneda local (USD $, EUR €, GBP £, AED, SAR, etc.) o ingrese un símbolo personalizado. Todos los recibos y reportes se formatearán al instante en su moneda.</string>
+    <string name="help_topic_12_title">12. ¿Cómo configurar notificaciones de resumen diario y mensual?</string>
+    <string name="help_topic_12_desc">Vaya a Configuración -&gt; Resumen Diario o Informe Mensual. Active el interruptor y seleccione la hora de cierre y el día preferido para recibir notificaciones automáticas.</string>
 </resources>

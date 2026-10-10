@@ -349,4 +349,8 @@
     <string name="settings_monthly_summary_day_label">Day of Month &amp; Time</string>
     <string name="notif_monthly_summary_title">%1$s Monthly Business Report</string>
     <string name="notif_monthly_summary_msg">This Month: %1$d Sales (%2$s) • Expenses: %3$s • Net Profit: %4$s</string>
+    <string name="help_topic_11_title">11. How to change Store Currency?</string>
+    <string name="help_topic_11_desc">Go to Settings -&gt; Store Currency. Select your local currency (USD $, AED, EUR €, GBP £, PKR, INR ₹, SAR, CAD, AUD) or enter a custom symbol. All store receipts, inventory, and financial reports will instantly format in your chosen currency.</string>
+    <string name="help_topic_12_title">12. How to configure Daily &amp; Monthly Summary Notifications?</string>
+    <string name="help_topic_12_desc">Go to Settings -&gt; Daily Business Summary or Monthly Business Report. Turn on the switch and select your store closing time and preferred day of the month to receive automated sales and profit push notifications.</string>
 </resources>

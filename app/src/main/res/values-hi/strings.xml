@@ -350,4 +350,8 @@
     <string name="settings_monthly_summary_day_label">महीने की तारीख और समय</string>
     <string name="notif_monthly_summary_title">%1$s मासिक व्यवसाय रिपोर्ट</string>
     <string name="notif_monthly_summary_msg">इस महीने: %1$d बिक्री (%2$s) • खर्च: %3$s • शुद्ध लाभ: %4$s</string>
+    <string name="help_topic_11_title">11. दुकान की मुद्रा (Currency) कैसे बदलें?</string>
+    <string name="help_topic_11_desc">सेटिंग्स -&gt; दुकान की मुद्रा पर जाएं। अपनी मुद्रा (USD $, AED, EUR €, GBP £, INR ₹, PKR) चुनें या कस्टम प्रतीक दर्ज करें। सभी रसीदें और रिपोर्ट तुरंत आपकी चुनी हुई मुद्रा में दिखाई देंगी।</string>
+    <string name="help_topic_12_title">12. दैनिक और मासिक सारांश सूचनाएं कैसे सेट करें?</string>
+    <string name="help_topic_12_desc">सेटिंग्स -&gt; दैनिक व्यवसाय सारांश या मासिक रिपोर्ट पर जाएं। स्विच ऑन करें और दुकान बंद होने का समय और तारीख चुनें।</string>
 </resources>

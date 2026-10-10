@@ -350,4 +350,8 @@
     <string name="settings_monthly_summary_day_label">每月推送日期与时间</string>
     <string name="notif_monthly_summary_title">%1$s 每月营业报告</string>
     <string name="notif_monthly_summary_msg">本月：%1$d 笔销售（%2$s）• 支出：%3$s • 净利润：%4$s</string>
+    <string name="help_topic_11_title">11. 如何更改店铺结算货币？</string>
+    <string name="help_topic_11_desc">前往设置 -&gt; 店铺结算货币。选择您的本地货币（USD $、AED、EUR €、GBP £、INR ₹、SAR 等）或输入自定义符号。所有小票和报表将立即转换为您选择的货币。</string>
+    <string name="help_topic_12_title">12. 如何设置每日与每月营业摘要通知？</string>
+    <string name="help_topic_12_desc">前往设置 -&gt; 每日营业摘要或每月营业报告。开启开关并选择打烊时间与每月推送日期，即可自动接收推送提醒。</string>
 </resources>

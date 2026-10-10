@@ -350,4 +350,8 @@
     <string name="settings_monthly_summary_day_label">Mahine ki Tareekh aur Time</string>
     <string name="notif_monthly_summary_title">%1$s Monthly Business Report</string>
     <string name="notif_monthly_summary_msg">Iss Mahine: %1$d Sales (%2$s) • Expenses: %3$s • Net Profit: %4$s</string>
+    <string name="help_topic_11_title">11. Store Currency kaise badlein?</string>
+    <string name="help_topic_11_desc">Settings -&gt; Store Currency par jayein. Apni currency (USD $, AED, EUR €, GBP £, PKR, INR ₹, SAR) select karein ya custom symbol darj karein. Tamam receipts aur reports aap ki chosen currency mein format hongi.</string>
+    <string name="help_topic_12_title">12. Daily aur Monthly Summary Notifications kaise set karein?</string>
+    <string name="help_topic_12_desc">Settings -&gt; Daily Business Summary ya Monthly Business Report par jayein. Switch ON karein aur dukan closing timing aur tareekh select karein.</string>
 </resources>

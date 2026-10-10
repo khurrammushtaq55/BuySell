@@ -775,7 +775,7 @@ fun SettingsScreen(
                     if (isMonthlySummaryEnabled) {
                         val (currentDay, currentHour, currentMin) = monthlySchedule
 
-                        val formattedDayText = if (currentDay == 31) "Day 31 (Last Day)" else "Day $currentDay"
+                        val formattedDayText = if (currentDay == 31) "31 (Last Day)" else "Day $currentDay"
 
                         val formattedTimeText = remember(currentHour, currentMin) {
                             val ampm = if (currentHour >= 12) "PM" else "AM"

@@ -350,4 +350,8 @@
     <string name="settings_monthly_summary_day_label">Jour du Mois et Heure</string>
     <string name="notif_monthly_summary_title">Rapport Mensuel de l\'Activité - %1$s</string>
     <string name="notif_monthly_summary_msg">Ce Mois : %1$d Ventes (%2$s) • Dépenses : %3$s • Bénéfice Net : %4$s</string>
+    <string name="help_topic_11_title">11. Comment changer la devise du magasin ?</string>
+    <string name="help_topic_11_desc">Allez dans Paramètres -&gt; Devise du Magasin. Sélectionnez votre devise locale (USD $, EUR €, GBP £, AED, SAR, etc.) ou entrez un symbole personnalisé. Tous les reçus et rapports s\'afficheront instantanément dans votre devise.</string>
+    <string name="help_topic_12_title">12. Comment configurer les notifications de résumé quotidien et mensuel ?</string>
+    <string name="help_topic_12_desc">Allez dans Paramètres -&gt; Résumé Quotidien ou Rapport Mensuel. Activez l\'interrupteur et sélectionnez l\'heure de fermeture et le jour souhaité.</string>
 </resources>

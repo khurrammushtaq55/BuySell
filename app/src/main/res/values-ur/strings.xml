@@ -350,4 +350,8 @@
     <string name="settings_monthly_summary_day_label">مہینے کی تاریخ اور وقت</string>
     <string name="notif_monthly_summary_title">%1$s ماہانہ کاروباری رپورٹ</string>
     <string name="notif_monthly_summary_msg">اس مہینے: %1$d سیلز (%2$s) • اخراجات: %3$s • خالص منافع: %4$s</string>
+    <string name="help_topic_11_title">11. اسٹور کی کرنسی کیسے تبدیل کریں؟</string>
+    <string name="help_topic_11_desc">سیٹنگز -&gt; اسٹور کرنسی پر جائیں۔ اپنی کرنسی (USD $, AED, EUR €, GBP £, PKR, INR ₹, SAR) منتخب کریں یا اپنی پسند کی علامت درج کریں۔ تمام رسیدیں اور رپورٹس اسی کرنسی میں ظاہر ہوں گی۔</string>
+    <string name="help_topic_12_title">12. روزانہ اور ماہانہ سمری نوٹیفکیشن کیسے سیٹ کریں؟</string>
+    <string name="help_topic_12_desc">سیٹنگز -&gt; روزانہ کاروباری خلاصہ یا ماہانہ کاروباری رپورٹ پر جائیں۔ نوٹیفکیشن آن کریں اور اپنی دکان بند ہونے کا وقت اور تاریخ منتخب کریں۔</string>
 </resources>
