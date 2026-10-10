@@ -344,5 +344,10 @@
     <string name="settings_daily_summary_sub">Dukan closing time par rozana sales aur munafa ka khulasa hasil karein</string>
     <string name="settings_daily_summary_time_label">Notification Timing</string>
     <string name="notif_daily_summary_title">%1$s Daily Sales Summary</string>
-    <string name="notif_daily_summary_msg">Aaj: %1$d Sales (%2$s) • Expenses: %3$s • Net Profit: %4$s</string>
+    <string name="notif_daily_summary_msg">Aaj: %1$d Sales (%2$s)</string>
+    <string name="settings_monthly_summary_title">Monthly Business Report Notification</string>
+    <string name="settings_monthly_summary_sub">Mahana sales, kharchay aur net profit ka khulasa hasil karein</string>
+    <string name="settings_monthly_summary_day_label">Mahine ki Tareekh aur Time</string>
+    <string name="notif_monthly_summary_title">%1$s Monthly Business Report</string>
+    <string name="notif_monthly_summary_msg">Iss Mahine: %1$d Sales (%2$s) • Expenses: %3$s • Net Profit: %4$s</string>
 </resources>

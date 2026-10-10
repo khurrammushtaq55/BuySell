@@ -237,3 +237,11 @@
 	- [x] Added `CHANNEL_DAILY_SUMMARY` in `AppNotificationManager.kt`.
 	- [x] Added Daily Summary Enable/Disable toggle switch and native `android.app.TimePickerDialog` in `SettingsScreen.kt` for picking any custom hour (0-23) and minute (0-59).
 	- [x] Added notification and settings string resources across all 8 locale folders.
+- [x] Daily Notification Simplification & Monthly Business Report Notification
+	- [x] Simplified daily summary notification to display **only sales count and revenue** (`"Today: 5 Sales ($125,000)"`).
+	- [x] Implemented `MonthlySummaryWorker.kt` scheduled once a month on a configurable Day of Month (default 1st) and Time (default 10:00 AM) to calculate full monthly sales, expenses, and net profit.
+	- [x] Added **Monthly Business Report Notification** controls in `SettingsScreen.kt` with toggle switch, Day selector (1–28), and native `TimePickerDialog`.
+	- [x] Updated all localized notification and settings strings across all 8 supported language folders.
+- [x] Independent Day (1-31) & Time Selectors for Monthly Summary
+	- [x] Updated `MonthlySummaryWorker.kt` to support Days 1 to 31 with Calendar `getActualMaximum(Calendar.DAY_OF_MONTH)` coercion so February/April fire safely on the month's last day without rolling over.
+	- [x] Updated `SettingsScreen.kt` to render 2 completely separate, independent clickable rows: **Summary Day of Month** (Day 1 to 31) and **Summary Notification Time** (native `TimePickerDialog`).

@@ -344,5 +344,10 @@
     <string name="settings_daily_summary_sub">Reciba un resumen diario de ventas y ganancias a la hora de cierre preferida</string>
     <string name="settings_daily_summary_time_label">Hora de la Notificación</string>
     <string name="notif_daily_summary_title">Resumen Diario de Ventas - %1$s</string>
-    <string name="notif_daily_summary_msg">Hoy: %1$d Ventas (%2$s) • Gastos: %3$s • Ganancia Neta: %4$s</string>
+    <string name="notif_daily_summary_msg">Hoy: %1$d Ventas (%2$s)</string>
+    <string name="settings_monthly_summary_title">Notificación del Informe Mensual del Negocio</string>
+    <string name="settings_monthly_summary_sub">Reciba un resumen mensual de ventas, gastos y ganancia neta</string>
+    <string name="settings_monthly_summary_day_label">Día del Mes y Hora</string>
+    <string name="notif_monthly_summary_title">Informe Mensual del Negocio - %1$s</string>
+    <string name="notif_monthly_summary_msg">Este Mes: %1$d Ventas (%2$s) • Gastos: %3$s • Ganancia Neta: %4$s</string>
 </resources>

@@ -7,6 +7,8 @@ import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -33,6 +35,7 @@ import androidx.compose.ui.unit.sp
 import com.mmushtaq04.buysell.R
 import com.mmushtaq04.buysell.data.local.entity.CategoryEntity
 import com.mmushtaq04.buysell.data.sync.DailySummaryWorker
+import com.mmushtaq04.buysell.data.sync.MonthlySummaryWorker
 import com.mmushtaq04.buysell.ui.theme.BuySellTheme
 import com.mmushtaq04.buysell.util.AppPinManager
 import com.mmushtaq04.buysell.util.AppPreferencesManager
@@ -728,6 +731,181 @@ fun SettingsScreen(
                                 )
                                 timePicker.setOnCancelListener { showTimePickerDialog = false }
                                 timePicker.setOnDismissListener { showTimePickerDialog = false }
+                                timePicker.show()
+                                onDispose {
+                                    timePicker.dismiss()
+                                }
+                            }
+                        }
+                    }
+
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+
+                    var isMonthlySummaryEnabled by remember { mutableStateOf(AppPreferencesManager.isMonthlySummaryEnabled(context)) }
+                    var monthlySchedule by remember { mutableStateOf(AppPreferencesManager.getMonthlySummarySchedule(context)) }
+                    var showMonthlyTimePicker by remember { mutableStateOf(false) }
+                    var showMonthlyDayDialog by remember { mutableStateOf(false) }
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                val updated = !isMonthlySummaryEnabled
+                                isMonthlySummaryEnabled = updated
+                                AppPreferencesManager.setMonthlySummaryEnabled(context, updated)
+                                MonthlySummaryWorker.scheduleMonthlySummary(context)
+                            },
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(stringResource(R.string.settings_monthly_summary_title), fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                            Text(stringResource(R.string.settings_monthly_summary_sub), fontSize = 12.sp, color = Color.Gray)
+                        }
+                        Switch(
+                            checked = isMonthlySummaryEnabled,
+                            onCheckedChange = { updated ->
+                                isMonthlySummaryEnabled = updated
+                                AppPreferencesManager.setMonthlySummaryEnabled(context, updated)
+                                MonthlySummaryWorker.scheduleMonthlySummary(context)
+                            }
+                        )
+                    }
+
+                    if (isMonthlySummaryEnabled) {
+                        val (currentDay, currentHour, currentMin) = monthlySchedule
+
+                        val formattedDayText = if (currentDay == 31) "Day 31 (Last Day)" else "Day $currentDay"
+
+                        val formattedTimeText = remember(currentHour, currentMin) {
+                            val ampm = if (currentHour >= 12) "PM" else "AM"
+                            val displayHour = when {
+                                currentHour == 0 -> 12
+                                currentHour > 12 -> currentHour - 12
+                                else -> currentHour
+                            }
+                            String.format(java.util.Locale.getDefault(), "%02d:%02d %s", displayHour, currentMin, ampm)
+                        }
+
+                        // Row 1: Day Selector
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { showMonthlyDayDialog = true }
+                                .padding(vertical = 4.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(stringResource(R.string.settings_monthly_summary_day_label), fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Surface(
+                                shape = RoundedCornerShape(8.dp),
+                                color = MaterialTheme.colorScheme.secondaryContainer
+                            ) {
+                                Text(
+                                    text = formattedDayText,
+                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 13.sp,
+                                    color = MaterialTheme.colorScheme.onSecondaryContainer
+                                )
+                            }
+                        }
+
+                        // Row 2: Time Selector
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { showMonthlyTimePicker = true }
+                                .padding(vertical = 4.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text("Summary Notification Time", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Surface(
+                                shape = RoundedCornerShape(8.dp),
+                                color = MaterialTheme.colorScheme.primaryContainer
+                            ) {
+                                Text(
+                                    text = formattedTimeText,
+                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 13.sp,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                                )
+                            }
+                        }
+
+                        // Independent Dialog 1: Day Selector Dialog (1 to 31)
+                        if (showMonthlyDayDialog) {
+                            var tempDay by remember { mutableStateOf(currentDay) }
+                            val daysList = (1..31).toList()
+
+                            AlertDialog(
+                                onDismissRequest = { showMonthlyDayDialog = false },
+                                title = { Text("Select Day of Month", fontWeight = FontWeight.Bold) },
+                                text = {
+                                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                        Text("Choose the day of the month for your business report (1 to 31):", fontSize = 13.sp, color = Color.Gray)
+                                        Box(modifier = Modifier.fillMaxWidth().height(220.dp)) {
+                                            LazyColumn {
+                                                items(daysList) { dayNum ->
+                                                    val labelText = if (dayNum == 31) "31 (Last Day of Month)" else "$dayNum"
+                                                    Row(
+                                                        modifier = Modifier
+                                                            .fillMaxWidth()
+                                                            .clickable { tempDay = dayNum }
+                                                            .padding(10.dp),
+                                                        verticalAlignment = Alignment.CenterVertically
+                                                    ) {
+                                                        RadioButton(
+                                                            selected = tempDay == dayNum,
+                                                            onClick = { tempDay = dayNum }
+                                                        )
+                                                        Spacer(modifier = Modifier.width(8.dp))
+                                                        Text(labelText, fontWeight = FontWeight.SemiBold)
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                confirmButton = {
+                                    Button(
+                                        onClick = {
+                                            monthlySchedule = Triple(tempDay, currentHour, currentMin)
+                                            AppPreferencesManager.setMonthlySummarySchedule(context, tempDay, currentHour, currentMin)
+                                            MonthlySummaryWorker.scheduleMonthlySummary(context, tempDay, currentHour, currentMin)
+                                            showMonthlyDayDialog = false
+                                        }
+                                    ) {
+                                        Text(stringResource(R.string.action_save))
+                                    }
+                                },
+                                dismissButton = {
+                                    TextButton(onClick = { showMonthlyDayDialog = false }) {
+                                        Text(stringResource(R.string.action_cancel))
+                                    }
+                                }
+                            )
+                        }
+
+                        // Independent Dialog 2: Time Picker Dialog
+                        if (showMonthlyTimePicker) {
+                            DisposableEffect(Unit) {
+                                val timePicker = android.app.TimePickerDialog(
+                                    context,
+                                    { _, hourOfDay, minute ->
+                                        monthlySchedule = Triple(currentDay, hourOfDay, minute)
+                                        AppPreferencesManager.setMonthlySummarySchedule(context, currentDay, hourOfDay, minute)
+                                        MonthlySummaryWorker.scheduleMonthlySummary(context, currentDay, hourOfDay, minute)
+                                        showMonthlyTimePicker = false
+                                    },
+                                    currentHour,
+                                    currentMin,
+                                    false
+                                )
+                                timePicker.setOnCancelListener { showMonthlyTimePicker = false }
+                                timePicker.setOnDismissListener { showMonthlyTimePicker = false }
                                 timePicker.show()
                                 onDispose {
                                     timePicker.dismiss()

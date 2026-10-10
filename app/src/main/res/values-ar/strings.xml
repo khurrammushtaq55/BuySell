@@ -344,5 +344,10 @@
     <string name="settings_daily_summary_sub">تلقي ملخص يومي للمبيعات والأرباح في وقت إغلاق متجرك</string>
     <string name="settings_daily_summary_time_label">وقت الإشعار</string>
     <string name="notif_daily_summary_title">ملخص المبيعات اليومية لـ %1$s</string>
-    <string name="notif_daily_summary_msg">اليوم: %1$d مبيعات (%2$s) • المصروفات: %3$s • صافي الربح: %4$s</string>
+    <string name="notif_daily_summary_msg">اليوم: %1$d مبيعات (%2$s)</string>
+    <string name="settings_monthly_summary_title">إشعار التقرير التجاري الشهري</string>
+    <string name="settings_monthly_summary_sub">تلقي ملخص شهري للمبيعات والمصروفات وصافي الربح</string>
+    <string name="settings_monthly_summary_day_label">يوم الشهر والوقت</string>
+    <string name="notif_monthly_summary_title">التقرير التجاري الشهري لـ %1$s</string>
+    <string name="notif_monthly_summary_msg">هذا الشهر: %1$d مبيعات (%2$s) • المصروفات: %3$s • صافي الربح: %4$s</string>
 </resources>

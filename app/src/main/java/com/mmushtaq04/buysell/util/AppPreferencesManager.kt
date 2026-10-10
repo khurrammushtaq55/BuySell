@@ -203,4 +203,36 @@ object AppPreferencesManager {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         prefs.edit().putInt(KEY_DAILY_SUMMARY_HOUR, hour).putInt(KEY_DAILY_SUMMARY_MINUTE, minute).apply()
     }
+
+    private const val KEY_MONTHLY_SUMMARY_ENABLED = "monthly_summary_enabled"
+    private const val KEY_MONTHLY_SUMMARY_DAY = "monthly_summary_day"
+    private const val KEY_MONTHLY_SUMMARY_HOUR = "monthly_summary_hour"
+    private const val KEY_MONTHLY_SUMMARY_MINUTE = "monthly_summary_minute"
+
+    fun isMonthlySummaryEnabled(context: Context): Boolean {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        return prefs.getBoolean(KEY_MONTHLY_SUMMARY_ENABLED, true)
+    }
+
+    fun setMonthlySummaryEnabled(context: Context, enabled: Boolean) {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit().putBoolean(KEY_MONTHLY_SUMMARY_ENABLED, enabled).apply()
+    }
+
+    fun getMonthlySummarySchedule(context: Context): Triple<Int, Int, Int> {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val day = prefs.getInt(KEY_MONTHLY_SUMMARY_DAY, 1) // 1st of month default
+        val hour = prefs.getInt(KEY_MONTHLY_SUMMARY_HOUR, 10) // 10:00 AM default
+        val minute = prefs.getInt(KEY_MONTHLY_SUMMARY_MINUTE, 0)
+        return Triple(day, hour, minute)
+    }
+
+    fun setMonthlySummarySchedule(context: Context, day: Int, hour: Int, minute: Int) {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit()
+            .putInt(KEY_MONTHLY_SUMMARY_DAY, day)
+            .putInt(KEY_MONTHLY_SUMMARY_HOUR, hour)
+            .putInt(KEY_MONTHLY_SUMMARY_MINUTE, minute)
+            .apply()
+    }
 }

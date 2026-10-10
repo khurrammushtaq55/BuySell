@@ -344,5 +344,10 @@
     <string name="settings_daily_summary_sub">Recevez un résumé quotidien des ventes et bénéfices à l\'heure de fermeture souhaitée</string>
     <string name="settings_daily_summary_time_label">Heure de la Notification</string>
     <string name="notif_daily_summary_title">Résumé Quotidien des Ventes - %1$s</string>
-    <string name="notif_daily_summary_msg">Aujourd\'hui : %1$d Ventes (%2$s) • Dépenses : %3$s • Bénéfice Net : %4$s</string>
+    <string name="notif_daily_summary_msg">Aujourd\'hui : %1$d Ventes (%2$s)</string>
+    <string name="settings_monthly_summary_title">Notification du Rapport Mensuel de l\'Activité</string>
+    <string name="settings_monthly_summary_sub">Recevez un résumé mensuel des ventes, dépenses et bénéfice net</string>
+    <string name="settings_monthly_summary_day_label">Jour du Mois et Heure</string>
+    <string name="notif_monthly_summary_title">Rapport Mensuel de l\'Activité - %1$s</string>
+    <string name="notif_monthly_summary_msg">Ce Mois : %1$d Ventes (%2$s) • Dépenses : %3$s • Bénéfice Net : %4$s</string>
 </resources>

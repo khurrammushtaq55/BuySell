@@ -14,24 +14,25 @@ import com.mmushtaq04.buysell.util.CurrencyFormatter
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
 
-class DailySummaryWorker(
+class MonthlySummaryWorker(
     appContext: Context,
     workerParams: WorkerParameters
 ) : CoroutineWorker(appContext, workerParams) {
 
     companion object {
-        private const val TAG = "DailySummaryWorker"
-        private const val WORK_NAME = "DailyBusinessSummaryWork"
+        private const val TAG = "MonthlySummaryWorker"
+        private const val WORK_NAME = "MonthlyBusinessSummaryWork"
 
-        fun scheduleDailySummary(context: Context, hour: Int = -1, minute: Int = -1) {
+        fun scheduleMonthlySummary(context: Context, dayOfMonth: Int = -1, hour: Int = -1, minute: Int = -1) {
             runCatching {
-                if (!AppPreferencesManager.isDailySummaryEnabled(context)) {
+                if (!AppPreferencesManager.isMonthlySummaryEnabled(context)) {
                     WorkManager.getInstance(context).cancelUniqueWork(WORK_NAME)
-                    Log.i(TAG, "Daily summary disabled by user. Cancelled work.")
+                    Log.i(TAG, "Monthly summary disabled by user. Cancelled work.")
                     return
                 }
 
-                val (prefHour, prefMin) = AppPreferencesManager.getDailySummaryTime(context)
+                val (prefDay, prefHour, prefMin) = AppPreferencesManager.getMonthlySummarySchedule(context)
+                val targetDay = if (dayOfMonth in 1..31) dayOfMonth else prefDay
                 val targetHour = if (hour >= 0) hour else prefHour
                 val targetMin = if (minute >= 0) minute else prefMin
 
@@ -41,15 +42,19 @@ class DailySummaryWorker(
                     set(Calendar.MINUTE, targetMin)
                     set(Calendar.SECOND, 0)
                     set(Calendar.MILLISECOND, 0)
+                    val maxDay = getActualMaximum(Calendar.DAY_OF_MONTH)
+                    set(Calendar.DAY_OF_MONTH, targetDay.coerceIn(1, 31).coerceAtMost(maxDay))
                 }
 
                 if (target.before(now)) {
-                    target.add(Calendar.DAY_OF_YEAR, 1)
+                    target.add(Calendar.MONTH, 1)
+                    val maxDayNext = target.getActualMaximum(Calendar.DAY_OF_MONTH)
+                    target.set(Calendar.DAY_OF_MONTH, targetDay.coerceIn(1, 31).coerceAtMost(maxDayNext))
                 }
 
                 val initialDelayMs = target.timeInMillis - now.timeInMillis
 
-                val summaryRequest = OneTimeWorkRequestBuilder<DailySummaryWorker>()
+                val summaryRequest = OneTimeWorkRequestBuilder<MonthlySummaryWorker>()
                     .setInitialDelay(initialDelayMs, TimeUnit.MILLISECONDS)
                     .build()
 
@@ -58,9 +63,9 @@ class DailySummaryWorker(
                     ExistingWorkPolicy.REPLACE,
                     summaryRequest
                 )
-                Log.i(TAG, "Scheduled DailySummaryWorker in ${initialDelayMs / 1000 / 60} minutes for $targetHour:$targetMin")
+                Log.i(TAG, "Scheduled MonthlySummaryWorker in ${initialDelayMs / 1000 / 60} minutes for Day $targetDay at $targetHour:$targetMin")
             }.onFailure { e ->
-                Log.e(TAG, "Failed to schedule DailySummaryWorker: ${e.localizedMessage}", e)
+                Log.e(TAG, "Failed to schedule MonthlySummaryWorker: ${e.localizedMessage}", e)
             }
         }
     }
@@ -73,40 +78,60 @@ class DailySummaryWorker(
 
         if (shopId.isNotBlank()) {
             val cal = Calendar.getInstance()
+            cal.set(Calendar.DAY_OF_MONTH, 1)
             cal.set(Calendar.HOUR_OF_DAY, 0)
             cal.set(Calendar.MINUTE, 0)
             cal.set(Calendar.SECOND, 0)
             cal.set(Calendar.MILLISECOND, 0)
-            val startOfDay = cal.timeInMillis
+            val startOfMonth = cal.timeInMillis
 
-            cal.set(Calendar.HOUR_OF_DAY, 23)
-            cal.set(Calendar.MINUTE, 59)
-            cal.set(Calendar.SECOND, 59)
-            cal.set(Calendar.MILLISECOND, 999)
-            val endOfDay = cal.timeInMillis
+            cal.add(Calendar.MONTH, 1)
+            val endOfMonth = cal.timeInMillis - 1
 
             val shop = db.shopDao().getShopById(shopId)
             val shopName = shop?.name?.ifBlank { "Mera Store" } ?: "Mera Store"
 
-            val txns = db.txnDao().getTxnsInTimeRange(shopId, startOfDay, endOfDay)
+            val txns = db.txnDao().getTxnsInTimeRange(shopId, startOfMonth, endOfMonth)
+            val expenses = db.expenseDao().getExpensesInTimeRange(shopId, startOfMonth, endOfMonth)
 
             var salesCount = 0
             var salesRevenuePaisa = 0L
+            var cogsPaisa = 0L
 
             for (txn in txns) {
                 if (txn.type == TxnType.SALE) {
                     salesCount++
                     salesRevenuePaisa += txn.totalAmount
+                    val lines = db.txnDao().getTxnLinesForTxn(txn.id)
+                    for (line in lines) {
+                        val stockItem = db.stockItemDao().getStockItemById(line.stockItemId)
+                        if (stockItem?.purchaseLineId != null) {
+                            val purchaseUnitPrice = db.txnDao().getUnitPriceByLineId(stockItem.purchaseLineId) ?: 0L
+                            cogsPaisa += purchaseUnitPrice * line.quantity
+                        }
+                    }
                 }
             }
 
-            val salesRevFormatted = CurrencyFormatter.formatPaisa(applicationContext, salesRevenuePaisa)
+            var expenseTotalPaisa = 0L
+            for (exp in expenses) {
+                expenseTotalPaisa += exp.amount
+            }
 
-            val title = applicationContext.getString(R.string.notif_daily_summary_title, shopName)
+            val grossProfitPaisa = salesRevenuePaisa - cogsPaisa
+            val netProfitPaisa = grossProfitPaisa - expenseTotalPaisa
+
+            val salesRevFormatted = CurrencyFormatter.formatPaisa(applicationContext, salesRevenuePaisa)
+            val expFormatted = CurrencyFormatter.formatPaisa(applicationContext, expenseTotalPaisa)
+            val profitFormatted = CurrencyFormatter.formatPaisa(applicationContext, netProfitPaisa)
+
+            val title = applicationContext.getString(R.string.notif_monthly_summary_title, shopName)
             val msg = applicationContext.getString(
-                R.string.notif_daily_summary_msg,
+                R.string.notif_monthly_summary_msg,
                 salesCount,
-                salesRevFormatted
+                salesRevFormatted,
+                expFormatted,
+                profitFormatted
             )
 
             val notification = NotificationCompat.Builder(applicationContext, AppNotificationManager.CHANNEL_DAILY_SUMMARY)
@@ -118,14 +143,14 @@ class DailySummaryWorker(
                 .build()
 
             try {
-                NotificationManagerCompat.from(applicationContext).notify(2001, notification)
+                NotificationManagerCompat.from(applicationContext).notify(3001, notification)
             } catch (_: SecurityException) {
                 // Permission not granted
             }
         }
 
-        // Re-schedule for tomorrow at same time
-        scheduleDailySummary(applicationContext)
+        // Re-schedule for next month
+        scheduleMonthlySummary(applicationContext)
 
         return Result.success()
     }
