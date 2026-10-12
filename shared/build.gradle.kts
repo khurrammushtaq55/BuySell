@@ -26,6 +26,7 @@ kotlin {
         commonMain.dependencies {
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.androidx.room.runtime)
+            implementation(libs.gson)
         }
         commonTest.dependencies {
             implementation(kotlin("test"))

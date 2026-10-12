@@ -237,9 +237,10 @@ private fun ExpenseItemCard(
                         fontWeight = FontWeight.Bold,
                         fontSize = 15.sp
                     )
-                    if (!expense.note.isNullOrBlank()) {
+                    val noteText = expense.note
+                    if (!noteText.isNullOrBlank()) {
                         Text(
-                            text = expense.note,
+                            text = noteText,
                             fontSize = 12.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )

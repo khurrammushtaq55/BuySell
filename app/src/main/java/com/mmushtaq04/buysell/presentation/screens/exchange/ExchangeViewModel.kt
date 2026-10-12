@@ -49,8 +49,9 @@ class ExchangeViewModel(application: Application) : AndroidViewModel(application
                     _stockItems.value = items
 
                     val simpleList = items.map { item ->
-                        val costPaisa = if (item.purchaseLineId != null) {
-                            db.txnDao().getUnitPriceByLineId(item.purchaseLineId) ?: 0L
+                        val lineId = item.purchaseLineId
+                        val costPaisa = if (lineId != null) {
+                            db.txnDao().getUnitPriceByLineId(lineId) ?: 0L
                         } else 0L
 
                         SimpleStockItem(

@@ -44,4 +44,12 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun expenseDao(): ExpenseDao
     abstract fun appMetaDao(): AppMetaDao
     abstract fun syncDao(): SyncDao
+
+    companion object {
+        @kotlin.jvm.JvmName("getInstanceAny")
+        @kotlin.jvm.JvmStatic
+        fun getInstance(context: Any): AppDatabase = getAppDatabase(context)
+    }
 }
+
+expect fun getAppDatabase(context: Any): AppDatabase

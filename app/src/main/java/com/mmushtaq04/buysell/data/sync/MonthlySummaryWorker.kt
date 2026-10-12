@@ -105,8 +105,9 @@ class MonthlySummaryWorker(
                     val lines = db.txnDao().getTxnLinesForTxn(txn.id)
                     for (line in lines) {
                         val stockItem = db.stockItemDao().getStockItemById(line.stockItemId)
-                        if (stockItem?.purchaseLineId != null) {
-                            val purchaseUnitPrice = db.txnDao().getUnitPriceByLineId(stockItem.purchaseLineId) ?: 0L
+                        val lineId = stockItem?.purchaseLineId
+                        if (lineId != null) {
+                            val purchaseUnitPrice = db.txnDao().getUnitPriceByLineId(lineId) ?: 0L
                             cogsPaisa += purchaseUnitPrice * line.quantity
                         }
                     }
