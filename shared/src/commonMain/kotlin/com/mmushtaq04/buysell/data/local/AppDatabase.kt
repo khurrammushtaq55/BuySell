@@ -46,7 +46,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun syncDao(): SyncDao
 
     companion object {
-        @kotlin.jvm.JvmName("getInstanceAny")
         @kotlin.jvm.JvmStatic
         fun getInstance(context: Any): AppDatabase = getAppDatabase(context)
     }

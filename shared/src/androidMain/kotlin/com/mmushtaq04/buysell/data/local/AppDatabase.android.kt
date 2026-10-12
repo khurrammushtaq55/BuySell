@@ -17,6 +17,3 @@ actual fun getAppDatabase(context: Any): AppDatabase {
         instance
     }
 }
-
-@kotlin.jvm.JvmName("getInstanceContext")
-fun AppDatabase.Companion.getInstance(context: Context): AppDatabase = getAppDatabase(context)
