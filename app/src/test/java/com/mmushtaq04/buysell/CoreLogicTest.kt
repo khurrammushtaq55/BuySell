@@ -395,7 +395,7 @@ class CoreLogicTest {
         val outboxItem = pendingOutbox.find { it.entityId == "exp-soft-1" }
         assertNotNull(outboxItem)
         assertEquals(com.mmushtaq04.buysell.data.local.enums.SyncOp.UPSERT, outboxItem?.op)
-        assertTrue(outboxItem?.payloadJson?.contains("deleted_at") == true)
+        assertTrue(outboxItem?.payloadJson?.contains("deleted") == true)
     }
 
     @Test

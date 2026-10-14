@@ -389,4 +389,10 @@
     <string name="paywall_toast_invalid_code">优惠码无效或已过期</string>
     <string name="paywall_gate_locked_title">%1$s 专业版功能</string>
     <string name="paywall_gate_unlock_btn">🔒 解锁专业版功能</string>
+    <string name="coffee_title">请开发者喝杯咖啡 ☕</string>
+    <string name="coffee_sub">支持开发者与 BuySell360 的后续更新</string>
+    <string name="coffee_dialog_title">支持 BuySell360 ☕</string>
+    <string name="coffee_dialog_msg">如果 BuySell360 帮助您更高效地管理店铺，不妨请开发者喝一杯咖啡！</string>
+    <string name="coffee_btn_buy">请喝咖啡 ($1.99) ☕</string>
+    <string name="coffee_toast_thanks">非常感谢您的支持与鼓励!</string>
 </resources>

@@ -1,7 +1,9 @@
 package com.mmushtaq04.buysell.data.local
 
+import androidx.room.ConstructedBy
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import androidx.room.RoomDatabaseConstructor
 import androidx.room.TypeConverters
 import com.mmushtaq04.buysell.data.local.dao.*
 import com.mmushtaq04.buysell.data.local.entity.*
@@ -32,6 +34,7 @@ import com.mmushtaq04.buysell.data.local.entity.*
     exportSchema = false
 )
 @TypeConverters(Converters::class)
+@ConstructedBy(AppDatabaseConstructor::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
     abstract fun shopDao(): ShopDao
@@ -49,6 +52,11 @@ abstract class AppDatabase : RoomDatabase() {
         @kotlin.jvm.JvmStatic
         fun getInstance(context: Any): AppDatabase = getAppDatabase(context)
     }
+}
+
+@Suppress("NO_ACTUAL_FOR_EXPECT")
+expect object AppDatabaseConstructor : RoomDatabaseConstructor<AppDatabase> {
+    override fun initialize(): AppDatabase
 }
 
 expect fun getAppDatabase(context: Any): AppDatabase

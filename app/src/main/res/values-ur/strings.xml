@@ -389,4 +389,10 @@
     <string name="paywall_toast_invalid_code">غلط یا ختم شدہ پرومو کوڈ</string>
     <string name="paywall_gate_locked_title">%1$s پرو فیچر</string>
     <string name="paywall_gate_unlock_btn">🔒 پرو فیچر ان لاک کریں</string>
+    <string name="coffee_title">ڈویلپر کو کافی گفٹ کریں ☕</string>
+    <string name="coffee_sub">ایپ کی ترقی اور نئی اپ ڈیٹس کے لیے سپورٹ کریں</string>
+    <string name="coffee_dialog_title">بائی سیل 360 کو سپورٹ کریں ☕</string>
+    <string name="coffee_dialog_msg">اگر یہ ایپ آپ کے دکان کے کاروبار میں مددگار ہے، تو ڈویلپر کو ایک کپ کافی پیش کریں!</string>
+    <string name="coffee_btn_buy">کافی بھیجیں ($1.99) ☕</string>
+    <string name="coffee_toast_thanks">آپ کی سپورٹ کا بہت بہت شکریہ!</string>
 </resources>

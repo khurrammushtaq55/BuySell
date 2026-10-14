@@ -15,6 +15,7 @@ class PlayBillingManager(private val context: Context) : PurchasesUpdatedListene
     companion object {
         const val SKU_PRO_MONTHLY = "buysell_pro_monthly"
         const val SKU_PRO_ANNUAL = "buysell_pro_annual"
+        const val SKU_BUY_COFFEE = "buysell_coffee_tip"
     }
 
     private var billingClient: BillingClient = BillingClient.newBuilder(context)
@@ -66,6 +67,10 @@ class PlayBillingManager(private val context: Context) : PurchasesUpdatedListene
             QueryProductDetailsParams.Product.newBuilder()
                 .setProductId(SKU_PRO_ANNUAL)
                 .setProductType(BillingClient.ProductType.SUBS)
+                .build(),
+            QueryProductDetailsParams.Product.newBuilder()
+                .setProductId(SKU_BUY_COFFEE)
+                .setProductType(BillingClient.ProductType.INAPP)
                 .build()
         )
 
@@ -91,19 +96,30 @@ class PlayBillingManager(private val context: Context) : PurchasesUpdatedListene
             return
         }
 
-        val offerToken = details.subscriptionOfferDetails?.firstOrNull()?.offerToken ?: ""
-        val productDetailsParamsList = listOf(
-            BillingFlowParams.ProductDetailsParams.newBuilder()
-                .setProductDetails(details)
-                .setOfferToken(offerToken)
-                .build()
-        )
+        val isSub = details.productType == BillingClient.ProductType.SUBS
+        val offerToken = if (isSub) details.subscriptionOfferDetails?.firstOrNull()?.offerToken ?: "" else ""
+
+        val productParamsBuilder = BillingFlowParams.ProductDetailsParams.newBuilder()
+            .setProductDetails(details)
+
+        if (offerToken.isNotEmpty()) {
+            productParamsBuilder.setOfferToken(offerToken)
+        }
 
         val billingFlowParams = BillingFlowParams.newBuilder()
-            .setProductDetailsParamsList(productDetailsParamsList)
+            .setProductDetailsParamsList(listOf(productParamsBuilder.build()))
             .build()
 
         billingClient.launchBillingFlow(activity, billingFlowParams)
+    }
+
+    fun consumePurchase(purchase: Purchase, onConsumed: () -> Unit) {
+        val consumeParams = ConsumeParams.newBuilder()
+            .setPurchaseToken(purchase.purchaseToken)
+            .build()
+        billingClient.consumeAsync(consumeParams) { _, _ ->
+            onConsumed()
+        }
     }
 
     fun restorePurchases(onPurchaseFound: (Purchase) -> Unit, onNoPurchaseFound: () -> Unit = {}) {
@@ -137,6 +153,11 @@ class PlayBillingManager(private val context: Context) : PurchasesUpdatedListene
             for (purchase in purchases) {
                 if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED) {
                     _purchasedToken.value = purchase.purchaseToken
+                    if (purchase.products.contains(SKU_BUY_COFFEE)) {
+                        consumePurchase(purchase) {
+                            Log.i(TAG, "✓ Consumed coffee tip purchase!")
+                        }
+                    }
                     Log.i(TAG, "✓ Purchase completed! Token: ${purchase.purchaseToken}")
                 }
             }

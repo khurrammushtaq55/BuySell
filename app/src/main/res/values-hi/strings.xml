@@ -389,4 +389,10 @@
     <string name="paywall_toast_invalid_code">अमान्य या समाप्त हो चुका प्रोमो कोड</string>
     <string name="paywall_gate_locked_title">%1$s प्रो सुविधा</string>
     <string name="paywall_gate_unlock_btn">🔒 प्रो सुविधा अनलॉक करें</string>
+    <string name="coffee_title">डेवलपर को कॉफी उपहार दें ☕</string>
+    <string name="coffee_sub">ऐप के विकास और नए अपडेट का समर्थन करें</string>
+    <string name="coffee_dialog_title">BuySell360 का समर्थन करें ☕</string>
+    <string name="coffee_dialog_msg">यदि यह ऐप आपकी दुकान चलाने में मददगार है, तो डेवलपर को एक कप कॉफी भेंट करें!</string>
+    <string name="coffee_btn_buy">कॉफी भेजें ($1.99) ☕</string>
+    <string name="coffee_toast_thanks">आपके समर्थन के लिए बहुत-बहुत धन्यवाद!</string>
 </resources>

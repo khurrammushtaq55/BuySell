@@ -11,6 +11,7 @@ import com.mmushtaq04.buysell.data.local.AppDatabase
 import com.mmushtaq04.buysell.data.local.entity.CategoryEntity
 import com.mmushtaq04.buysell.data.repository.FeatureAccessRepositoryImpl
 import com.mmushtaq04.buysell.data.repository.PremiumFeature
+import com.mmushtaq04.buysell.presentation.components.BuyCoffeeDialog
 import com.mmushtaq04.buysell.presentation.components.PremiumPaywallDialog
 import com.mmushtaq04.buysell.presentation.screens.settings.SettingsScreen
 import com.mmushtaq04.buysell.presentation.screens.settings.SettingsViewModel

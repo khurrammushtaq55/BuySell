@@ -389,4 +389,10 @@
     <string name="paywall_toast_invalid_code">Ghalat ya expired promo code</string>
     <string name="paywall_gate_locked_title">%1$s Pro Feature</string>
     <string name="paywall_gate_unlock_btn">🔒 Unlock Pro Feature</string>
+    <string name="coffee_title">Developer ko Coffee Gift Karein ☕</string>
+    <string name="coffee_sub">App ki taraqqi aur nayi updates ke liye support karein</string>
+    <string name="coffee_dialog_title">BuySell360 ko Support Karein ☕</string>
+    <string name="coffee_dialog_msg">Agar yeh app aap ke dukaan ke karobar mein madadgar hai, toh developer ko ek cup coffee pesh karein!</string>
+    <string name="coffee_btn_buy">Coffee Bhejein ($1.99) ☕</string>
+    <string name="coffee_toast_thanks">Aap ki support ka bohat bohat shukriya!</string>
 </resources>

@@ -389,4 +389,10 @@
     <string name="paywall_toast_invalid_code">رمز ترويجي غير صالحة أو منتهي الصلاحية</string>
     <string name="paywall_gate_locked_title">ميزة احترافية في %1$s</string>
     <string name="paywall_gate_unlock_btn">🔒 فتح الميزة الاحترافية</string>
+    <string name="coffee_title">دعمني بكوب قهوة ☕</string>
+    <string name="coffee_sub">دعم المطور والتحديثات القادمة للتطبيق</string>
+    <string name="coffee_dialog_title">دعم BuySell360 ☕</string>
+    <string name="coffee_dialog_msg">إذا كان تطبيق BuySell360 يساعدك في إدارة متجرك بفعالية، ففكر في إهداء المطور كوب قهوة!</string>
+    <string name="coffee_btn_buy">إهداء كوب قهوة (1.99$) ☕</string>
+    <string name="coffee_toast_thanks">شكراً جزيلاً لدعمك اللطيف!</string>
 </resources>

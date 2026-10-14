@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.WorkspacePremium
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -17,7 +16,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mmushtaq04.buysell.R
@@ -45,7 +43,7 @@ fun PremiumFeatureGate(
                 .fillMaxWidth()
                 .then(
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                        Modifier.blur(10.dp)
+                        Modifier.blur(6.dp)
                     } else {
                         Modifier
                     }
@@ -58,64 +56,38 @@ fun PremiumFeatureGate(
         Box(
             modifier = Modifier
                 .matchParentSize()
-                .background(Color.Black.copy(alpha = 0.55f))
+                .background(Color.Black.copy(alpha = 0.45f))
                 .clickable { onUnlockClick() }
         )
 
-        // Center Lock Badge & Action Card
+        // Small, Compact Lock Pill Badge
         Surface(
             modifier = Modifier
                 .align(Alignment.Center)
-                .padding(16.dp),
-            shape = RoundedCornerShape(16.dp),
+                .padding(6.dp)
+                .clickable { onUnlockClick() },
+            shape = RoundedCornerShape(20.dp),
             color = MaterialTheme.colorScheme.surface,
-            tonalElevation = 6.dp,
-            shadowElevation = 8.dp
+            shadowElevation = 4.dp,
+            tonalElevation = 4.dp
         ) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+            Row(
+                modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(5.dp)
             ) {
-                Surface(
-                    shape = RoundedCornerShape(50),
-                    color = MaterialTheme.colorScheme.primaryContainer
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.WorkspacePremium,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .size(28.dp)
-                    )
-                }
-
-                Text(
-                    text = stringResource(R.string.paywall_gate_locked_title, featureName),
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 15.sp,
-                    textAlign = TextAlign.Center,
-                    color = MaterialTheme.colorScheme.onSurface
+                Icon(
+                    imageVector = Icons.Default.Lock,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(14.dp)
                 )
-
-                Button(
-                    onClick = onUnlockClick,
-                    shape = RoundedCornerShape(10.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Lock,
-                        contentDescription = null,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(
-                        text = stringResource(R.string.paywall_gate_unlock_btn),
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 13.sp
-                    )
-                }
+                Text(
+                    text = stringResource(R.string.paywall_gate_unlock_btn),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 11.sp,
+                    color = MaterialTheme.colorScheme.primary
+                )
             }
         }
     }

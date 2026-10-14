@@ -389,4 +389,10 @@
     <string name="paywall_toast_invalid_code">Code promo invalide ou expiré</string>
     <string name="paywall_gate_locked_title">Fonctionnalité Pro %1$s</string>
     <string name="paywall_gate_unlock_btn">🔒 Débloquer la fonctionnalité Pro</string>
+    <string name="coffee_title">Offrir un café ☕</string>
+    <string name="coffee_sub">Soutenez le développeur et les prochaines mises à jour</string>
+    <string name="coffee_dialog_title">Soutenir BuySell360 ☕</string>
+    <string name="coffee_dialog_msg">Si BuySell360 vous aide à gérer efficacement votre magasin, offrez un café au développeur !</string>
+    <string name="coffee_btn_buy">Offrir un café (1,99 $) ☕</string>
+    <string name="coffee_toast_thanks">Merci beaucoup pour votre soutien!</string>
 </resources>

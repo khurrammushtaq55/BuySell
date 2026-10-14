@@ -5,9 +5,11 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.LocalCafe
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material.icons.filled.WorkspacePremium
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -31,6 +33,7 @@ fun SecurityAndAccountSection(
     userRole: String,
     isExportLocked: Boolean = false,
     onUnlockClick: () -> Unit = {},
+    onBuyCoffeeClick: () -> Unit = {},
     onAttemptSignOut: (onRequireWarning: (Int) -> Unit, onReadyToSignOut: () -> Unit) -> Unit,
     onForceSignOut: (onReadyToSignOut: () -> Unit) -> Unit
 ) {
@@ -199,6 +202,16 @@ fun SecurityAndAccountSection(
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             SettingClickableRow(
+                icon = Icons.Default.WorkspacePremium,
+                title = stringResource(R.string.paywall_btn_upgrade),
+                subtitle = stringResource(R.string.paywall_sub)
+            ) {
+                onUnlockClick()
+            }
+
+            HorizontalDivider(modifier = Modifier.padding(vertical = 2.dp))
+
+            SettingClickableRow(
                 icon = Icons.Default.Lock,
                 title = stringResource(R.string.settings_app_pin),
                 subtitle = if (isPinActive) stringResource(R.string.settings_pin_sub_active) else stringResource(R.string.settings_pin_sub_inactive)
@@ -222,6 +235,14 @@ fun SecurityAndAccountSection(
                         }
                     }
                 }
+            }
+
+            SettingClickableRow(
+                icon = Icons.Default.LocalCafe,
+                title = stringResource(R.string.coffee_title),
+                subtitle = stringResource(R.string.coffee_sub)
+            ) {
+                onBuyCoffeeClick()
             }
 
             SettingClickableRow(
