@@ -48,23 +48,29 @@ object AppPreferencesManager {
     )
 
     fun isShowBuyCostInSellEnabled(context: Context): Boolean {
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        return prefs.getBoolean(KEY_SHOW_BUY_COST_IN_SELL, true)
+        val prefs = runCatching { context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE) }.getOrNull()
+        return prefs?.getBoolean(KEY_SHOW_BUY_COST_IN_SELL, true) ?: true
     }
 
     fun setShowBuyCostInSellEnabled(context: Context, enabled: Boolean) {
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        prefs.edit().putBoolean(KEY_SHOW_BUY_COST_IN_SELL, enabled).apply()
+        val prefs = runCatching { context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE) }.getOrNull() ?: return
+        val editor = prefs.edit() ?: return
+        editor.putBoolean(KEY_SHOW_BUY_COST_IN_SELL, enabled)
+        editor.apply()
     }
 
     fun getAppThemeMode(context: Context): String {
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        return prefs.getString(KEY_APP_THEME_MODE, "system") ?: "system"
+        val prefs = runCatching { context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE) }.getOrNull()
+        return prefs?.getString(KEY_APP_THEME_MODE, "system") ?: "system"
     }
 
     fun setAppThemeMode(context: Context, themeMode: String) {
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        prefs.edit().putString(KEY_APP_THEME_MODE, themeMode).apply()
+        val prefs = runCatching { context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE) }.getOrNull()
+        val editor = prefs?.edit()
+        if (editor != null) {
+            editor.putString(KEY_APP_THEME_MODE, themeMode)
+            editor.apply()
+        }
 
         applyAppThemeMode(themeMode)
         (context as? Activity)?.recreate()
@@ -79,8 +85,8 @@ object AppPreferencesManager {
     }
 
     fun getAppLanguageTag(context: Context): String {
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        val rawTag = prefs.getString(KEY_APP_LANGUAGE_TAG, null)
+        val prefs = runCatching { context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE) }.getOrNull()
+        val rawTag = prefs?.getString(KEY_APP_LANGUAGE_TAG, null)
 
         if (!rawTag.isNullOrBlank()) {
             val cleanTag = when (rawTag) {
@@ -89,12 +95,16 @@ object AppPreferencesManager {
                 else -> rawTag
             }
             if (cleanTag != rawTag) {
-                prefs.edit().putString(KEY_APP_LANGUAGE_TAG, cleanTag).apply()
+                val editor = prefs.edit()
+                if (editor != null) {
+                    editor.putString(KEY_APP_LANGUAGE_TAG, cleanTag)
+                    editor.apply()
+                }
             }
             return cleanTag
         }
 
-        val deviceLocale = context.resources.configuration.locales.get(0)
+        val deviceLocale = runCatching { context.resources?.configuration?.locales?.get(0) }.getOrNull()
         val language = deviceLocale?.language ?: "en"
         val script = deviceLocale?.script ?: ""
 
@@ -110,7 +120,11 @@ object AppPreferencesManager {
             else -> "en"
         }
 
-        prefs.edit().putString(KEY_APP_LANGUAGE_TAG, matchedTag).apply()
+        val editor = prefs?.edit()
+        if (editor != null) {
+            editor.putString(KEY_APP_LANGUAGE_TAG, matchedTag)
+            editor.apply()
+        }
         return matchedTag
     }
 
@@ -121,8 +135,12 @@ object AppPreferencesManager {
             else -> languageTag
         }
 
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        prefs.edit().putString(KEY_APP_LANGUAGE_TAG, cleanTag).apply()
+        val prefs = runCatching { context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE) }.getOrNull()
+        val editor = prefs?.edit()
+        if (editor != null) {
+            editor.putString(KEY_APP_LANGUAGE_TAG, cleanTag)
+            editor.apply()
+        }
 
         val localeList = LocaleListCompat.forLanguageTags(cleanTag)
         AppCompatDelegate.setApplicationLocales(localeList)
@@ -131,32 +149,47 @@ object AppPreferencesManager {
     }
 
     fun getCurrencySymbol(context: Context): String {
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        val symbol = prefs.getString(KEY_CURRENCY_SYMBOL, null)
+        val prefs = runCatching { context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE) }.getOrNull()
+        val symbol = prefs?.getString(KEY_CURRENCY_SYMBOL, null)
         if (!symbol.isNullOrBlank()) return symbol
 
         val (autoSymbol, autoCode) = autoDetectCurrency(context)
-        prefs.edit().putString(KEY_CURRENCY_SYMBOL, autoSymbol).putString(KEY_CURRENCY_CODE, autoCode).apply()
+        val editor = prefs?.edit()
+        if (editor != null) {
+            editor.putString(KEY_CURRENCY_SYMBOL, autoSymbol)
+            editor.putString(KEY_CURRENCY_CODE, autoCode)
+            editor.apply()
+        }
         return autoSymbol
     }
 
     fun getCurrencyCode(context: Context): String {
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        val code = prefs.getString(KEY_CURRENCY_CODE, null)
+        val prefs = runCatching { context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE) }.getOrNull()
+        val code = prefs?.getString(KEY_CURRENCY_CODE, null)
         if (!code.isNullOrBlank()) return code
 
         val (autoSymbol, autoCode) = autoDetectCurrency(context)
-        prefs.edit().putString(KEY_CURRENCY_SYMBOL, autoSymbol).putString(KEY_CURRENCY_CODE, autoCode).apply()
+        val editor = prefs?.edit()
+        if (editor != null) {
+            editor.putString(KEY_CURRENCY_SYMBOL, autoSymbol)
+            editor.putString(KEY_CURRENCY_CODE, autoCode)
+            editor.apply()
+        }
         return autoCode
     }
 
     fun setCurrency(context: Context, symbol: String, code: String) {
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        prefs.edit().putString(KEY_CURRENCY_SYMBOL, symbol).putString(KEY_CURRENCY_CODE, code).apply()
+        val prefs = runCatching { context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE) }.getOrNull()
+        val editor = prefs?.edit()
+        if (editor != null) {
+            editor.putString(KEY_CURRENCY_SYMBOL, symbol)
+            editor.putString(KEY_CURRENCY_CODE, code)
+            editor.apply()
+        }
     }
 
     private fun autoDetectCurrency(context: Context): Pair<String, String> {
-        val deviceLocale = context.resources.configuration.locales.get(0)
+        val deviceLocale = runCatching { context.resources?.configuration?.locales?.get(0) }.getOrNull()
         val country = deviceLocale?.country?.uppercase() ?: ""
 
         return when (country) {
@@ -171,8 +204,12 @@ object AppPreferencesManager {
             "DE", "FR", "ES", "IT", "NL", "BE", "AT", "GR", "PT", "FI", "IE" -> "€" to "EUR"
             else -> {
                 runCatching {
-                    val curr = java.util.Currency.getInstance(deviceLocale)
-                    curr.symbol to curr.currencyCode
+                    if (deviceLocale != null) {
+                        val curr = java.util.Currency.getInstance(deviceLocale)
+                        curr.symbol to curr.currencyCode
+                    } else {
+                        "Rs" to "PKR"
+                    }
                 }.getOrDefault("Rs" to "PKR")
             }
         }
@@ -183,25 +220,34 @@ object AppPreferencesManager {
     private const val KEY_DAILY_SUMMARY_MINUTE = "daily_summary_minute"
 
     fun isDailySummaryEnabled(context: Context): Boolean {
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        return prefs.getBoolean(KEY_DAILY_SUMMARY_ENABLED, true)
+        val prefs = runCatching { context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE) }.getOrNull()
+        return prefs?.getBoolean(KEY_DAILY_SUMMARY_ENABLED, true) ?: true
     }
 
     fun setDailySummaryEnabled(context: Context, enabled: Boolean) {
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        prefs.edit().putBoolean(KEY_DAILY_SUMMARY_ENABLED, enabled).apply()
+        val prefs = runCatching { context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE) }.getOrNull()
+        val editor = prefs?.edit()
+        if (editor != null) {
+            editor.putBoolean(KEY_DAILY_SUMMARY_ENABLED, enabled)
+            editor.apply()
+        }
     }
 
     fun getDailySummaryTime(context: Context): Pair<Int, Int> {
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        val hour = prefs.getInt(KEY_DAILY_SUMMARY_HOUR, 22) // 10 PM default
-        val minute = prefs.getInt(KEY_DAILY_SUMMARY_MINUTE, 0)
+        val prefs = runCatching { context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE) }.getOrNull()
+        val hour = prefs?.getInt(KEY_DAILY_SUMMARY_HOUR, 22) ?: 22 // 10 PM default
+        val minute = prefs?.getInt(KEY_DAILY_SUMMARY_MINUTE, 0) ?: 0
         return hour to minute
     }
 
     fun setDailySummaryTime(context: Context, hour: Int, minute: Int) {
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        prefs.edit().putInt(KEY_DAILY_SUMMARY_HOUR, hour).putInt(KEY_DAILY_SUMMARY_MINUTE, minute).apply()
+        val prefs = runCatching { context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE) }.getOrNull()
+        val editor = prefs?.edit()
+        if (editor != null) {
+            editor.putInt(KEY_DAILY_SUMMARY_HOUR, hour)
+            editor.putInt(KEY_DAILY_SUMMARY_MINUTE, minute)
+            editor.apply()
+        }
     }
 
     private const val KEY_MONTHLY_SUMMARY_ENABLED = "monthly_summary_enabled"
@@ -210,41 +256,51 @@ object AppPreferencesManager {
     private const val KEY_MONTHLY_SUMMARY_MINUTE = "monthly_summary_minute"
 
     fun isMonthlySummaryEnabled(context: Context): Boolean {
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        return prefs.getBoolean(KEY_MONTHLY_SUMMARY_ENABLED, true)
+        val prefs = runCatching { context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE) }.getOrNull()
+        return prefs?.getBoolean(KEY_MONTHLY_SUMMARY_ENABLED, true) ?: true
     }
 
     fun setMonthlySummaryEnabled(context: Context, enabled: Boolean) {
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        prefs.edit().putBoolean(KEY_MONTHLY_SUMMARY_ENABLED, enabled).apply()
+        val prefs = runCatching { context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE) }.getOrNull()
+        val editor = prefs?.edit()
+        if (editor != null) {
+            editor.putBoolean(KEY_MONTHLY_SUMMARY_ENABLED, enabled)
+            editor.apply()
+        }
     }
 
     fun getMonthlySummarySchedule(context: Context): Triple<Int, Int, Int> {
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        val day = prefs.getInt(KEY_MONTHLY_SUMMARY_DAY, 1) // 1st of month default
-        val hour = prefs.getInt(KEY_MONTHLY_SUMMARY_HOUR, 10) // 10:00 AM default
-        val minute = prefs.getInt(KEY_MONTHLY_SUMMARY_MINUTE, 0)
+        val prefs = runCatching { context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE) }.getOrNull()
+        val day = prefs?.getInt(KEY_MONTHLY_SUMMARY_DAY, 1) ?: 1 // 1st of month default
+        val hour = prefs?.getInt(KEY_MONTHLY_SUMMARY_HOUR, 10) ?: 10 // 10:00 AM default
+        val minute = prefs?.getInt(KEY_MONTHLY_SUMMARY_MINUTE, 0) ?: 0
         return Triple(day, hour, minute)
     }
 
     fun setMonthlySummarySchedule(context: Context, day: Int, hour: Int, minute: Int) {
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        prefs.edit()
-            .putInt(KEY_MONTHLY_SUMMARY_DAY, day)
-            .putInt(KEY_MONTHLY_SUMMARY_HOUR, hour)
-            .putInt(KEY_MONTHLY_SUMMARY_MINUTE, minute)
-            .apply()
+        val prefs = runCatching { context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE) }.getOrNull()
+        val editor = prefs?.edit()
+        if (editor != null) {
+            editor.putInt(KEY_MONTHLY_SUMMARY_DAY, day)
+            editor.putInt(KEY_MONTHLY_SUMMARY_HOUR, hour)
+            editor.putInt(KEY_MONTHLY_SUMMARY_MINUTE, minute)
+            editor.apply()
+        }
     }
 
     private const val KEY_IS_PREMIUM_UNLOCKED = "is_premium_unlocked"
 
     fun isPremiumUnlocked(context: Context): Boolean {
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        return prefs.getBoolean(KEY_IS_PREMIUM_UNLOCKED, false)
+        val prefs = runCatching { context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE) }.getOrNull()
+        return prefs?.getBoolean(KEY_IS_PREMIUM_UNLOCKED, false) ?: false
     }
 
     fun setPremiumUnlocked(context: Context, unlocked: Boolean) {
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        prefs.edit().putBoolean(KEY_IS_PREMIUM_UNLOCKED, unlocked).apply()
+        val prefs = runCatching { context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE) }.getOrNull()
+        val editor = prefs?.edit()
+        if (editor != null) {
+            editor.putBoolean(KEY_IS_PREMIUM_UNLOCKED, unlocked)
+            editor.apply()
+        }
     }
 }

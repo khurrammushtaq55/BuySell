@@ -5,6 +5,9 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.mmushtaq04.buysell.data.local.AppDatabase
+import com.mmushtaq04.buysell.data.local.entity.StockItemEntity
+import com.mmushtaq04.buysell.data.local.entity.TxnEntity
+import com.mmushtaq04.buysell.data.local.entity.TxnLineEntity
 import com.mmushtaq04.buysell.data.local.enums.ItemStatus
 import com.mmushtaq04.buysell.data.local.enums.TxnType
 import kotlinx.coroutines.flow.*
@@ -13,10 +16,16 @@ import java.util.*
 
 enum class TimeRange {
     TODAY,
-    THIS_WEEK,
     THIS_MONTH,
+    THIS_YEAR,
     ALL_TIME
 }
+
+data class ChartBarData(
+    val label: String,
+    val revenueRs: Long,
+    val profitRs: Long
+)
 
 data class TopSellingModel(
     val modelName: String,
@@ -34,6 +43,10 @@ data class DashboardUiState(
     val returnsRefundsRs: Long = 0L,
     val todaySalesCount: Int = 0,
     val todaySalesTotalRs: Long = 0L,
+    val dailyExpenseRs: Long = 0L,
+    val monthlyExpenseRs: Long = 0L,
+    val yearlyExpenseRs: Long = 0L,
+    val trendChartData: List<ChartBarData> = emptyList(),
     val capitalInStockRs: Long = 0L,
     val slowStockCount: Int = 0,
     val slowStockValueRs: Long = 0L,
@@ -90,12 +103,20 @@ class OwnerDashboardViewModel(application: Application) : AndroidViewModel(appli
         val now = System.currentTimeMillis()
         val (startTimeMs, endTimeMs) = getTimeRangeBounds(range, now)
 
-        // Today's range for Today's Sales Card
+        // Today's range
         val (todayStart, todayEnd) = getTimeRangeBounds(TimeRange.TODAY, now)
         val todayCount = db.txnDao().getTodaySalesCount(activeShopId, todayStart, todayEnd)
         val todayPaisa = db.txnDao().getTodaySalesAmountPaisa(activeShopId, todayStart, todayEnd)
 
-        // Pre-fetch all lines and stock items into in-memory maps (eliminates N+1 DB loop queries)
+        // Expense Breakdown
+        val (monthStart, monthEnd) = getTimeRangeBounds(TimeRange.THIS_MONTH, now)
+        val (yearStart, yearEnd) = getTimeRangeBounds(TimeRange.THIS_YEAR, now)
+
+        val dailyExpensePaisa = db.expenseDao().getTotalExpensesPaisa(activeShopId, todayStart, todayEnd)
+        val monthlyExpensePaisa = db.expenseDao().getTotalExpensesPaisa(activeShopId, monthStart, monthEnd)
+        val yearlyExpensePaisa = db.expenseDao().getTotalExpensesPaisa(activeShopId, yearStart, yearEnd)
+
+        // Pre-fetch all lines and stock items into in-memory maps
         val allTxns = db.txnDao().getTxnsInTimeRange(activeShopId, startTimeMs, endTimeMs)
         val allLines = db.txnDao().getAllTxnLines(activeShopId)
         val lineMapByTxn = allLines.groupBy { it.txnId }
@@ -124,7 +145,7 @@ class OwnerDashboardViewModel(application: Application) : AndroidViewModel(appli
                             purchaseUnitPrice
                         } else {
                             missingCostCount++
-                            0L // Do not assume sale price as purchase cost
+                            0L
                         }
 
                         val lineCogs = unitCost * line.quantity
@@ -147,7 +168,6 @@ class OwnerDashboardViewModel(application: Application) : AndroidViewModel(appli
                 }
                 TxnType.SALE_RETURN -> {
                     returnsRefundsPaisa += txn.totalAmount
-                    // Deduct COGS for returned sold items
                     val lines = lineMapByTxn[txn.id] ?: emptyList()
                     for (line in lines) {
                         val stockItem = stockMap[line.stockItemId]
@@ -212,6 +232,9 @@ class OwnerDashboardViewModel(application: Application) : AndroidViewModel(appli
         }
         val slowValueRs = totalSlowValuePaisa / 100
 
+        // Compute Trend Chart Data
+        val trendData = computeTrendChartData(range, allTxns, lineMapByTxn, stockMap, linePriceMap)
+
         Log.i(TAG, "✓ Computed Dashboard Metrics for '$range': Revenue=$netRevenueRs, COGS=$cogsRs, Expenses=$expensesRs, NetProfit=$netProfitRs, MissingCostsCount=$missingCostCount")
 
         return DashboardUiState(
@@ -223,6 +246,10 @@ class OwnerDashboardViewModel(application: Application) : AndroidViewModel(appli
             returnsRefundsRs = returnsRefundsRs,
             todaySalesCount = todayCount,
             todaySalesTotalRs = todayPaisa / 100,
+            dailyExpenseRs = dailyExpensePaisa / 100,
+            monthlyExpenseRs = monthlyExpensePaisa / 100,
+            yearlyExpenseRs = yearlyExpensePaisa / 100,
+            trendChartData = trendData,
             capitalInStockRs = capitalLockedRs,
             slowStockCount = slowCount,
             slowStockValueRs = slowValueRs,
@@ -231,6 +258,57 @@ class OwnerDashboardViewModel(application: Application) : AndroidViewModel(appli
             hasMissingCosts = missingCostCount > 0,
             isLoading = false
         )
+    }
+
+    private fun computeTrendChartData(
+        range: TimeRange,
+        allTxns: List<TxnEntity>,
+        lineMapByTxn: Map<String, List<TxnLineEntity>>,
+        stockMap: Map<String, StockItemEntity>,
+        linePriceMap: Map<String, Long>
+    ): List<ChartBarData> {
+        val labels = when (range) {
+            TimeRange.TODAY -> listOf("Morning", "Noon", "Evening", "Night")
+            TimeRange.THIS_MONTH -> listOf("Week 1", "Week 2", "Week 3", "Week 4")
+            TimeRange.THIS_YEAR -> listOf("Q1", "Q2", "Q3", "Q4")
+            TimeRange.ALL_TIME -> listOf("Phase 1", "Phase 2", "Phase 3", "Current")
+        }
+
+        if (allTxns.isEmpty()) {
+            return labels.map { ChartBarData(it, 0L, 0L) }
+        }
+
+        val buckets = Array(labels.size) { Pair(0L, 0L) }
+
+        val minTime = allTxns.minOfOrNull { it.txnDate } ?: 0L
+        val maxTime = allTxns.maxOfOrNull { it.txnDate } ?: System.currentTimeMillis()
+        val span = (maxTime - minTime).coerceAtLeast(1L)
+
+        for (txn in allTxns) {
+            if (txn.type == TxnType.SALE) {
+                val idx = (((txn.txnDate - minTime).toDouble() / span) * (labels.size - 1))
+                    .toInt()
+                    .coerceIn(0, labels.size - 1)
+
+                var txnCogs = 0L
+                val lines = lineMapByTxn[txn.id] ?: emptyList()
+                for (line in lines) {
+                    val stockItem = stockMap[line.stockItemId]
+                    val unitCost = stockItem?.purchaseLineId?.let { linePriceMap[it] } ?: 0L
+                    txnCogs += unitCost * line.quantity
+                }
+
+                val current = buckets[idx]
+                buckets[idx] = Pair(current.first + txn.totalAmount, current.second + txnCogs)
+            }
+        }
+
+        return labels.mapIndexed { idx, label ->
+            val (revPaisa, cogsPaisa) = buckets[idx]
+            val revRs = revPaisa / 100
+            val profitRs = (revPaisa - cogsPaisa) / 100
+            ChartBarData(label = label, revenueRs = revRs, profitRs = profitRs)
+        }
     }
 
     private fun getTimeRangeBounds(range: TimeRange, nowMs: Long): Pair<Long, Long> {
@@ -247,8 +325,8 @@ class OwnerDashboardViewModel(application: Application) : AndroidViewModel(appli
                 val end = cal.timeInMillis - 1
                 start to end
             }
-            TimeRange.THIS_WEEK -> {
-                cal.add(Calendar.DAY_OF_YEAR, -7)
+            TimeRange.THIS_MONTH -> {
+                cal.set(Calendar.DAY_OF_MONTH, 1)
                 cal.set(Calendar.HOUR_OF_DAY, 0)
                 cal.set(Calendar.MINUTE, 0)
                 cal.set(Calendar.SECOND, 0)
@@ -256,8 +334,8 @@ class OwnerDashboardViewModel(application: Application) : AndroidViewModel(appli
                 val start = cal.timeInMillis
                 start to nowMs
             }
-            TimeRange.THIS_MONTH -> {
-                cal.set(Calendar.DAY_OF_MONTH, 1)
+            TimeRange.THIS_YEAR -> {
+                cal.set(Calendar.DAY_OF_YEAR, 1)
                 cal.set(Calendar.HOUR_OF_DAY, 0)
                 cal.set(Calendar.MINUTE, 0)
                 cal.set(Calendar.SECOND, 0)

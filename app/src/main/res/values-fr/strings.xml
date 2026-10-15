@@ -146,7 +146,7 @@
     <string name="sell_select_stock">Sélectionnez un article en stock *:</string>
     <string name="sell_buyer_info_header">Détails de l\'acheteur (Obligatoire *):</string>
     <string name="stock_title">Mon Stock (%1$s)</string>
-    <string name="stock_search_label">Rechercher par IMEI, marque, modèle ou couleur</string>
+    <string name="stock_search_label">Rechercher par IMEI, marque, etc.</string>
     <string name="stock_empty_msg">Aucun article en stock — ajoutez votre premier achat</string>
     <string name="stock_close_dialog">Fermer</string>
     <string name="stock_qty_label">Qté: %1$s</string>
@@ -417,4 +417,22 @@
     <string name="label_optional_details_header">Détails supplémentaires / optionnels</string>
     <string name="sub_optional_details_hint">RAM, Stockage, Couleur, Spécifications, Défauts (Appuyer pour développer)</string>
     <string name="label_serial_or_item_code">Numéro de série / Code d\'article</string>
+    <string name="home_help_icon_desc">Aide / Support</string>
+    <string name="home_settings_icon_desc">Paramètres</string>
+    <string name="home_today_sales_count">%1$d ventes • %2$s</string>
+    <string name="dashboard_card_subtitle">Afficher les bénéfices, les analyses de ventes et les rapports de stock</string>
+    <string name="home_subtitle_read_only">Lecture seule</string>
+    <string name="home_subtitle_farokht">Ventes</string>
+    <string name="home_subtitle_khareedari">Achats</string>
+    <string name="home_subtitle_baqi_paisay">Solde dû</string>
+    <string name="home_subtitle_available_phones">Téléphones disponibles</string>
+    <string name="home_subtitle_partner_entry_disabled">Mode associé — saisie désactivée</string>
+    <string name="home_subtitle_exchange_desc">Le client échange son ancien téléphone contre un nouveau</string>
+    <string name="splash_loading_store">Chargement de votre magasin et dossiers…</string>
+    <string name="dashboard_filter_year">Annuel</string>
+    <string name="dashboard_expense_breakdown">Résumé des dépenses</string>
+    <string name="dashboard_daily_expense">Dépense quotidienne</string>
+    <string name="dashboard_monthly_expense">Dépense annuelle</string>
+    <string name="dashboard_yearly_expense">Dépense annuelle</string>
+    <string name="dashboard_trend_graph_title">Analyse des ventes et bénéfices</string>
 </resources>

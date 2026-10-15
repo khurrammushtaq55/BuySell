@@ -16,37 +16,47 @@ object RatingManager {
     private const val TRIGGER_INTERACTION_INTERVAL = 2 // Prompt after every 2 key interactions
 
     fun isNeverShowAgain(context: Context): Boolean {
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        return prefs.getBoolean(KEY_NEVER_SHOW_AGAIN, false)
+        val prefs = runCatching { context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE) }.getOrNull()
+        return prefs?.getBoolean(KEY_NEVER_SHOW_AGAIN, false) ?: false
     }
 
     fun setNeverShowAgain(context: Context, neverShow: Boolean) {
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        prefs.edit().putBoolean(KEY_NEVER_SHOW_AGAIN, neverShow).apply()
+        val prefs = runCatching { context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE) }.getOrNull()
+        val editor = prefs?.edit()
+        if (editor != null) {
+            editor.putBoolean(KEY_NEVER_SHOW_AGAIN, neverShow)
+            editor.apply()
+        }
         Log.d(TAG, "Updated never_show_again preference to: $neverShow")
     }
 
     fun recordInteraction(context: Context) {
         if (isNeverShowAgain(context)) return
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        val count = prefs.getInt(KEY_INTERACTION_COUNT, 0) + 1
-        prefs.edit().putInt(KEY_INTERACTION_COUNT, count).apply()
+        val prefs = runCatching { context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE) }.getOrNull()
+        val count = (prefs?.getInt(KEY_INTERACTION_COUNT, 0) ?: 0) + 1
+        val editor = prefs?.edit()
+        if (editor != null) {
+            editor.putInt(KEY_INTERACTION_COUNT, count)
+            editor.apply()
+        }
         Log.d(TAG, "Recorded interaction count: $count")
     }
 
     fun shouldShowRatingPrompt(context: Context): Boolean {
         if (isNeverShowAgain(context)) return false
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        val count = prefs.getInt(KEY_INTERACTION_COUNT, 0)
+        val prefs = runCatching { context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE) }.getOrNull()
+        val count = prefs?.getInt(KEY_INTERACTION_COUNT, 0) ?: 0
         return count >= TRIGGER_INTERACTION_INTERVAL
     }
 
     fun resetInteractionCount(context: Context) {
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        prefs.edit()
-            .putInt(KEY_INTERACTION_COUNT, 0)
-            .putLong(KEY_LAST_PROMPT_MS, System.currentTimeMillis())
-            .apply()
+        val prefs = runCatching { context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE) }.getOrNull()
+        val editor = prefs?.edit()
+        if (editor != null) {
+            editor.putInt(KEY_INTERACTION_COUNT, 0)
+            editor.putLong(KEY_LAST_PROMPT_MS, System.currentTimeMillis())
+            editor.apply()
+        }
     }
 
     fun launchGoogleInAppReview(activity: Activity, onComplete: () -> Unit = {}) {

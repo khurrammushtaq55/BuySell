@@ -10,11 +10,15 @@ object AppPinManager {
     private const val KEY_PIN_SALT = "app_pin_salt"
 
     private fun getOrCreateSalt(context: Context): String {
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        var salt = prefs.getString(KEY_PIN_SALT, null)
+        val prefs = runCatching { context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE) }.getOrNull()
+        var salt = prefs?.getString(KEY_PIN_SALT, null)
         if (salt.isNullOrBlank()) {
             salt = UUID.randomUUID().toString()
-            prefs.edit().putString(KEY_PIN_SALT, salt).apply()
+            val editor = prefs?.edit()
+            if (editor != null) {
+                editor.putString(KEY_PIN_SALT, salt)
+                editor.apply()
+            }
         }
         return salt
     }
@@ -25,25 +29,34 @@ object AppPinManager {
     }
 
     fun isPinSet(context: Context): Boolean {
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        return !prefs.getString(KEY_PIN_HASH, null).isNullOrBlank()
+        val prefs = runCatching { context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE) }.getOrNull()
+        return !prefs?.getString(KEY_PIN_HASH, null).isNullOrBlank()
     }
 
     fun savePin(context: Context, pin: String) {
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val prefs = runCatching { context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE) }.getOrNull()
         val salt = getOrCreateSalt(context)
-        prefs.edit().putString(KEY_PIN_HASH, hashPin(pin, salt)).apply()
+        val editor = prefs?.edit()
+        if (editor != null) {
+            editor.putString(KEY_PIN_HASH, hashPin(pin, salt))
+            editor.apply()
+        }
     }
 
     fun verifyPin(context: Context, inputPin: String): Boolean {
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        val storedHash = prefs.getString(KEY_PIN_HASH, null) ?: return false
+        val prefs = runCatching { context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE) }.getOrNull()
+        val storedHash = prefs?.getString(KEY_PIN_HASH, null) ?: return false
         val salt = getOrCreateSalt(context)
         return storedHash == hashPin(inputPin, salt)
     }
 
     fun clearPin(context: Context) {
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        prefs.edit().remove(KEY_PIN_HASH).remove(KEY_PIN_SALT).apply()
+        val prefs = runCatching { context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE) }.getOrNull()
+        val editor = prefs?.edit()
+        if (editor != null) {
+            editor.remove(KEY_PIN_HASH)
+            editor.remove(KEY_PIN_SALT)
+            editor.apply()
+        }
     }
 }

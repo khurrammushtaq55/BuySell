@@ -109,16 +109,20 @@ fun SellWizardScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .verticalScroll(rememberScrollState())
                 .padding(16.dp),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
             Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 LinearProgressIndicator(
                     progress = { step / 3f },
-                    modifier = Modifier.fillMaxWidth().height(8.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(8.dp)
                 )
 
                 when (step) {
@@ -141,7 +145,7 @@ fun SellWizardScreen(
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(vertical = 32.dp),
+                                    .weight(1f),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
@@ -152,7 +156,9 @@ fun SellWizardScreen(
                             }
                         } else {
                             LazyColumn(
-                                modifier = Modifier.height(280.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .weight(1f),
                                 verticalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
                                 items(filtered) { item ->
@@ -176,105 +182,113 @@ fun SellWizardScreen(
                     }
 
                     2 -> {
-                        Text(stringResource(R.string.sell_buyer_info_header), fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f)
+                                .verticalScroll(rememberScrollState()),
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            Text(stringResource(R.string.sell_buyer_info_header), fontSize = 16.sp, fontWeight = FontWeight.Bold)
 
-                        selectedItem?.let { item ->
-                            Card(modifier = Modifier.fillMaxWidth()) {
-                                Column(modifier = Modifier.padding(12.dp)) {
-                                    Text("Selected Item: ${item.title}", fontWeight = FontWeight.Bold)
-                                    Text("IMEI: ${item.imei}", fontSize = 12.sp)
+                            selectedItem?.let { item ->
+                                Card(modifier = Modifier.fillMaxWidth()) {
+                                    Column(modifier = Modifier.padding(12.dp)) {
+                                        Text("Selected Item: ${item.title}", fontWeight = FontWeight.Bold)
+                                        Text("IMEI: ${item.imei}", fontSize = 12.sp)
+                                    }
                                 }
                             }
-                        }
 
-                        // Hidden Buy Price Card with Eye Toggle
-                        val isPrefEnabled = AppPreferencesManager.isShowBuyCostInSellEnabled(context)
-                        if (showBuyCostInSellWizard && isPrefEnabled && selectedItem != null) {
-                            Card(
-                                modifier = Modifier.fillMaxWidth(),
-                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
-                            ) {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 12.dp, vertical = 8.dp),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
+                            // Hidden Buy Price Card with Eye Toggle
+                            val isPrefEnabled = AppPreferencesManager.isShowBuyCostInSellEnabled(context)
+                            if (showBuyCostInSellWizard && isPrefEnabled && selectedItem != null) {
+                                Card(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
                                 ) {
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Icon(Icons.Default.ShoppingCart, contentDescription = null, modifier = Modifier.size(18.dp), tint = MaterialTheme.colorScheme.primary)
-                                        Spacer(modifier = Modifier.width(8.dp))
-                                        Text(
-                                            text = stringResource(R.string.label_buy_price),
-                                            fontSize = 13.sp,
-                                            fontWeight = FontWeight.Bold
-                                        )
-                                        val currSym = com.mmushtaq04.buysell.util.CurrencyFormatter.getSymbol(LocalContext.current)
-                                        val formattedCost = com.mmushtaq04.buysell.util.CurrencyFormatter.formatAmount(LocalContext.current, selectedItem?.cost ?: 0L)
-                                        Text(
-                                            text = if (isCostVisible) formattedCost else "$currSym ••••••",
-                                            fontSize = 14.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            color = if (isCostVisible) MaterialTheme.colorScheme.primary else Color.Gray
-                                        )
-                                    }
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(horizontal = 12.dp, vertical = 8.dp),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Icon(Icons.Default.ShoppingCart, contentDescription = null, modifier = Modifier.size(18.dp), tint = MaterialTheme.colorScheme.primary)
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            Text(
+                                                text = stringResource(R.string.label_buy_price),
+                                                fontSize = 13.sp,
+                                                fontWeight = FontWeight.Bold
+                                            )
+                                            val currSym = com.mmushtaq04.buysell.util.CurrencyFormatter.getSymbol(LocalContext.current)
+                                            val formattedCost = com.mmushtaq04.buysell.util.CurrencyFormatter.formatAmount(LocalContext.current, selectedItem?.cost ?: 0L)
+                                            Text(
+                                                text = if (isCostVisible) formattedCost else "$currSym ••••••",
+                                                fontSize = 14.sp,
+                                                fontWeight = FontWeight.Bold,
+                                                color = if (isCostVisible) MaterialTheme.colorScheme.primary else Color.Gray
+                                            )
+                                        }
 
-                                    IconButton(onClick = { isCostVisible = !isCostVisible }) {
-                                        Icon(
-                                            imageVector = if (isCostVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                                            contentDescription = if (isCostVisible) "Hide buy price" else "Show buy price",
-                                            tint = MaterialTheme.colorScheme.primary
-                                        )
+                                        IconButton(onClick = { isCostVisible = !isCostVisible }) {
+                                            Icon(
+                                                imageVector = if (isCostVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                                                contentDescription = if (isCostVisible) "Hide buy price" else "Show buy price",
+                                                tint = MaterialTheme.colorScheme.primary
+                                            )
+                                        }
                                     }
                                 }
                             }
+
+                            OutlinedTextField(
+                                value = buyerName,
+                                onValueChange = { buyerName = it },
+                                label = { Text(stringResource(R.string.label_buyer_name)) },
+                                isError = buyerName.isBlank(),
+                                keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words),
+                                modifier = Modifier.fillMaxWidth()
+                            )
+
+                            OutlinedTextField(
+                                value = buyerPhone,
+                                onValueChange = { newValue -> buyerPhone = newValue.filter { it.isDigit() || it == '+' } },
+                                label = { Text(stringResource(R.string.label_mobile_number)) },
+                                isError = buyerPhone.isBlank(),
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                                modifier = Modifier.fillMaxWidth()
+                            )
+
+                            OutlinedTextField(
+                                value = salePriceText,
+                                onValueChange = { newPriceRaw ->
+                                    val digitsOnly = newPriceRaw.filter { it.isDigit() }
+                                    val oldPrice = salePriceText
+                                    salePriceText = digitsOnly
+                                    if (receivedAmountText.isBlank() || receivedAmountText == oldPrice) {
+                                        receivedAmountText = digitsOnly
+                                    }
+                                },
+                                label = { Text(stringResource(R.string.label_sale_price)) },
+                                isError = (salePriceText.toLongOrNull() ?: 0L) <= 0,
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                modifier = Modifier.fillMaxWidth()
+                            )
+
+                            HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+
+                            OutlinedTextField(
+                                value = currentUserName,
+                                onValueChange = {},
+                                readOnly = true,
+                                label = { Text(stringResource(R.string.label_recorded_by)) },
+                                leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
+                                supportingText = { Text(stringResource(R.string.sub_readonly_user)) },
+                                modifier = Modifier.fillMaxWidth()
+                            )
                         }
-
-                        OutlinedTextField(
-                            value = buyerName,
-                            onValueChange = { buyerName = it },
-                            label = { Text(stringResource(R.string.label_buyer_name)) },
-                            isError = buyerName.isBlank(),
-                            keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words),
-                            modifier = Modifier.fillMaxWidth()
-                        )
-
-                        OutlinedTextField(
-                            value = buyerPhone,
-                            onValueChange = { newValue -> buyerPhone = newValue.filter { it.isDigit() || it == '+' } },
-                            label = { Text(stringResource(R.string.label_mobile_number)) },
-                            isError = buyerPhone.isBlank(),
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-                            modifier = Modifier.fillMaxWidth()
-                        )
-
-                        OutlinedTextField(
-                            value = salePriceText,
-                            onValueChange = { newPriceRaw ->
-                                val digitsOnly = newPriceRaw.filter { it.isDigit() }
-                                val oldPrice = salePriceText
-                                salePriceText = digitsOnly
-                                if (receivedAmountText.isBlank() || receivedAmountText == oldPrice) {
-                                    receivedAmountText = digitsOnly
-                                }
-                            },
-                            label = { Text(stringResource(R.string.label_sale_price)) },
-                            isError = (salePriceText.toLongOrNull() ?: 0L) <= 0,
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            modifier = Modifier.fillMaxWidth()
-                        )
-
-                        HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
-
-                        OutlinedTextField(
-                            value = currentUserName,
-                            onValueChange = {},
-                            readOnly = true,
-                            label = { Text(stringResource(R.string.label_recorded_by)) },
-                            leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
-                            supportingText = { Text(stringResource(R.string.sub_readonly_user)) },
-                            modifier = Modifier.fillMaxWidth()
-                        )
                     }
 
                     3 -> {
@@ -282,114 +296,121 @@ fun SellWizardScreen(
                         val received = receivedAmountText.toLongOrNull() ?: salePrice
                         val remaining = (salePrice - received).coerceAtLeast(0L)
 
-                        Text(stringResource(R.string.label_payment_confirmation), fontSize = 16.sp, fontWeight = FontWeight.Bold)
-
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f)
+                                .verticalScroll(rememberScrollState()),
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
-                            Column(modifier = Modifier.padding(16.dp)) {
-                                Text(stringResource(R.string.label_sale_price_summary, salePrice), fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                                Text(stringResource(R.string.label_recorded_by_summary, currentUserName), fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                if (remaining > 0) {
-                                    Text(stringResource(R.string.label_customer_udhaar_summary, remaining), color = Color(0xFFD32F2F), fontWeight = FontWeight.Bold)
-                                } else {
-                                    Text(stringResource(R.string.label_full_payment_received), color = Color(0xFF2E7D32))
+                            Text(stringResource(R.string.label_payment_confirmation), fontSize = 16.sp, fontWeight = FontWeight.Bold)
+
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+                            ) {
+                                Column(modifier = Modifier.padding(16.dp)) {
+                                    Text(stringResource(R.string.label_sale_price_summary, salePrice), fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                                    Text(stringResource(R.string.label_recorded_by_summary, currentUserName), fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    if (remaining > 0) {
+                                        Text(stringResource(R.string.label_customer_udhaar_summary, remaining), color = Color(0xFFD32F2F), fontWeight = FontWeight.Bold)
+                                    } else {
+                                        Text(stringResource(R.string.label_full_payment_received), color = Color(0xFF2E7D32))
+                                    }
                                 }
                             }
-                        }
 
-                        OutlinedTextField(
-                            value = receivedAmountText,
-                            onValueChange = { newValue -> receivedAmountText = newValue.filter { it.isDigit() } },
-                            label = { Text(stringResource(R.string.label_amount_given_by_customer)) },
-                            placeholder = { Text(salePrice.toString()) },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            modifier = Modifier.fillMaxWidth()
-                        )
-
-                        Text(stringResource(R.string.label_payment_mode), fontSize = 14.sp, fontWeight = FontWeight.Bold)
-
-                        FlowRow(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp),
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            methods.forEach { method ->
-                                val isSelected = method == paymentMethod
-                                FilterChip(
-                                    selected = isSelected,
-                                    onClick = { paymentMethod = method },
-                                    label = { Text(method, fontSize = 13.sp) },
-                                    leadingIcon = if (isSelected) {
-                                        { Icon(Icons.Default.CheckCircle, contentDescription = null, modifier = Modifier.size(16.dp)) }
-                                    } else null
-                                )
-                            }
-                        }
-
-                        OutlinedTextField(
-                            value = paymentDetails,
-                            onValueChange = { paymentDetails = it },
-                            label = {
-                                Text(
-                                    if (paymentMethod == "Other") "Payment Method Detail / Name *"
-                                    else "Bank / Account / Ref Info (Optional)"
-                                )
-                            },
-                            placeholder = { Text("e.g. HBL / Easypaisa Txn #12345 / Account title") },
-                            modifier = Modifier.fillMaxWidth()
-                        )
-
-                        if (remaining > 0) {
                             OutlinedTextField(
-                                value = promisedDateText,
-                                onValueChange = { promisedDateText = it },
-                                label = { Text(stringResource(R.string.label_promised_due_date)) },
+                                value = receivedAmountText,
+                                onValueChange = { newValue -> receivedAmountText = newValue.filter { it.isDigit() } },
+                                label = { Text(stringResource(R.string.label_amount_given_by_customer)) },
+                                placeholder = { Text(salePrice.toString()) },
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                 modifier = Modifier.fillMaxWidth()
                             )
+
+                            Text(stringResource(R.string.label_payment_mode), fontSize = 14.sp, fontWeight = FontWeight.Bold)
+
+                            FlowRow(
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalArrangement = Arrangement.spacedBy(8.dp),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                methods.forEach { method ->
+                                    val isSelected = method == paymentMethod
+                                    FilterChip(
+                                        selected = isSelected,
+                                        onClick = { paymentMethod = method },
+                                        label = { Text(method, fontSize = 13.sp) },
+                                        leadingIcon = if (isSelected) {
+                                            { Icon(Icons.Default.CheckCircle, contentDescription = null, modifier = Modifier.size(16.dp)) }
+                                        } else null
+                                    )
+                                }
+                            }
+
+                            OutlinedTextField(
+                                value = paymentDetails,
+                                onValueChange = { paymentDetails = it },
+                                label = {
+                                    Text(
+                                        if (paymentMethod == "Other") "Payment Method Detail / Name *"
+                                        else "Bank / Account / Ref Info (Optional)"
+                                    )
+                                },
+                                placeholder = { Text("e.g. HBL / Easypaisa Txn #12345 / Account title") },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+
+                            if (remaining > 0) {
+                                OutlinedTextField(
+                                    value = promisedDateText,
+                                    onValueChange = { promisedDateText = it },
+                                    label = { Text(stringResource(R.string.label_promised_due_date)) },
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
                         }
                     }
                 }
+            }
 
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Button(
-                    onClick = {
-                        if (step < 3) {
-                            if (step == 1 && selectedItem == null) return@Button
-                            step++
-                        } else {
-                            selectedItem?.let { item ->
-                                val salePrice = salePriceText.toLongOrNull() ?: 0L
-                                val received = receivedAmountText.toLongOrNull() ?: salePrice
-                                onSaveSale(
-                                    item.id,
-                                    salePrice,
-                                    buyerName,
-                                    buyerPhone,
-                                    currentUserName,
-                                    received,
-                                    paymentMethod,
-                                    paymentDetails,
-                                    promisedDateText
-                                )
-                            }
-                            onSaveSuccess()
+            Button(
+                onClick = {
+                    if (step < 3) {
+                        if (step == 1 && selectedItem == null) return@Button
+                        step++
+                    } else {
+                        selectedItem?.let { item ->
+                            val salePrice = salePriceText.toLongOrNull() ?: 0L
+                            val received = receivedAmountText.toLongOrNull() ?: salePrice
+                            onSaveSale(
+                                item.id,
+                                salePrice,
+                                buyerName,
+                                buyerPhone,
+                                currentUserName,
+                                received,
+                                paymentMethod,
+                                paymentDetails,
+                                promisedDateText
+                            )
                         }
-                    },
-                    enabled = isStepValid,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Text(
-                        text = if (step < 3) stringResource(R.string.action_next) else stringResource(R.string.btn_save_sale),
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
+                        onSaveSuccess()
+                    }
+                },
+                enabled = isStepValid,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp)
+                    .height(56.dp),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text(
+                    text = if (step < 3) stringResource(R.string.action_next) else stringResource(R.string.btn_save_sale),
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
     }

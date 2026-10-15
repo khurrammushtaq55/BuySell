@@ -146,7 +146,7 @@
     <string name="sell_select_stock">سٹاک سے ائٹم منتخب کریں *:</string>
     <string name="sell_buyer_info_header">گاہک (خریدار) کی تفصیلات (ضروری *):</string>
     <string name="stock_title">میرا سٹاک (%1$s)</string>
-    <string name="stock_search_label">IMEI، برانڈ، ماڈل یا رنگ سے تلاش کریں</string>
+    <string name="stock_search_label">IMEI، برانڈ وغیرہ سے تلاش کریں</string>
     <string name="stock_empty_msg">ابھی کوئی ائٹم سٹاک میں نہیں ہے — پہلی خریداری شامل کریں</string>
     <string name="stock_close_dialog">بند کریں (Close)</string>
     <string name="stock_qty_label">تعداد: %1$s</string>
@@ -417,4 +417,22 @@
     <string name="label_optional_details_header">اضافی / اختیاری تفصیلات</string>
     <string name="sub_optional_details_hint">ریم، اسٹوریج، رنگ، تفصیلات، نقائص (کھولنے کے لیے ٹیپ کریں)</string>
     <string name="label_serial_or_item_code">سیریل نمبر / آئٹم کوڈ</string>
+    <string name="home_help_icon_desc">مدد / راہنمائی</string>
+    <string name="home_settings_icon_desc">سیٹنگز</string>
+    <string name="home_today_sales_count">%1$d فروخت • %2$s</string>
+    <string name="dashboard_card_subtitle">منافع، سیلز تجزیہ اور اسٹاک رپورٹس دیکھیں</string>
+    <string name="home_subtitle_read_only">صرف دیکھنے کے لیے</string>
+    <string name="home_subtitle_farokht">فروخت</string>
+    <string name="home_subtitle_khareedari">خریداری</string>
+    <string name="home_subtitle_baqi_paisay">باقی پیسے</string>
+    <string name="home_subtitle_available_phones">دستیاب فونز</string>
+    <string name="home_subtitle_partner_entry_disabled">پارٹنر موڈ — اینٹری معطل</string>
+    <string name="home_subtitle_exchange_desc">کسٹمر پرانا فون دے کر نیا لے رہا ہے</string>
+    <string name="splash_loading_store">دکان اور ریکارڈز لوڈ ہو رہے ہیں…</string>
+    <string name="dashboard_filter_year">سالانہ</string>
+    <string name="dashboard_expense_breakdown">اخراجات کا خلاصہ</string>
+    <string name="dashboard_daily_expense">روزانہ کا خرچہ</string>
+    <string name="dashboard_monthly_expense">ماہانہ خرچہ</string>
+    <string name="dashboard_yearly_expense">سالانہ خرچہ</string>
+    <string name="dashboard_trend_graph_title">فروخت اور منافع گراف تجزیہ</string>
 </resources>

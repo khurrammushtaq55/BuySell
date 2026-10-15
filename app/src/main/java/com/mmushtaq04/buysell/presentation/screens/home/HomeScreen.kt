@@ -122,10 +122,10 @@ fun HomeScreen(
                 },
                 actions = {
                     IconButton(onClick = onNavigateToHelp) {
-                        Icon(Icons.AutoMirrored.Filled.HelpOutline, contentDescription = "Madad / Help")
+                        Icon(Icons.AutoMirrored.Filled.HelpOutline, contentDescription = stringResource(R.string.home_help_icon_desc))
                     }
                     IconButton(onClick = onNavigateToSettings) {
-                        Icon(Icons.Default.Settings, contentDescription = "Settings")
+                        Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.home_settings_icon_desc))
                     }
                 }
             )
@@ -180,7 +180,7 @@ fun HomeScreen(
                         val formattedAmount = com.mmushtaq04.buysell.util.CurrencyFormatter.formatPaisa(context, todaySalesAmountPaisa)
                         val zeroFormatted = com.mmushtaq04.buysell.util.CurrencyFormatter.formatAmount(context, 0L)
                         Text(
-                            text = if (todaySalesCount > 0) "$todaySalesCount sales • $formattedAmount" else zeroFormatted,
+                            text = if (todaySalesCount > 0) stringResource(R.string.home_today_sales_count, todaySalesCount, formattedAmount) else zeroFormatted,
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
                             color = if (todaySalesCount > 0) Color(0xFF2E7D32) else MaterialTheme.colorScheme.onSurfaceVariant
@@ -224,7 +224,7 @@ fun HomeScreen(
                                 fontSize = 16.sp
                             )
                             Text(
-                                text = "Munafa, sales analytics, aur stock reports dekhein",
+                                text = stringResource(R.string.dashboard_card_subtitle),
                                 fontSize = 12.sp,
                                 color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
                             )
@@ -246,7 +246,7 @@ fun HomeScreen(
             ) {
                 ActionCard(
                     title = stringResource(R.string.action_sell),
-                    subtitle = if (isPartner) "Read-Only" else "Farokht",
+                    subtitle = if (isPartner) stringResource(R.string.home_subtitle_read_only) else stringResource(R.string.home_subtitle_farokht),
                     icon = Icons.Default.Sell,
                     backgroundColor = if (isPartner) Color.LightGray.copy(alpha = 0.3f) else Color(0xFFE8F5E9),
                     contentColor = if (isPartner) Color.Gray else Color(0xFF2E7D32),
@@ -255,7 +255,7 @@ fun HomeScreen(
                 )
                 ActionCard(
                     title = stringResource(R.string.action_buy),
-                    subtitle = if (isPartner) "Read-Only" else "Khareedari",
+                    subtitle = if (isPartner) stringResource(R.string.home_subtitle_read_only) else stringResource(R.string.home_subtitle_khareedari),
                     icon = Icons.Default.ShoppingCart,
                     backgroundColor = if (isPartner) Color.LightGray.copy(alpha = 0.3f) else Color(0xFFE3F2FD),
                     contentColor = if (isPartner) Color.Gray else Color(0xFF1565C0),
@@ -270,7 +270,7 @@ fun HomeScreen(
             ) {
                 ActionCard(
                     title = stringResource(R.string.action_khata),
-                    subtitle = "Baqi paisay",
+                    subtitle = stringResource(R.string.home_subtitle_baqi_paisay),
                     icon = Icons.Default.MenuBook,
                     backgroundColor = Color(0xFFFFF8E1),
                     contentColor = Color(0xFFF57F17),
@@ -279,7 +279,7 @@ fun HomeScreen(
                 )
                 ActionCard(
                     title = stringResource(R.string.action_stock),
-                    subtitle = "Available phones",
+                    subtitle = stringResource(R.string.home_subtitle_available_phones),
                     icon = Icons.Default.Inventory2,
                     backgroundColor = Color(0xFFF3E5F5),
                     contentColor = Color(0xFF7B1FA2),
@@ -321,7 +321,7 @@ fun HomeScreen(
                             color = if (isPartner) Color.Gray else MaterialTheme.colorScheme.onSecondaryContainer
                         )
                         Text(
-                            text = if (isPartner) "Partner mode — entry disabled" else "Customer purana phone de kar naya le raha hai",
+                            text = if (isPartner) stringResource(R.string.home_subtitle_partner_entry_disabled) else stringResource(R.string.home_subtitle_exchange_desc),
                             fontSize = 12.sp,
                             color = if (isPartner) Color.Gray else MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f)
                         )
@@ -378,14 +378,38 @@ private fun ActionCard(
     }
 }
 
-@Preview(showBackground = true)
+@Preview(name = "Owner Role", showBackground = true)
 @Composable
-fun HomeScreenPreview() {
+fun HomeScreenOwnerPreview() {
+    BuySellTheme {
+        HomeScreen(
+            userRole = "Owner",
+            todaySalesCount = 5,
+            todaySalesAmountPaisa = 25000000L
+        )
+    }
+}
+
+@Preview(name = "Partner Role", showBackground = true)
+@Composable
+fun HomeScreenPartnerPreview() {
     BuySellTheme {
         HomeScreen(
             userRole = "Partner",
             todaySalesCount = 3,
             todaySalesAmountPaisa = 12500000L
+        )
+    }
+}
+
+@Preview(name = "Staff Role", showBackground = true)
+@Composable
+fun HomeScreenStaffPreview() {
+    BuySellTheme {
+        HomeScreen(
+            userRole = "Staff",
+            todaySalesCount = 2,
+            todaySalesAmountPaisa = 8000000L
         )
     }
 }

@@ -61,7 +61,6 @@ fun StockListScreen(
         val detail = selectedStockDetail!!
         AlertDialog(
             onDismissRequest = { selectedStockDetail = null },
-            icon = { Icon(Icons.Default.Info, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
             title = { Text("${detail.brand} ${detail.model}", fontWeight = FontWeight.Bold) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -141,18 +140,31 @@ fun StockListScreen(
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                                Column(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .padding(end = 12.dp),
+                                    verticalArrangement = Arrangement.spacedBy(2.dp)
+                                ) {
                                     val memVariant = listOf(item.ram, item.storage, item.specs).filter { it.isNotBlank() }.joinToString(" • ")
                                     Text(
-                                        text = if (memVariant.isNotBlank()) "${item.brand} ${item.model} ($memVariant)" else "${item.brand} ${item.model}",
+                                        text = "${item.brand} ${item.model}".trim(),
                                         fontWeight = FontWeight.Bold,
                                         fontSize = 16.sp
                                     )
-                                    if (item.imei != "N/A") {
-                                        Text("IMEI: ${item.imei}", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    if (memVariant.isNotBlank()) {
+                                        Text(
+                                            text = memVariant,
+                                            fontSize = 13.sp,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
                                     }
                                     if (item.color.isNotBlank()) {
-                                        Text("Color: ${item.color}", fontSize = 12.sp, color = MaterialTheme.colorScheme.primary)
+                                        Text(
+                                            text = "Color: ${item.color}",
+                                            fontSize = 12.sp,
+                                            color = MaterialTheme.colorScheme.primary
+                                        )
                                     }
                                 }
 
@@ -191,7 +203,36 @@ private fun DetailRow(label: String, value: String) {
 @Preview(showBackground = true)
 @Composable
 fun StockListScreenPreview() {
+    val sampleStock = listOf(
+        DisplayStock(
+            id = "1",
+            brand = "Apple",
+            model = "iPhone 15 Pro Max",
+            imei = "358912345678901",
+            category = "Mobile",
+            color = "Natural Titanium",
+            ram = "8GB",
+            storage = "512GB",
+            specs = "A17 Pro",
+            remainingQty = 1,
+            status = "In Stock"
+        ),
+        DisplayStock(
+            id = "2",
+            brand = "Dell",
+            model = "XPS 15 Touchscreen Laptop",
+            imei = "DL9876543210",
+            category = "Laptop",
+            color = "Space Grey",
+            ram = "32GB",
+            storage = "1TB SSD",
+            specs = "Core i9 13th Gen RTX 4070",
+            issue = "Minor scratch on bottom",
+            remainingQty = 3,
+            status = "In Stock"
+        )
+    )
     BuySellTheme {
-        StockListScreen()
+        StockListScreen(stockItems = sampleStock)
     }
 }

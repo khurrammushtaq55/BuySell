@@ -146,7 +146,7 @@
     <string name="sell_select_stock">从库存中选择商品 *:</string>
     <string name="sell_buyer_info_header">买家详细信息（必填 *）:</string>
     <string name="stock_title">我的库存 (%1$s)</string>
-    <string name="stock_search_label">通过 IMEI、品牌、型号或颜色搜索</string>
+    <string name="stock_search_label">通过 IMEI、品牌等搜索</string>
     <string name="stock_empty_msg">目前库存中没有商品 — 添加您的第一笔采购</string>
     <string name="stock_close_dialog">关闭</string>
     <string name="stock_qty_label">数量: %1$s</string>
@@ -417,4 +417,22 @@
     <string name="label_optional_details_header">其他 / 可选详细信息</string>
     <string name="sub_optional_details_hint">内存、存储、颜色、参数、瑕疵（点击展开）</string>
     <string name="label_serial_or_item_code">序列号 / 商品编码</string>
+    <string name="home_help_icon_desc">帮助 / 支持</string>
+    <string name="home_settings_icon_desc">设置</string>
+    <string name="home_today_sales_count">%1$d 笔销售 • %2$s</string>
+    <string name="dashboard_card_subtitle">查看利润、销售分析与库存报告</string>
+    <string name="home_subtitle_read_only">仅只读</string>
+    <string name="home_subtitle_farokht">销售</string>
+    <string name="home_subtitle_khareedari">采购</string>
+    <string name="home_subtitle_baqi_paisay">应收欠款</string>
+    <string name="home_subtitle_available_phones">现货手机</string>
+    <string name="home_subtitle_partner_entry_disabled">合伙人模式 — 禁用录入</string>
+    <string name="home_subtitle_exchange_desc">顾客以旧换新购买新手机</string>
+    <string name="splash_loading_store">正在加载您的店铺和记录…</string>
+    <string name="dashboard_filter_year">按年</string>
+    <string name="dashboard_expense_breakdown">支出汇总</string>
+    <string name="dashboard_daily_expense">日支出</string>
+    <string name="dashboard_monthly_expense">月支出</string>
+    <string name="dashboard_yearly_expense">年支出</string>
+    <string name="dashboard_trend_graph_title">销售与利润趋势图表</string>
 </resources>

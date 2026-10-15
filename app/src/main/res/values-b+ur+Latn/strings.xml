@@ -93,7 +93,7 @@
     <string name="sell_select_stock">Stock se item choose karein *:</string>
     <string name="sell_buyer_info_header">Gahak (Buyer) ki detail (Mandatory fields *):</string>
     <string name="stock_title">Mera Stock (%1$d)</string>
-    <string name="stock_search_label">Search by IMEI, Brand, Model, Specs, or Color</string>
+    <string name="stock_search_label">IMEI, Brand, waghaira se talash karein</string>
     <string name="stock_empty_msg">Abhi koi item stock mein nahi — pehli khareedari add karein</string>
     <string name="stock_close_dialog">Band Karein (Close)</string>
     <string name="stock_qty_label">Qty: %1$d</string>
@@ -417,4 +417,22 @@
     <string name="label_optional_details_header">Izafi / Ikhtiyari Tafseelat</string>
     <string name="sub_optional_details_hint">RAM, Storage, Rang, Specs, Naqais (Kholne ke liye tap karein)</string>
     <string name="label_serial_or_item_code">Serial Number / Item Code</string>
+    <string name="home_help_icon_desc">Madad / Help</string>
+    <string name="home_settings_icon_desc">Settings</string>
+    <string name="home_today_sales_count">%1$d sales • %2$s</string>
+    <string name="dashboard_card_subtitle">Munafa, sales analytics, aur stock reports dekhein</string>
+    <string name="home_subtitle_read_only">Read-Only</string>
+    <string name="home_subtitle_farokht">Farokht</string>
+    <string name="home_subtitle_khareedari">Khareedari</string>
+    <string name="home_subtitle_baqi_paisay">Baqi paisay</string>
+    <string name="home_subtitle_available_phones">Available phones</string>
+    <string name="home_subtitle_partner_entry_disabled">Partner mode — entry disabled</string>
+    <string name="home_subtitle_exchange_desc">Customer purana phone de kar naya le raha hai</string>
+    <string name="splash_loading_store">Dukan aur records load ho rahe hain…</string>
+    <string name="dashboard_filter_year">Is Saal</string>
+    <string name="dashboard_expense_breakdown">Dukan Ke Akhrajat (Expenses Summary)</string>
+    <string name="dashboard_daily_expense">Aaj Ka Kharcha</string>
+    <string name="dashboard_monthly_expense">Iss Mahine Ka Kharcha</string>
+    <string name="dashboard_yearly_expense">Iss Saal Ka Kharcha</string>
+    <string name="dashboard_trend_graph_title">Sales aur Profit Graph Analytics</string>
 </resources>

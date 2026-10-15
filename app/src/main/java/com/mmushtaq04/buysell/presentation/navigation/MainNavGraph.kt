@@ -106,7 +106,6 @@ fun NavGraphBuilder.mainNavGraph(
         val featureRepo = remember { com.mmushtaq04.buysell.data.repository.FeatureAccessRepositoryImpl(context, db) }
 
         val ownerDashboardViewModel: OwnerDashboardViewModel = viewModel()
-        val dashboardState by ownerDashboardViewModel.uiState.collectAsState()
 
         var showPaywallDialog by remember { mutableStateOf(false) }
 
@@ -132,12 +131,9 @@ fun NavGraphBuilder.mainNavGraph(
         }
 
         OwnerDashboardScreen(
-            uiState = dashboardState,
+            viewModel = ownerDashboardViewModel,
             isDashboardLocked = featureRepo.isFeatureLocked(com.mmushtaq04.buysell.data.repository.PremiumFeature.OWNER_DASHBOARD),
             onUnlockClick = { showPaywallDialog = true },
-            onTimeRangeSelect = { range ->
-                ownerDashboardViewModel.setTimeRange(range)
-            },
             onNavigateToExpenses = { navController.navigate(NavRoutes.Expenses.route) },
             onNavigateBack = { navController.popBackStack() }
         )

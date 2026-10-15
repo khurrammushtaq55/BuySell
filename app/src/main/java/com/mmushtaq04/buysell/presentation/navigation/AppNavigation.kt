@@ -27,9 +27,12 @@ import com.mmushtaq04.buysell.data.auth.FirebaseAuthManager
 import com.mmushtaq04.buysell.data.local.AppDatabase
 import com.mmushtaq04.buysell.data.local.enums.Role
 import com.mmushtaq04.buysell.data.sync.FirestoreSyncManager
+import com.mmushtaq04.buysell.presentation.screens.splash.AppSplashScreen
 import com.mmushtaq04.buysell.presentation.viewmodel.CategoryViewModel
 import com.mmushtaq04.buysell.util.AppPinManager
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
 fun AppNavigation(
@@ -43,7 +46,6 @@ fun AppNavigation(
     val isPinSet = AppPinManager.isPinSet(context)
 
     val msgRecords = stringResource(R.string.restoration_msg_records)
-    val msgDownloading = stringResource(R.string.restoration_msg_downloading)
     val msgSearching = stringResource(R.string.restoration_msg_searching)
     val msgParties = stringResource(R.string.restoration_msg_parties)
     val msgFinalizing = stringResource(R.string.restoration_msg_finalizing)
@@ -53,9 +55,6 @@ fun AppNavigation(
 
     val primaryUserFlow = remember { db.userDao().observePrimaryUser() }
     val primaryUser by primaryUserFlow.collectAsState(initial = null)
-
-    val appMetaFlow = remember { db.appMetaDao().observeAppMeta() }
-    val appMeta by appMetaFlow.collectAsState(initial = null)
 
     val firebaseUser = authManager.currentUser
     val registeredUserName = remember(primaryUser, firebaseUser) {
@@ -74,31 +73,41 @@ fun AppNavigation(
     val categoryViewModel: CategoryViewModel = viewModel()
     val allCategories by categoryViewModel.allCategories.collectAsState()
 
-    LaunchedEffect(isUserLoggedIn) {
-        if (isUserLoggedIn) {
-            val userId = authManager.currentUser?.uid ?: return@LaunchedEffect
-            val meta = db.appMetaDao().getAppMeta()
-            if (meta?.activeShopId.isNullOrBlank()) {
-                isRestoringData = true
-                restorationMessage = msgDownloading
-                val restoredId = FirestoreSyncManager(db).restoreUserDataFromFirestore(userId).getOrDefault("")
-                isRestoringData = false
-                if (restoredId.isBlank()) {
-                    // Logged in user has no active shop -> Ensure user stays on ShopSetupScreen
-                    navController.navigate(NavRoutes.ShopSetup.route) {
-                        popUpTo(NavRoutes.Home.route) { inclusive = true }
-                        popUpTo(NavRoutes.Welcome.route) { inclusive = true }
+    var initialStartDestination by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(Unit) {
+        withContext(Dispatchers.IO) {
+            if (!isUserLoggedIn) {
+                initialStartDestination = NavRoutes.Welcome.route
+            } else {
+                val userId = authManager.currentUser?.uid
+                val localUser = db.userDao().getPrimaryUser()
+
+                // If logged-in user changed on device, wipe stale local Room DB state
+                if (localUser != null && userId != null && localUser.id != userId) {
+                    Log.i("AppNavigation", "New user login detected ($userId vs local ${localUser.id}). Clearing local DB.")
+                    db.clearAllTables()
+                }
+
+                val meta = db.appMetaDao().getAppMeta()
+                val user = db.userDao().getPrimaryUser()
+                var activeShopId = meta?.activeShopId ?: user?.shopId
+
+                if (activeShopId.isNullOrBlank() && userId != null) {
+                    val restoredId = FirestoreSyncManager(db).restoreUserDataFromFirestore(userId).getOrDefault("")
+                    if (restoredId.isNotBlank()) {
+                        activeShopId = restoredId
                     }
                 }
+
+                val targetRoute = when {
+                    isPinSet -> NavRoutes.AppLock.route
+                    activeShopId.isNullOrBlank() -> NavRoutes.ShopSetup.route
+                    else -> NavRoutes.Home.route
+                }
+                initialStartDestination = targetRoute
             }
         }
-    }
-
-    val startDest = when {
-        !isUserLoggedIn -> NavRoutes.Welcome.route
-        isPinSet -> NavRoutes.AppLock.route
-        appMeta?.activeShopId.isNullOrBlank() && primaryUser?.shopId.isNullOrBlank() -> NavRoutes.ShopSetup.route
-        else -> NavRoutes.Home.route
     }
 
     fun navigateAfterLogin() {
@@ -107,7 +116,6 @@ fun AppNavigation(
             isRestoringData = true
             restorationMessage = msgSearching
 
-            // If local DB user ID doesn't match current logged-in userId, wipe stale local DB state
             val localUser = db.userDao().getPrimaryUser()
             if (localUser != null && localUser.id != userId) {
                 Log.i("AppNavigation", "New user login detected ($userId vs local ${localUser.id}). Clearing stale local Room DB tables.")
@@ -144,42 +152,46 @@ fun AppNavigation(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        NavHost(
-            navController = navController,
-            startDestination = startDest
-        ) {
-            authNavGraph(
+    if (initialStartDestination == null) {
+        AppSplashScreen()
+    } else {
+        Box(modifier = Modifier.fillMaxSize()) {
+            NavHost(
                 navController = navController,
-                onNavigateAfterLogin = { navigateAfterLogin() }
-            )
+                startDestination = initialStartDestination!!
+            ) {
+                authNavGraph(
+                    navController = navController,
+                    onNavigateAfterLogin = { navigateAfterLogin() }
+                )
 
-            mainNavGraph(
-                navController = navController,
-                registeredUserRole = registeredUserRole
-            )
+                mainNavGraph(
+                    navController = navController,
+                    registeredUserRole = registeredUserRole
+                )
 
-            wizardsNavGraph(
-                navController = navController,
-                registeredUserName = registeredUserName
-            )
+                wizardsNavGraph(
+                    navController = navController,
+                    registeredUserName = registeredUserName
+                )
 
-            settingsNavGraph(
-                navController = navController,
-                authManager = authManager,
-                registeredUserName = registeredUserName,
-                registeredUserRole = registeredUserRole,
-                allCategories = allCategories,
-                categoryViewModel = categoryViewModel
-            )
-        }
+                settingsNavGraph(
+                    navController = navController,
+                    authManager = authManager,
+                    registeredUserName = registeredUserName,
+                    registeredUserRole = registeredUserRole,
+                    allCategories = allCategories,
+                    categoryViewModel = categoryViewModel
+                )
+            }
 
-        AnimatedVisibility(
-            visible = isRestoringData,
-            enter = fadeIn(),
-            exit = fadeOut()
-        ) {
-            DataRestorationOverlayScreen(message = restorationMessage)
+            AnimatedVisibility(
+                visible = isRestoringData,
+                enter = fadeIn(),
+                exit = fadeOut()
+            ) {
+                DataRestorationOverlayScreen(message = restorationMessage)
+            }
         }
     }
 }
