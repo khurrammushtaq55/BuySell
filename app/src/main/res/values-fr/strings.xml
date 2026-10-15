@@ -413,4 +413,8 @@
     <string name="placeholder_partner_name">ex. Bilal Khan</string>
     <string name="placeholder_partner_phone">03335554433</string>
     <string name="placeholder_partner_code">ex. P8X9R2Q5</string>
+    <string name="toast_min_category_required">Au moins 1 catégorie commerciale doit rester activée</string>
+    <string name="label_optional_details_header">Détails supplémentaires / optionnels</string>
+    <string name="sub_optional_details_hint">RAM, Stockage, Couleur, Spécifications, Défauts (Appuyer pour développer)</string>
+    <string name="label_serial_or_item_code">Numéro de série / Code d\'article</string>
 </resources>

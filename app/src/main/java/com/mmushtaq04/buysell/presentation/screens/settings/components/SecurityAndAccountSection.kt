@@ -213,12 +213,18 @@ fun SecurityAndAccountSection(
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 2.dp))
 
-            SettingClickableRow(
-                icon = Icons.Default.Lock,
-                title = stringResource(R.string.settings_app_pin),
-                subtitle = if (isPinActive) stringResource(R.string.settings_pin_sub_active) else stringResource(R.string.settings_pin_sub_inactive)
+            PremiumFeatureGate(
+                isLocked = isExportLocked,
+                featureName = stringResource(R.string.settings_app_pin),
+                onUnlockClick = onUnlockClick
             ) {
-                showPinDialog = true
+                SettingClickableRow(
+                    icon = Icons.Default.Lock,
+                    title = stringResource(R.string.settings_app_pin),
+                    subtitle = if (isPinActive) stringResource(R.string.settings_pin_sub_active) else stringResource(R.string.settings_pin_sub_inactive)
+                ) {
+                    showPinDialog = true
+                }
             }
 
             if (isOwner || userRole.equals("Partner", ignoreCase = true)) {

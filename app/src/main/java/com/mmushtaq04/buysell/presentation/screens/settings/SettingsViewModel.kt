@@ -205,6 +205,10 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
 
     fun toggleCategory(category: CategoryEntity) {
         viewModelScope.launch {
+            if (category.enabled && _categories.value.count { it.enabled } <= 1) {
+                Log.w(TAG, "Cannot disable the last remaining category: ${category.name}")
+                return@launch
+            }
             val updated = category.copy(
                 enabled = !category.enabled,
                 updatedAt = System.currentTimeMillis(),

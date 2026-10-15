@@ -413,4 +413,8 @@
     <string name="placeholder_partner_name">जैसे: बिलाल खान</string>
     <string name="placeholder_partner_phone">03335554433</string>
     <string name="placeholder_partner_code">जैसे: P8X9R2Q5</string>
+    <string name="toast_min_category_required">कम से कम 1 व्यावसायिक श्रेणी चालू रहना आवश्यक है</string>
+    <string name="label_optional_details_header">अतिरिक्त / वैकल्पिक विवरण</string>
+    <string name="sub_optional_details_hint">रैम, स्टोरेज, रंग, विनिर्देश, कमियां (विस्तार के लिए टैप करें)</string>
+    <string name="label_serial_or_item_code">सीरियल नंबर / आइटम कोड</string>
 </resources>

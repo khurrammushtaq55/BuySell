@@ -413,4 +413,8 @@
     <string name="placeholder_partner_name">e.g. Bilal Khan</string>
     <string name="placeholder_partner_phone">03335554433</string>
     <string name="placeholder_partner_code">e.g. P8X9R2Q5</string>
+    <string name="toast_min_category_required">Kam se kam 1 trading category on rehna zaroori hai</string>
+    <string name="label_optional_details_header">Izafi / Ikhtiyari Tafseelat</string>
+    <string name="sub_optional_details_hint">RAM, Storage, Rang, Specs, Naqais (Kholne ke liye tap karein)</string>
+    <string name="label_serial_or_item_code">Serial Number / Item Code</string>
 </resources>

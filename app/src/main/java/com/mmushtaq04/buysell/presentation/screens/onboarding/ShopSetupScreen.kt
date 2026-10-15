@@ -29,6 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mmushtaq04.buysell.R
+import com.mmushtaq04.buysell.presentation.components.CategorySelectionChips
 import com.mmushtaq04.buysell.presentation.components.ShopProfileFields
 import com.mmushtaq04.buysell.ui.theme.BuySellTheme
 
@@ -148,29 +149,11 @@ fun ShopSetupScreen(
 
                     Text(stringResource(R.string.shop_setup_categories_prompt), fontWeight = FontWeight.Bold, fontSize = 14.sp)
 
-                    FlowRow(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        presetCategories.forEach { category ->
-                            val isSelected = selectedCategories.contains(category)
-                            FilterChip(
-                                selected = isSelected,
-                                onClick = {
-                                    selectedCategories = if (isSelected) {
-                                        selectedCategories - category
-                                    } else {
-                                        selectedCategories + category
-                                    }
-                                },
-                                label = { Text(category, fontSize = 13.sp) },
-                                leadingIcon = if (isSelected) {
-                                    { Icon(Icons.Default.CheckCircle, contentDescription = null, modifier = Modifier.size(16.dp)) }
-                                } else null
-                            )
-                        }
-                    }
+                    CategorySelectionChips(
+                        categories = presetCategories,
+                        selectedCategories = selectedCategories,
+                        onCategoriesChange = { selectedCategories = it }
+                    )
                 } else if (selectedTab == 1) {
                     // --- STAFF MEMBER: JOIN EXISTING SHOP ---
                     Row(verticalAlignment = Alignment.CenterVertically) {

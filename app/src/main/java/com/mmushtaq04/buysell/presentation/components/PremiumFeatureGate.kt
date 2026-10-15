@@ -13,12 +13,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mmushtaq04.buysell.R
+import com.mmushtaq04.buysell.ui.theme.BuySellTheme
 
 @Composable
 fun PremiumFeatureGate(
@@ -37,13 +38,13 @@ fun PremiumFeatureGate(
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
     ) {
-        // Blurred Background Content
+        // Lightly Blurred Background Content (Lightly visible, non-clickable)
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .then(
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                        Modifier.blur(6.dp)
+                        Modifier.blur(3.dp)
                     } else {
                         Modifier
                     }
@@ -52,15 +53,15 @@ fun PremiumFeatureGate(
             content()
         }
 
-        // Translucent Overlay Mask
+        // Light Translucent Overlay Scrim that intercepts touch events
         Box(
             modifier = Modifier
                 .matchParentSize()
-                .background(Color.Black.copy(alpha = 0.45f))
+                .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.50f))
                 .clickable { onUnlockClick() }
         )
 
-        // Small, Compact Lock Pill Badge
+        // Compact Lock Pill Badge
         Surface(
             modifier = Modifier
                 .align(Alignment.Center)
@@ -88,6 +89,26 @@ fun PremiumFeatureGate(
                     fontSize = 11.sp,
                     color = MaterialTheme.colorScheme.primary
                 )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PremiumFeatureGatePreview() {
+    BuySellTheme {
+        Box(modifier = Modifier.padding(16.dp)) {
+            PremiumFeatureGate(
+                isLocked = true,
+                featureName = "Monthly Business Report",
+                onUnlockClick = {}
+            ) {
+                Column(modifier = Modifier.padding(12.dp)) {
+                    Text("Daily Business Summary Notification", fontWeight = FontWeight.Bold)
+                    Text("Receive automated daily sales push notifications", fontSize = 12.sp)
+                    Switch(checked = true, onCheckedChange = {})
+                }
             }
         }
     }

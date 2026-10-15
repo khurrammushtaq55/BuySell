@@ -413,4 +413,8 @@
     <string name="placeholder_partner_name">مثلاً بلال خان</string>
     <string name="placeholder_partner_phone">03335554433</string>
     <string name="placeholder_partner_code">مثلاً P8X9R2Q5</string>
+    <string name="toast_min_category_required">کم از کم 1 تجارتی کیٹیگری آن رہنا ضروری ہے</string>
+    <string name="label_optional_details_header">اضافی / اختیاری تفصیلات</string>
+    <string name="sub_optional_details_hint">ریم، اسٹوریج، رنگ، تفصیلات، نقائص (کھولنے کے لیے ٹیپ کریں)</string>
+    <string name="label_serial_or_item_code">سیریل نمبر / آئٹم کوڈ</string>
 </resources>

@@ -61,6 +61,9 @@ class CategoryViewModel(application: Application) : AndroidViewModel(application
 
     fun toggleCategoryEnabled(category: CategoryEntity) {
         viewModelScope.launch {
+            if (category.enabled && _allCategories.value.count { it.enabled } <= 1) {
+                return@launch
+            }
             val updated = category.copy(
                 enabled = !category.enabled,
                 updatedAt = System.currentTimeMillis()

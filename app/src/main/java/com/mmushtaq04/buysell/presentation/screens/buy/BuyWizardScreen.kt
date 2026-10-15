@@ -19,6 +19,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mmushtaq04.buysell.R
+import com.mmushtaq04.buysell.presentation.components.ExpandableOptionalSection
 import com.mmushtaq04.buysell.ui.theme.BuySellTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -336,74 +337,17 @@ private fun StepDeviceDetails(
             modifier = Modifier.fillMaxWidth()
         )
 
-        // Memory / RAM Selection
-        Text(stringResource(R.string.label_ram), fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
-        FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            presetRamList.forEach { r ->
-                val isSelected = r == ram
-                FilterChip(
-                    selected = isSelected,
-                    onClick = { onRamChange(if (isSelected) "" else r) },
-                    label = { Text(r, fontSize = 12.sp) },
-                    leadingIcon = if (isSelected) {
-                        { Icon(Icons.Default.CheckCircle, contentDescription = null, modifier = Modifier.size(14.dp)) }
-                    } else null
-                )
-            }
-        }
-
-        // Storage / Capacity Selection
-        Text(stringResource(R.string.label_storage), fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
-        FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            presetStorageList.forEach { s ->
-                val isSelected = s == storage
-                FilterChip(
-                    selected = isSelected,
-                    onClick = { onStorageChange(if (isSelected) "" else s) },
-                    label = { Text(s, fontSize = 12.sp) },
-                    leadingIcon = if (isSelected) {
-                        { Icon(Icons.Default.CheckCircle, contentDescription = null, modifier = Modifier.size(14.dp)) }
-                    } else null
-                )
-            }
+        val identifierLabelRes = when {
+            category.contains("Mobile", ignoreCase = true) -> R.string.label_imei
+            category.contains("Tablet", ignoreCase = true) || category.contains("Laptop", ignoreCase = true) || category.contains("Console", ignoreCase = true) || category.contains("Smartwatch", ignoreCase = true) || category.contains("Camera", ignoreCase = true) -> R.string.exchange_old_imei_label
+            else -> R.string.label_serial_or_item_code
         }
 
         OutlinedTextField(
             value = imei,
             onValueChange = onImeiChange,
-            label = { Text(stringResource(R.string.label_imei)) },
+            label = { Text(stringResource(identifierLabelRes)) },
             supportingText = { Text(stringResource(R.string.sub_imei)) },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        OutlinedTextField(
-            value = color,
-            onValueChange = onColorChange,
-            label = { Text(stringResource(R.string.label_color)) },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        OutlinedTextField(
-            value = specs,
-            onValueChange = onSpecsChange,
-            label = { Text(stringResource(R.string.label_specs)) },
-            supportingText = { Text(stringResource(R.string.sub_specs_hint)) },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        OutlinedTextField(
-            value = issue,
-            onValueChange = onIssueChange,
-            label = { Text(stringResource(R.string.label_fault_issue)) },
-            supportingText = { Text(stringResource(R.string.sub_fault_issue)) },
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -415,6 +359,81 @@ private fun StepDeviceDetails(
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             modifier = Modifier.fillMaxWidth()
         )
+
+        // Collapsible Optional Details Section (RAM, Storage, Color, Specs, Faults)
+        val hasOptionalValues = ram.isNotBlank() || storage.isNotBlank() || color.isNotBlank() || specs.isNotBlank() || issue.isNotBlank()
+        val hasRamStoragePresets = category.contains("Mobile", ignoreCase = true) || category.contains("Tablet", ignoreCase = true) || category.contains("Laptop", ignoreCase = true)
+
+        ExpandableOptionalSection(
+            initialExpanded = hasOptionalValues
+        ) {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                if (hasRamStoragePresets) {
+                    // Memory / RAM Selection
+                    Text(stringResource(R.string.label_ram), fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                    FlowRow(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        presetRamList.forEach { r ->
+                            val isSelected = r == ram
+                            FilterChip(
+                                selected = isSelected,
+                                onClick = { onRamChange(if (isSelected) "" else r) },
+                                label = { Text(r, fontSize = 12.sp) },
+                                leadingIcon = if (isSelected) {
+                                    { Icon(Icons.Default.CheckCircle, contentDescription = null, modifier = Modifier.size(14.dp)) }
+                                } else null
+                            )
+                        }
+                    }
+
+                    // Storage / Capacity Selection
+                    Text(stringResource(R.string.label_storage), fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                    FlowRow(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        presetStorageList.forEach { s ->
+                            val isSelected = s == storage
+                            FilterChip(
+                                selected = isSelected,
+                                onClick = { onStorageChange(if (isSelected) "" else s) },
+                                label = { Text(s, fontSize = 12.sp) },
+                                leadingIcon = if (isSelected) {
+                                    { Icon(Icons.Default.CheckCircle, contentDescription = null, modifier = Modifier.size(14.dp)) }
+                                } else null
+                            )
+                        }
+                    }
+                }
+
+                OutlinedTextField(
+                    value = color,
+                    onValueChange = onColorChange,
+                    label = { Text(stringResource(R.string.label_color)) },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                OutlinedTextField(
+                    value = specs,
+                    onValueChange = onSpecsChange,
+                    label = { Text(stringResource(R.string.label_specs)) },
+                    supportingText = { Text(stringResource(R.string.sub_specs_hint)) },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                OutlinedTextField(
+                    value = issue,
+                    onValueChange = onIssueChange,
+                    label = { Text(stringResource(R.string.label_fault_issue)) },
+                    supportingText = { Text(stringResource(R.string.sub_fault_issue)) },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        }
     }
 }
 

@@ -413,4 +413,8 @@
     <string name="placeholder_partner_name">例如：比拉尔·汗</string>
     <string name="placeholder_partner_phone">03335554433</string>
     <string name="placeholder_partner_code">例如：P8X9R2Q5</string>
+    <string name="toast_min_category_required">至少须保留 1 个交易品类开启</string>
+    <string name="label_optional_details_header">其他 / 可选详细信息</string>
+    <string name="sub_optional_details_hint">内存、存储、颜色、参数、瑕疵（点击展开）</string>
+    <string name="label_serial_or_item_code">序列号 / 商品编码</string>
 </resources>

@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mmushtaq04.buysell.R
 import com.mmushtaq04.buysell.data.local.entity.CategoryEntity
+import com.mmushtaq04.buysell.presentation.components.EntityCategorySelectionChips
 import com.mmushtaq04.buysell.presentation.components.PremiumFeatureGate
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -168,23 +169,11 @@ fun TeamAndCategoriesSection(
             Text(stringResource(R.string.settings_trading_categories), fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
 
             if (allCategories.isNotEmpty()) {
-                FlowRow(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    allCategories.forEach { categoryItem ->
-                        FilterChip(
-                            selected = categoryItem.enabled,
-                            enabled = isOwner,
-                            onClick = { onToggleCategory(categoryItem) },
-                            label = { Text(categoryItem.name, fontSize = 13.sp) },
-                            leadingIcon = if (categoryItem.enabled) {
-                                { Icon(Icons.Default.CheckCircle, contentDescription = null, modifier = Modifier.size(16.dp)) }
-                            } else null
-                        )
-                    }
-                }
+                EntityCategorySelectionChips(
+                    categoryEntities = allCategories,
+                    onToggleCategory = onToggleCategory,
+                    enabled = isOwner
+                )
             }
         }
     }
