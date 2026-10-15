@@ -5,44 +5,57 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
+    <!-- Store Canopy Roof -->
     <path
-        android:fillColor="#F8FAFC"
-        android:pathData="M43,30 h22 a4,4 0 0,1 4,4 v40 a4,4 0 0,1 -4,4 h-22 a4,4 0 0,1 -4,-4 v-40 a4,4 0 0,1 4,-4 z" />
+        android:fillColor="#ECFDF5"
+        android:pathData="M34,34 h40 l4,10 h-48 z" />
 
-    <!-- Smartphone Screen Inner Area -->
+    <!-- Canopy Stripes Accent -->
     <path
-        android:fillColor="#1E293B"
-        android:pathData="M45,34 h18 a2,2 0 0,1 2,2 v34 a2,2 0 0,1 -2,2 h-18 a2,2 0 0,1 -2,-2 v-34 a2,2 0 0,1 2,-2 z" />
+        android:fillColor="#10B981"
+        android:pathData="M40,34 h6 l-1,10 h-6 z M51,34 h6 l0,10 h-6 z M62,34 h6 l1,10 h-6 z" />
 
-    <!-- Speaker Notch -->
+    <!-- Store Awning Scallops -->
     <path
-        android:fillColor="#CBD5E1"
-        android:pathData="M50,32 h8 v1 h-8 z" />
+        android:fillColor="#D1FAE5"
+        android:pathData="M30,44 c2,4 6,4 8,0 c2,4 6,4 8,0 c2,4 6,4 8,0 c2,4 6,4 8,0 c2,4 6,4 8,0 c2,4 6,4 8,0 v2 h-48 z" />
 
-    <!-- Screen UI Elements (Green Buy Badge, Ledger Lines, Orange Sell Accent) -->
+    <!-- Store Side Pillars -->
     <path
-        android:fillColor="#22C55E"
-        android:pathData="M48,38 h12 v2.5 h-12 z" />
+        android:fillColor="#ECFDF5"
+        android:pathData="M34,48 h5 v22 h-5 z M69,48 h5 v22 h-5 z" />
+
+    <!-- Store Base Floor -->
+    <path
+        android:fillColor="#A7F3D0"
+        android:pathData="M30,70 h48 v4 h-48 z" />
+
+    <!-- Smartphone Body Inside Display Window -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M45,49 h18 a3,3 0 0,1 3,3 v17 a3,3 0 0,1 -3,3 h-18 a3,3 0 0,1 -3,-3 v-17 a3,3 0 0,1 3,-3 z" />
+
+    <!-- Screen Area -->
+    <path
+        android:fillColor="#064E3B"
+        android:pathData="M47,52 h14 a1,1 0 0,1 1,1 v12 a1,1 0 0,1 -1,1 h-14 a1,1 0 0,1 -1,-1 v-12 a1,1 0 0,1 1,-1 z" />
+
+    <!-- Green Success Badge in Screen -->
+    <path
+        android:fillColor="#10B981"
+        android:pathData="M50,55 h8 v2 h-8 z" />
 
     <path
-        android:fillColor="#94A3B8"
-        android:pathData="M48,43.5 h12 v1.5 h-12 z" />
+        android:fillColor="#6EE7B7"
+        android:pathData="M50,59 h8 v1.5 h-8 z" />
 
-    <path
-        android:fillColor="#94A3B8"
-        android:pathData="M48,47.5 h12 v1.5 h-12 z" />
-
-    <path
-        android:fillColor="#F97316"
-        android:pathData="M48,51.5 h12 v2.5 h-12 z" />
-
-    <!-- Screen Success Checkmark -->
+    <!-- Checkmark Badge -->
     <path
         android:fillColor="#00000000"
-        android:strokeColor="#22C55E"
-        android:strokeWidth="2"
+        android:strokeColor="#34D399"
+        android:strokeWidth="1.5"
         android:strokeLineCap="round"
         android:strokeLineJoin="round"
-        android:pathData="M49,61 L53,65 L59,57" />
+        android:pathData="M52,63.5 L53.8,65 L56.2,62" />
 
 </vector>

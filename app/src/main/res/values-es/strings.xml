@@ -403,4 +403,14 @@
     <string name="promo_btn_redeem">Canjear código 🚀</string>
     <string name="promo_success_toast">¡Código aplicado! Funciones Pro desbloqueadas. 🎉</string>
     <string name="promo_error_invalid">Código inválido o expirado. Inténtalo de nuevo.</string>
+    <string name="placeholder_owner_name">p. ej. Malik Mushtaq</string>
+    <string name="placeholder_shop_name">p. ej. Mushtaq Móviles</string>
+    <string name="placeholder_shop_phone">03001234567</string>
+    <string name="placeholder_shop_address">Tienda #12, Planta Baja, Centro Hafeez</string>
+    <string name="placeholder_staff_name">p. ej. Usman Ahmed</string>
+    <string name="placeholder_mobile_number">03129876543</string>
+    <string name="placeholder_staff_code">p. ej. K7M2A9P4</string>
+    <string name="placeholder_partner_name">p. ej. Bilal Khan</string>
+    <string name="placeholder_partner_phone">03335554433</string>
+    <string name="placeholder_partner_code">p. ej. P8X9R2Q5</string>
 </resources>

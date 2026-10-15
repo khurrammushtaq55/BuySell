@@ -403,4 +403,14 @@
     <string name="promo_btn_redeem">कोड भुनाएं 🚀</string>
     <string name="promo_success_toast">प्रोमो कोड लागू हुआ! प्रो सुविधाएं अनलॉक हो गईं। 🎉</string>
     <string name="promo_error_invalid">अमान्य या समाप्त हो चुका प्रोमो कोड। कृपया पुन: प्रयास करें।</string>
+    <string name="placeholder_owner_name">जैसे: मालिक मुश्ताक</string>
+    <string name="placeholder_shop_name">जैसे: मुश्ताक मोबाइल ट्रेडिंग</string>
+    <string name="placeholder_shop_phone">03001234567</string>
+    <string name="placeholder_shop_address">दुकान नं. 12, ग्राउंड फ्लोर, हफीज सेंटर</string>
+    <string name="placeholder_staff_name">जैसे: उस्मान अहमद</string>
+    <string name="placeholder_mobile_number">03129876543</string>
+    <string name="placeholder_staff_code">जैसे: K7M2A9P4</string>
+    <string name="placeholder_partner_name">जैसे: बिलाल खान</string>
+    <string name="placeholder_partner_phone">03335554433</string>
+    <string name="placeholder_partner_code">जैसे: P8X9R2Q5</string>
 </resources>

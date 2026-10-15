@@ -30,6 +30,10 @@ fun NavGraphBuilder.mainNavGraph(
         val homeViewModel: HomeViewModel = viewModel()
         val homeUiState by homeViewModel.uiState.collectAsState()
 
+        LaunchedEffect(Unit) {
+            homeViewModel.loadHomeData()
+        }
+
         HomeScreen(
             shopName = homeUiState.shopName,
             userRole = registeredUserRole,

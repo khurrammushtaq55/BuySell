@@ -12,9 +12,7 @@ import androidx.compose.material.icons.filled.Badge
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.Key
-import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Storefront
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.*
@@ -25,11 +23,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mmushtaq04.buysell.R
+import com.mmushtaq04.buysell.presentation.components.ShopProfileFields
 import com.mmushtaq04.buysell.ui.theme.BuySellTheme
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
@@ -133,41 +133,15 @@ fun ShopSetupScreen(
                         }
                     }
 
-                    OutlinedTextField(
-                        value = userName,
-                        onValueChange = { userName = it },
-                        label = { Text(stringResource(R.string.label_owner_name)) },
-                        placeholder = { Text("e.g. Malik Mushtaq") },
-                        leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-
-                    OutlinedTextField(
-                        value = shopName,
-                        onValueChange = { shopName = it },
-                        label = { Text(stringResource(R.string.label_owner_shop_name)) },
-                        placeholder = { Text("e.g. Mushtaq Mobile Trading") },
-                        leadingIcon = { Icon(Icons.Default.Storefront, contentDescription = null) },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-
-                    OutlinedTextField(
-                        value = shopPhone,
-                        onValueChange = { shopPhone = it },
-                        label = { Text(stringResource(R.string.label_owner_shop_phone)) },
-                        placeholder = { Text("03001234567") },
-                        leadingIcon = { Icon(Icons.Default.Phone, contentDescription = null) },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-                        modifier = Modifier.fillMaxWidth()
-                    )
-
-                    OutlinedTextField(
-                        value = shopNumberAddress,
-                        onValueChange = { shopNumberAddress = it },
-                        label = { Text(stringResource(R.string.label_owner_shop_address)) },
-                        placeholder = { Text("Shop #12, Ground Floor, Hafeez Center") },
-                        leadingIcon = { Icon(Icons.Default.LocationOn, contentDescription = null) },
-                        modifier = Modifier.fillMaxWidth()
+                    ShopProfileFields(
+                        ownerName = userName,
+                        onOwnerNameChange = { userName = it },
+                        shopName = shopName,
+                        onShopNameChange = { shopName = it },
+                        shopPhone = shopPhone,
+                        onShopPhoneChange = { shopPhone = it },
+                        shopAddress = shopNumberAddress,
+                        onShopAddressChange = { shopNumberAddress = it }
                     )
 
                     HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
@@ -217,17 +191,18 @@ fun ShopSetupScreen(
                         value = joinUserName,
                         onValueChange = { joinUserName = it },
                         label = { Text(stringResource(R.string.label_staff_name)) },
-                        placeholder = { Text("e.g. Usman Ahmed") },
+                        placeholder = { Text(stringResource(R.string.placeholder_staff_name)) },
                         leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
+                        keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words),
                         modifier = Modifier.fillMaxWidth()
                     )
 
                     OutlinedTextField(
                         value = joinPhone,
-                        onValueChange = { joinPhone = it },
+                        onValueChange = { newValue -> joinPhone = newValue.filter { it.isDigit() } },
                         label = { Text(stringResource(R.string.label_mobile_number)) },
-                        placeholder = { Text("03129876543") },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                        placeholder = { Text(stringResource(R.string.placeholder_mobile_number)) },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         modifier = Modifier.fillMaxWidth()
                     )
 
@@ -235,8 +210,9 @@ fun ShopSetupScreen(
                         value = inviteCode,
                         onValueChange = { inviteCode = it.uppercase() },
                         label = { Text(stringResource(R.string.label_staff_code)) },
-                        placeholder = { Text("e.g. K7M2A9P4") },
+                        placeholder = { Text(stringResource(R.string.placeholder_staff_code)) },
                         leadingIcon = { Icon(Icons.Default.Key, contentDescription = null) },
+                        keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Characters),
                         modifier = Modifier.fillMaxWidth()
                     )
                 } else {
@@ -259,17 +235,18 @@ fun ShopSetupScreen(
                         value = joinUserName,
                         onValueChange = { joinUserName = it },
                         label = { Text(stringResource(R.string.label_partner_name)) },
-                        placeholder = { Text("e.g. Bilal Khan") },
+                        placeholder = { Text(stringResource(R.string.placeholder_partner_name)) },
                         leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
+                        keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words),
                         modifier = Modifier.fillMaxWidth()
                     )
 
                     OutlinedTextField(
                         value = joinPhone,
-                        onValueChange = { joinPhone = it },
+                        onValueChange = { newValue -> joinPhone = newValue.filter { it.isDigit() } },
                         label = { Text(stringResource(R.string.label_mobile_number)) },
-                        placeholder = { Text("03335554433") },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                        placeholder = { Text(stringResource(R.string.placeholder_partner_phone)) },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         modifier = Modifier.fillMaxWidth()
                     )
 
@@ -277,8 +254,9 @@ fun ShopSetupScreen(
                         value = inviteCode,
                         onValueChange = { inviteCode = it.uppercase() },
                         label = { Text(stringResource(R.string.label_partner_code)) },
-                        placeholder = { Text("e.g. P8X9R2Q5") },
+                        placeholder = { Text(stringResource(R.string.placeholder_partner_code)) },
                         leadingIcon = { Icon(Icons.Default.Key, contentDescription = null) },
+                        keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Characters),
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
@@ -296,7 +274,7 @@ fun ShopSetupScreen(
                             shopName.trim(),
                             shopPhone.trim(),
                             shopNumberAddress.trim(),
-                            selectedCategories.toList()
+                            selectedCategories.ifEmpty { presetCategories.toSet() }.toList()
                         )
                     } else {
                         onJoinWithInvite(
@@ -310,7 +288,7 @@ fun ShopSetupScreen(
                     }
                 },
                 enabled = if (selectedTab == 0) {
-                    userName.isNotBlank() && shopName.isNotBlank() && shopPhone.isNotBlank() && shopNumberAddress.isNotBlank() && !isLoading
+                    userName.isNotBlank() && shopName.isNotBlank() && shopPhone.isNotBlank() && shopNumberAddress.isNotBlank() && selectedCategories.isNotEmpty() && !isLoading
                 } else {
                     joinUserName.isNotBlank() && joinPhone.isNotBlank() && inviteCode.length == 8 && !isLoading
                 },

@@ -403,4 +403,14 @@
     <string name="promo_btn_redeem">کوڈ ریڈیم کریں 🚀</string>
     <string name="promo_success_toast">پرومو کوڈ فعال ہو گیا! پرو فیچرز انلاک ہو گئے۔ 🎉</string>
     <string name="promo_error_invalid">غلط یا ختم شدہ پرومو کوڈ۔ دوبارہ کوشش کریں۔</string>
+    <string name="placeholder_owner_name">مثلاً ملک مشتاق</string>
+    <string name="placeholder_shop_name">مثلاً مشتاق موبائل ٹریڈنگ</string>
+    <string name="placeholder_shop_phone">03001234567</string>
+    <string name="placeholder_shop_address">دکان نمبر 12، حفیظ سینٹر، لاہور</string>
+    <string name="placeholder_staff_name">مثلاً عثمان احمد</string>
+    <string name="placeholder_mobile_number">03129876543</string>
+    <string name="placeholder_staff_code">مثلاً K7M2A9P4</string>
+    <string name="placeholder_partner_name">مثلاً بلال خان</string>
+    <string name="placeholder_partner_phone">03335554433</string>
+    <string name="placeholder_partner_code">مثلاً P8X9R2Q5</string>
 </resources>

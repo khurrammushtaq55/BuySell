@@ -2,9 +2,9 @@ package com.mmushtaq04.buysell.presentation.screens.settings.components
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Store
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -12,10 +12,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mmushtaq04.buysell.R
+import com.mmushtaq04.buysell.presentation.components.ShopProfileFields
 
 @Composable
 fun StoreProfileSection(
@@ -65,45 +65,17 @@ fun StoreProfileSection(
                 }
             }
 
-            OutlinedTextField(
-                value = editableOwnerName,
-                onValueChange = { editableOwnerName = it },
-                label = { Text(stringResource(R.string.label_owner_name)) },
-                readOnly = !isOwner,
+            ShopProfileFields(
+                ownerName = editableOwnerName,
+                onOwnerNameChange = { editableOwnerName = it },
+                shopName = editableShopName,
+                onShopNameChange = { editableShopName = it },
+                shopPhone = editableShopPhone,
+                onShopPhoneChange = { editableShopPhone = it },
+                shopAddress = editableShopAddress,
+                onShopAddressChange = { editableShopAddress = it },
                 enabled = isOwner,
-                leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            OutlinedTextField(
-                value = editableShopName,
-                onValueChange = { editableShopName = it },
-                label = { Text(stringResource(R.string.label_shop_name)) },
-                readOnly = !isOwner,
-                enabled = isOwner,
-                leadingIcon = { Icon(Icons.Default.Storefront, contentDescription = null) },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            OutlinedTextField(
-                value = editableShopPhone,
-                onValueChange = { editableShopPhone = it },
-                label = { Text(stringResource(R.string.label_shop_phone)) },
-                readOnly = !isOwner,
-                enabled = isOwner,
-                leadingIcon = { Icon(Icons.Default.Phone, contentDescription = null) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            OutlinedTextField(
-                value = editableShopAddress,
-                onValueChange = { editableShopAddress = it },
-                label = { Text(stringResource(R.string.label_shop_address)) },
-                readOnly = !isOwner,
-                enabled = isOwner,
-                leadingIcon = { Icon(Icons.Default.LocationOn, contentDescription = null) },
-                modifier = Modifier.fillMaxWidth()
+                readOnly = !isOwner
             )
 
             if (isOwner) {

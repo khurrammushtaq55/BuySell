@@ -403,4 +403,14 @@
     <string name="promo_btn_redeem">تفعيل الرمز 🚀</string>
     <string name="promo_success_toast">تم تفعيل الرمز الترويجي! تم فتح ميزات Pro. 🎉</string>
     <string name="promo_error_invalid">رمز ترويجي غير صالح أو منتهي الصلاحية. يرجى المحاولة مرة أخرى.</string>
+    <string name="placeholder_owner_name">مثلاً مالك مشتاق</string>
+    <string name="placeholder_shop_name">مثلاً مشتاق لتجارة الجوالات</string>
+    <string name="placeholder_shop_phone">03001234567</string>
+    <string name="placeholder_shop_address">المحل رقم 12، الدور الأرضي، مركز حفيظ</string>
+    <string name="placeholder_staff_name">مثلاً عثمان أحمد</string>
+    <string name="placeholder_mobile_number">03129876543</string>
+    <string name="placeholder_staff_code">مثلاً K7M2A9P4</string>
+    <string name="placeholder_partner_name">مثلاً بلال خان</string>
+    <string name="placeholder_partner_phone">03335554433</string>
+    <string name="placeholder_partner_code">مثلاً P8X9R2Q5</string>
 </resources>
