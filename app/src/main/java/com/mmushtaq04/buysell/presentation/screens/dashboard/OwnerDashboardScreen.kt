@@ -1,5 +1,7 @@
 package com.mmushtaq04.buysell.presentation.screens.dashboard
 
+import android.content.Context
+import android.content.Intent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -7,14 +9,22 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.AssignmentReturn
 import androidx.compose.material.icons.automirrored.filled.HelpOutline
 import androidx.compose.material.icons.automirrored.filled.ReceiptLong
+import androidx.compose.material.icons.automirrored.filled.TrendingDown
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
+import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AttachMoney
 import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.EventBusy
 import androidx.compose.material.icons.filled.Inventory2
+import androidx.compose.material.icons.filled.MoneyOff
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.TrendingDown
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -24,14 +34,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.mmushtaq04.buysell.R
 import com.mmushtaq04.buysell.presentation.components.PremiumFeatureGate
 import com.mmushtaq04.buysell.presentation.components.PremiumPaywallDialog
-import com.mmushtaq04.buysell.ui.theme.BuySellTheme
 
 @Composable
 fun OwnerDashboardScreen(
@@ -40,6 +48,7 @@ fun OwnerDashboardScreen(
     isInventoryInsightsLocked: Boolean = false,
     onNavigateBack: () -> Unit = {},
     onNavigateToExpenses: () -> Unit = {},
+    onNavigateToPartyList: () -> Unit = {},
     onUnlockClick: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -49,8 +58,11 @@ fun OwnerDashboardScreen(
         isAdvancedDashboardLocked = isAdvancedDashboardLocked,
         isInventoryInsightsLocked = isInventoryInsightsLocked,
         onTimeRangeSelected = { viewModel.setTimeRange(it) },
+        onCustomTimeRangeSelected = { start, end -> viewModel.setCustomTimeRange(start, end) },
+        onSortOrderChanged = { viewModel.setTopModelsSortOrder(it) },
         onNavigateBack = onNavigateBack,
         onNavigateToExpenses = onNavigateToExpenses,
+        onNavigateToPartyList = onNavigateToPartyList,
         onUnlockClick = onUnlockClick
     )
 }
@@ -62,8 +74,11 @@ fun OwnerDashboardContent(
     isAdvancedDashboardLocked: Boolean = false,
     isInventoryInsightsLocked: Boolean = false,
     onTimeRangeSelected: (TimeRange) -> Unit = {},
+    onCustomTimeRangeSelected: (Long, Long) -> Unit = { _, _ -> },
+    onSortOrderChanged: (TopModelsSortOrder) -> Unit = {},
     onNavigateBack: () -> Unit = {},
     onNavigateToExpenses: () -> Unit = {},
+    onNavigateToPartyList: () -> Unit = {},
     onUnlockClick: () -> Unit = {}
 ) {
     val context = LocalContext.current
@@ -71,6 +86,7 @@ fun OwnerDashboardContent(
     var showHelpDialogTitle by remember { mutableStateOf<String?>(null) }
     var showHelpDialogMsg by remember { mutableStateOf<String?>(null) }
     var showPaywallDialog by remember { mutableStateOf(false) }
+    var showDateRangePicker by remember { mutableStateOf(false) }
 
     if (showPaywallDialog) {
         PremiumPaywallDialog(
@@ -84,31 +100,30 @@ fun OwnerDashboardContent(
         )
     }
 
+    if (showDateRangePicker) {
+        CustomDateRangePickerDialog(
+            onDismiss = { showDateRangePicker = false },
+            onDateRangeSelected = { start, end ->
+                showDateRangePicker = false
+                onCustomTimeRangeSelected(start, end)
+            }
+        )
+    }
+
     if (showHelpDialogTitle != null && showHelpDialogMsg != null) {
         AlertDialog(
             onDismissRequest = {
                 showHelpDialogTitle = null
                 showHelpDialogMsg = null
             },
-            icon = {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.HelpOutline,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            },
-            title = {
-                Text(text = showHelpDialogTitle!!, fontWeight = FontWeight.Bold)
-            },
-            text = {
-                Text(text = showHelpDialogMsg!!, fontSize = 14.sp)
-            },
+            title = { Text(showHelpDialogTitle!!) },
+            text = { Text(showHelpDialogMsg!!) },
             confirmButton = {
                 TextButton(onClick = {
                     showHelpDialogTitle = null
                     showHelpDialogMsg = null
                 }) {
-                    Text(stringResource(R.string.action_ok))
+                    Text(stringResource(android.R.string.ok))
                 }
             }
         )
@@ -117,64 +132,83 @@ fun OwnerDashboardContent(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = stringResource(R.string.dashboard_title), fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(R.string.dashboard_title), fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
+                },
+                actions = {
+                    // P8 TASK T6: Share Summary Button (Free)
+                    IconButton(onClick = {
+                        shareDashboardSummary(context, "Hafeez Center Mobile", uiState)
+                    }) {
+                        Icon(Icons.Default.Share, contentDescription = stringResource(R.string.dashboard_btn_share))
+                    }
                 }
             )
         }
-    ) { padding ->
+    ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding)
+                .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Time Range Segmented Selector
-            Card(
+            // Time Range Switcher Chips
+            Row(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(4.dp),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    val ranges = listOf(
-                        TimeRange.TODAY to stringResource(R.string.dashboard_filter_today),
-                        TimeRange.THIS_MONTH to stringResource(R.string.dashboard_filter_month),
-                        TimeRange.THIS_YEAR to stringResource(R.string.dashboard_filter_year),
-                        TimeRange.ALL_TIME to stringResource(R.string.dashboard_filter_all)
+                TimeRange.entries.forEach { range ->
+                    val isSelected = uiState.timeRangeSelection.preset != TimeRangePreset.CUSTOM && uiState.timeRange == range
+                    FilterChip(
+                        selected = isSelected,
+                        onClick = { onTimeRangeSelected(range) },
+                        label = {
+                            Text(
+                                when (range) {
+                                    TimeRange.TODAY -> "Today"
+                                    TimeRange.THIS_MONTH -> "This Month"
+                                    TimeRange.THIS_YEAR -> "This Year"
+                                    TimeRange.ALL_TIME -> "All Time"
+                                },
+                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                            )
+                        }
                     )
+                }
 
-                    ranges.forEach { (rangeOption, label) ->
-                        val isSelected = uiState.timeRange == rangeOption
-                        FilterChip(
-                            selected = isSelected,
-                            onClick = { onTimeRangeSelected(rangeOption) },
-                            label = {
-                                Text(
-                                    text = label,
-                                    fontSize = 12.sp,
-                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
-                                )
-                            },
-                            modifier = Modifier.weight(1f)
+                // P8 TASK T3: Custom Range Chip (Gated under DASHBOARD_ADVANCED)
+                val isCustomSelected = uiState.timeRangeSelection.preset == TimeRangePreset.CUSTOM
+                FilterChip(
+                    selected = isCustomSelected,
+                    onClick = {
+                        if (isAdvancedDashboardLocked) {
+                            onUnlockClick()
+                        } else {
+                            showDateRangePicker = true
+                        }
+                    },
+                    leadingIcon = {
+                        Icon(Icons.Default.DateRange, contentDescription = null, modifier = Modifier.size(14.dp))
+                    },
+                    label = {
+                        Text(
+                            stringResource(R.string.dashboard_custom_range),
+                            fontWeight = if (isCustomSelected) FontWeight.Bold else FontWeight.Normal
                         )
                     }
-                }
+                )
             }
 
+            // Unrecorded Purchase Costs Warning Banner
             if (uiState.hasMissingCosts) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
+                    shape = RoundedCornerShape(8.dp),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)
                 ) {
                     Row(
@@ -188,7 +222,12 @@ fun OwnerDashboardContent(
                             tint = MaterialTheme.colorScheme.error
                         )
                         Text(
-                            text = stringResource(R.string.dashboard_warning_missing_costs, uiState.missingCostCount),
+                            text = stringResource(
+                                R.string.dashboard_warning_missing_costs,
+                                uiState.missingCostSoldLines,
+                                uiState.profitCoveredLines,
+                                uiState.totalSoldLines
+                            ),
                             fontSize = 12.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.onErrorContainer
@@ -204,11 +243,11 @@ fun OwnerDashboardContent(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
             ) {
                 Column(
-                    modifier = Modifier.padding(18.dp),
-                    verticalArrangement = Arrangement.spacedBy(6.dp)
+                    modifier = Modifier.padding(20.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -251,6 +290,120 @@ fun OwnerDashboardContent(
                         fontWeight = FontWeight.Bold,
                         color = profitColor
                     )
+
+                    // P8 TASK T1: Insights Row (Margins, Avg Sale, Avg Unit Profit)
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = stringResource(
+                                R.string.dashboard_net_margin,
+                                String.format(java.util.Locale.US, "%.1f", uiState.netMarginPercent)
+                            ),
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Text(
+                            text = stringResource(
+                                R.string.dashboard_avg_sale_value,
+                                com.mmushtaq04.buysell.util.CurrencyFormatter.formatAmount(context, uiState.avgSaleValueRs)
+                            ),
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Text(
+                            text = stringResource(
+                                R.string.dashboard_avg_unit_profit,
+                                com.mmushtaq04.buysell.util.CurrencyFormatter.formatAmount(context, uiState.avgProfitPerUnitRs)
+                            ),
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+
+            // P8 TASK T2: Period Comparison Card (Gated under DASHBOARD_ADVANCED)
+            if (uiState.timeRangeSelection.preset != TimeRangePreset.ALL_TIME) {
+                PremiumFeatureGate(
+                    isLocked = isAdvancedDashboardLocked,
+                    featureName = stringResource(R.string.dashboard_comparison_title),
+                    onUnlockClick = onUnlockClick
+                ) {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.dashboard_comparison_title),
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 15.sp
+                            )
+                            HorizontalDivider()
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                val revChange = uiState.periodComparison.revenueChangePercent
+                                Column {
+                                    Text(stringResource(R.string.dashboard_comparison_vs_prev), fontSize = 11.sp, color = Color.Gray)
+                                    if (revChange != null) {
+                                        val isPositive = revChange >= 0f
+                                        val changeColor = if (isPositive) Color(0xFF2E7D32) else MaterialTheme.colorScheme.error
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Icon(
+                                                imageVector = if (isPositive) Icons.AutoMirrored.Filled.TrendingUp else Icons.AutoMirrored.Filled.TrendingDown,
+                                                contentDescription = null,
+                                                tint = changeColor,
+                                                modifier = Modifier.size(16.dp)
+                                            )
+                                            Spacer(Modifier.width(4.dp))
+                                            Text(
+                                                text = String.format(java.util.Locale.US, "%+.1f%% Revenue", revChange),
+                                                fontWeight = FontWeight.Bold,
+                                                fontSize = 13.sp,
+                                                color = changeColor
+                                            )
+                                        }
+                                    }
+                                }
+
+                                val profChange = uiState.periodComparison.profitChangePercent
+                                Column {
+                                    Text(stringResource(R.string.dashboard_comparison_vs_prev), fontSize = 11.sp, color = Color.Gray)
+                                    if (profChange != null) {
+                                        val isPositive = profChange >= 0f
+                                        val changeColor = if (isPositive) Color(0xFF2E7D32) else MaterialTheme.colorScheme.error
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Icon(
+                                                imageVector = if (isPositive) Icons.AutoMirrored.Filled.TrendingUp else Icons.AutoMirrored.Filled.TrendingDown,
+                                                contentDescription = null,
+                                                tint = changeColor,
+                                                modifier = Modifier.size(16.dp)
+                                            )
+                                            Spacer(Modifier.width(4.dp))
+                                            Text(
+                                                text = String.format(java.util.Locale.US, "%+.1f%% Profit", profChange),
+                                                fontWeight = FontWeight.Bold,
+                                                fontSize = 13.sp,
+                                                color = changeColor
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
 
@@ -305,113 +458,169 @@ fun OwnerDashboardContent(
                 }
             }
 
-            // Expense Breakdown Section (Free / Open)
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+            // P7: Receivables & Payables Pair (Free)
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                DashboardSmallCard(
+                    title = stringResource(R.string.dashboard_receivables_title),
+                    value = com.mmushtaq04.buysell.util.CurrencyFormatter.formatAmount(context, uiState.receivablesRs),
+                    icon = Icons.Default.AccountBalanceWallet,
+                    iconColor = Color(0xFF2E7D32),
+                    subtitle = stringResource(R.string.dashboard_receivables_subtitle, uiState.receivablesPartyCount),
+                    onClick = onNavigateToPartyList,
+                    modifier = Modifier.weight(1f)
+                )
+
+                DashboardSmallCard(
+                    title = stringResource(R.string.dashboard_payables_title),
+                    value = com.mmushtaq04.buysell.util.CurrencyFormatter.formatAmount(context, uiState.payablesRs),
+                    icon = Icons.Default.MoneyOff,
+                    iconColor = MaterialTheme.colorScheme.error,
+                    subtitle = stringResource(R.string.dashboard_payables_subtitle, uiState.payablesPartyCount),
+                    onClick = onNavigateToPartyList,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+
+            // P8 TASK T5: Below-Cost Sales Alert Card (Gated under DASHBOARD_ADVANCED)
+            if (uiState.belowCostSalesCount > 0) {
+                PremiumFeatureGate(
+                    isLocked = isAdvancedDashboardLocked,
+                    featureName = stringResource(R.string.dashboard_below_cost_title),
+                    onUnlockClick = onUnlockClick
                 ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(6.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ReceiptLong,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.error,
-                                modifier = Modifier.size(20.dp)
-                            )
-                            Text(
-                                text = stringResource(R.string.dashboard_expense_breakdown),
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 15.sp
-                            )
-                        }
-
-                        TextButton(onClick = onNavigateToExpenses) {
-                            Icon(
-                                imageVector = Icons.Default.Add,
-                                contentDescription = null,
-                                modifier = Modifier.size(16.dp)
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(stringResource(R.string.expense_btn_add), fontSize = 12.sp)
-                        }
-                    }
-
-                    HorizontalDivider()
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        ExpenseStatItem(
-                            label = stringResource(R.string.dashboard_daily_expense),
-                            value = com.mmushtaq04.buysell.util.CurrencyFormatter.formatAmount(context, uiState.dailyExpenseRs),
-                            modifier = Modifier.weight(1f)
-                        )
-                        ExpenseStatItem(
-                            label = stringResource(R.string.dashboard_monthly_expense),
-                            value = com.mmushtaq04.buysell.util.CurrencyFormatter.formatAmount(context, uiState.monthlyExpenseRs),
-                            modifier = Modifier.weight(1f)
-                        )
-                        ExpenseStatItem(
-                            label = stringResource(R.string.dashboard_yearly_expense),
-                            value = com.mmushtaq04.buysell.util.CurrencyFormatter.formatAmount(context, uiState.yearlyExpenseRs),
-                            modifier = Modifier.weight(1f)
-                        )
-                    }
-                }
-            }
-
-            // Sales & Profit Analytics Graph (DASHBOARD_ADVANCED)
-            PremiumFeatureGate(
-                isLocked = isAdvancedDashboardLocked,
-                featureName = stringResource(R.string.dashboard_trend_graph_title),
-                onUnlockClick = onUnlockClick,
-                placeholder = {
-                    val dummyData = listOf(
-                        ChartBarData("P1", 100000L, 20000L),
-                        ChartBarData("P2", 150000L, 30000L),
-                        ChartBarData("P3", 120000L, 25000L),
-                        ChartBarData("P4", 180000L, 40000L)
-                    )
-                    DashboardTrendBarChart(data = dummyData)
-                }
-            ) {
-                DashboardTrendBarChart(data = uiState.trendChartData)
-            }
-
-            // Top Selling Models Card (DASHBOARD_ADVANCED)
-            PremiumFeatureGate(
-                isLocked = isAdvancedDashboardLocked,
-                featureName = stringResource(R.string.dashboard_top_models),
-                onUnlockClick = onUnlockClick,
-                placeholder = {
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)
                     ) {
                         Column(
                             modifier = Modifier.padding(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                            verticalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
-                            Text("Top Selling Models", fontWeight = FontWeight.Bold, fontSize = 15.sp)
-                            Text("••••••••••••••••", color = Color.Gray, fontSize = 13.sp)
-                            Text("••••••••••••••••", color = Color.Gray, fontSize = 13.sp)
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Icon(Icons.Default.Warning, contentDescription = null, tint = MaterialTheme.colorScheme.error)
+                                Text(
+                                    text = stringResource(R.string.dashboard_below_cost_title),
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 15.sp,
+                                    color = MaterialTheme.colorScheme.onErrorContainer
+                                )
+                            }
+                            Text(
+                                text = stringResource(
+                                    R.string.dashboard_below_cost_sub,
+                                    uiState.belowCostSalesCount,
+                                    com.mmushtaq04.buysell.util.CurrencyFormatter.formatAmount(context, uiState.belowCostTotalLossRs)
+                                ),
+                                fontSize = 12.sp,
+                                color = MaterialTheme.colorScheme.onErrorContainer
+                            )
                         }
                     }
                 }
+            }
+
+            // P8 TASK T4: Aged Stock Breakdown Card (Gated under DASHBOARD_ADVANCED)
+            PremiumFeatureGate(
+                isLocked = isAdvancedDashboardLocked,
+                featureName = stringResource(R.string.dashboard_aged_stock_title),
+                onUnlockClick = onUnlockClick
+            ) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.dashboard_aged_stock_title),
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 15.sp
+                        )
+                        HorizontalDivider()
+                        uiState.agedStockBuckets.forEach { bucket ->
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(bucket.rangeLabel, fontSize = 13.sp, fontWeight = FontWeight.Medium)
+                                Text(
+                                    text = "${bucket.itemCount} items • ${com.mmushtaq04.buysell.util.CurrencyFormatter.formatAmount(context, bucket.costValueRs)}",
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            // P7: Money by Payment Method Card (Gated under DASHBOARD_ADVANCED)
+            PremiumFeatureGate(
+                isLocked = isAdvancedDashboardLocked,
+                featureName = stringResource(R.string.dashboard_money_by_method),
+                onUnlockClick = onUnlockClick
+            ) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.dashboard_money_by_method),
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 15.sp
+                        )
+                        HorizontalDivider()
+                        if (uiState.paymentMethodTotals.isEmpty()) {
+                            Text("No transactions recorded in this period", fontSize = 12.sp, color = Color.Gray)
+                        } else {
+                            uiState.paymentMethodTotals.forEach { (method, amountRs) ->
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = method.name.replace("_", " "),
+                                        fontWeight = FontWeight.SemiBold,
+                                        fontSize = 14.sp
+                                    )
+                                    val isPositive = amountRs >= 0
+                                    val amountColor = if (isPositive) Color(0xFF2E7D32) else MaterialTheme.colorScheme.error
+                                    Text(
+                                        text = com.mmushtaq04.buysell.util.CurrencyFormatter.formatAmount(context, amountRs),
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 14.sp,
+                                        color = amountColor
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Top Selling Models Card (Gated under INVENTORY_INSIGHTS)
+            PremiumFeatureGate(
+                isLocked = isInventoryInsightsLocked,
+                featureName = stringResource(R.string.dashboard_top_models),
+                onUnlockClick = onUnlockClick
             ) {
                 if (uiState.topSellingModels.isNotEmpty()) {
                     Card(
@@ -423,6 +632,26 @@ fun OwnerDashboardContent(
                             modifier = Modifier.padding(16.dp),
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(stringResource(R.string.dashboard_top_models), fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                                    FilterChip(
+                                        selected = uiState.topModelsSortOrder == TopModelsSortOrder.UNITS_SOLD,
+                                        onClick = { onSortOrderChanged(TopModelsSortOrder.UNITS_SOLD) },
+                                        label = { Text("Units", fontSize = 10.sp) }
+                                    )
+                                    FilterChip(
+                                        selected = uiState.topModelsSortOrder == TopModelsSortOrder.PROFIT,
+                                        onClick = { onSortOrderChanged(TopModelsSortOrder.PROFIT) },
+                                        label = { Text("Profit", fontSize = 10.sp) }
+                                    )
+                                }
+                            }
+                            HorizontalDivider()
                             uiState.topSellingModels.forEachIndexed { idx, model ->
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
@@ -448,11 +677,11 @@ fun OwnerDashboardContent(
                                             )
                                         }
                                     }
-
                                     Text(
                                         text = com.mmushtaq04.buysell.util.CurrencyFormatter.formatAmount(context, model.revenueRs),
                                         fontWeight = FontWeight.Bold,
-                                        fontSize = 14.sp
+                                        fontSize = 14.sp,
+                                        color = MaterialTheme.colorScheme.primary
                                     )
                                 }
                             }
@@ -461,196 +690,135 @@ fun OwnerDashboardContent(
                 }
             }
 
-            // Capital Locked in Stock & Slow Stock (INVENTORY_INSIGHTS)
+            // Inventory Insights Section (Capital Locked & Slow Moving Stock)
             PremiumFeatureGate(
                 isLocked = isInventoryInsightsLocked,
-                featureName = stringResource(R.string.dashboard_capital_stock),
-                onUnlockClick = onUnlockClick,
-                placeholder = {
-                    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                        DashboardMetricCard(
-                            title = stringResource(R.string.dashboard_capital_stock),
-                            value = "Rs ••••••",
-                            valueColor = Color(0xFF7B1FA2),
-                            helpTitle = stringResource(R.string.dashboard_help_capital_title),
-                            helpMsg = stringResource(R.string.dashboard_help_capital_msg),
-                            onHelpClick = { title, msg ->
-                                showHelpDialogTitle = title
-                                showHelpDialogMsg = msg
-                            }
-                        )
-                    }
-                }
+                featureName = "Inventory Insights",
+                onUnlockClick = onUnlockClick
             ) {
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    DashboardMetricCard(
-                        title = stringResource(R.string.dashboard_capital_stock),
-                        value = com.mmushtaq04.buysell.util.CurrencyFormatter.formatAmount(context, uiState.capitalInStockRs),
-                        valueColor = Color(0xFF7B1FA2),
-                        helpTitle = stringResource(R.string.dashboard_help_capital_title),
-                        helpMsg = stringResource(R.string.dashboard_help_capital_msg),
-                        onHelpClick = { title, msg ->
-                            showHelpDialogTitle = title
-                            showHelpDialogMsg = msg
-                        }
-                    )
-
-                    val formattedSlowVal = com.mmushtaq04.buysell.util.CurrencyFormatter.formatAmount(context, uiState.slowStockValueRs)
-                    DashboardMetricCard(
-                        title = stringResource(R.string.dashboard_slow_stock),
-                        value = if (uiState.slowStockCount > 0) "${uiState.slowStockCount} items • $formattedSlowVal" else "0 items",
-                        valueColor = if (uiState.slowStockCount > 0) MaterialTheme.colorScheme.error else Color(0xFF2E7D32),
-                        helpTitle = stringResource(R.string.dashboard_help_slow_stock_title),
-                        helpMsg = stringResource(R.string.dashboard_help_slow_stock_msg),
-                        onHelpClick = { title, msg ->
-                            showHelpDialogTitle = title
-                            showHelpDialogMsg = msg
-                        }
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun ExpenseStatItem(
-    label: String,
-    value: String,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = label,
-            fontSize = 11.sp,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        Spacer(modifier = Modifier.height(2.dp))
-        Text(
-            text = value,
-            fontSize = 15.sp,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.error
-        )
-    }
-}
-
-@Composable
-private fun DashboardTrendBarChart(
-    data: List<ChartBarData>,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.BarChart,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                    Text(
-                        text = stringResource(R.string.dashboard_trend_graph_title),
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 15.sp
-                    )
-                }
-
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        Surface(modifier = Modifier.size(10.dp), shape = RoundedCornerShape(2.dp), color = Color(0xFF1565C0)) {}
-                        Text("Sales", fontSize = 11.sp, color = Color.Gray)
-                    }
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        Surface(modifier = Modifier.size(10.dp), shape = RoundedCornerShape(2.dp), color = Color(0xFF2E7D32)) {}
-                        Text("Profit", fontSize = 11.sp, color = Color.Gray)
-                    }
-                }
-            }
-
-            HorizontalDivider()
-
-            val maxVal = data.maxOfOrNull { maxOf(it.revenueRs, it.profitRs) }?.coerceAtLeast(1L) ?: 1L
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(130.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.Bottom
-            ) {
-                data.forEach { bar ->
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Bottom,
-                        modifier = Modifier.weight(1f)
+                    // Capital Locked Card
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
                     ) {
                         Row(
-                            horizontalArrangement = Arrangement.spacedBy(4.dp),
-                            verticalAlignment = Alignment.Bottom,
-                            modifier = Modifier.height(100.dp)
+                            modifier = Modifier.padding(16.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            // Revenue Bar
-                            val revFrac = (bar.revenueRs.toFloat() / maxVal).coerceIn(0.08f, 1f)
-                            Surface(
-                                modifier = Modifier
-                                    .width(12.dp)
-                                    .fillMaxHeight(revFrac),
-                                shape = RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp),
-                                color = Color(0xFF1565C0)
-                            ) {}
-
-                            // Profit Bar
-                            val profitFrac = (bar.profitRs.coerceAtLeast(0L).toFloat() / maxVal).coerceIn(0.05f, 1f)
-                            Surface(
-                                modifier = Modifier
-                                    .width(12.dp)
-                                    .fillMaxHeight(profitFrac),
-                                shape = RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp),
-                                color = if (bar.profitRs >= 0) Color(0xFF2E7D32) else MaterialTheme.colorScheme.error
-                            ) {}
+                            Column {
+                                Text("Capital Locked in Stock", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                                Text("Purchase cost value of in-stock items", fontSize = 11.sp, color = Color.Gray)
+                            }
+                            Text(
+                                text = com.mmushtaq04.buysell.util.CurrencyFormatter.formatAmount(context, uiState.capitalInStockRs),
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary
+                            )
                         }
+                    }
 
-                        Spacer(modifier = Modifier.height(6.dp))
-
-                        Text(
-                            text = bar.label,
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            maxLines = 1
-                        )
+                    // Slow Moving Stock Card (> 30 days)
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(16.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column {
+                                Text("Slow Moving Stock", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                                Text("${uiState.slowStockCount} items in stock > 30 days", fontSize = 11.sp, color = Color.Gray)
+                            }
+                            Text(
+                                text = com.mmushtaq04.buysell.util.CurrencyFormatter.formatAmount(context, uiState.slowStockValueRs),
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.secondary
+                            )
+                        }
                     }
                 }
             }
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun CustomDateRangePickerDialog(
+    onDismiss: () -> Unit,
+    onDateRangeSelected: (Long, Long) -> Unit
+) {
+    val dateRangePickerState = rememberDateRangePickerState()
+
+    DatePickerDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    val start = dateRangePickerState.selectedStartDateMillis
+                    val end = dateRangePickerState.selectedEndDateMillis
+                    if (start != null && end != null && start <= end) {
+                        onDateRangeSelected(start, end)
+                    }
+                }
+            ) {
+                Text(stringResource(android.R.string.ok))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        }
+    ) {
+        DateRangePicker(
+            state = dateRangePickerState,
+            title = { Text(stringResource(R.string.dashboard_select_date_range), modifier = Modifier.padding(16.dp)) },
+            modifier = Modifier.weight(1f)
+        )
+    }
+}
+
+private fun shareDashboardSummary(context: Context, shopName: String, uiState: DashboardUiState) {
+    val rangeText = when (uiState.timeRangeSelection.preset) {
+        TimeRangePreset.TODAY -> "Today"
+        TimeRangePreset.THIS_MONTH -> "This Month"
+        TimeRangePreset.THIS_YEAR -> "This Year"
+        TimeRangePreset.ALL_TIME -> "All Time"
+        TimeRangePreset.CUSTOM -> "Custom Range"
+    }
+
+    val summaryText = """
+        📊 $shopName - Dashboard Summary ($rangeText)
+        -------------------------------------------
+        💵 Net Revenue: ${com.mmushtaq04.buysell.util.CurrencyFormatter.formatAmount(context, uiState.netRevenueRs)}
+        📦 Cost of Goods: ${com.mmushtaq04.buysell.util.CurrencyFormatter.formatAmount(context, uiState.cogsRs)}
+        🧾 Expenses: ${com.mmushtaq04.buysell.util.CurrencyFormatter.formatAmount(context, uiState.expensesRs)}
+        📈 Net Profit: ${com.mmushtaq04.buysell.util.CurrencyFormatter.formatAmount(context, uiState.netProfitRs)} (${String.format(java.util.Locale.US, "%.1f%%", uiState.netMarginPercent)})
+        🛒 Sales Count: ${uiState.saleTxnCount}
+        💡 Avg Sale Value: ${com.mmushtaq04.buysell.util.CurrencyFormatter.formatAmount(context, uiState.avgSaleValueRs)}
+        💰 Receivables: ${com.mmushtaq04.buysell.util.CurrencyFormatter.formatAmount(context, uiState.receivablesRs)}
+        💳 Payables: ${com.mmushtaq04.buysell.util.CurrencyFormatter.formatAmount(context, uiState.payablesRs)}
+        🏢 Capital in Stock: ${com.mmushtaq04.buysell.util.CurrencyFormatter.formatAmount(context, uiState.capitalInStockRs)}
+        -------------------------------------------
+        Generated via BuySell App
+    """.trimIndent()
+
+    val sendIntent = Intent().apply {
+        action = Intent.ACTION_SEND
+        putExtra(Intent.EXTRA_TEXT, summaryText)
+        type = "text/plain"
+    }
+    val shareIntent = Intent.createChooser(sendIntent, context.getString(R.string.dashboard_btn_share))
+    context.startActivity(shareIntent)
 }
 
 @Composable
@@ -664,13 +832,12 @@ private fun DashboardSmallCard(
     modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = modifier
-            .then(if (onClick != null) Modifier.clickable { onClick() } else Modifier),
+        modifier = modifier.then(if (onClick != null) Modifier.clickable { onClick() } else Modifier),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Column(
-            modifier = Modifier.padding(14.dp),
+            modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             Row(
@@ -685,104 +852,24 @@ private fun DashboardSmallCard(
                 )
                 Text(
                     text = title,
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color.Gray
                 )
             }
-
             Text(
                 text = value,
-                fontSize = 17.sp,
+                fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface
             )
-
-            if (!subtitle.isNullOrBlank()) {
+            if (subtitle != null) {
                 Text(
                     text = subtitle,
                     fontSize = 10.sp,
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.SemiBold
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
         }
-    }
-}
-
-@Composable
-private fun DashboardMetricCard(
-    title: String,
-    value: String,
-    valueColor: Color,
-    helpTitle: String,
-    helpMsg: String,
-    onHelpClick: (String, String) -> Unit
-) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(text = title, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                IconButton(onClick = { onHelpClick(helpTitle, helpMsg) }) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.HelpOutline,
-                        contentDescription = "Help",
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
-            }
-            Text(
-                text = value,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                color = valueColor
-            )
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun OwnerDashboardScreenPreview() {
-    val sampleState = DashboardUiState(
-        timeRange = TimeRange.THIS_MONTH,
-        netRevenueRs = 450000L,
-        cogsRs = 320000L,
-        expensesRs = 25000L,
-        netProfitRs = 105000L,
-        returnsRefundsRs = 12000L,
-        dailyExpenseRs = 1500L,
-        monthlyExpenseRs = 25000L,
-        yearlyExpenseRs = 180000L,
-        trendChartData = listOf(
-            ChartBarData("Week 1", 110000L, 25000L),
-            ChartBarData("Week 2", 130000L, 30000L),
-            ChartBarData("Week 3", 95000L, 20000L),
-            ChartBarData("Week 4", 127000L, 30000L)
-        ),
-        topSellingModels = listOf(
-            TopSellingModel("Apple iPhone 15 Pro", 8, 1200000L, 160000L),
-            TopSellingModel("Samsung Galaxy S24", 5, 750000L, 90000L)
-        ),
-        capitalInStockRs = 850000L,
-        slowStockCount = 2,
-        slowStockValueRs = 120000L
-    )
-
-    BuySellTheme {
-        OwnerDashboardContent(
-            uiState = sampleState,
-            isAdvancedDashboardLocked = false,
-            isInventoryInsightsLocked = false
-        )
     }
 }

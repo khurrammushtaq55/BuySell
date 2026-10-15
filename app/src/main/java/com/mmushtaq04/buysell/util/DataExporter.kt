@@ -26,7 +26,7 @@ object DataExporter {
             val db = AppDatabase.getInstance(context)
             val repo = com.mmushtaq04.buysell.data.repository.FeatureAccessRepositoryImpl(context, db)
 
-            if (repo.isFeatureLockedNow(com.mmushtaq04.buysell.data.repository.PremiumFeature.DATA_EXPORT)) {
+            if (repo.isFeatureLockedNow(com.mmushtaq04.buysell.data.repository.PremiumFeature.REPORTS_EXPORT_PRO)) {
                 withContext(Dispatchers.Main) {
                     Toast.makeText(context, "Data export is a premium feature. Please upgrade to unlock.", Toast.LENGTH_LONG).show()
                 }

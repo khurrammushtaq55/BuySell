@@ -450,8 +450,8 @@ class CoreLogicTest {
         val repo = com.mmushtaq04.buysell.data.repository.FeatureAccessRepositoryImpl(context, db)
 
         // Initially locked for default locked features when no valid license is cached
-        assertTrue(repo.isFeatureLocked(com.mmushtaq04.buysell.data.repository.PremiumFeature.OWNER_DASHBOARD))
-        assertTrue(repo.isFeatureLocked(com.mmushtaq04.buysell.data.repository.PremiumFeature.DATA_EXPORT))
+        assertTrue(repo.isFeatureLocked(com.mmushtaq04.buysell.data.repository.PremiumFeature.DASHBOARD_ADVANCED))
+        assertTrue(repo.isFeatureLocked(com.mmushtaq04.buysell.data.repository.PremiumFeature.REPORTS_EXPORT_PRO))
         assertFalse(repo.isPremiumUnlocked.value)
     }
 

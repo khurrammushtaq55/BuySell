@@ -6,6 +6,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
+import com.mmushtaq04.buysell.R
 import com.mmushtaq04.buysell.data.auth.FirebaseAuthManager
 import com.mmushtaq04.buysell.data.local.AppDatabase
 import com.mmushtaq04.buysell.data.local.entity.CategoryEntity
@@ -153,7 +154,24 @@ fun NavGraphBuilder.settingsNavGraph(
                 settingsViewModel.toggleCategory(category)
             },
             onGenerateInvite = { role, onCodeGenerated ->
-                settingsViewModel.generateInviteCode(role, onCodeGenerated)
+                scope.launch {
+                    val currentShopId = shopEntity?.id
+                    if (role == "STAFF" && currentShopId != null) {
+                        val db = com.mmushtaq04.buysell.data.local.AppDatabase.getInstance(context)
+                        val staffCount = db.shopMemberDao().getStaffCount(currentShopId)
+                        val isSeatsLocked = featureRepo.isFeatureLockedNow(PremiumFeature.EXTRA_STAFF_SEATS)
+                        if (!com.mmushtaq04.buysell.domain.StaffSeatLimitChecker.canAddStaffSeat(staffCount, isSeatsLocked)) {
+                            android.widget.Toast.makeText(
+                                context,
+                                context.getString(R.string.settings_staff_seat_limit_reached),
+                                android.widget.Toast.LENGTH_LONG
+                            ).show()
+                            showPaywallDialog = true
+                            return@launch
+                        }
+                    }
+                    settingsViewModel.generateInviteCode(role, onCodeGenerated)
+                }
             },
             onNavigateBack = { navController.popBackStack() },
             onNavigateToHelp = { navController.navigate(NavRoutes.Help.route) },

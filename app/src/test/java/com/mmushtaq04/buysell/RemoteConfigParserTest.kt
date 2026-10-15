@@ -10,11 +10,12 @@ import org.junit.Test
 class RemoteConfigParserTest {
 
     private val defaultLockedSet = setOf(
-        PremiumFeature.OWNER_DASHBOARD,
-        PremiumFeature.DATA_EXPORT,
+        PremiumFeature.DASHBOARD_ADVANCED,
+        PremiumFeature.INVENTORY_INSIGHTS,
+        PremiumFeature.REPORTS_EXPORT_PRO,
+        PremiumFeature.MONTHLY_SUMMARY_REPORTS,
         PremiumFeature.SLEEPING_PARTNER_INVITE,
-        PremiumFeature.CUSTOM_CURRENCY,
-        PremiumFeature.MONTHLY_SUMMARY_REPORTS
+        PremiumFeature.EXTRA_STAFF_SEATS
     )
 
     @Test
@@ -46,7 +47,7 @@ class RemoteConfigParserTest {
 
     @Test
     fun testKillSwitchFalseUnlocksEverything() {
-        val rawList = listOf("owner_dashboard", "data_export")
+        val rawList = listOf("dashboard_advanced", "reports_export_pro")
         val result = RemoteConfigParser.parseRemoteConfig(
             rawFeaturesList = rawList,
             rawEnforcementRaw = false, // Kill switch set to false
@@ -60,7 +61,7 @@ class RemoteConfigParserTest {
 
     @Test
     fun testMixedCaseAndUnknownKeysIgnored() {
-        val rawList = listOf("OWNER_DASHBOARD", "Data_Export", "unknown_future_feature_key")
+        val rawList = listOf("DASHBOARD_ADVANCED", "Reports_Export_Pro", "unknown_future_feature_key")
         val result = RemoteConfigParser.parseRemoteConfig(
             rawFeaturesList = rawList,
             rawEnforcementRaw = true,
@@ -70,7 +71,24 @@ class RemoteConfigParserTest {
 
         assertTrue(result.enforcementEnabled)
         assertEquals(
-            setOf(PremiumFeature.OWNER_DASHBOARD, PremiumFeature.DATA_EXPORT),
+            setOf(PremiumFeature.DASHBOARD_ADVANCED, PremiumFeature.REPORTS_EXPORT_PRO),
+            result.lockedFeatures
+        )
+    }
+
+    @Test
+    fun testLegacyOwnerDashboardExpanded() {
+        val rawList = listOf("owner_dashboard")
+        val result = RemoteConfigParser.parseRemoteConfig(
+            rawFeaturesList = rawList,
+            rawEnforcementRaw = true,
+            lastKnownGood = defaultLockedSet,
+            lastEnforcementEnabled = true
+        )
+
+        assertTrue(result.enforcementEnabled)
+        assertEquals(
+            setOf(PremiumFeature.DASHBOARD_ADVANCED, PremiumFeature.INVENTORY_INSIGHTS),
             result.lockedFeatures
         )
     }

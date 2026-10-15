@@ -162,6 +162,7 @@ fun NavGraphBuilder.mainNavGraph(
             isInventoryInsightsLocked = featureRepo.isFeatureLocked(com.mmushtaq04.buysell.data.repository.PremiumFeature.INVENTORY_INSIGHTS),
             onUnlockClick = { showPaywallDialog = true },
             onNavigateToExpenses = { navController.navigate(NavRoutes.Expenses.route) },
+            onNavigateToPartyList = { navController.navigate(NavRoutes.PartyList.route) },
             onNavigateBack = { navController.popBackStack() }
         )
     }

@@ -3,6 +3,7 @@ package com.mmushtaq04.buysell.data.local.dao
 import androidx.room.*
 import com.mmushtaq04.buysell.data.local.entity.*
 import com.mmushtaq04.buysell.data.local.enums.ItemStatus
+import com.mmushtaq04.buysell.data.local.enums.PaymentMethod
 import com.mmushtaq04.buysell.data.local.enums.PromiseStatus
 import com.mmushtaq04.buysell.data.local.enums.Role
 import com.mmushtaq04.buysell.data.local.enums.Scope
@@ -25,6 +26,15 @@ interface ShopDao {
 
     @Update
     suspend fun updateShop(shop: ShopEntity)
+}
+
+@Dao
+interface ShopMemberDao {
+    @Query("SELECT COUNT(*) FROM shop_members WHERE shop_id = :shopId AND role = 'STAFF' AND deleted_at IS NULL")
+    suspend fun getStaffCount(shopId: String): Int
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertMember(member: ShopMemberEntity)
 }
 
 @Dao
@@ -148,7 +158,84 @@ interface PartyDao {
         LIMIT 1
     """)
     suspend fun getPublicPartyBalance(shopId: String, partyId: String): PartyBalanceDto?
+
+    @Query("""
+        SELECT COALESCE(SUM(b.balance), 0) AS totalAmount, COUNT(b.id) AS partyCount
+        FROM (
+            SELECT p.id,
+                   (
+                    (COALESCE((SELECT SUM(t.total_amount) FROM txns t WHERE t.party_id = p.id AND t.type = 'SALE' AND t.deleted_at IS NULL), 0) -
+                     COALESCE((SELECT SUM(t.total_amount) FROM txns t WHERE t.party_id = p.id AND t.type = 'SALE_RETURN' AND t.deleted_at IS NULL), 0) -
+                     COALESCE((SELECT SUM(pay.amount) FROM payments pay WHERE pay.party_id = p.id AND pay.direction = 'IN' AND pay.deleted_at IS NULL), 0))
+                    -
+                    (COALESCE((SELECT SUM(t.total_amount) FROM txns t WHERE t.party_id = p.id AND t.type = 'PURCHASE' AND t.deleted_at IS NULL), 0) -
+                     COALESCE((SELECT SUM(t.total_amount) FROM txns t WHERE t.party_id = p.id AND t.type = 'PURCHASE_RETURN' AND t.deleted_at IS NULL), 0) -
+                     COALESCE((SELECT SUM(pay.amount) FROM payments pay WHERE pay.party_id = p.id AND pay.direction = 'OUT' AND pay.deleted_at IS NULL), 0))
+                   ) AS balance
+            FROM parties p
+            WHERE p.shop_id = :shopId AND p.deleted_at IS NULL
+        ) b
+        WHERE b.balance > 0
+    """)
+    suspend fun getReceivablesAggregate(shopId: String): FinancialAggregateDto
+
+    @Query("""
+        SELECT COALESCE(SUM(ABS(b.balance)), 0) AS totalAmount, COUNT(b.id) AS partyCount
+        FROM (
+            SELECT p.id,
+                   (
+                    (COALESCE((SELECT SUM(t.total_amount) FROM txns t WHERE t.party_id = p.id AND t.type = 'SALE' AND t.deleted_at IS NULL), 0) -
+                     COALESCE((SELECT SUM(t.total_amount) FROM txns t WHERE t.party_id = p.id AND t.type = 'SALE_RETURN' AND t.deleted_at IS NULL), 0) -
+                     COALESCE((SELECT SUM(pay.amount) FROM payments pay WHERE pay.party_id = p.id AND pay.direction = 'IN' AND pay.deleted_at IS NULL), 0))
+                    -
+                    (COALESCE((SELECT SUM(t.total_amount) FROM txns t WHERE t.party_id = p.id AND t.type = 'PURCHASE' AND t.deleted_at IS NULL), 0) -
+                     COALESCE((SELECT SUM(t.total_amount) FROM txns t WHERE t.party_id = p.id AND t.type = 'PURCHASE_RETURN' AND t.deleted_at IS NULL), 0) -
+                     COALESCE((SELECT SUM(pay.amount) FROM payments pay WHERE pay.party_id = p.id AND pay.direction = 'OUT' AND pay.deleted_at IS NULL), 0))
+                   ) AS balance
+            FROM parties p
+            WHERE p.shop_id = :shopId AND p.deleted_at IS NULL
+        ) b
+        WHERE b.balance < 0
+    """)
+    suspend fun getPayablesAggregate(shopId: String): FinancialAggregateDto
+
+    @Query("""
+        SELECT b.id, b.name, b.phone, b.cnic, b.balance
+        FROM (
+            SELECT p.id, p.name, p.phone, p.cnic,
+                   (
+                    (COALESCE((SELECT SUM(t.total_amount) FROM txns t WHERE t.party_id = p.id AND t.type = 'SALE' AND t.deleted_at IS NULL), 0) -
+                     COALESCE((SELECT SUM(t.total_amount) FROM txns t WHERE t.party_id = p.id AND t.type = 'SALE_RETURN' AND t.deleted_at IS NULL), 0) -
+                     COALESCE((SELECT SUM(pay.amount) FROM payments pay WHERE pay.party_id = p.id AND pay.direction = 'IN' AND pay.deleted_at IS NULL), 0))
+                    -
+                    (COALESCE((SELECT SUM(t.total_amount) FROM txns t WHERE t.party_id = p.id AND t.type = 'PURCHASE' AND t.deleted_at IS NULL), 0) -
+                     COALESCE((SELECT SUM(t.total_amount) FROM txns t WHERE t.party_id = p.id AND t.type = 'PURCHASE_RETURN' AND t.deleted_at IS NULL), 0) -
+                     COALESCE((SELECT SUM(pay.amount) FROM payments pay WHERE pay.party_id = p.id AND pay.direction = 'OUT' AND pay.deleted_at IS NULL), 0))
+                   ) AS balance
+            FROM parties p
+            WHERE p.shop_id = :shopId AND p.deleted_at IS NULL
+        ) b
+        WHERE b.balance > 0
+        ORDER BY b.balance DESC
+        LIMIT 5
+    """)
+    suspend fun getTopDebtors(shopId: String): List<PartyBalanceDto>
 }
+
+data class FinancialAggregateDto(
+    val totalAmount: Long,
+    val partyCount: Int
+)
+
+data class OverdueAggregateDto(
+    val totalAmount: Long,
+    val itemCount: Int
+)
+
+data class MethodTotalDto(
+    val method: PaymentMethod,
+    val totalAmountPaisa: Long
+)
 
 data class PartyBalanceDto(
     val id: String,
@@ -171,6 +258,12 @@ interface StockItemDao {
 
     @Query("SELECT * FROM stock_items WHERE shop_id = :shopId AND deleted_at IS NULL")
     suspend fun getAllStockItems(shopId: String): List<StockItemEntity>
+
+    @Query("SELECT * FROM stock_items WHERE id IN (:ids) AND deleted_at IS NULL")
+    suspend fun getStockItemsByIds(ids: List<String>): List<StockItemEntity>
+
+    @Query("SELECT * FROM stock_items WHERE shop_id = :shopId AND (status = 'IN_STOCK' OR remaining_qty > 0) AND deleted_at IS NULL")
+    suspend fun getInStockItems(shopId: String): List<StockItemEntity>
 
     @Query("SELECT * FROM stock_items WHERE shop_id = :shopId AND status = 'IN_STOCK' AND remaining_qty > 0 AND deleted_at IS NULL ORDER BY stocked_at DESC")
     fun observeInStockItems(shopId: String): Flow<List<StockItemEntity>>
@@ -243,6 +336,12 @@ interface TxnDao {
     @Query("SELECT * FROM txn_lines WHERE txn_id = :txnId AND deleted_at IS NULL")
     suspend fun getTxnLinesForTxn(txnId: String): List<TxnLineEntity>
 
+    @Query("SELECT * FROM txn_lines WHERE txn_id IN (:txnIds) AND deleted_at IS NULL")
+    suspend fun getTxnLinesForTxnIds(txnIds: List<String>): List<TxnLineEntity>
+
+    @Query("SELECT * FROM txn_lines WHERE id IN (:lineIds) AND deleted_at IS NULL")
+    suspend fun getTxnLinesByIds(lineIds: List<String>): List<TxnLineEntity>
+
     @Query("SELECT * FROM txn_lines WHERE shop_id = :shopId AND deleted_at IS NULL")
     suspend fun getAllTxnLines(shopId: String): List<TxnLineEntity>
 
@@ -280,6 +379,20 @@ interface PaymentDao {
     @Query("SELECT * FROM payments WHERE shop_id = :shopId AND deleted_at IS NULL")
     suspend fun getAllPayments(shopId: String): List<PaymentEntity>
 
+    @Query("""
+        SELECT method,
+               (COALESCE(SUM(CASE WHEN direction = 'IN' THEN amount ELSE 0 END), 0) -
+                COALESCE(SUM(CASE WHEN direction = 'OUT' THEN amount ELSE 0 END), 0)) AS totalAmountPaisa
+        FROM payments
+        WHERE shop_id = :shopId
+          AND pay_date >= :startTimeMs
+          AND pay_date <= :endTimeMs
+          AND method != 'TRADE_IN'
+          AND deleted_at IS NULL
+        GROUP BY method
+    """)
+    suspend fun getPaymentMethodTotalsInRange(shopId: String, startTimeMs: Long, endTimeMs: Long): List<MethodTotalDto>
+
     @Query("SELECT SUM(amount) FROM payments WHERE shop_id = :shopId AND txn_id = :txnId AND deleted_at IS NULL")
     suspend fun getSumPaymentsForTxn(shopId: String, txnId: String): Long?
 }
@@ -294,6 +407,17 @@ interface PaymentPromiseDao {
 
     @Query("SELECT * FROM payment_promises WHERE shop_id = :shopId AND promised_date <= :nowMs AND status = 'OPEN' AND deleted_at IS NULL ORDER BY promised_date ASC")
     fun observeOverduePromises(shopId: String, nowMs: Long): Flow<List<PaymentPromiseEntity>>
+
+    @Query("""
+        SELECT COALESCE(SUM(amount), 0) AS totalAmount, COUNT(*) AS itemCount
+        FROM payment_promises
+        WHERE shop_id = :shopId
+          AND direction = 'RECEIVE'
+          AND status = 'OPEN'
+          AND promised_date < :startOfTodayMs
+          AND deleted_at IS NULL
+    """)
+    suspend fun getOverdueReceivePromisesAggregate(shopId: String, startOfTodayMs: Long): OverdueAggregateDto
 
     @Query("SELECT * FROM payment_promises WHERE txn_id = :txnId AND status = 'OPEN' AND deleted_at IS NULL LIMIT 1")
     suspend fun getOpenPromiseForTxn(txnId: String): PaymentPromiseEntity?
