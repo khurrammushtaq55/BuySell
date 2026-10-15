@@ -246,102 +246,102 @@ fun LanguageAndPreferencesSection(
             var showMonthlyTimePicker by remember { mutableStateOf(false) }
             var showMonthlyDayDialog by remember { mutableStateOf(false) }
 
-            PremiumFeatureGate(
-                isLocked = isMonthlyReportLocked,
-                featureName = stringResource(R.string.settings_daily_summary_title),
-                onUnlockClick = onUnlockClick
-            ) {
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    // Daily Summary Notification Row
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                // Daily Summary Notification Row (FREE forever, unwrapped)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            val updated = !isDailySummaryEnabled
+                            isDailySummaryEnabled = updated
+                            AppPreferencesManager.setDailySummaryEnabled(context, updated)
+                            DailySummaryWorker.scheduleDailySummary(context)
+                        },
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(stringResource(R.string.settings_daily_summary_title), fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                        Text(stringResource(R.string.settings_daily_summary_sub), fontSize = 12.sp, color = Color.Gray)
+                    }
+                    Switch(
+                        checked = isDailySummaryEnabled,
+                        onCheckedChange = { updated ->
+                            isDailySummaryEnabled = updated
+                            AppPreferencesManager.setDailySummaryEnabled(context, updated)
+                            DailySummaryWorker.scheduleDailySummary(context)
+                        }
+                    )
+                }
+
+                if (isDailySummaryEnabled) {
+                    val formattedTime = remember(dailySummaryTime) {
+                        val h = dailySummaryTime.first
+                        val m = dailySummaryTime.second
+                        val ampm = if (h >= 12) "PM" else "AM"
+                        val displayHour = when {
+                            h == 0 -> 12
+                            h > 12 -> h - 12
+                            else -> h
+                        }
+                        String.format(java.util.Locale.getDefault(), "%02d:%02d %s", displayHour, m, ampm)
+                    }
+
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable {
-                                val updated = !isDailySummaryEnabled
-                                isDailySummaryEnabled = updated
-                                AppPreferencesManager.setDailySummaryEnabled(context, updated)
-                                DailySummaryWorker.scheduleDailySummary(context)
-                            },
+                            .clickable { showTimePickerDialog = true }
+                            .padding(vertical = 4.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(stringResource(R.string.settings_daily_summary_title), fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                            Text(stringResource(R.string.settings_daily_summary_sub), fontSize = 12.sp, color = Color.Gray)
-                        }
-                        Switch(
-                            checked = isDailySummaryEnabled,
-                            onCheckedChange = { updated ->
-                                isDailySummaryEnabled = updated
-                                AppPreferencesManager.setDailySummaryEnabled(context, updated)
-                                DailySummaryWorker.scheduleDailySummary(context)
-                            }
-                        )
-                    }
-
-                    if (isDailySummaryEnabled) {
-                        val formattedTime = remember(dailySummaryTime) {
-                            val h = dailySummaryTime.first
-                            val m = dailySummaryTime.second
-                            val ampm = if (h >= 12) "PM" else "AM"
-                            val displayHour = when {
-                                h == 0 -> 12
-                                h > 12 -> h - 12
-                                else -> h
-                            }
-                            String.format(java.util.Locale.getDefault(), "%02d:%02d %s", displayHour, m, ampm)
-                        }
-
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable { showTimePickerDialog = true }
-                                .padding(vertical = 4.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
+                        Text(stringResource(R.string.settings_daily_summary_time_label), fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Surface(
+                            shape = RoundedCornerShape(8.dp),
+                            color = MaterialTheme.colorScheme.primaryContainer
                         ) {
-                            Text(stringResource(R.string.settings_daily_summary_time_label), fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            Surface(
-                                shape = RoundedCornerShape(8.dp),
-                                color = MaterialTheme.colorScheme.primaryContainer
-                            ) {
-                                Text(
-                                    text = formattedTime,
-                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 13.sp,
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                                )
-                            }
-                        }
-
-                        if (showTimePickerDialog) {
-                            DisposableEffect(Unit) {
-                                val timePicker = android.app.TimePickerDialog(
-                                    context,
-                                    { _, hourOfDay, minute ->
-                                        dailySummaryTime = hourOfDay to minute
-                                        AppPreferencesManager.setDailySummaryTime(context, hourOfDay, minute)
-                                        DailySummaryWorker.scheduleDailySummary(context, hourOfDay, minute)
-                                        showTimePickerDialog = false
-                                    },
-                                    dailySummaryTime.first,
-                                    dailySummaryTime.second,
-                                    false
-                                )
-                                timePicker.setOnCancelListener { showTimePickerDialog = false }
-                                timePicker.setOnDismissListener { showTimePickerDialog = false }
-                                timePicker.show()
-                                onDispose {
-                                    timePicker.dismiss()
-                                }
-                            }
+                            Text(
+                                text = formattedTime,
+                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 13.sp,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                            )
                         }
                     }
 
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+                    if (showTimePickerDialog) {
+                        DisposableEffect(Unit) {
+                            val timePicker = android.app.TimePickerDialog(
+                                context,
+                                { _, hourOfDay, minute ->
+                                    dailySummaryTime = hourOfDay to minute
+                                    AppPreferencesManager.setDailySummaryTime(context, hourOfDay, minute)
+                                    DailySummaryWorker.scheduleDailySummary(context, hourOfDay, minute)
+                                    showTimePickerDialog = false
+                                },
+                                dailySummaryTime.first,
+                                dailySummaryTime.second,
+                                false
+                            )
+                            timePicker.setOnCancelListener { showTimePickerDialog = false }
+                            timePicker.setOnDismissListener { showTimePickerDialog = false }
+                            timePicker.show()
+                            onDispose {
+                                timePicker.dismiss()
+                            }
+                        }
+                    }
+                }
 
-                    // Monthly Business Report Row
+                HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+
+                // Monthly Business Report Row (Gated by MONTHLY_SUMMARY_REPORTS)
+                PremiumFeatureGate(
+                    isLocked = isMonthlyReportLocked,
+                    featureName = stringResource(R.string.settings_monthly_summary_title),
+                    onUnlockClick = onUnlockClick
+                ) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -510,7 +510,6 @@ fun LanguageAndPreferencesSection(
                         }
                     }
                 }
-            }
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
 
@@ -523,4 +522,5 @@ fun LanguageAndPreferencesSection(
             }
         }
     }
+}
 }

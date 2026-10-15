@@ -107,22 +107,48 @@ fun NavGraphBuilder.mainNavGraph(
 
         val ownerDashboardViewModel: OwnerDashboardViewModel = viewModel()
 
+        val billingManager = remember { com.mmushtaq04.buysell.domain.billing.PlayBillingManager.getInstance(context) }
+        val productDetailsMap by billingManager.productDetailsMap.collectAsState()
+        val isBillingReady by billingManager.isBillingReady.collectAsState()
+
+        var userEntity by remember { mutableStateOf<com.mmushtaq04.buysell.data.local.entity.UserEntity?>(null) }
+        LaunchedEffect(Unit) {
+            val user = db.userDao().getPrimaryUser()
+            userEntity = user
+            if (user != null) {
+                billingManager.initializeSession(featureRepo, user.shopId, user.id)
+            }
+        }
+
         var showPaywallDialog by remember { mutableStateOf(false) }
 
         if (showPaywallDialog) {
             com.mmushtaq04.buysell.presentation.components.PremiumPaywallDialog(
+                isOwner = userEntity?.role == com.mmushtaq04.buysell.data.local.enums.Role.OWNER,
+                productDetailsMap = productDetailsMap,
+                isBillingReady = isBillingReady,
                 onDismiss = { showPaywallDialog = false },
-                onUpgradeClick = { _ ->
-                    featureRepo.unlockLocallyForTesting(context)
+                onUpgradeClick = { selectedProductId ->
+                    val activity = context as? android.app.Activity
+                    if (activity != null && userEntity != null) {
+                        billingManager.launchBillingFlow(
+                            activity = activity,
+                            productId = selectedProductId,
+                            shopId = userEntity!!.shopId,
+                            userUid = userEntity!!.id
+                        )
+                    }
                     showPaywallDialog = false
                 },
                 onRestoreClick = {
-                    featureRepo.unlockLocallyForTesting(context)
+                    if (userEntity != null) {
+                        billingManager.restorePurchases(userEntity!!.shopId, featureRepo)
+                    }
                     showPaywallDialog = false
                 },
                 onRedeemPromoCode = { code, onSuccess, onError ->
                     scope.launch {
-                        val user = db.userDao().getPrimaryUser()
+                        val user = userEntity ?: db.userDao().getPrimaryUser()
                         val success = featureRepo.redeemAdminPromoCode(code, user?.shopId ?: "")
                         if (success) onSuccess() else onError()
                     }
@@ -132,7 +158,8 @@ fun NavGraphBuilder.mainNavGraph(
 
         OwnerDashboardScreen(
             viewModel = ownerDashboardViewModel,
-            isDashboardLocked = featureRepo.isFeatureLocked(com.mmushtaq04.buysell.data.repository.PremiumFeature.OWNER_DASHBOARD),
+            isAdvancedDashboardLocked = featureRepo.isFeatureLocked(com.mmushtaq04.buysell.data.repository.PremiumFeature.DASHBOARD_ADVANCED),
+            isInventoryInsightsLocked = featureRepo.isFeatureLocked(com.mmushtaq04.buysell.data.repository.PremiumFeature.INVENTORY_INSIGHTS),
             onUnlockClick = { showPaywallDialog = true },
             onNavigateToExpenses = { navController.navigate(NavRoutes.Expenses.route) },
             onNavigateBack = { navController.popBackStack() }

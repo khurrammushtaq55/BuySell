@@ -1,6 +1,14 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="app_name">BuySell360</string>
+    <string name="billing_error_network">Error de red durante la compra. Por favor verifique su conexión a internet.</string>
+    <string name="billing_error_generic">Ocurrió un error de facturación. Por favor intente más tarde.</string>
+    <string name="billing_payment_pending">El pago está pendiente. El acceso se desbloqueará cuando se complete el pago.</string>
+    <string name="paywall_owner_only_notice">Solo el propietario de la tienda puede comprar o restaurar suscripciones.</string>
+    <string name="billing_btn_loading">Cargando planes…</string>
+    <string name="paywall_gate_locked_desc">Función premium bloqueada: %1$s. Toque para desbloquear.</string>
+    <string name="paywall_gate_unlock_feature">Desbloquear %1$s</string>
+    <string name="settings_staff_seat_limit_reached">Ha alcanzado el límite gratuito de 1 miembro del personal. Actualice a Pro para obtener asientos ilimitados.</string>
     <string name="login_tagline">Mantenga sus cuentas e inventario seguros</string>
     <string name="login_btn_google">Iniciar sesión con Google</string>
     <string name="login_or_email">o Iniciar sesión con correo</string>

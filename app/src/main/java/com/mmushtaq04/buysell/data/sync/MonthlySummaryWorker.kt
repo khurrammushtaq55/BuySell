@@ -72,6 +72,14 @@ class MonthlySummaryWorker(
 
     override suspend fun doWork(): Result {
         val db = AppDatabase.getInstance(applicationContext)
+        val repo = com.mmushtaq04.buysell.data.repository.FeatureAccessRepositoryImpl(applicationContext, db)
+
+        if (repo.isFeatureLockedNow(com.mmushtaq04.buysell.data.repository.PremiumFeature.MONTHLY_SUMMARY_REPORTS)) {
+            Log.i(TAG, "Monthly summary report feature is locked. Skipping execution.")
+            scheduleMonthlySummary(applicationContext)
+            return Result.success()
+        }
+
         val meta = db.appMetaDao().getAppMeta()
         val user = db.userDao().getPrimaryUser()
         val shopId = meta?.activeShopId?.ifBlank { null } ?: user?.shopId ?: ""

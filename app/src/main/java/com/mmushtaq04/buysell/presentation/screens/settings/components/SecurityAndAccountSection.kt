@@ -213,34 +213,24 @@ fun SecurityAndAccountSection(
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 2.dp))
 
-            PremiumFeatureGate(
-                isLocked = isExportLocked,
-                featureName = stringResource(R.string.settings_app_pin),
-                onUnlockClick = onUnlockClick
+            // App PIN is FREE forever (unwrapped)
+            SettingClickableRow(
+                icon = Icons.Default.Lock,
+                title = stringResource(R.string.settings_app_pin),
+                subtitle = if (isPinActive) stringResource(R.string.settings_pin_sub_active) else stringResource(R.string.settings_pin_sub_inactive)
             ) {
-                SettingClickableRow(
-                    icon = Icons.Default.Lock,
-                    title = stringResource(R.string.settings_app_pin),
-                    subtitle = if (isPinActive) stringResource(R.string.settings_pin_sub_active) else stringResource(R.string.settings_pin_sub_inactive)
-                ) {
-                    showPinDialog = true
-                }
+                showPinDialog = true
             }
 
             if (isOwner || userRole.equals("Partner", ignoreCase = true)) {
-                PremiumFeatureGate(
-                    isLocked = isExportLocked,
-                    featureName = stringResource(R.string.settings_export_data_title),
-                    onUnlockClick = onUnlockClick
+                // Basic CSV/ZIP Data Export is FREE forever (unwrapped)
+                SettingClickableRow(
+                    icon = Icons.Default.Download,
+                    title = stringResource(R.string.settings_export_data_title),
+                    subtitle = stringResource(R.string.settings_export_data_sub)
                 ) {
-                    SettingClickableRow(
-                        icon = Icons.Default.Download,
-                        title = stringResource(R.string.settings_export_data_title),
-                        subtitle = stringResource(R.string.settings_export_data_sub)
-                    ) {
-                        scope.launch {
-                            DataExporter.exportDataZip(context)
-                        }
+                    scope.launch {
+                        DataExporter.exportDataZip(context)
                     }
                 }
             }

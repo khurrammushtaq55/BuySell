@@ -48,15 +48,42 @@ fun NavGraphBuilder.settingsNavGraph(
             shopEntity?.id?.let { featureRepo.syncEntitlementAndConfig(it) }
         }
 
+        val billingManager = remember { com.mmushtaq04.buysell.domain.billing.PlayBillingManager.getInstance(context) }
+        val productDetailsMap by billingManager.productDetailsMap.collectAsState()
+        val isBillingReady by billingManager.isBillingReady.collectAsState()
+
+        var userEntity by remember { mutableStateOf<com.mmushtaq04.buysell.data.local.entity.UserEntity?>(null) }
+        LaunchedEffect(Unit) {
+            val db = com.mmushtaq04.buysell.data.local.AppDatabase.getInstance(context)
+            val user = db.userDao().getPrimaryUser()
+            userEntity = user
+            if (user != null) {
+                billingManager.initializeSession(featureRepo, user.shopId, user.id)
+            }
+        }
+
         if (showPaywallDialog) {
             PremiumPaywallDialog(
+                isOwner = userEntity?.role == com.mmushtaq04.buysell.data.local.enums.Role.OWNER,
+                productDetailsMap = productDetailsMap,
+                isBillingReady = isBillingReady,
                 onDismiss = { showPaywallDialog = false },
-                onUpgradeClick = { _ ->
-                    featureRepo.unlockLocallyForTesting(context)
+                onUpgradeClick = { selectedProductId ->
+                    val activity = context as? android.app.Activity
+                    if (activity != null && userEntity != null) {
+                        billingManager.launchBillingFlow(
+                            activity = activity,
+                            productId = selectedProductId,
+                            shopId = userEntity!!.shopId,
+                            userUid = userEntity!!.id
+                        )
+                    }
                     showPaywallDialog = false
                 },
                 onRestoreClick = {
-                    featureRepo.unlockLocallyForTesting(context)
+                    if (userEntity != null) {
+                        billingManager.restorePurchases(userEntity!!.shopId, featureRepo)
+                    }
                     showPaywallDialog = false
                 },
                 onRedeemPromoCode = { code, onSuccess, onError ->
@@ -105,7 +132,7 @@ fun NavGraphBuilder.settingsNavGraph(
             shopAddress = shopEntity?.address ?: "",
             allCategories = categories,
             currencySymbol = currencySymbol,
-            isExportLocked = featureRepo.isFeatureLocked(PremiumFeature.DATA_EXPORT),
+            isExportLocked = featureRepo.isFeatureLocked(PremiumFeature.REPORTS_EXPORT_PRO),
             isPartnerInviteLocked = featureRepo.isFeatureLocked(PremiumFeature.SLEEPING_PARTNER_INVITE),
             isMonthlyReportLocked = featureRepo.isFeatureLocked(PremiumFeature.MONTHLY_SUMMARY_REPORTS),
             onUnlockClick = { showPaywallDialog = true },

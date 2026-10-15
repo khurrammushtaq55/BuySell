@@ -1,6 +1,14 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="app_name">BuySell360</string>
+    <string name="billing_error_network">خریداری کے دوران نیٹ ورک کی خرابی۔ براہ کرم اپنا انٹرنیٹ کنکشن چیک کریں۔</string>
+    <string name="billing_error_generic">بلنگ میں خرابی پیش آئی۔ براہ کرم بعد میں دوبارہ کوشش کریں۔</string>
+    <string name="billing_payment_pending">آپ کی ادائیگی زیر التواء ہے۔ ادائیگی مکمل ہونے پر رسائی انلاک ہو جائے گی۔</string>
+    <string name="paywall_owner_only_notice">صرف دکان کا مالک ہی اس دکان کے لیے سبسکرپشن خرید یا بحال کر سکتا ہے۔</string>
+    <string name="billing_btn_loading">منصوبے لوڈ ہو رہے ہیں…</string>
+    <string name="paywall_gate_locked_desc">لاک شدہ پریمیم فیچر: %1$s۔ انلاک کرنے کے لیے ٹیپ کریں۔</string>
+    <string name="paywall_gate_unlock_feature">انلاک %1$s</string>
+    <string name="settings_staff_seat_limit_reached">آپ 1 اسٹاف ممبر کی مفت حد تک پہنچ چکے ہیں۔ لامحدود اسٹاف کی سیٹوں کے لیے پرو میں اپ گریڈ کریں۔</string>
     <string name="login_tagline">اپنی دکان کا حساب اور اسٹاک محفوظ رکھیں</string>
     <string name="login_btn_google">گوگل سے لاگ ان کریں</string>
     <string name="login_or_email">یا ای میل سے لاگ ان کریں</string>

@@ -1,6 +1,14 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="app_name">BuySell360</string>
+    <string name="billing_error_network">Network error during purchase. Please check your internet connection.</string>
+    <string name="billing_error_generic">Billing error occurred. Please try again later.</string>
+    <string name="billing_payment_pending">Payment is pending. Access will be unlocked once payment completes.</string>
+    <string name="paywall_owner_only_notice">Only the shop owner can purchase or restore subscription plans for this shop.</string>
+    <string name="billing_btn_loading">Loading plans…</string>
+    <string name="paywall_gate_locked_desc">Locked premium feature: %1$s. Tap to unlock.</string>
+    <string name="paywall_gate_unlock_feature">Unlock %1$s</string>
+    <string name="settings_staff_seat_limit_reached">You have reached the free limit of 1 staff member. Upgrade to Pro for unlimited staff seats.</string>
     <string name="login_welcome">Welcome to %1$s</string>
     <string name="login_subtitle">Digitize your shop ledger, purchases, and sales</string>
     <string name="login_email">Email Address</string>

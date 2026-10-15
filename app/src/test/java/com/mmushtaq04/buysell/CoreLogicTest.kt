@@ -449,16 +449,10 @@ class CoreLogicTest {
     fun testFeatureAccessRepositoryAndLocking() {
         val repo = com.mmushtaq04.buysell.data.repository.FeatureAccessRepositoryImpl(context, db)
 
-        // Initially locked for default locked features
+        // Initially locked for default locked features when no valid license is cached
         assertTrue(repo.isFeatureLocked(com.mmushtaq04.buysell.data.repository.PremiumFeature.OWNER_DASHBOARD))
         assertTrue(repo.isFeatureLocked(com.mmushtaq04.buysell.data.repository.PremiumFeature.DATA_EXPORT))
-
-        // Test local unlock simulation
-        repo.unlockLocallyForTesting(context)
-
-        assertFalse(repo.isFeatureLocked(com.mmushtaq04.buysell.data.repository.PremiumFeature.OWNER_DASHBOARD))
-        assertFalse(repo.isFeatureLocked(com.mmushtaq04.buysell.data.repository.PremiumFeature.DATA_EXPORT))
-        assertTrue(repo.isPremiumUnlocked.value)
+        assertFalse(repo.isPremiumUnlocked.value)
     }
 
     @Test

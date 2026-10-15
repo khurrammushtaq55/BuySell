@@ -36,7 +36,8 @@ import com.mmushtaq04.buysell.ui.theme.BuySellTheme
 @Composable
 fun OwnerDashboardScreen(
     viewModel: OwnerDashboardViewModel = viewModel(),
-    isDashboardLocked: Boolean = false,
+    isAdvancedDashboardLocked: Boolean = false,
+    isInventoryInsightsLocked: Boolean = false,
     onNavigateBack: () -> Unit = {},
     onNavigateToExpenses: () -> Unit = {},
     onUnlockClick: () -> Unit = {}
@@ -45,7 +46,8 @@ fun OwnerDashboardScreen(
 
     OwnerDashboardContent(
         uiState = uiState,
-        isDashboardLocked = isDashboardLocked,
+        isAdvancedDashboardLocked = isAdvancedDashboardLocked,
+        isInventoryInsightsLocked = isInventoryInsightsLocked,
         onTimeRangeSelected = { viewModel.setTimeRange(it) },
         onNavigateBack = onNavigateBack,
         onNavigateToExpenses = onNavigateToExpenses,
@@ -57,7 +59,8 @@ fun OwnerDashboardScreen(
 @Composable
 fun OwnerDashboardContent(
     uiState: DashboardUiState,
-    isDashboardLocked: Boolean = false,
+    isAdvancedDashboardLocked: Boolean = false,
+    isInventoryInsightsLocked: Boolean = false,
     onTimeRangeSelected: (TimeRange) -> Unit = {},
     onNavigateBack: () -> Unit = {},
     onNavigateToExpenses: () -> Unit = {},
@@ -370,22 +373,47 @@ fun OwnerDashboardContent(
                 }
             }
 
-            // Sales & Profit Analytics Graph (Behind Premium Overlay)
+            // Sales & Profit Analytics Graph (DASHBOARD_ADVANCED)
             PremiumFeatureGate(
-                isLocked = isDashboardLocked,
+                isLocked = isAdvancedDashboardLocked,
                 featureName = stringResource(R.string.dashboard_trend_graph_title),
-                onUnlockClick = onUnlockClick
+                onUnlockClick = onUnlockClick,
+                placeholder = {
+                    val dummyData = listOf(
+                        ChartBarData("P1", 100000L, 20000L),
+                        ChartBarData("P2", 150000L, 30000L),
+                        ChartBarData("P3", 120000L, 25000L),
+                        ChartBarData("P4", 180000L, 40000L)
+                    )
+                    DashboardTrendBarChart(data = dummyData)
+                }
             ) {
                 DashboardTrendBarChart(data = uiState.trendChartData)
             }
 
-            // Top Selling Models Card (Behind Premium Overlay)
-            if (uiState.topSellingModels.isNotEmpty()) {
-                PremiumFeatureGate(
-                    isLocked = isDashboardLocked,
-                    featureName = stringResource(R.string.dashboard_top_models),
-                    onUnlockClick = onUnlockClick
-                ) {
+            // Top Selling Models Card (DASHBOARD_ADVANCED)
+            PremiumFeatureGate(
+                isLocked = isAdvancedDashboardLocked,
+                featureName = stringResource(R.string.dashboard_top_models),
+                onUnlockClick = onUnlockClick,
+                placeholder = {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Text("Top Selling Models", fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                            Text("••••••••••••••••", color = Color.Gray, fontSize = 13.sp)
+                            Text("••••••••••••••••", color = Color.Gray, fontSize = 13.sp)
+                        }
+                    }
+                }
+            ) {
+                if (uiState.topSellingModels.isNotEmpty()) {
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
@@ -433,11 +461,26 @@ fun OwnerDashboardContent(
                 }
             }
 
-            // Capital Locked in Stock & Slow Stock (Behind Premium Overlay)
+            // Capital Locked in Stock & Slow Stock (INVENTORY_INSIGHTS)
             PremiumFeatureGate(
-                isLocked = isDashboardLocked,
+                isLocked = isInventoryInsightsLocked,
                 featureName = stringResource(R.string.dashboard_capital_stock),
-                onUnlockClick = onUnlockClick
+                onUnlockClick = onUnlockClick,
+                placeholder = {
+                    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        DashboardMetricCard(
+                            title = stringResource(R.string.dashboard_capital_stock),
+                            value = "Rs ••••••",
+                            valueColor = Color(0xFF7B1FA2),
+                            helpTitle = stringResource(R.string.dashboard_help_capital_title),
+                            helpMsg = stringResource(R.string.dashboard_help_capital_msg),
+                            onHelpClick = { title, msg ->
+                                showHelpDialogTitle = title
+                                showHelpDialogMsg = msg
+                            }
+                        )
+                    }
+                }
             ) {
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     DashboardMetricCard(
@@ -738,7 +781,8 @@ fun OwnerDashboardScreenPreview() {
     BuySellTheme {
         OwnerDashboardContent(
             uiState = sampleState,
-            isDashboardLocked = false
+            isAdvancedDashboardLocked = false,
+            isInventoryInsightsLocked = false
         )
     }
 }

@@ -24,6 +24,15 @@ object DataExporter {
     suspend fun exportDataZip(context: Context) = withContext(Dispatchers.IO) {
         runCatching {
             val db = AppDatabase.getInstance(context)
+            val repo = com.mmushtaq04.buysell.data.repository.FeatureAccessRepositoryImpl(context, db)
+
+            if (repo.isFeatureLockedNow(com.mmushtaq04.buysell.data.repository.PremiumFeature.DATA_EXPORT)) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(context, "Data export is a premium feature. Please upgrade to unlock.", Toast.LENGTH_LONG).show()
+                }
+                return@runCatching
+            }
+
             val user = db.userDao().getPrimaryUser()
             val meta = db.appMetaDao().getAppMeta()
             val shopId = meta?.activeShopId?.ifBlank { null } ?: user?.shopId ?: ""

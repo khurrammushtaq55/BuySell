@@ -4,11 +4,21 @@ import android.app.Activity
 import android.content.Context
 import android.util.Log
 import com.android.billingclient.api.*
+import com.mmushtaq04.buysell.R
+import com.mmushtaq04.buysell.data.repository.FeatureAccessRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import kotlin.coroutines.resume
 
-class PlayBillingManager(private val context: Context) : PurchasesUpdatedListener {
+class PlayBillingManager private constructor(context: Context) : PurchasesUpdatedListener {
+
+    private val applicationContext = context.applicationContext
+    private val scope = CoroutineScope(Dispatchers.IO)
 
     private val TAG = "PlayBillingManager"
 
@@ -16,15 +26,27 @@ class PlayBillingManager(private val context: Context) : PurchasesUpdatedListene
         const val SKU_PRO_MONTHLY = "buysell_pro_monthly"
         const val SKU_PRO_ANNUAL = "buysell_pro_annual"
         const val SKU_BUY_COFFEE = "buysell_coffee_tip"
+
+        @Volatile
+        private var INSTANCE: PlayBillingManager? = null
+
+        fun getInstance(context: Context): PlayBillingManager {
+            return INSTANCE ?: synchronized(this) {
+                INSTANCE ?: PlayBillingManager(context.applicationContext).also { INSTANCE = it }
+            }
+        }
     }
 
-    private var billingClient: BillingClient = BillingClient.newBuilder(context)
+    private var billingClient: BillingClient = BillingClient.newBuilder(applicationContext)
         .setListener(this)
         .enablePendingPurchases(PendingPurchasesParams.newBuilder().enableOneTimeProducts().build())
         .build()
 
-    private val _purchasedToken = MutableStateFlow<String?>(null)
-    val purchasedToken: StateFlow<String?> = _purchasedToken.asStateFlow()
+    private var featureRepo: FeatureAccessRepository? = null
+    private var activeShopId: String = ""
+    private var activeUserUid: String = ""
+
+    private var retryDelayMs = 1000L
 
     private val _productDetailsMap = MutableStateFlow<Map<String, ProductDetails>>(emptyMap())
     val productDetailsMap: StateFlow<Map<String, ProductDetails>> = _productDetailsMap.asStateFlow()
@@ -32,8 +54,21 @@ class PlayBillingManager(private val context: Context) : PurchasesUpdatedListene
     private val _isBillingReady = MutableStateFlow(false)
     val isBillingReady: StateFlow<Boolean> = _isBillingReady.asStateFlow()
 
+    private val _billingEventMessage = MutableStateFlow<String?>(null)
+    val billingEventMessage: StateFlow<String?> = _billingEventMessage.asStateFlow()
+
     init {
         startConnection()
+    }
+
+    fun initializeSession(repo: FeatureAccessRepository, shopId: String, userUid: String) {
+        this.featureRepo = repo
+        this.activeShopId = shopId
+        this.activeUserUid = userUid
+    }
+
+    fun clearEventMessage() {
+        _billingEventMessage.value = null
     }
 
     fun startConnection(onConnected: () -> Unit = {}) {
@@ -41,6 +76,7 @@ class PlayBillingManager(private val context: Context) : PurchasesUpdatedListene
             override fun onBillingSetupFinished(billingResult: BillingResult) {
                 if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
                     _isBillingReady.value = true
+                    retryDelayMs = 1000L
                     Log.i(TAG, "✓ Google Play Billing connected successfully.")
                     queryAvailableProducts()
                     onConnected()
@@ -51,7 +87,12 @@ class PlayBillingManager(private val context: Context) : PurchasesUpdatedListene
 
             override fun onBillingServiceDisconnected() {
                 _isBillingReady.value = false
-                Log.w(TAG, "Billing service disconnected.")
+                Log.w(TAG, "Billing service disconnected. Retrying in ${retryDelayMs}ms...")
+                scope.launch {
+                    delay(retryDelayMs)
+                    retryDelayMs = (retryDelayMs * 2).coerceAtMost(16000L)
+                    startConnection()
+                }
             }
         })
     }
@@ -89,9 +130,15 @@ class PlayBillingManager(private val context: Context) : PurchasesUpdatedListene
         }
     }
 
-    fun launchBillingFlow(activity: Activity, productId: String) {
+    fun launchBillingFlow(
+        activity: Activity,
+        productId: String,
+        shopId: String,
+        userUid: String
+    ) {
         val details = _productDetailsMap.value[productId]
         if (details == null) {
+            _billingEventMessage.value = applicationContext.getString(R.string.billing_btn_loading)
             Log.w(TAG, "Product details not loaded for '$productId'")
             return
         }
@@ -106,11 +153,40 @@ class PlayBillingManager(private val context: Context) : PurchasesUpdatedListene
             productParamsBuilder.setOfferToken(offerToken)
         }
 
-        val billingFlowParams = BillingFlowParams.newBuilder()
+        val billingFlowParamsBuilder = BillingFlowParams.newBuilder()
             .setProductDetailsParamsList(listOf(productParamsBuilder.build()))
+
+        // Bind obfuscated account ID & profile ID (truncated to Google Play's 64-char limit)
+        if (shopId.isNotBlank()) {
+            billingFlowParamsBuilder.setObfuscatedAccountId(shopId.take(64))
+        }
+        if (userUid.isNotBlank()) {
+            billingFlowParamsBuilder.setObfuscatedProfileId(userUid.take(64))
+        }
+
+        val result = billingClient.launchBillingFlow(activity, billingFlowParamsBuilder.build())
+        if (result.responseCode != BillingClient.BillingResponseCode.OK) {
+            Log.e(TAG, "Failed to launch billing flow: ${result.responseCode}")
+            _billingEventMessage.value = applicationContext.getString(R.string.billing_error_generic)
+        }
+    }
+
+    suspend fun acknowledgePurchase(purchaseToken: String): Boolean = kotlinx.coroutines.suspendCancellableCoroutine { cont ->
+        val params = AcknowledgePurchaseParams.newBuilder()
+            .setPurchaseToken(purchaseToken)
             .build()
 
-        billingClient.launchBillingFlow(activity, billingFlowParams)
+        billingClient.acknowledgePurchase(params) { billingResult ->
+            val success = billingResult.responseCode == BillingClient.BillingResponseCode.OK
+            if (success) {
+                Log.i(TAG, "✓ Purchase acknowledged successfully.")
+            } else {
+                Log.e(TAG, "Failed to acknowledge purchase: ${billingResult.responseCode}")
+            }
+            if (cont.isActive) {
+                cont.resume(success)
+            }
+        }
     }
 
     fun consumePurchase(purchase: Purchase, onConsumed: () -> Unit) {
@@ -122,9 +198,13 @@ class PlayBillingManager(private val context: Context) : PurchasesUpdatedListene
         }
     }
 
-    fun restorePurchases(onPurchaseFound: (Purchase) -> Unit, onNoPurchaseFound: () -> Unit = {}) {
+    fun restorePurchases(
+        shopId: String,
+        repo: FeatureAccessRepository,
+        onComplete: (Boolean) -> Unit = {}
+    ) {
         if (!_isBillingReady.value) {
-            startConnection { restorePurchases(onPurchaseFound, onNoPurchaseFound) }
+            startConnection { restorePurchases(shopId, repo, onComplete) }
             return
         }
 
@@ -134,37 +214,77 @@ class PlayBillingManager(private val context: Context) : PurchasesUpdatedListene
                 .build()
         ) { billingResult, purchases ->
             if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && purchases.isNotEmpty()) {
-                val validPurchase = purchases.find { it.purchaseState == Purchase.PurchaseState.PURCHASED }
-                if (validPurchase != null) {
-                    _purchasedToken.value = validPurchase.purchaseToken
-                    onPurchaseFound(validPurchase)
-                    Log.i(TAG, "✓ Restored active purchase token: ${validPurchase.purchaseToken}")
-                } else {
-                    onNoPurchaseFound()
+                scope.launch {
+                    var restoredCount = 0
+                    for (purchase in purchases) {
+                        val res = PurchaseProcessor.processPurchase(
+                            purchase = purchase,
+                            shopId = shopId,
+                            featureRepo = repo,
+                            onAcknowledge = { acknowledgePurchase(it) },
+                            onConsumeCoffee = { consumePurchase(it) {} }
+                        )
+                        if (res is PurchaseResult.Success) {
+                            restoredCount++
+                        }
+                    }
+                    onComplete(restoredCount > 0)
                 }
             } else {
-                onNoPurchaseFound()
+                onComplete(false)
             }
         }
     }
 
     override fun onPurchasesUpdated(billingResult: BillingResult, purchases: MutableList<Purchase>?) {
-        if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && !purchases.isNullOrEmpty()) {
-            for (purchase in purchases) {
-                if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED) {
-                    _purchasedToken.value = purchase.purchaseToken
-                    if (purchase.products.contains(SKU_BUY_COFFEE)) {
-                        consumePurchase(purchase) {
-                            Log.i(TAG, "✓ Consumed coffee tip purchase!")
+        when (billingResult.responseCode) {
+            BillingClient.BillingResponseCode.OK -> {
+                if (!purchases.isNullOrEmpty() && featureRepo != null && activeShopId.isNotBlank()) {
+                    scope.launch {
+                        for (purchase in purchases) {
+                            val result = PurchaseProcessor.processPurchase(
+                                purchase = purchase,
+                                shopId = activeShopId,
+                                featureRepo = featureRepo!!,
+                                onAcknowledge = { acknowledgePurchase(it) },
+                                onConsumeCoffee = { consumePurchase(it) {} }
+                            )
+
+                            when (result) {
+                                is PurchaseResult.Pending -> {
+                                    _billingEventMessage.value = applicationContext.getString(R.string.billing_payment_pending)
+                                }
+                                is PurchaseResult.VerificationFailed -> {
+                                    _billingEventMessage.value = applicationContext.getString(R.string.billing_error_generic)
+                                }
+                                else -> {}
+                            }
                         }
                     }
-                    Log.i(TAG, "✓ Purchase completed! Token: ${purchase.purchaseToken}")
                 }
             }
-        } else if (billingResult.responseCode == BillingClient.BillingResponseCode.USER_CANCELED) {
-            Log.i(TAG, "User canceled billing flow.")
-        } else {
-            Log.e(TAG, "Purchase failed with code: ${billingResult.responseCode}")
+
+            BillingClient.BillingResponseCode.USER_CANCELED -> {
+                Log.i(TAG, "User canceled billing flow.")
+            }
+
+            BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED -> {
+                Log.i(TAG, "Item already owned. Triggering restore...")
+                if (featureRepo != null && activeShopId.isNotBlank()) {
+                    restorePurchases(activeShopId, featureRepo!!)
+                }
+            }
+
+            BillingClient.BillingResponseCode.SERVICE_UNAVAILABLE,
+            BillingClient.BillingResponseCode.NETWORK_ERROR -> {
+                Log.w(TAG, "Billing network error: ${billingResult.responseCode}")
+                _billingEventMessage.value = applicationContext.getString(R.string.billing_error_network)
+            }
+
+            else -> {
+                Log.e(TAG, "Purchase failed with code: ${billingResult.responseCode}")
+                _billingEventMessage.value = applicationContext.getString(R.string.billing_error_generic)
+            }
         }
     }
 }

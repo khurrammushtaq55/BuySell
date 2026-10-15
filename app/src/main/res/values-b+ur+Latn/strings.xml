@@ -1,6 +1,14 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="app_name">BuySell360</string>
+    <string name="billing_error_network">Kharidari ke dauran network ka masla. Internet connection check karein.</string>
+    <string name="billing_error_generic">Billing me masla aya. Phir koshish karein.</string>
+    <string name="billing_payment_pending">Aap ki payment pending hai. Payment mukammal hone par access unlock hoga.</string>
+    <string name="paywall_owner_only_notice">Sirf dukan ka maalik subscription kharid ya restore kar sakta hai.</string>
+    <string name="billing_btn_loading">Plans load ho rahe hain…</string>
+    <string name="paywall_gate_locked_desc">Locked feature: %1$s. Unlock karne ke liye tap karein.</string>
+    <string name="paywall_gate_unlock_feature">Unlock %1$s</string>
+    <string name="settings_staff_seat_limit_reached">Aap free 1 staff member limit par pohench chuke hain. Unlimited staff seats ke liye Pro upgrade karein.</string>
     <string name="login_tagline">Apni dukan ka hisaab aur stock mehfooz rakhein</string>
     <string name="login_btn_google">Google se login karein</string>
     <string name="login_or_email">ya Email se login karein</string>

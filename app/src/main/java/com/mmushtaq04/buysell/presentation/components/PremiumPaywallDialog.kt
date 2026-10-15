@@ -10,8 +10,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Key
-import androidx.compose.material.icons.filled.WorkspacePremium
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -25,20 +25,34 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.android.billingclient.api.ProductDetails
 import com.mmushtaq04.buysell.R
+import com.mmushtaq04.buysell.domain.billing.PlayBillingManager
 
 @Composable
 fun PremiumPaywallDialog(
+    isOwner: Boolean = true,
+    productDetailsMap: Map<String, ProductDetails> = emptyMap(),
+    isBillingReady: Boolean = true,
     onDismiss: () -> Unit,
     onUpgradeClick: (plan: String) -> Unit,
     onRestoreClick: () -> Unit,
     onRedeemPromoCode: (code: String, onSuccess: () -> Unit, onError: () -> Unit) -> Unit
 ) {
     val context = LocalContext.current
-    var selectedPlan by remember { mutableStateOf("ANNUAL") }
+    var selectedPlan by remember { mutableStateOf(PlayBillingManager.SKU_PRO_ANNUAL) }
     var showPromoDialog by remember { mutableStateOf(false) }
     var promoCodeInput by remember { mutableStateOf("") }
     var isRedeeming by remember { mutableStateOf(false) }
+
+    val annualDetails = productDetailsMap[PlayBillingManager.SKU_PRO_ANNUAL]
+    val monthlyDetails = productDetailsMap[PlayBillingManager.SKU_PRO_MONTHLY]
+
+    val annualPriceText = annualDetails?.subscriptionOfferDetails?.firstOrNull()?.pricingPhases
+        ?.pricingPhaseList?.firstOrNull()?.formattedPrice ?: stringResource(R.string.paywall_plan_annual)
+
+    val monthlyPriceText = monthlyDetails?.subscriptionOfferDetails?.firstOrNull()?.pricingPhases
+        ?.pricingPhaseList?.firstOrNull()?.formattedPrice ?: stringResource(R.string.paywall_plan_monthly)
 
     if (showPromoDialog) {
         AlertDialog(
@@ -144,102 +158,144 @@ fun PremiumPaywallDialog(
 
                 HorizontalDivider()
 
-                // Pricing Options Selection
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { selectedPlan = "ANNUAL" },
-                    shape = RoundedCornerShape(12.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = if (selectedPlan == "ANNUAL") MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant
-                    )
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(12.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
+                if (!isOwner) {
+                    // T7: Non-owner notice
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)
                     ) {
-                        Column {
+                        Row(
+                            modifier = Modifier.padding(12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Info,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.error
+                            )
                             Text(
-                                text = stringResource(R.string.paywall_plan_annual),
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 13.sp
+                                text = stringResource(R.string.paywall_owner_only_notice),
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = MaterialTheme.colorScheme.onErrorContainer
                             )
                         }
-                        RadioButton(
-                            selected = selectedPlan == "ANNUAL",
-                            onClick = { selectedPlan = "ANNUAL" }
-                        )
                     }
-                }
-
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { selectedPlan = "MONTHLY" },
-                    shape = RoundedCornerShape(12.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = if (selectedPlan == "MONTHLY") MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant
-                    )
-                ) {
-                    Row(
+                } else {
+                    // Pricing Options Selection (Owner only)
+                    Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(12.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
+                            .clickable { selectedPlan = PlayBillingManager.SKU_PRO_ANNUAL },
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = if (selectedPlan == PlayBillingManager.SKU_PRO_ANNUAL) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant
+                        )
                     ) {
-                        Text(
-                            text = stringResource(R.string.paywall_plan_monthly),
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 13.sp
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Column {
+                                Text(
+                                    text = "Annual Plan",
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 13.sp
+                                )
+                                Text(
+                                    text = annualPriceText,
+                                    fontSize = 12.sp,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                            RadioButton(
+                                selected = selectedPlan == PlayBillingManager.SKU_PRO_ANNUAL,
+                                onClick = { selectedPlan = PlayBillingManager.SKU_PRO_ANNUAL }
+                            )
+                        }
+                    }
+
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { selectedPlan = PlayBillingManager.SKU_PRO_MONTHLY },
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = if (selectedPlan == PlayBillingManager.SKU_PRO_MONTHLY) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant
                         )
-                        RadioButton(
-                            selected = selectedPlan == "MONTHLY",
-                            onClick = { selectedPlan = "MONTHLY" }
-                        )
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Column {
+                                Text(
+                                    text = "Monthly Plan",
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 13.sp
+                                )
+                                Text(
+                                    text = monthlyPriceText,
+                                    fontSize = 12.sp,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                            RadioButton(
+                                selected = selectedPlan == PlayBillingManager.SKU_PRO_MONTHLY,
+                                onClick = { selectedPlan = PlayBillingManager.SKU_PRO_MONTHLY }
+                            )
+                        }
                     }
                 }
             }
         },
         confirmButton = {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Button(
-                    onClick = { onUpgradeClick(selectedPlan) },
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+            if (isOwner) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(
-                        text = stringResource(R.string.paywall_btn_upgrade),
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp
-                    )
-                }
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    TextButton(onClick = onRestoreClick) {
+                    Button(
+                        onClick = { onUpgradeClick(selectedPlan) },
+                        enabled = isBillingReady,
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
                         Text(
-                            text = stringResource(R.string.paywall_btn_restore),
-                            fontSize = 11.sp,
-                            color = MaterialTheme.colorScheme.primary
+                            text = if (isBillingReady) stringResource(R.string.paywall_btn_upgrade) else stringResource(R.string.billing_btn_loading),
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 14.sp
                         )
                     }
 
-                    TextButton(onClick = { showPromoDialog = true }) {
-                        Text(
-                            text = stringResource(R.string.paywall_btn_promo),
-                            fontSize = 11.sp,
-                            color = MaterialTheme.colorScheme.secondary
-                        )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        TextButton(onClick = onRestoreClick, enabled = isBillingReady) {
+                            Text(
+                                text = stringResource(R.string.paywall_btn_restore),
+                                fontSize = 11.sp,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+
+                        TextButton(onClick = { showPromoDialog = true }) {
+                            Text(
+                                text = stringResource(R.string.paywall_btn_promo),
+                                fontSize = 11.sp,
+                                color = MaterialTheme.colorScheme.secondary
+                            )
+                        }
                     }
                 }
             }

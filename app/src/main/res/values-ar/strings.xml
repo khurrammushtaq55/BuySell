@@ -1,6 +1,14 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="app_name">BuySell360</string>
+    <string name="billing_error_network">خطأ في الشبكة أثناء الشراء. يرجى التحقق من الاتصال بالإنترنت.</string>
+    <string name="billing_error_generic">حدث خطأ في خدمة الفوترة. يرجى المحاولة لاحقًا.</string>
+    <string name="billing_payment_pending">الدفع معلق. سيتم إلغاء القفل بمجرد اكتمال الدفع.</string>
+    <string name="paywall_owner_only_notice">يمكن لمالك المحل فقط شراء الاشتراكات أو استعادتها لهذا المحل.</string>
+    <string name="billing_btn_loading">جاري تحميل الخطط…</string>
+    <string name="paywall_gate_locked_desc">ميزة ممتازة مقفلة: %1$s. انقر لإلغاء القفل.</string>
+    <string name="paywall_gate_unlock_feature">إلغاء قفل %1$s</string>
+    <string name="settings_staff_seat_limit_reached">لقد وصلت إلى الحد المسموح به مجانًا وهو عضو طاقم واحد. ترقية إلى Pro للحصول على عدد غير محدود من الطاقم.</string>
     <string name="login_tagline">حافظ على سلامة حساباتك ومخزونك</string>
     <string name="login_btn_google">تسجيل الدخول باستخدام Google</string>
     <string name="login_or_email">أو تسجيل الدخول بالبريد الإلكتروني</string>

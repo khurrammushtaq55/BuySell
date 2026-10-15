@@ -1,6 +1,14 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="app_name">BuySell360</string>
+    <string name="billing_error_network">购买期间发生网络错误，请检查您的网络连接。</string>
+    <string name="billing_error_generic">账单服务出错，请稍后重试。</string>
+    <string name="billing_payment_pending">付款正在处理中，完成付款后将解锁访问权限。</string>
+    <string name="paywall_owner_only_notice">只有店铺拥有者才能购买或恢复该店铺的订阅。</string>
+    <string name="billing_btn_loading">正在加载订阅方案…</string>
+    <string name="paywall_gate_locked_desc">受限高级功能：%1$s。点击解锁。</string>
+    <string name="paywall_gate_unlock_feature">解锁 %1$s</string>
+    <string name="settings_staff_seat_limit_reached">您已达到免费 1 名员工的上限。升级至 Pro 版以享受无限员工席位。</string>
     <string name="login_tagline">保障您的店铺账目和库存安全</string>
     <string name="login_btn_google">使用 Google 登录</string>
     <string name="login_or_email">或使用邮箱登录</string>

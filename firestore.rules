@@ -48,6 +48,19 @@ service cloud.firestore {
       allow read, create, update: if isAuthenticated() && request.auth.uid == uid;
     }
 
+    // Server-only collections: No client access
+    match /purchases/{docId} {
+      allow read, write: if false;
+    }
+
+    match /app_config/{document=**} {
+      allow read, write: if false;
+    }
+
+    match /promo_redemptions/{docId} {
+      allow read, write: if false;
+    }
+
     // Root invites collection
     match /invites/{code} {
       allow get: if isAuthenticated();
@@ -79,12 +92,24 @@ service cloud.firestore {
 
       allow create: if isAuthenticated() && (
         request.resource.data.owner_user_id == request.auth.uid
-      );
+      ) && !request.resource.data.keys().hasAny(['is_premium', 'premium_plan', 'premium_until', 'purchase_token', 'auto_renewing']);
 
-      allow update, delete: if isAuthenticated() && (
+      allow update: if isAuthenticated() && (
+        resource.data.owner_user_id == request.auth.uid ||
+        getMemberRole(shopId) == 'OWNER'
+      ) && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['is_premium', 'premium_plan', 'premium_until', 'purchase_token', 'auto_renewing']);
+
+      allow delete: if isAuthenticated() && (
         resource.data.owner_user_id == request.auth.uid ||
         getMemberRole(shopId) == 'OWNER'
       );
+
+
+      // Shop License Subcollection: Readable by shop members, no client writes
+      match /license/{docId} {
+        allow read: if isShopMember(shopId);
+        allow write: if false;
+      }
 
 
       // Shop Members Subcollection
