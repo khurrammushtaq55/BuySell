@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -234,12 +235,13 @@ fun SellWizardScreen(
                             onValueChange = { buyerName = it },
                             label = { Text(stringResource(R.string.label_buyer_name)) },
                             isError = buyerName.isBlank(),
+                            keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words),
                             modifier = Modifier.fillMaxWidth()
                         )
 
                         OutlinedTextField(
                             value = buyerPhone,
-                            onValueChange = { buyerPhone = it },
+                            onValueChange = { newValue -> buyerPhone = newValue.filter { it.isDigit() || it == '+' } },
                             label = { Text(stringResource(R.string.label_mobile_number)) },
                             isError = buyerPhone.isBlank(),
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
@@ -248,11 +250,12 @@ fun SellWizardScreen(
 
                         OutlinedTextField(
                             value = salePriceText,
-                            onValueChange = { newPrice ->
+                            onValueChange = { newPriceRaw ->
+                                val digitsOnly = newPriceRaw.filter { it.isDigit() }
                                 val oldPrice = salePriceText
-                                salePriceText = newPrice
+                                salePriceText = digitsOnly
                                 if (receivedAmountText.isBlank() || receivedAmountText == oldPrice) {
-                                    receivedAmountText = newPrice
+                                    receivedAmountText = digitsOnly
                                 }
                             },
                             label = { Text(stringResource(R.string.label_sale_price)) },
@@ -298,7 +301,7 @@ fun SellWizardScreen(
 
                         OutlinedTextField(
                             value = receivedAmountText,
-                            onValueChange = { receivedAmountText = it },
+                            onValueChange = { newValue -> receivedAmountText = newValue.filter { it.isDigit() } },
                             label = { Text(stringResource(R.string.label_amount_given_by_customer)) },
                             placeholder = { Text(salePrice.toString()) },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),

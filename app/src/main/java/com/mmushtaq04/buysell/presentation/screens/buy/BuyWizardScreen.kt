@@ -14,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -281,8 +282,8 @@ private fun StepDeviceDetails(
     val showDefaultBrandChips = category.equals("Mobile", ignoreCase = true) || category.equals("Tablet / iPad", ignoreCase = true)
     var selectedChip by remember { mutableStateOf<String?>(null) }
 
-    val presetRamList = listOf("4GB", "6GB", "8GB", "12GB", "16GB", "32GB")
-    val presetStorageList = listOf("64GB", "128GB", "256GB", "512GB", "1TB")
+    val presetRamList = listOf("2GB", "4GB", "6GB", "8GB", "12GB", "16GB", "24GB", "32GB", "64GB", "128GB", "256GB", "512GB", "1TB")
+    val presetStorageList = listOf("32GB", "64GB", "128GB", "256GB", "512GB", "1TB", "2TB", "4TB", "8TB")
 
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text(stringResource(R.string.buy_fill_device_details), fontSize = 16.sp, fontWeight = FontWeight.Bold)
@@ -353,7 +354,7 @@ private fun StepDeviceDetails(
 
         OutlinedTextField(
             value = price,
-            onValueChange = onPriceChange,
+            onValueChange = { newValue -> onPriceChange(newValue.filter { it.isDigit() }) },
             label = { Text(stringResource(R.string.label_purchase_price)) },
             isError = price.isBlank(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -452,12 +453,13 @@ private fun StepSellerInfo(
             onValueChange = onNameChange,
             label = { Text(stringResource(R.string.label_seller_name)) },
             isError = name.isBlank(),
+            keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words),
             modifier = Modifier.fillMaxWidth()
         )
 
         OutlinedTextField(
             value = phone,
-            onValueChange = onPhoneChange,
+            onValueChange = { newValue -> onPhoneChange(newValue.filter { it.isDigit() || it == '+' }) },
             label = { Text(stringResource(R.string.label_mobile_number)) },
             isError = phone.isBlank(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
@@ -466,7 +468,7 @@ private fun StepSellerInfo(
 
         OutlinedTextField(
             value = cnic,
-            onValueChange = onCnicChange,
+            onValueChange = { newValue -> onCnicChange(newValue.filter { it.isDigit() }) },
             label = { Text(stringResource(R.string.label_cnic)) },
             isError = cnic.isBlank(),
             supportingText = { Text(stringResource(R.string.sub_cnic)) },
@@ -520,7 +522,7 @@ private fun StepPayment(
 
         OutlinedTextField(
             value = paidAmount,
-            onValueChange = onPaidChange,
+            onValueChange = { newValue -> onPaidChange(newValue.filter { it.isDigit() }) },
             label = { Text(stringResource(R.string.label_paid_amount)) },
             isError = paidAmount.isBlank(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),

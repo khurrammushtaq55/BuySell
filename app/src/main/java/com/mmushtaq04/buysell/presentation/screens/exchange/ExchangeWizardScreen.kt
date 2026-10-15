@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -94,8 +95,8 @@ fun ExchangeWizardScreen(
     val showDefaultBrandChips = oldCategory.equals("Mobile", ignoreCase = true) || oldCategory.equals("Tablet / iPad", ignoreCase = true)
     var selectedChip by remember { mutableStateOf<String?>(null) }
 
-    val presetRamList = listOf("4GB", "6GB", "8GB", "12GB", "16GB", "32GB")
-    val presetStorageList = listOf("64GB", "128GB", "256GB", "512GB", "1TB")
+    val presetRamList = listOf("2GB", "4GB", "6GB", "8GB", "12GB", "16GB", "24GB", "32GB", "64GB", "128GB", "256GB", "512GB", "1TB")
+    val presetStorageList = listOf("32GB", "64GB", "128GB", "256GB", "512GB", "1TB", "2TB", "4TB", "8TB")
 
     val filteredStock = stockList.filter {
         it.title.contains(searchQuery, ignoreCase = true) || it.imei.contains(searchQuery, ignoreCase = true)
@@ -185,7 +186,7 @@ fun ExchangeWizardScreen(
                     if (selectedItem != null) {
                         OutlinedTextField(
                             value = newPhonePriceText,
-                            onValueChange = { newPhonePriceText = it },
+                            onValueChange = { newValue -> newPhonePriceText = newValue.filter { it.isDigit() } },
                             label = { Text(stringResource(R.string.exchange_new_price_label)) },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             modifier = Modifier.fillMaxWidth()
@@ -295,7 +296,7 @@ fun ExchangeWizardScreen(
 
                         OutlinedTextField(
                             value = oldPhoneValueText,
-                            onValueChange = { oldPhoneValueText = it },
+                            onValueChange = { newValue -> oldPhoneValueText = newValue.filter { it.isDigit() } },
                             label = { Text(stringResource(R.string.exchange_old_value_label)) },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             modifier = Modifier.fillMaxWidth()
@@ -424,12 +425,13 @@ fun ExchangeWizardScreen(
                             value = customerName,
                             onValueChange = { customerName = it },
                             label = { Text(stringResource(R.string.exchange_customer_name_label)) },
+                            keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words),
                             modifier = Modifier.fillMaxWidth()
                         )
 
                         OutlinedTextField(
                             value = customerPhone,
-                            onValueChange = { customerPhone = it },
+                            onValueChange = { newValue -> customerPhone = newValue.filter { it.isDigit() || it == '+' } },
                             label = { Text(stringResource(R.string.exchange_customer_phone_label)) },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                             modifier = Modifier.fillMaxWidth()
@@ -437,7 +439,7 @@ fun ExchangeWizardScreen(
 
                         OutlinedTextField(
                             value = cashPaidText,
-                            onValueChange = { cashPaidText = it },
+                            onValueChange = { newValue -> cashPaidText = newValue.filter { it.isDigit() } },
                             label = { Text(stringResource(R.string.exchange_cash_paid_label)) },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             modifier = Modifier.fillMaxWidth()

@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
+import androidx.compose.material.icons.filled.Storefront
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -17,12 +18,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mmushtaq04.buysell.R
-
-import androidx.compose.foundation.Image
-import androidx.compose.ui.res.painterResource
+import com.mmushtaq04.buysell.ui.theme.BuySellTheme
 
 val GoldStarColor = Color(0xFFFFC107)
 
@@ -40,16 +40,15 @@ fun InAppRatingDialog(
         icon = {
             Surface(
                 shape = CircleShape,
-                color = Color.Transparent,
+                color = MaterialTheme.colorScheme.primaryContainer,
                 modifier = Modifier.size(56.dp)
             ) {
                 Box(contentAlignment = Alignment.Center) {
-                    Image(
-                        painter = painterResource(id = R.mipmap.ic_launcher_round),
+                    Icon(
+                        imageVector = Icons.Default.Storefront,
                         contentDescription = null,
-                        modifier = Modifier
-                            .size(52.dp)
-                            .clip(CircleShape)
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(32.dp)
                     )
                 }
             }
@@ -151,4 +150,15 @@ fun InAppRatingDialog(
             }
         }
     )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun InAppRatingDialogPreview() {
+    BuySellTheme {
+        InAppRatingDialog(
+            onRateClick = { _, _ -> },
+            onDismiss = {}
+        )
+    }
 }
