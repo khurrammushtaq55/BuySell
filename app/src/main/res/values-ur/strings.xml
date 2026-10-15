@@ -395,4 +395,12 @@
     <string name="coffee_dialog_msg">اگر یہ ایپ آپ کے دکان کے کاروبار میں مددگار ہے، تو ڈویلپر کو ایک کپ کافی پیش کریں!</string>
     <string name="coffee_btn_buy">کافی بھیجیں ($1.99) ☕</string>
     <string name="coffee_toast_thanks">آپ کی سپورٹ کا بہت بہت شکریہ!</string>
+    <string name="promo_option_title">پرومو یا واؤچر کوڈ درج کریں 🎟️</string>
+    <string name="promo_option_sub">مفت پرو فیچرز انلاک کرنے کے لیے واؤچر کوڈ درج کریں</string>
+    <string name="promo_dialog_title">واؤچر یا پرومو کوڈ 🎟️</string>
+    <string name="promo_dialog_msg">اپنی دکان کے لیے پرو فیچرز مفت حاصل کرنے کے لیے پرومو کوڈ درج کریں:</string>
+    <string name="promo_hint">پرومو کوڈ درج کریں (مثلاً VIP2026)</string>
+    <string name="promo_btn_redeem">کوڈ ریڈیم کریں 🚀</string>
+    <string name="promo_success_toast">پرومو کوڈ فعال ہو گیا! پرو فیچرز انلاک ہو گئے۔ 🎉</string>
+    <string name="promo_error_invalid">غلط یا ختم شدہ پرومو کوڈ۔ دوبارہ کوشش کریں۔</string>
 </resources>

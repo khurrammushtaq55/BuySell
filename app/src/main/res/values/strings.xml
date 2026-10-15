@@ -395,4 +395,12 @@
     <string name="coffee_dialog_msg">If BuySell360 helps you manage your shop efficiently, consider buying the developer a coffee!</string>
     <string name="coffee_btn_buy">Buy Me a Coffee ($1.99) ☕</string>
     <string name="coffee_toast_thanks">Thank you so much for your support!</string>
+    <string name="promo_option_title">Redeem Promo / Voucher 🎟️</string>
+    <string name="promo_option_sub">Enter a promotional code or voucher to unlock Pro features for free</string>
+    <string name="promo_dialog_title">Redeem Voucher / Promo Code 🎟️</string>
+    <string name="promo_dialog_msg">Enter your promo code or VIP voucher below to unlock all Pro features for your store:</string>
+    <string name="promo_hint">Enter promo code (e.g. VIP2026)</string>
+    <string name="promo_btn_redeem">Redeem Code 🚀</string>
+    <string name="promo_success_toast">Promo code applied! Pro features unlocked. 🎉</string>
+    <string name="promo_error_invalid">Invalid or expired promo code. Please try again.</string>
 </resources>

@@ -91,9 +91,19 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 }
             }
 
-            _uiState.value = _uiState.value.copy(
-                shopName = localShop?.name ?: "Mera Store"
-            )
+            if (activeShopId.isNotBlank()) {
+                db.shopDao().observeShopById(activeShopId).collect { shop ->
+                    if (shop != null) {
+                        _uiState.value = _uiState.value.copy(
+                            shopName = shop.name
+                        )
+                    }
+                }
+            } else {
+                _uiState.value = _uiState.value.copy(
+                    shopName = localShop?.name ?: "Mera Store"
+                )
+            }
         }
     }
 

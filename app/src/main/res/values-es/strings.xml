@@ -395,4 +395,12 @@
     <string name="coffee_dialog_msg">Si BuySell360 te ayuda a gestionar tu tienda eficazmente, ¡considera invitarle un café al desarrollador!</string>
     <string name="coffee_btn_buy">Invitar un café ($1.99) ☕</string>
     <string name="coffee_toast_thanks">¡Muchas gracias por tu apoyo!</string>
+    <string name="promo_option_title">Canjear cupón o código 🎟️</string>
+    <string name="promo_option_sub">Ingresa un código promocional para desbloquear funciones Pro gratis</string>
+    <string name="promo_dialog_title">Canjear cupón / Código promocional 🎟️</string>
+    <string name="promo_dialog_msg">Ingresa tu código promocional o cupón VIP para desbloquear las funciones Pro:</string>
+    <string name="promo_hint">Ingresa código (ej. VIP2026)</string>
+    <string name="promo_btn_redeem">Canjear código 🚀</string>
+    <string name="promo_success_toast">¡Código aplicado! Funciones Pro desbloqueadas. 🎉</string>
+    <string name="promo_error_invalid">Código inválido o expirado. Inténtalo de nuevo.</string>
 </resources>

@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.filled.ConfirmationNumber
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.LocalCafe
 import androidx.compose.material.icons.filled.Lock
@@ -34,6 +35,7 @@ fun SecurityAndAccountSection(
     isExportLocked: Boolean = false,
     onUnlockClick: () -> Unit = {},
     onBuyCoffeeClick: () -> Unit = {},
+    onRedeemPromoClick: () -> Unit = {},
     onAttemptSignOut: (onRequireWarning: (Int) -> Unit, onReadyToSignOut: () -> Unit) -> Unit,
     onForceSignOut: (onReadyToSignOut: () -> Unit) -> Unit
 ) {
@@ -243,6 +245,14 @@ fun SecurityAndAccountSection(
                 subtitle = stringResource(R.string.coffee_sub)
             ) {
                 onBuyCoffeeClick()
+            }
+
+            SettingClickableRow(
+                icon = Icons.Default.ConfirmationNumber,
+                title = stringResource(R.string.promo_option_title),
+                subtitle = stringResource(R.string.promo_option_sub)
+            ) {
+                onRedeemPromoClick()
             }
 
             SettingClickableRow(

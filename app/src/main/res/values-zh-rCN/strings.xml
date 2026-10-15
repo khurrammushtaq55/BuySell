@@ -395,4 +395,12 @@
     <string name="coffee_dialog_msg">如果 BuySell360 帮助您更高效地管理店铺，不妨请开发者喝一杯咖啡！</string>
     <string name="coffee_btn_buy">请喝咖啡 ($1.99) ☕</string>
     <string name="coffee_toast_thanks">非常感谢您的支持与鼓励!</string>
+    <string name="promo_option_title">兑换优惠码 / 礼品券 🎟️</string>
+    <string name="promo_option_sub">输入优惠码或礼品券，免费解锁 Pro 专业版功能</string>
+    <string name="promo_dialog_title">兑换礼品券 / 优惠码 🎟️</string>
+    <string name="promo_dialog_msg">请输入您的优惠码或 VIP 礼品券，为您的店铺解锁全套 Pro 功能：</string>
+    <string name="promo_hint">输入优惠码（如 VIP2026）</string>
+    <string name="promo_btn_redeem">立即兑换 🚀</string>
+    <string name="promo_success_toast">优惠码兑换成功！已解锁 Pro 专业功能。 🎉</string>
+    <string name="promo_error_invalid">优惠码无效或已过期，请重试。</string>
 </resources>

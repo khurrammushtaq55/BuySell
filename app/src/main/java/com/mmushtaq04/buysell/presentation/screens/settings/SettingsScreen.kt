@@ -36,6 +36,7 @@ fun SettingsScreen(
     isMonthlyReportLocked: Boolean = false,
     onUnlockClick: () -> Unit = {},
     onBuyCoffeeClick: () -> Unit = {},
+    onRedeemPromoClick: () -> Unit = {},
     onUpdateCurrency: (symbol: String, code: String) -> Unit = { _, _ -> },
     onUpdateShopProfile: (ownerName: String, shopName: String, phone: String, address: String) -> Unit = { _, _, _, _ -> },
     onToggleCategory: (CategoryEntity) -> Unit = {},
@@ -108,6 +109,7 @@ fun SettingsScreen(
                 isExportLocked = isExportLocked,
                 onUnlockClick = onUnlockClick,
                 onBuyCoffeeClick = onBuyCoffeeClick,
+                onRedeemPromoClick = onRedeemPromoClick,
                 onAttemptSignOut = onAttemptSignOut,
                 onForceSignOut = onForceSignOut
             )

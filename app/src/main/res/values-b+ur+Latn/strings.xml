@@ -395,4 +395,12 @@
     <string name="coffee_dialog_msg">Agar yeh app aap ke dukaan ke karobar mein madadgar hai, toh developer ko ek cup coffee pesh karein!</string>
     <string name="coffee_btn_buy">Coffee Bhejein ($1.99) ☕</string>
     <string name="coffee_toast_thanks">Aap ki support ka bohat bohat shukriya!</string>
+    <string name="promo_option_title">Promo ya Voucher Code Darj Karein 🎟️</string>
+    <string name="promo_option_sub">Muft Pro features unlock karne ke liye voucher code darj karein</string>
+    <string name="promo_dialog_title">Voucher ya Promo Code 🎟️</string>
+    <string name="promo_dialog_msg">Apni dukaan ke liye Pro features muft hasil karne ke liye promo code darj karein:</string>
+    <string name="promo_hint">Promo code darj karein (e.g. VIP2026)</string>
+    <string name="promo_btn_redeem">Code Redeem Karein 🚀</string>
+    <string name="promo_success_toast">Promo code faal ho gaya! Pro features unlock ho gaye. 🎉</string>
+    <string name="promo_error_invalid">Ghalat ya khatam shuda promo code. Dobara koshish karein.</string>
 </resources>

@@ -395,4 +395,12 @@
     <string name="coffee_dialog_msg">إذا كان تطبيق BuySell360 يساعدك في إدارة متجرك بفعالية، ففكر في إهداء المطور كوب قهوة!</string>
     <string name="coffee_btn_buy">إهداء كوب قهوة (1.99$) ☕</string>
     <string name="coffee_toast_thanks">شكراً جزيلاً لدعمك اللطيف!</string>
+    <string name="promo_option_title">استخدام رمز الترويجي / القسيمة 🎟️</string>
+    <string name="promo_option_sub">أدخل رمز ترويجي لفتح ميزات Pro مجاناً</string>
+    <string name="promo_dialog_title">استخدام القسيمة / الرمز الترويجي 🎟️</string>
+    <string name="promo_dialog_msg">أدخل الرمز الترويجي أو قسيمة VIP لفتح جميع ميزات Pro لمتجرك:</string>
+    <string name="promo_hint">أدخل الرمز الترويجي (مثال: VIP2026)</string>
+    <string name="promo_btn_redeem">تفعيل الرمز 🚀</string>
+    <string name="promo_success_toast">تم تفعيل الرمز الترويجي! تم فتح ميزات Pro. 🎉</string>
+    <string name="promo_error_invalid">رمز ترويجي غير صالح أو منتهي الصلاحية. يرجى المحاولة مرة أخرى.</string>
 </resources>
