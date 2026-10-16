@@ -96,21 +96,19 @@ class ExchangeViewModel(application: Application) : AndroidViewModel(application
             val exchangeGroupId = "EXG-${UUID.randomUUID().toString().take(8)}"
 
             db.withTransaction {
-                // 1. Create or Find Customer/Party
-                val partyId = UUID.randomUUID().toString()
-                val partyEntity = PartyEntity(
-                    id = partyId,
+                // 1. Create or Find Customer/Party via PartyResolver
+                val partyEntity = com.mmushtaq04.buysell.domain.PartyResolver.findOrCreate(
+                    partyDao = db.partyDao(),
                     shopId = activeShopId,
-                    name = customerName.ifBlank { "Exchange Customer" },
-                    phone = customerPhone.ifBlank { null },
-                    cnic = customerCnic.ifBlank { null },
+                    rawName = customerName,
+                    rawPhone = customerPhone,
+                    rawCnic = customerCnic,
                     typeHint = PartyTypeHint.BOTH,
-                    createdAt = now,
-                    updatedAt = now,
-                    createdBy = recordedBy,
-                    updatedBy = recordedBy
+                    recordedBy = recordedBy,
+                    nowMs = now,
+                    generateId = { UUID.randomUUID().toString() }
                 )
-                db.partyDao().insertParty(partyEntity)
+                val partyId = partyEntity.id
                 db.syncDao().enqueueOutbox(
                     SyncOutboxEntity(
                         id = UUID.randomUUID().toString(),

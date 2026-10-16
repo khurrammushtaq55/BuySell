@@ -54,21 +54,19 @@ class BuyViewModel(application: Application) : AndroidViewModel(application) {
             val now = System.currentTimeMillis()
 
             db.withTransaction {
-                // 1. Create or Find Seller Party
-                val partyId = UUID.randomUUID().toString()
-                val sellerParty = PartyEntity(
-                    id = partyId,
+                // 1. Create or Find Seller Party via PartyResolver
+                val sellerParty = com.mmushtaq04.buysell.domain.PartyResolver.findOrCreate(
+                    partyDao = db.partyDao(),
                     shopId = activeShopId,
-                    name = sellerName.ifBlank { "Seller" },
-                    phone = sellerPhone.ifBlank { null },
-                    cnic = sellerCnic.ifBlank { null },
+                    rawName = sellerName,
+                    rawPhone = sellerPhone,
+                    rawCnic = sellerCnic,
                     typeHint = PartyTypeHint.SUPPLIER,
-                    createdAt = now,
-                    updatedAt = now,
-                    createdBy = recordedBy,
-                    updatedBy = recordedBy
+                    recordedBy = recordedBy,
+                    nowMs = now,
+                    generateId = { UUID.randomUUID().toString() }
                 )
-                db.partyDao().insertParty(sellerParty)
+                val partyId = sellerParty.id
                 db.syncDao().enqueueOutbox(
                     SyncOutboxEntity(
                         id = UUID.randomUUID().toString(),

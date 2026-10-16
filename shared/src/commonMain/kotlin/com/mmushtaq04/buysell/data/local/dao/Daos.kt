@@ -84,6 +84,9 @@ interface PartyDao {
     @Query("SELECT * FROM parties WHERE shop_id = :shopId AND deleted_at IS NULL ORDER BY name ASC")
     fun observeParties(shopId: String): Flow<List<PartyEntity>>
 
+    @Query("SELECT * FROM parties WHERE shop_id = :shopId AND deleted_at IS NULL AND (name LIKE '%' || :query || '%' OR phone LIKE '%' || :query || '%' OR cnic LIKE '%' || :query || '%') ORDER BY name ASC LIMIT 5")
+    suspend fun searchParties(shopId: String, query: String): List<PartyEntity>
+
     @Query("SELECT * FROM parties WHERE shop_id = :shopId AND deleted_at IS NULL")
     suspend fun getAllParties(shopId: String): List<PartyEntity>
 
