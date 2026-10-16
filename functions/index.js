@@ -16,13 +16,14 @@ const DEFAULT_PACKAGE_NAME = "com.mmushtaq04.buysell";
 /**
  * Helper to query Google Play AndroidPublisher v3 subscriptionsv2.get
  */
-async function queryPlaySubscriptionV2(token) {
+async function queryPlaySubscriptionV2(token, packageName = DEFAULT_PACKAGE_NAME) {
   const auth = new google.auth.GoogleAuth({
     scopes: ["https://www.googleapis.com/auth/androidpublisher"],
   });
   const androidPublisher = google.androidpublisher({ version: "v3", auth });
 
   const response = await androidPublisher.purchases.subscriptionsv2.get({
+    packageName: packageName,
     token: token,
   });
 
@@ -75,7 +76,7 @@ exports.verifyPlayPurchase = functions.https.onCall(async (data, context) => {
 
   // T2 & T5: Fail closed. Query Google Play subscriptionsv2 API
   try {
-    playData = await queryPlaySubscriptionV2(purchaseToken);
+    playData = await queryPlaySubscriptionV2(purchaseToken, targetPackageName);
   } catch (apiError) {
     functions.logger.error(`Google Play API verification failed for token '${purchaseToken}': ${apiError.message}`);
     throw new functions.https.HttpsError(
@@ -197,7 +198,7 @@ exports.handlePlayRtdn = functions.pubsub.topic("play-rtdn").onPublish(async (me
     // T7: Re-query Google Play API for authoritative status
     let playData = null;
     try {
-      playData = await queryPlaySubscriptionV2(purchaseToken);
+      playData = await queryPlaySubscriptionV2(purchaseToken, DEFAULT_PACKAGE_NAME);
     } catch (apiErr) {
       functions.logger.error(`Error re-querying Play API in RTDN handler for token '${purchaseToken}': ${apiErr.message}`);
       return null;

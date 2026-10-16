@@ -64,6 +64,7 @@ interface FeatureAccessRepository {
 
     fun isFeatureLocked(feature: PremiumFeature): Boolean
     fun isFeatureLockedNow(feature: PremiumFeature): Boolean
+    fun clearCacheOnSignOut()
     suspend fun syncEntitlementAndConfig(shopId: String)
     suspend fun redeemAdminPromoCode(code: String, shopId: String): Boolean
     suspend fun verifyPurchaseWithServer(purchaseToken: String, productId: String, shopId: String): Boolean
@@ -79,11 +80,16 @@ class FeatureAccessRepositoryImpl(
     private val functions by lazy { FirebaseFunctions.getInstance() }
     private val licenseCache by lazy { LicenseCache(context) }
 
+    init {
+        licenseCache.updateLastSeenTime(System.currentTimeMillis())
+    }
+
     private val initialCachedLicense = licenseCache.read()
     private val initialEntitlement = LicensePolicy.computeEntitlement(
         license = initialCachedLicense,
         nowMs = System.currentTimeMillis(),
-        lastSeenTimeMs = licenseCache.lastSeenTimeMs
+        lastSeenTimeMs = licenseCache.lastSeenTimeMs,
+        elapsedSinceFetchMs = licenseCache.getElapsedSinceFetchMs()
     )
 
     private val _entitlementState = MutableStateFlow(initialEntitlement)
@@ -103,17 +109,26 @@ class FeatureAccessRepositoryImpl(
     }
 
     override fun isFeatureLockedNow(feature: PremiumFeature): Boolean {
+        licenseCache.updateLastSeenTime(System.currentTimeMillis())
         val cached = licenseCache.read()
         val computed = LicensePolicy.computeEntitlement(
             license = cached,
             nowMs = System.currentTimeMillis(),
-            lastSeenTimeMs = licenseCache.lastSeenTimeMs
+            lastSeenTimeMs = licenseCache.lastSeenTimeMs,
+            elapsedSinceFetchMs = licenseCache.getElapsedSinceFetchMs()
         )
         if (computed.isUnlocked) return false
         if (!licenseCache.enforcementEnabled) return false
         val savedKeys = licenseCache.readLockedFeatures()
         val currentSet = savedKeys.mapNotNull { PremiumFeature.fromKey(it) }.toSet()
         return currentSet.contains(feature)
+    }
+
+    override fun clearCacheOnSignOut() {
+        licenseCache.clearCache()
+        val expired = Entitlement(isUnlocked = false, status = "EXPIRED", reason = "Signed out")
+        _entitlementState.value = expired
+        _isPremiumUnlocked.value = false
     }
 
     override suspend fun syncEntitlementAndConfig(shopId: String): Unit = withContext(Dispatchers.IO) {
@@ -142,7 +157,15 @@ class FeatureAccessRepositoryImpl(
                         serverTimeMs = serverTimeMs,
                         lastFetchLocalMs = System.currentTimeMillis()
                     )
-                    licenseCache.save(freshLicense)
+                    licenseCache.save(freshLicense, shopId)
+
+                    val newEntitlement = LicensePolicy.computeEntitlement(
+                        license = freshLicense,
+                        nowMs = System.currentTimeMillis(),
+                        lastSeenTimeMs = licenseCache.lastSeenTimeMs
+                    )
+                    _entitlementState.value = newEntitlement
+                    _isPremiumUnlocked.value = newEntitlement.isUnlocked
 
                     if (com.mmushtaq04.buysell.BuildConfig.DEBUG) {
                         Log.i(TAG, "✓ Fetched server license for shop '$shopId': status=$status, validUntil=$validUntil")
@@ -150,8 +173,14 @@ class FeatureAccessRepositoryImpl(
                         Log.i(TAG, "✓ Fetched server license: status=$status")
                     }
                 } else {
+                    val expiredLicense = LicenseData(status = "EXPIRED", validUntilMs = 0L)
+                    licenseCache.save(expiredLicense, shopId)
+                    val expiredEntitlement = Entitlement(isUnlocked = false, status = "EXPIRED", reason = "No license found")
+                    _entitlementState.value = expiredEntitlement
+                    _isPremiumUnlocked.value = false
+
                     if (com.mmushtaq04.buysell.BuildConfig.DEBUG) {
-                        Log.w(TAG, "No license document exists at shops/$shopId/license/current")
+                        Log.w(TAG, "No license document exists at shops/$shopId/license/current - Cache reset to EXPIRED")
                     }
                 }
             }

@@ -25,13 +25,12 @@ object LicensePolicy {
     fun computeEntitlement(
         license: LicenseData,
         nowMs: Long,
-        lastSeenTimeMs: Long
+        lastSeenTimeMs: Long,
+        elapsedSinceFetchMs: Long = 0L
     ): Entitlement {
-        // 1. Clock rollback protection
         val isClockRolledBack = nowMs < (lastSeenTimeMs - CLOCK_ROLLBACK_TOLERANCE_MS)
         val effectiveNowMs = if (isClockRolledBack) lastSeenTimeMs else maxOf(nowMs, lastSeenTimeMs)
 
-        // 2. Missing or zero validUntil -> NOT premium
         if (license.validUntilMs <= 0L) {
             return Entitlement(
                 isUnlocked = false,
@@ -42,8 +41,15 @@ object LicensePolicy {
             )
         }
 
-        // 3. Offline trust window check
-        if (license.lastFetchLocalMs > 0L && (effectiveNowMs - license.lastFetchLocalMs) > OFFLINE_TRUST_WINDOW_MS) {
+        val offlineDurationMs = if (elapsedSinceFetchMs > 0L) {
+            elapsedSinceFetchMs
+        } else if (license.lastFetchLocalMs > 0L) {
+            (effectiveNowMs - license.lastFetchLocalMs).coerceAtLeast(0L)
+        } else {
+            0L
+        }
+
+        if (offlineDurationMs > OFFLINE_TRUST_WINDOW_MS) {
             return Entitlement(
                 isUnlocked = false,
                 status = license.status,
@@ -53,7 +59,6 @@ object LicensePolicy {
             )
         }
 
-        // 4. Status and expiration check
         val normalizedStatus = license.status.uppercase().trim()
         val isAllowedStatus = normalizedStatus in setOf("ACTIVE", "GRACE", "ON_HOLD", "CANCELED_ACTIVE")
 
@@ -67,7 +72,6 @@ object LicensePolicy {
             )
         }
 
-        // Effective expiration includes grace window for GRACE or ON_HOLD
         val effectiveValidUntilMs = if (normalizedStatus == "GRACE" || normalizedStatus == "ON_HOLD") {
             license.validUntilMs + GRACE_WINDOW_MS
         } else {

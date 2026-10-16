@@ -7,12 +7,14 @@ import androidx.lifecycle.viewModelScope
 import androidx.room.withTransaction
 import com.google.gson.Gson
 import com.mmushtaq04.buysell.data.local.AppDatabase
-import com.mmushtaq04.buysell.data.local.entity.PartyEntity
 import com.mmushtaq04.buysell.data.local.entity.SyncOutboxEntity
 import com.mmushtaq04.buysell.data.local.enums.*
 import com.mmushtaq04.buysell.data.repository.*
 import com.mmushtaq04.buysell.data.sync.SyncWorker
 import com.mmushtaq04.buysell.domain.model.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.util.UUID
 
@@ -20,6 +22,12 @@ class BuyViewModel(application: Application) : AndroidViewModel(application) {
 
     private val db = AppDatabase.getInstance(application)
     private val stockRepository = StockRepositoryImpl(db)
+
+    private val _isSaving = MutableStateFlow(false)
+    val isSaving: StateFlow<Boolean> = _isSaving.asStateFlow()
+
+    private val _saveError = MutableStateFlow<String?>(null)
+    val saveError: StateFlow<String?> = _saveError.asStateFlow()
 
     companion object {
         private const val TAG = "BuyViewModel"
@@ -30,12 +38,12 @@ class BuyViewModel(application: Application) : AndroidViewModel(application) {
         brand: String,
         model: String,
         imei: String,
+        priceRs: Long,
         color: String,
         issue: String,
         ram: String,
         storage: String,
         specs: String,
-        priceRs: Long,
         sellerName: String,
         sellerPhone: String,
         sellerCnic: String,
@@ -47,140 +55,162 @@ class BuyViewModel(application: Application) : AndroidViewModel(application) {
         onSuccess: () -> Unit
     ) {
         viewModelScope.launch {
+            if (_isSaving.value) return@launch
+            _isSaving.value = true
+            _saveError.value = null
             Log.d(TAG, "Starting savePurchase: Category=$categoryName, Brand=$brand, Model=$model, Price= $priceRs, Seller=$sellerName, RecordedBy=$recordedBy")
+
             val user = db.userDao().getPrimaryUser()
             val meta = db.appMetaDao().getAppMeta()
             val activeShopId = meta?.activeShopId?.ifBlank { null } ?: user?.shopId ?: ""
             val now = System.currentTimeMillis()
 
-            db.withTransaction {
-                // 1. Create or Find Seller Party via PartyResolver
-                val sellerParty = com.mmushtaq04.buysell.domain.PartyResolver.findOrCreate(
-                    partyDao = db.partyDao(),
-                    shopId = activeShopId,
-                    rawName = sellerName,
-                    rawPhone = sellerPhone,
-                    rawCnic = sellerCnic,
-                    typeHint = PartyTypeHint.SUPPLIER,
-                    recordedBy = recordedBy,
-                    nowMs = now,
-                    generateId = { UUID.randomUUID().toString() }
-                )
-                val partyId = sellerParty.id
-                db.syncDao().enqueueOutbox(
-                    SyncOutboxEntity(
-                        id = UUID.randomUUID().toString(),
-                        entityType = "parties",
-                        entityId = sellerParty.id,
-                        op = SyncOp.UPSERT,
-                        payloadJson = Gson().toJson(sellerParty),
-                        createdAt = now
-                    )
-                )
-
-                // 2. Find Category ID
-                val categories = db.categoryDao().getCategories(activeShopId)
-                val matchedCat = categories.firstOrNull { it.name.equals(categoryName, ignoreCase = true) }
-                val categoryId = matchedCat?.id ?: UUID.randomUUID().toString()
-
-                // Construct attributes JSON for color, issue, ram, storage, and specs
-                val attrMap = mutableMapOf<String, String>()
-                if (color.isNotBlank()) attrMap["color"] = color.trim()
-                if (issue.isNotBlank()) attrMap["issue"] = issue.trim()
-                if (ram.isNotBlank()) attrMap["ram"] = ram.trim()
-                if (storage.isNotBlank()) attrMap["storage"] = storage.trim()
-                if (specs.isNotBlank()) attrMap["specs"] = specs.trim()
-                val attributesJson = if (attrMap.isNotEmpty()) Gson().toJson(attrMap) else null
-
-                // 3. Create Stock Item
-                val stockItem = StockItem(
-                    id = UUID.randomUUID().toString(),
-                    shopId = activeShopId,
-                    categoryId = categoryId,
-                    brand = brand.ifBlank { "Generic" },
-                    model = model.ifBlank { categoryName },
-                    identifier = imei.ifBlank { null },
-                    attributes = attributesJson,
-                    condition = issue.ifBlank { "GOOD" },
-                    quantity = 1,
-                    remainingQty = 1,
-                    stockedAt = now
-                )
-
-                // 4. Record Purchase Txn
-                val pricePaisa = priceRs * 100
-                val txn = stockRepository.recordPurchase(
-                    stockItem = stockItem,
-                    purchasePrice = pricePaisa,
-                    partyId = partyId,
-                    createdByUserId = recordedBy
-                )
-                Log.i(TAG, "✓ Recorded Purchase Txn ID: ${txn.id}, StockItem ID: ${stockItem.id}")
-
-                // 5. Record Payment
-                val paidPaisa = (paidAmountRs * 100).coerceAtMost(pricePaisa)
-                if (paidPaisa > 0) {
-                    val methodEnum = PaymentMethod.fromStr(paymentMethodStr)
-
-                    val payment = Payment(
-                        id = UUID.randomUUID().toString(),
+            try {
+                db.withTransaction {
+                    // 1. Create or Find Seller Party via PartyResolver
+                    val sellerParty = com.mmushtaq04.buysell.domain.PartyResolver.findOrCreate(
+                        partyDao = db.partyDao(),
                         shopId = activeShopId,
-                        txnId = txn.id,
-                        partyId = partyId,
-                        direction = PaymentDirection.OUT,
-                        amount = paidPaisa,
-                        method = methodEnum,
-                        referenceNo = paymentDetails.ifBlank { null },
-                        payDate = now,
-                        scope = Scope.VAULT
+                        rawName = sellerName,
+                        rawPhone = sellerPhone,
+                        rawCnic = sellerCnic,
+                        typeHint = PartyTypeHint.SUPPLIER,
+                        recordedBy = recordedBy,
+                        nowMs = now,
+                        generateId = { UUID.randomUUID().toString() }
                     )
-                    val paymentEntity = payment.toEntity(recordedBy)
-                    db.paymentDao().insertPayment(paymentEntity)
+                    val partyId = sellerParty.id
                     db.syncDao().enqueueOutbox(
                         SyncOutboxEntity(
                             id = UUID.randomUUID().toString(),
-                            entityType = "payments",
-                            entityId = paymentEntity.id,
+                            entityType = "parties",
+                            entityId = sellerParty.id,
                             op = SyncOp.UPSERT,
-                            payloadJson = Gson().toJson(paymentEntity),
+                            payloadJson = Gson().toJson(sellerParty),
                             createdAt = now
                         )
                     )
-                }
 
-                // 6. Record Promise if Partial Payment
-                val remainingPaisa = pricePaisa - paidPaisa
-                if (remainingPaisa > 0) {
-                    val promise = PaymentPromise(
+                    // 2. Find Category ID
+                    val categories = db.categoryDao().getCategories(activeShopId)
+                    val matchedCat = categories.firstOrNull { it.name.equals(categoryName, ignoreCase = true) }
+                    val categoryId = matchedCat?.id ?: UUID.randomUUID().toString()
+
+                    // Construct attributes JSON
+                    val attrMap = mutableMapOf<String, String>()
+                    if (color.isNotBlank()) attrMap["color"] = color.trim()
+                    if (issue.isNotBlank()) attrMap["issue"] = issue.trim()
+                    if (ram.isNotBlank()) attrMap["ram"] = ram.trim()
+                    if (storage.isNotBlank()) attrMap["storage"] = storage.trim()
+                    if (specs.isNotBlank()) attrMap["specs"] = specs.trim()
+                    val attributesJson = if (attrMap.isNotEmpty()) Gson().toJson(attrMap) else null
+
+                    // 3. Create Stock Item
+                    val stockItem = StockItem(
                         id = UUID.randomUUID().toString(),
                         shopId = activeShopId,
+                        categoryId = categoryId,
+                        brand = brand.ifBlank { "Generic" },
+                        model = model.ifBlank { categoryName },
+                        identifier = imei.ifBlank { null },
+                        attributes = attributesJson,
+                        condition = issue.ifBlank { "GOOD" },
+                        quantity = 1,
+                        remainingQty = 1,
+                        stockedAt = now
+                    )
+
+                    // 4. Record Purchase Txn
+                    val pricePaisa = priceRs * 100
+                    val txn = stockRepository.recordPurchase(
+                        stockItem = stockItem,
+                        purchasePrice = pricePaisa,
                         partyId = partyId,
-                        txnId = txn.id,
-                        direction = PromiseDirection.PAY,
-                        amount = remainingPaisa,
-                        promisedDate = now + 7 * 24 * 60 * 60 * 1000L, // default 7 days
-                        note = promisedDateStr.ifBlank { null },
-                        scope = Scope.VAULT
+                        createdByUserId = recordedBy
                     )
-                    val promiseEntity = promise.toEntity(recordedBy)
-                    db.paymentPromiseDao().insertPromise(promiseEntity)
-                    db.syncDao().enqueueOutbox(
-                        SyncOutboxEntity(
+                    Log.i(TAG, "✓ Recorded Purchase Txn ID: ${txn.id}, StockItem ID: ${stockItem.id}")
+
+                    // 5. Record Payment
+                    val paidPaisa = (paidAmountRs * 100).coerceAtMost(pricePaisa)
+                    if (paidPaisa > 0) {
+                        val methodEnum = PaymentMethod.fromStr(paymentMethodStr)
+
+                        val payment = Payment(
                             id = UUID.randomUUID().toString(),
-                            entityType = "payment_promises",
-                            entityId = promiseEntity.id,
-                            op = SyncOp.UPSERT,
-                            payloadJson = Gson().toJson(promiseEntity),
-                            createdAt = now
+                            shopId = activeShopId,
+                            txnId = txn.id,
+                            partyId = partyId,
+                            direction = PaymentDirection.OUT,
+                            amount = paidPaisa,
+                            method = methodEnum,
+                            referenceNo = paymentDetails.ifBlank { null },
+                            payDate = now,
+                            scope = Scope.VAULT
                         )
-                    )
+                        val paymentEntity = payment.toEntity(recordedBy)
+                        db.paymentDao().insertPayment(paymentEntity)
+                        db.syncDao().enqueueOutbox(
+                            SyncOutboxEntity(
+                                id = UUID.randomUUID().toString(),
+                                entityType = "payments",
+                                entityId = paymentEntity.id,
+                                op = SyncOp.UPSERT,
+                                payloadJson = Gson().toJson(paymentEntity),
+                                createdAt = now
+                            )
+                        )
+                    }
+
+                    // 6. Record Promise if Partial Payment
+                    val remainingPaisa = pricePaisa - paidPaisa
+                    if (remainingPaisa > 0) {
+                        val parsedPromiseDate = parsePromisedDateMs(promisedDateStr, now)
+                        val promise = PaymentPromise(
+                            id = UUID.randomUUID().toString(),
+                            shopId = activeShopId,
+                            partyId = partyId,
+                            txnId = txn.id,
+                            direction = PromiseDirection.PAY,
+                            amount = remainingPaisa,
+                            promisedDate = parsedPromiseDate,
+                            note = promisedDateStr.ifBlank { null },
+                            scope = Scope.VAULT
+                        )
+                        val promiseEntity = promise.toEntity(recordedBy)
+                        db.paymentPromiseDao().insertPromise(promiseEntity)
+                        db.syncDao().enqueueOutbox(
+                            SyncOutboxEntity(
+                                id = UUID.randomUUID().toString(),
+                                entityType = "payment_promises",
+                                entityId = promiseEntity.id,
+                                op = SyncOp.UPSERT,
+                                payloadJson = Gson().toJson(promiseEntity),
+                                createdAt = now
+                            )
+                        )
+                    }
                 }
+
+                SyncWorker.enqueueOneTimeSync(getApplication())
+                com.mmushtaq04.buysell.util.RatingManager.recordInteraction(getApplication())
+                Log.i(TAG, "✓ savePurchase completed and background sync enqueued.")
+                onSuccess()
+            } catch (e: Exception) {
+                Log.e(TAG, "Error saving purchase: ${e.message}", e)
+                _saveError.value = e.message ?: "Failed to save purchase transaction"
+            } finally {
+                _isSaving.value = false
             }
-
-            SyncWorker.enqueueOneTimeSync(getApplication())
-            com.mmushtaq04.buysell.util.RatingManager.recordInteraction(getApplication())
-            Log.i(TAG, "✓ savePurchase completed and background sync enqueued.")
-            onSuccess()
         }
+    }
+
+    private fun parsePromisedDateMs(promisedDateStr: String?, defaultNowMs: Long): Long {
+        if (promisedDateStr.isNullOrBlank()) return defaultNowMs + 7 * 24 * 60 * 60 * 1000L
+        val parsedLong = promisedDateStr.toLongOrNull()
+        if (parsedLong != null && parsedLong > 0) return parsedLong
+        return runCatching {
+            val sdf = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US)
+            sdf.parse(promisedDateStr.trim())?.time
+        }.getOrNull() ?: (defaultNowMs + 7 * 24 * 60 * 60 * 1000L)
     }
 }

@@ -37,6 +37,7 @@ class PurchaseProcessorTest {
 
         override fun isFeatureLocked(feature: com.mmushtaq04.buysell.data.repository.PremiumFeature): Boolean = !shouldVerify
         override fun isFeatureLockedNow(feature: com.mmushtaq04.buysell.data.repository.PremiumFeature): Boolean = !shouldVerify
+        override fun clearCacheOnSignOut() {}
         override suspend fun syncEntitlementAndConfig(shopId: String) {}
         override suspend fun redeemAdminPromoCode(code: String, shopId: String): Boolean = shouldVerify
         override suspend fun verifyPurchaseWithServer(purchaseToken: String, productId: String, shopId: String): Boolean = shouldVerify

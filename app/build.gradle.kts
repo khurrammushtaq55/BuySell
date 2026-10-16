@@ -90,7 +90,7 @@ dependencies {
 
     // Play Review & Play Billing
     implementation(libs.play.review.ktx)
-    implementation("com.android.billingclient:billing-ktx:7.0.0")
+    implementation("com.android.billingclient:billing-ktx:7.1.1")
 
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)

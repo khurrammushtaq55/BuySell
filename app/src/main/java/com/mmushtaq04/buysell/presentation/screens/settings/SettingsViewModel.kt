@@ -271,6 +271,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
             authManager.signOut()
             db.clearAllTables()
             AppPinManager.clearPin(getApplication())
+            com.mmushtaq04.buysell.util.LicenseCache(getApplication()).clearCache()
             withContext(Dispatchers.Main) {
                 onReadyToSignOut()
             }

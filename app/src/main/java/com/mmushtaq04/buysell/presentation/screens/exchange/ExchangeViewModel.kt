@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.room.withTransaction
 import com.google.gson.Gson
 import com.mmushtaq04.buysell.data.local.AppDatabase
-import com.mmushtaq04.buysell.data.local.entity.PartyEntity
 import com.mmushtaq04.buysell.data.local.entity.SyncOutboxEntity
 import com.mmushtaq04.buysell.data.local.enums.*
 import com.mmushtaq04.buysell.data.repository.*
@@ -30,6 +29,12 @@ class ExchangeViewModel(application: Application) : AndroidViewModel(application
 
     private val _simpleStockList = MutableStateFlow<List<SimpleStockItem>>(emptyList())
     val simpleStockList: StateFlow<List<SimpleStockItem>> = _simpleStockList.asStateFlow()
+
+    private val _isSaving = MutableStateFlow(false)
+    val isSaving: StateFlow<Boolean> = _isSaving.asStateFlow()
+
+    private val _saveError = MutableStateFlow<String?>(null)
+    val saveError: StateFlow<String?> = _saveError.asStateFlow()
 
     companion object {
         private const val TAG = "ExchangeViewModel"
@@ -88,133 +93,144 @@ class ExchangeViewModel(application: Application) : AndroidViewModel(application
         onSuccess: () -> Unit
     ) {
         viewModelScope.launch {
+            if (_isSaving.value) return@launch
+            _isSaving.value = true
+            _saveError.value = null
             Log.d(TAG, "Starting processExchange: SoldStockItemID=$soldStockItemId, OldPhone=$oldPhoneBrand $oldPhoneModel, Value= $oldPhoneValueRs, NewPrice=Rs $newPhonePriceRs, Customer=$customerName")
+
             val user = db.userDao().getPrimaryUser()
             val meta = db.appMetaDao().getAppMeta()
             val activeShopId = meta?.activeShopId?.ifBlank { null } ?: user?.shopId ?: ""
             val now = System.currentTimeMillis()
             val exchangeGroupId = "EXG-${UUID.randomUUID().toString().take(8)}"
 
-            db.withTransaction {
-                // 1. Create or Find Customer/Party via PartyResolver
-                val partyEntity = com.mmushtaq04.buysell.domain.PartyResolver.findOrCreate(
-                    partyDao = db.partyDao(),
-                    shopId = activeShopId,
-                    rawName = customerName,
-                    rawPhone = customerPhone,
-                    rawCnic = customerCnic,
-                    typeHint = PartyTypeHint.BOTH,
-                    recordedBy = recordedBy,
-                    nowMs = now,
-                    generateId = { UUID.randomUUID().toString() }
-                )
-                val partyId = partyEntity.id
-                db.syncDao().enqueueOutbox(
-                    SyncOutboxEntity(
-                        id = UUID.randomUUID().toString(),
-                        entityType = "parties",
-                        entityId = partyEntity.id,
-                        op = SyncOp.UPSERT,
-                        payloadJson = Gson().toJson(partyEntity),
-                        createdAt = now
-                    )
-                )
-
-                // Construct attributes JSON for trade-in device
-                val attrMap = mutableMapOf<String, String>()
-                if (oldPhoneColor.isNotBlank()) attrMap["color"] = oldPhoneColor.trim()
-                if (oldPhoneIssue.isNotBlank()) attrMap["issue"] = oldPhoneIssue.trim()
-                if (oldPhoneRam.isNotBlank()) attrMap["ram"] = oldPhoneRam.trim()
-                if (oldPhoneStorage.isNotBlank()) attrMap["storage"] = oldPhoneStorage.trim()
-                if (oldPhoneSpecs.isNotBlank()) attrMap["specs"] = oldPhoneSpecs.trim()
-                val attributesJson = if (attrMap.isNotEmpty()) Gson().toJson(attrMap) else null
-
-                // 2. PURCHASE of Customer's Old Trade-In Device
-                val oldStockItem = StockItem(
-                    id = UUID.randomUUID().toString(),
-                    shopId = activeShopId,
-                    categoryId = "exchange_cat",
-                    brand = oldPhoneBrand.ifBlank { "Generic" },
-                    model = oldPhoneModel.ifBlank { "Trade-in Device" },
-                    identifier = oldPhoneImei.ifBlank { null },
-                    attributes = attributesJson,
-                    condition = oldPhoneIssue.ifBlank { "USED_EXCHANGE" },
-                    quantity = 1,
-                    remainingQty = 1,
-                    stockedAt = now
-                )
-
-                val purchaseValuePaisa = oldPhoneValueRs * 100
-                val purchaseTxn = stockRepository.recordPurchase(
-                    stockItem = oldStockItem,
-                    purchasePrice = purchaseValuePaisa,
-                    partyId = partyId,
-                    createdByUserId = recordedBy
-                )
-
-                // Link Exchange Group ID to Purchase Txn
-                val purchaseEntity = db.txnDao().getTxnById(purchaseTxn.id)
-                if (purchaseEntity != null) {
-                    db.txnDao().insertTxn(purchaseEntity.copy(exchangeGroupId = exchangeGroupId))
-                }
-
-                // 3. SALE of Shop's Selected Device
-                val salePricePaisa = newPhonePriceRs * 100
-                val saleTxn = stockRepository.recordSale(
-                    stockItemId = soldStockItemId,
-                    salePrice = salePricePaisa,
-                    partyId = partyId,
-                    createdByUserId = recordedBy,
-                    qtyToSell = 1
-                )
-
-                // Link Exchange Group ID to Sale Txn
-                val saleEntity = db.txnDao().getTxnById(saleTxn.id)
-                if (saleEntity != null) {
-                    db.txnDao().insertTxn(saleEntity.copy(exchangeGroupId = exchangeGroupId))
-                }
-
-                Log.i(TAG, "✓ Linked Exchange Group ID '$exchangeGroupId' between Purchase Txn ${purchaseTxn.id} & Sale Txn ${saleTxn.id}")
-
-                // 4. Record Net Cash Difference Payment
-                val netDifferenceRs = newPhonePriceRs - oldPhoneValueRs
-                val cashPaisa = cashPaidRs * 100
-
-                if (cashPaisa > 0) {
-                    val methodEnum = PaymentMethod.fromStr(paymentMethodStr)
-
-                    val direction = if (netDifferenceRs >= 0) PaymentDirection.IN else PaymentDirection.OUT
-                    val scope = if (direction == PaymentDirection.OUT) Scope.VAULT else Scope.PUBLIC
-
-                    val payment = Payment(
-                        id = UUID.randomUUID().toString(),
+            try {
+                db.withTransaction {
+                    // 1. Create or Find Customer/Party via PartyResolver
+                    val partyEntity = com.mmushtaq04.buysell.domain.PartyResolver.findOrCreate(
+                        partyDao = db.partyDao(),
                         shopId = activeShopId,
-                        txnId = saleTxn.id,
-                        partyId = partyId,
-                        direction = direction,
-                        amount = cashPaisa,
-                        method = methodEnum,
-                        payDate = now,
-                        scope = scope
+                        rawName = customerName,
+                        rawPhone = customerPhone,
+                        rawCnic = customerCnic,
+                        typeHint = PartyTypeHint.BOTH,
+                        recordedBy = recordedBy,
+                        nowMs = now,
+                        generateId = { UUID.randomUUID().toString() }
                     )
-                    db.paymentDao().insertPayment(payment.toEntity(recordedBy))
+                    val partyId = partyEntity.id
                     db.syncDao().enqueueOutbox(
                         SyncOutboxEntity(
                             id = UUID.randomUUID().toString(),
-                            entityType = "payments",
-                            entityId = payment.id,
+                            entityType = "parties",
+                            entityId = partyEntity.id,
                             op = SyncOp.UPSERT,
-                            payloadJson = Gson().toJson(payment.toEntity(recordedBy)),
+                            payloadJson = Gson().toJson(partyEntity),
                             createdAt = now
                         )
                     )
-                }
-            }
 
-            SyncWorker.enqueueOneTimeSync(getApplication())
-            com.mmushtaq04.buysell.util.RatingManager.recordInteraction(getApplication())
-            Log.i(TAG, "✓ processExchange completed and background sync enqueued.")
-            onSuccess()
+                    // Construct attributes JSON
+                    val attrMap = mutableMapOf<String, String>()
+                    if (oldPhoneColor.isNotBlank()) attrMap["color"] = oldPhoneColor.trim()
+                    if (oldPhoneIssue.isNotBlank()) attrMap["issue"] = oldPhoneIssue.trim()
+                    if (oldPhoneRam.isNotBlank()) attrMap["ram"] = oldPhoneRam.trim()
+                    if (oldPhoneStorage.isNotBlank()) attrMap["storage"] = oldPhoneStorage.trim()
+                    if (oldPhoneSpecs.isNotBlank()) attrMap["specs"] = oldPhoneSpecs.trim()
+                    val attributesJson = if (attrMap.isNotEmpty()) Gson().toJson(attrMap) else null
+
+                    // 2. PURCHASE of Customer's Old Trade-In Device
+                    val oldStockItem = StockItem(
+                        id = UUID.randomUUID().toString(),
+                        shopId = activeShopId,
+                        categoryId = "exchange_cat",
+                        brand = oldPhoneBrand.ifBlank { "Generic" },
+                        model = oldPhoneModel.ifBlank { "Trade-in Device" },
+                        identifier = oldPhoneImei.ifBlank { null },
+                        attributes = attributesJson,
+                        condition = oldPhoneIssue.ifBlank { "USED_EXCHANGE" },
+                        quantity = 1,
+                        remainingQty = 1,
+                        stockedAt = now
+                    )
+
+                    val purchaseValuePaisa = oldPhoneValueRs * 100
+                    val purchaseTxn = stockRepository.recordPurchase(
+                        stockItem = oldStockItem,
+                        purchasePrice = purchaseValuePaisa,
+                        partyId = partyId,
+                        createdByUserId = recordedBy
+                    )
+
+                    // Link Exchange Group ID to Purchase Txn
+                    val purchaseEntity = db.txnDao().getTxnById(purchaseTxn.id)
+                    if (purchaseEntity != null) {
+                        db.txnDao().insertTxn(purchaseEntity.copy(exchangeGroupId = exchangeGroupId))
+                    }
+
+                    // 3. SALE of Shop's Selected Device
+                    val salePricePaisa = newPhonePriceRs * 100
+                    val saleTxn = stockRepository.recordSale(
+                        stockItemId = soldStockItemId,
+                        salePrice = salePricePaisa,
+                        partyId = partyId,
+                        createdByUserId = recordedBy,
+                        qtyToSell = 1
+                    )
+
+                    // Link Exchange Group ID to Sale Txn
+                    val saleEntity = db.txnDao().getTxnById(saleTxn.id)
+                    if (saleEntity != null) {
+                        db.txnDao().insertTxn(saleEntity.copy(exchangeGroupId = exchangeGroupId))
+                    }
+
+                    Log.i(TAG, "✓ Linked Exchange Group ID '$exchangeGroupId' between Purchase Txn ${purchaseTxn.id} & Sale Txn ${saleTxn.id}")
+
+                    // 4. Record Net Cash Difference Payment
+                    val netDifferenceRs = newPhonePriceRs - oldPhoneValueRs
+                    val cashPaisa = cashPaidRs * 100
+
+                    if (cashPaisa > 0) {
+                        val methodEnum = PaymentMethod.fromStr(paymentMethodStr)
+
+                        val direction = if (netDifferenceRs >= 0) PaymentDirection.IN else PaymentDirection.OUT
+                        val scope = if (direction == PaymentDirection.OUT) Scope.VAULT else Scope.PUBLIC
+
+                        val payment = Payment(
+                            id = UUID.randomUUID().toString(),
+                            shopId = activeShopId,
+                            txnId = saleTxn.id,
+                            partyId = partyId,
+                            direction = direction,
+                            amount = cashPaisa,
+                            method = methodEnum,
+                            payDate = now,
+                            scope = scope
+                        )
+                        db.paymentDao().insertPayment(payment.toEntity(recordedBy))
+                        db.syncDao().enqueueOutbox(
+                            SyncOutboxEntity(
+                                id = UUID.randomUUID().toString(),
+                                entityType = "payments",
+                                entityId = payment.id,
+                                op = SyncOp.UPSERT,
+                                payloadJson = Gson().toJson(payment.toEntity(recordedBy)),
+                                createdAt = now
+                            )
+                        )
+                    }
+                }
+
+                SyncWorker.enqueueOneTimeSync(getApplication())
+                com.mmushtaq04.buysell.util.RatingManager.recordInteraction(getApplication())
+                Log.i(TAG, "✓ processExchange completed and background sync enqueued.")
+                onSuccess()
+            } catch (e: Exception) {
+                Log.e(TAG, "Error processing exchange: ${e.message}", e)
+                _saveError.value = e.message ?: "Failed to process exchange transaction"
+            } finally {
+                _isSaving.value = false
+            }
         }
     }
 }

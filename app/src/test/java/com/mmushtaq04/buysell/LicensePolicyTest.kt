@@ -161,4 +161,27 @@ class LicensePolicyTest {
         assertTrue(result.isUnlocked)
         assertEquals("PROMO", result.source)
     }
+
+    @Test
+    fun testMonotonicElapsedRealtimeExceedingOfflineWindowDeniesEntitlement() {
+        val license = LicenseData(
+            plan = "PRO_ANNUAL",
+            status = "ACTIVE",
+            validUntilMs = baseNowMs + 100L * 86400000L,
+            source = "PLAY",
+            serverTimeMs = baseNowMs,
+            lastFetchLocalMs = baseNowMs
+        )
+
+        val elapsedSinceFetchMs = 15L * 86400000L
+        val result = LicensePolicy.computeEntitlement(
+            license = license,
+            nowMs = baseNowMs + 86400000L,
+            lastSeenTimeMs = baseNowMs + 86400000L,
+            elapsedSinceFetchMs = elapsedSinceFetchMs
+        )
+
+        assertFalse(result.isUnlocked)
+        assertEquals("Offline trust window exceeded", result.reason)
+    }
 }

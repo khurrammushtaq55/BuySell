@@ -61,10 +61,18 @@ class PlayBillingManager private constructor(context: Context) : PurchasesUpdate
         startConnection()
     }
 
+    private var hasAutoRecoveredOnStart = false
+
     fun initializeSession(repo: FeatureAccessRepository, shopId: String, userUid: String) {
         this.featureRepo = repo
         this.activeShopId = shopId
         this.activeUserUid = userUid
+
+        if (_isBillingReady.value && shopId.isNotBlank() && !hasAutoRecoveredOnStart) {
+            hasAutoRecoveredOnStart = true
+            Log.i(TAG, "Triggering automatic purchase recovery on app startup for shop '$shopId'")
+            restorePurchases(shopId, repo)
+        }
     }
 
     fun clearEventMessage() {
@@ -79,6 +87,13 @@ class PlayBillingManager private constructor(context: Context) : PurchasesUpdate
                     retryDelayMs = 1000L
                     Log.i(TAG, "✓ Google Play Billing connected successfully.")
                     queryAvailableProducts()
+
+                    if (activeShopId.isNotBlank() && featureRepo != null && !hasAutoRecoveredOnStart) {
+                        hasAutoRecoveredOnStart = true
+                        Log.i(TAG, "Triggering automatic purchase recovery on billing connection for shop '$activeShopId'")
+                        restorePurchases(activeShopId, featureRepo!!)
+                    }
+
                     onConnected()
                 } else {
                     Log.w(TAG, "Billing setup failed with code: ${billingResult.responseCode}")
