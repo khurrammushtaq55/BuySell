@@ -3,6 +3,9 @@
     <string name="app_name">BuySell360</string>
     <string name="billing_error_network">Erreur réseau lors de l\'achat. Veuillez vérifier votre connexion internet.</string>
     <string name="dashboard_today">Aujourd\'hui</string>
+    <string name="dashboard_insight_margin">Marge Nette</string>
+    <string name="dashboard_insight_avg_sale">Vente Moyenne</string>
+    <string name="dashboard_insight_unit_profit">Profit/Unité</string>
     <string name="dashboard_this_month">Ce Mois</string>
     <string name="dashboard_this_year">Cette Année</string>
     <string name="dashboard_all_time">Tout le Temps</string>
@@ -210,7 +213,7 @@
     <string name="exchange_old_imei_label">IMEI / Numéro de série</string>
     <string name="exchange_defects_label">Défauts / Problèmes (le cas échéant)</string>
     <string name="exchange_defects_sub">ex: Écran fissuré, Face ID ne fonctionne pas</string>
-    <string name="exchange_old_value_label">Valeur convenue de l\'ancien article</string>
+    <string name="exchange_old_value_label">Prix d\'Achat (Buying Price)</string>
     <string name="exchange_btn_step3">Étape suivante (Client &amp; Paiement)</string>
     <string name="exchange_new_price_summary">Prix du nouvel article : %1$s</string>
     <string name="exchange_old_value_summary">Valeur de l\'ancien article : %1$s</string>

@@ -1,5 +1,6 @@
 package com.mmushtaq04.buysell.presentation.screens.exchange
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -13,6 +14,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Badge
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.SwapHoriz
@@ -22,6 +24,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -44,6 +47,7 @@ fun ExchangeWizardScreen(
     stockList: List<SimpleStockItem> = emptyList(),
     currentUserName: String = "Malik / Staff",
     enabledCategories: List<String> = emptyList(),
+    initialStep: Int = 1,
     onNavigateBack: () -> Unit = {},
     onSaveExchange: (
         soldStockItemId: String,
@@ -68,7 +72,7 @@ fun ExchangeWizardScreen(
     onSaveSuccess: () -> Unit = {}
 ) {
     val context = LocalContext.current
-    var step by remember { mutableIntStateOf(1) }
+    var step by remember { mutableIntStateOf(initialStep) }
 
     val activeCategories = enabledCategories.ifEmpty {
         listOf("Mobile", "Tablet / iPad", "Laptop", "Console", "Smartwatch", "Earbuds", "Accessories")
@@ -118,20 +122,22 @@ fun ExchangeWizardScreen(
 
     val newPriceVal = newPhonePriceText.toLongOrNull() ?: 0L
     val oldPriceVal = oldPhoneValueText.toLongOrNull() ?: 0L
-    val netDiffVal = (newPriceVal - oldPriceVal).coerceAtLeast(0L)
+    val absDiffVal = kotlin.math.abs(newPriceVal - oldPriceVal)
 
     LaunchedEffect(step, newPhonePriceText, oldPhoneValueText) {
-        if (step == 3 && (cashPaidText.isBlank() || cashPaidText == "0")) {
-            if (netDiffVal > 0) {
-                cashPaidText = netDiffVal.toString()
-            }
+        if (step == 3) {
+            cashPaidText = absDiffVal.toString()
         }
     }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.exchange_wizard_title, step, 3), fontWeight = FontWeight.Bold) },
+                title = {
+                    Column {
+                        Text(stringResource(R.string.exchange_wizard_title, step, 3), fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                    }
+                },
                 navigationIcon = {
                     IconButton(onClick = {
                         if (step > 1) step-- else onNavigateBack()
@@ -149,9 +155,29 @@ fun ExchangeWizardScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            // Segmented Progress Bar (Option 1: Modern & Minimalist 3-Step Segments)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 4.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                for (i in 1..3) {
+                    val isCompletedOrActive = i <= step
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(6.dp)
+                            .clip(RoundedCornerShape(3.dp))
+                            .background(
+                                if (isCompletedOrActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
+                            )
+                    )
+                }
+            }
+
             when (step) {
                 1 -> {
-                    // Step 1: Select item from stock to give in exchange
                     Text(stringResource(R.string.exchange_step1_header), fontSize = 16.sp, fontWeight = FontWeight.Bold)
 
                     OutlinedTextField(
@@ -263,6 +289,9 @@ fun ExchangeWizardScreen(
 
                 2 -> {
                     // Step 2: Customer's old trade-in device details
+                    val oldValNum = oldPhoneValueText.toLongOrNull() ?: 0L
+                    val isOldValueValid = oldPhoneValueText.isNotBlank() && oldValNum > 0L
+
                     Column(
                         modifier = Modifier
                             .weight(1f)
@@ -356,7 +385,8 @@ fun ExchangeWizardScreen(
                         OutlinedTextField(
                             value = oldPhoneValueText,
                             onValueChange = { newValue -> oldPhoneValueText = newValue.filter { it.isDigit() } },
-                            label = { Text(stringResource(R.string.exchange_old_value_label)) },
+                            label = { Text(stringResource(R.string.exchange_old_value_label) + " *") },
+                            isError = oldPhoneValueText.isNotBlank() && oldValNum <= 0L,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -439,7 +469,7 @@ fun ExchangeWizardScreen(
 
                     Button(
                         onClick = { step = 3 },
-                        enabled = oldCategory.isNotBlank() && oldPhoneValueText.isNotBlank(),
+                        enabled = oldCategory.isNotBlank() && isOldValueValid,
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(stringResource(R.string.exchange_btn_step3))
@@ -521,8 +551,9 @@ fun ExchangeWizardScreen(
                         OutlinedTextField(
                             value = customerName,
                             onValueChange = { customerName = it },
-                            label = { Text(stringResource(R.string.exchange_customer_name_label)) },
+                            label = { Text(stringResource(R.string.exchange_customer_name_label) + " *") },
                             leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
+                            isError = customerName.isBlank(),
                             keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words),
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -530,7 +561,9 @@ fun ExchangeWizardScreen(
                         OutlinedTextField(
                             value = customerPhone,
                             onValueChange = { newValue -> customerPhone = newValue.filter { it.isDigit() || it == '+' } },
-                            label = { Text(stringResource(R.string.exchange_customer_phone_label)) },
+                            label = { Text(stringResource(R.string.exchange_customer_phone_label) + " *") },
+                            leadingIcon = { Icon(Icons.Default.Phone, contentDescription = null) },
+                            isError = customerPhone.isBlank(),
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -547,8 +580,14 @@ fun ExchangeWizardScreen(
                         OutlinedTextField(
                             value = cashPaidText,
                             onValueChange = { newValue -> cashPaidText = newValue.filter { it.isDigit() } },
-                            label = { Text(stringResource(R.string.exchange_cash_paid_label)) },
+                            label = { Text(stringResource(R.string.exchange_cash_paid_label) + " *") },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            isError = cashPaidText.isBlank(),
+                            supportingText = {
+                                if (cashPaidText.isBlank()) {
+                                    Text("Compulsory / Zaroori *", color = MaterialTheme.colorScheme.error, fontSize = 11.sp)
+                                }
+                            },
                             modifier = Modifier.fillMaxWidth()
                         )
 
@@ -610,7 +649,7 @@ fun ExchangeWizardScreen(
                             isSaving = false
                             onSaveSuccess()
                         },
-                        enabled = !isSaving,
+                        enabled = !isSaving && customerName.isNotBlank() && customerPhone.isNotBlank() && cashPaidText.isNotBlank(),
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Icon(Icons.Default.SwapHoriz, contentDescription = null)
@@ -623,15 +662,45 @@ fun ExchangeWizardScreen(
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, name = "Exchange Step 1 - Select Shop Stock")
 @Composable
-fun ExchangeWizardScreenPreview() {
+fun ExchangeWizardStep1Preview() {
     BuySellTheme {
         ExchangeWizardScreen(
+            initialStep = 1,
             stockList = listOf(
-                SimpleStockItem("1", "Apple iPhone 15 Pro", "358912345678901", 180000),
+                SimpleStockItem("1", "Apple iPhone 15 Pro Max 256GB", "358912345678901", 180000),
                 SimpleStockItem("2", "Samsung Galaxy S24 Ultra", "351234567890123", 210000)
-            )
+            ),
+            currentUserName = "Malik Mushtaq (Owner)"
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Exchange Step 2 - Trade-In Device Details")
+@Composable
+fun ExchangeWizardStep2Preview() {
+    BuySellTheme {
+        ExchangeWizardScreen(
+            initialStep = 2,
+            stockList = listOf(
+                SimpleStockItem("1", "Apple iPhone 15 Pro Max 256GB", "358912345678901", 180000)
+            ),
+            currentUserName = "Malik Mushtaq (Owner)"
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Exchange Step 3 - Settlement & Customer Info")
+@Composable
+fun ExchangeWizardStep3Preview() {
+    BuySellTheme {
+        ExchangeWizardScreen(
+            initialStep = 3,
+            stockList = listOf(
+                SimpleStockItem("1", "Apple iPhone 15 Pro Max 256GB", "358912345678901", 180000)
+            ),
+            currentUserName = "Malik Mushtaq (Owner)"
         )
     }
 }

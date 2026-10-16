@@ -3,6 +3,9 @@
     <string name="app_name">BuySell360</string>
     <string name="billing_error_network">Kharidari ke dauran network ka masla. Internet connection check karein.</string>
     <string name="dashboard_today">Aaj</string>
+    <string name="dashboard_insight_margin">Net Margin</string>
+    <string name="dashboard_insight_avg_sale">Avg Sale</string>
+    <string name="dashboard_insight_unit_profit">Unit Profit</string>
     <string name="dashboard_this_month">Iss Mahine</string>
     <string name="dashboard_this_year">Iss Saal</string>
     <string name="dashboard_all_time">Maikal Record</string>
@@ -210,10 +213,10 @@
     <string name="exchange_old_imei_label">IMEI / Serial Number</string>
     <string name="exchange_defects_label">Defects / Issue (if any)</string>
     <string name="exchange_defects_sub">e.g. Screen glass cracked, Face ID not working</string>
-    <string name="exchange_old_value_label">Purane Item ki Lagayei Gayi Qeemat</string>
+    <string name="exchange_old_value_label">Buying Price (Khareed Rate)</string>
     <string name="exchange_btn_step3">Agla Step (Customer &amp; Hisab)</string>
     <string name="exchange_new_price_summary">Naye Item Price: %1$s</string>
-    <string name="exchange_old_value_summary">Purane Item Value: %1$s</string>
+    <string name="exchange_old_value_summary">Purane Item ki Khareed Price: %1$s</string>
     <string name="exchange_customer_due">Customer owes: %1$s</string>
     <string name="exchange_shop_due">Shop owes customer: %1$s</string>
     <string name="exchange_customer_name_label">Customer Name</string>

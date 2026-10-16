@@ -3,6 +3,9 @@
     <string name="app_name">BuySell360</string>
     <string name="billing_error_network">خطأ في الشبكة أثناء الشراء. يرجى التحقق من الاتصال بالإنترنت.</string>
     <string name="dashboard_today">اليوم</string>
+    <string name="dashboard_insight_margin">هامش الربح</string>
+    <string name="dashboard_insight_avg_sale">متوسط البيع</string>
+    <string name="dashboard_insight_unit_profit">ربح القطعة</string>
     <string name="dashboard_this_month">هذا الشهر</string>
     <string name="dashboard_this_year">هذه السنة</string>
     <string name="dashboard_all_time">كل الأوقات</string>
@@ -210,7 +213,7 @@
     <string name="exchange_old_imei_label">رقم IMEI / الرقم التسلسلي</string>
     <string name="exchange_defects_label">العيوب / المشاكل (إن وجدت)</string>
     <string name="exchange_defects_sub">مثال: شاشة مكسورة، بصمة الوجه لا تعمل</string>
-    <string name="exchange_old_value_label">القيمة المتفق عليها للجهاز القديم (روبية)</string>
+    <string name="exchange_old_value_label">سعر الشراء (Buying Price)</string>
     <string name="exchange_btn_step3">الخطوة التالية (العميل والدفع)</string>
     <string name="exchange_new_price_summary">سعر الصنف الجديد: %1$s روبية</string>
     <string name="exchange_old_value_summary">قيمة الصنف القديم: %1$s روبية</string>

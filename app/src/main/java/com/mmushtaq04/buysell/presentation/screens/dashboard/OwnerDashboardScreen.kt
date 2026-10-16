@@ -4,43 +4,71 @@ import android.content.Context
 import android.content.Intent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.AssignmentReturn
 import androidx.compose.material.icons.automirrored.filled.HelpOutline
 import androidx.compose.material.icons.automirrored.filled.ReceiptLong
 import androidx.compose.material.icons.automirrored.filled.TrendingDown
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.AccountBalanceWallet
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AttachMoney
-import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.EventBusy
 import androidx.compose.material.icons.filled.Inventory2
 import androidx.compose.material.icons.filled.MoneyOff
 import androidx.compose.material.icons.filled.Share
-import androidx.compose.material.icons.filled.TrendingDown
 import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DateRangePicker
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberDateRangePickerState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.mmushtaq04.buysell.R
 import com.mmushtaq04.buysell.presentation.components.PremiumFeatureGate
 import com.mmushtaq04.buysell.presentation.components.PremiumPaywallDialog
+import com.mmushtaq04.buysell.ui.theme.BuySellTheme
 
 @Composable
 fun OwnerDashboardScreen(
@@ -295,39 +323,89 @@ fun OwnerDashboardContent(
                         color = profitColor
                     )
 
-                    // P8 TASK T1: Insights Row (Margins, Avg Sale, Avg Unit Profit)
+                    // Financial Insights (3 Separate Boxes for Maximum Clarity)
                     HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Text(
-                            text = stringResource(
-                                R.string.dashboard_net_margin,
-                                String.format(java.util.Locale.US, "%.1f", uiState.netMarginPercent)
-                            ),
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Text(
-                            text = stringResource(
-                                R.string.dashboard_avg_sale_value,
-                                com.mmushtaq04.buysell.util.CurrencyFormatter.formatAmount(context, uiState.avgSaleValueRs)
-                            ),
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Text(
-                            text = stringResource(
-                                R.string.dashboard_avg_unit_profit,
-                                com.mmushtaq04.buysell.util.CurrencyFormatter.formatAmount(context, uiState.avgProfitPerUnitRs)
-                            ),
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                        // Box 1: Net Margin %
+                        Surface(
+                            modifier = Modifier.weight(1f),
+                            shape = RoundedCornerShape(8.dp),
+                            color = MaterialTheme.colorScheme.surface
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 8.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.dashboard_insight_margin),
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    color = Color.Gray
+                                )
+                                Spacer(modifier = Modifier.height(2.dp))
+                                Text(
+                                    text = String.format(java.util.Locale.US, "%.1f%%", uiState.netMarginPercent),
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+                        }
+
+                        // Box 2: Avg Sale Value
+                        Surface(
+                            modifier = Modifier.weight(1f),
+                            shape = RoundedCornerShape(8.dp),
+                            color = MaterialTheme.colorScheme.surface
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 8.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.dashboard_insight_avg_sale),
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    color = Color.Gray
+                                )
+                                Spacer(modifier = Modifier.height(2.dp))
+                                Text(
+                                    text = com.mmushtaq04.buysell.util.CurrencyFormatter.formatAmount(context, uiState.avgSaleValueRs),
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+                        }
+
+                        // Box 3: Avg Profit Per Unit
+                        Surface(
+                            modifier = Modifier.weight(1f),
+                            shape = RoundedCornerShape(8.dp),
+                            color = MaterialTheme.colorScheme.surface
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 8.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.dashboard_insight_unit_profit),
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    color = Color.Gray
+                                )
+                                Spacer(modifier = Modifier.height(2.dp))
+                                Text(
+                                    text = com.mmushtaq04.buysell.util.CurrencyFormatter.formatAmount(context, uiState.avgProfitPerUnitRs),
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = profitColor
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -841,39 +919,134 @@ private fun DashboardSmallCard(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(14.dp),
             verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    tint = iconColor,
-                    modifier = Modifier.size(18.dp)
-                )
                 Text(
                     text = title,
-                    fontSize = 12.sp,
+                    fontSize = 11.sp,
                     fontWeight = FontWeight.SemiBold,
-                    color = Color.Gray
+                    color = Color.Gray,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f)
                 )
+                Surface(
+                    shape = RoundedCornerShape(6.dp),
+                    color = iconColor.copy(alpha = 0.12f)
+                ) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = null,
+                        tint = iconColor,
+                        modifier = Modifier
+                            .padding(4.dp)
+                            .size(16.dp)
+                    )
+                }
             }
             Text(
                 text = value,
-                fontSize = 18.sp,
+                fontSize = 17.sp,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
             if (subtitle != null) {
                 Text(
                     text = subtitle,
                     fontSize = 10.sp,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.primary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
         }
+    }
+}
+
+@Preview(showBackground = true, name = "Owner Dashboard - Pro Unlocked")
+@Composable
+fun OwnerDashboardContentUnlockedPreview() {
+    BuySellTheme {
+        OwnerDashboardContent(
+            uiState = DashboardUiState(
+                shopName = "Mushtaq Mobile Store",
+                netRevenueRs = 850000L,
+                cogsRs = 620000L,
+                expensesRs = 35000L,
+                netProfitRs = 195000L,
+                returnsRefundsRs = 12000L,
+                receivablesRs = 145000L,
+                receivablesPartyCount = 8,
+                payablesRs = 82000L,
+                payablesPartyCount = 4,
+                overduePromisesRs = 45000L,
+                overduePromisesCount = 3,
+                capitalInStockRs = 1250000L,
+                slowStockCount = 5,
+                slowStockValueRs = 320000L,
+                netMarginPercent = 22.9f,
+                avgSaleValueRs = 85000L,
+                avgProfitPerUnitRs = 19500L,
+                saleTxnCount = 10,
+                periodComparison = PeriodComparison(
+                    previousRevenueRs = 720000L,
+                    previousProfitRs = 150000L,
+                    revenueChangePercent = 18.1f,
+                    profitChangePercent = 30.0f
+                ),
+                topSellingModels = listOf(
+                    TopSellingModel("Apple iPhone 15 Pro", 4, 840000L, 120000L),
+                    TopSellingModel("Samsung Galaxy S24 Ultra", 3, 630000L, 90000L),
+                    TopSellingModel("Xiaomi 14 Ultra", 2, 350000L, 50000L)
+                ),
+                agedStockBuckets = listOf(
+                    AgedStockBucket("0-30 Days (Fresh)", 12, 850000L),
+                    AgedStockBucket("31-60 Days (Aging)", 4, 250000L),
+                    AgedStockBucket("61-90 Days (Slow)", 2, 110000L),
+                    AgedStockBucket("90+ Days (Stagnant)", 1, 40000L)
+                ),
+                paymentMethodTotals = mapOf(
+                    com.mmushtaq04.buysell.data.local.enums.PaymentMethod.CASH to 450000L,
+                    com.mmushtaq04.buysell.data.local.enums.PaymentMethod.BANK to 300000L,
+                    com.mmushtaq04.buysell.data.local.enums.PaymentMethod.WALLET to 100000L
+                )
+            ),
+            isAdvancedDashboardLocked = false,
+            isInventoryInsightsLocked = false
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Owner Dashboard - Free Gated")
+@Composable
+fun OwnerDashboardContentLockedPreview() {
+    BuySellTheme {
+        OwnerDashboardContent(
+            uiState = DashboardUiState(
+                shopName = "Mushtaq Mobile Store",
+                netRevenueRs = 250000L,
+                cogsRs = 180000L,
+                expensesRs = 15000L,
+                netProfitRs = 55000L,
+                receivablesRs = 45000L,
+                receivablesPartyCount = 3,
+                payablesRs = 20000L,
+                payablesPartyCount = 2,
+                netMarginPercent = 22.0f,
+                avgSaleValueRs = 50000L,
+                avgProfitPerUnitRs = 11000L,
+                saleTxnCount = 5
+            ),
+            isAdvancedDashboardLocked = true,
+            isInventoryInsightsLocked = true
+        )
     }
 }

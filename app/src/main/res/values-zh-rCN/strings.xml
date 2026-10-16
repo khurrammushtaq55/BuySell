@@ -3,6 +3,9 @@
     <string name="app_name">BuySell360</string>
     <string name="billing_error_network">购买期间发生网络错误，请检查您的网络连接。</string>
     <string name="dashboard_today">今天</string>
+    <string name="dashboard_insight_margin">净利润率</string>
+    <string name="dashboard_insight_avg_sale">平均售价</string>
+    <string name="dashboard_insight_unit_profit">单件利润</string>
     <string name="dashboard_this_month">本月</string>
     <string name="dashboard_this_year">今年</string>
     <string name="dashboard_all_time">全部记录</string>
@@ -210,7 +213,7 @@
     <string name="exchange_old_imei_label">IMEI / 序列号</string>
     <string name="exchange_defects_label">缺陷 / 问题（如有）</string>
     <string name="exchange_defects_sub">例如：屏幕玻璃破裂，Face ID 无法使用</string>
-    <string name="exchange_old_value_label">旧商品折价金额（卢比）</string>
+    <string name="exchange_old_value_label">收购价格 (Buying Price)</string>
     <string name="exchange_btn_step3">下一步（客户与付款）</string>
     <string name="exchange_new_price_summary">新商品价格：%1$s</string>
     <string name="exchange_old_value_summary">旧商品折价：%1$s</string>
