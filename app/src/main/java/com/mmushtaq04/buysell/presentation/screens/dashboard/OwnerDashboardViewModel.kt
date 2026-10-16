@@ -121,6 +121,7 @@ data class DashboardUiState(
     val belowCostSalesCount: Int = 0,
     val belowCostTotalLossRs: Long = 0L,
     val topBelowCostSales: List<BelowCostSaleItem> = emptyList(),
+    val shopName: String = "Mera Store",
     val isLoading: Boolean = false
 )
 
@@ -251,6 +252,9 @@ class OwnerDashboardViewModel(application: Application) : AndroidViewModel(appli
         val methodTotalsList = db.paymentDao().getPaymentMethodTotalsInRange(activeShopId, startTimeMs, endTimeMs)
         val methodTotalsMap = methodTotalsList.associate { it.method to (it.totalAmountPaisa / 100) }
 
+        val shopEntity = db.shopDao().getShopById(activeShopId)
+        val activeShopName = shopEntity?.name?.ifBlank { "Mera Store" } ?: "Mera Store"
+
         val mappedTimeRange = when (selection.preset) {
             TimeRangePreset.TODAY -> TimeRange.TODAY
             TimeRangePreset.THIS_MONTH -> TimeRange.THIS_MONTH
@@ -305,6 +309,7 @@ class OwnerDashboardViewModel(application: Application) : AndroidViewModel(appli
             belowCostSalesCount = currentMetrics.belowCostSalesCount,
             belowCostTotalLossRs = currentMetrics.belowCostTotalLossRs,
             topBelowCostSales = currentMetrics.topBelowCostSales,
+            shopName = activeShopName,
             isLoading = false
         )
     }

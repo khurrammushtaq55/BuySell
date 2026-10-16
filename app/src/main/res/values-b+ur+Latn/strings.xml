@@ -2,6 +2,13 @@
 <resources>
     <string name="app_name">BuySell360</string>
     <string name="billing_error_network">Kharidari ke dauran network ka masla. Internet connection check karein.</string>
+    <string name="dashboard_today">Aaj</string>
+    <string name="dashboard_this_month">Iss Mahine</string>
+    <string name="dashboard_this_year">Iss Saal</string>
+    <string name="dashboard_all_time">Maikal Record</string>
+    <string name="settings_notifications_permission_title">Notifications Permission</string>
+    <string name="settings_notifications_permission_sub">Udhaar reminders aur business reports ke liye notifications enable karein</string>
+    <string name="settings_btn_open_settings">Settings Kholein</string>
     <string name="billing_error_generic">Billing me masla aya. Phir koshish karein.</string>
     <string name="billing_payment_pending">Aap ki payment pending hai. Payment mukammal hone par access unlock hoga.</string>
     <string name="paywall_owner_only_notice">Sirf dukan ka maalik subscription kharid ya restore kar sakta hai.</string>
@@ -186,7 +193,7 @@
     <string name="login_btn_login">Login Karein</string>
     <string name="label_owner_shop_name">Dukan Ka Naam *</string>
     <string name="label_owner_shop_phone">Dukan Ka Phone Number *</string>
-    <string name="label_owner_shop_address">Hafeez Center Shop Address *</string>
+    <string name="label_owner_shop_address">Dukan Ka Pata (Address) *</string>
     <string name="home_title">%1$s</string>
     <string name="home_welcome_role">Logged in as %1$s</string>
     <string name="dashboard_total_profit">Kul Safi Munafa (Net Profit)</string>
@@ -439,7 +446,7 @@
     <string name="placeholder_owner_name">e.g. Malik Mushtaq</string>
     <string name="placeholder_shop_name">e.g. Mushtaq Mobile Trading</string>
     <string name="placeholder_shop_phone">03001234567</string>
-    <string name="placeholder_shop_address">Shop #12, Ground Floor, Hafeez Center</string>
+    <string name="placeholder_shop_address">Shop #12, Ground Floor, Main Market</string>
     <string name="placeholder_staff_name">e.g. Usman Ahmed</string>
     <string name="placeholder_mobile_number">03129876543</string>
     <string name="placeholder_staff_code">e.g. K7M2A9P4</string>

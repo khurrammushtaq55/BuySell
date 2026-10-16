@@ -2,6 +2,13 @@
 <resources>
     <string name="app_name">BuySell360</string>
     <string name="billing_error_network">خریداری کے دوران نیٹ ورک کی خرابی۔ براہ کرم اپنا انٹرنیٹ کنکشن چیک کریں۔</string>
+    <string name="dashboard_today">آج</string>
+    <string name="dashboard_this_month">اس مہینے</string>
+    <string name="dashboard_this_year">اس سال</string>
+    <string name="dashboard_all_time">کل ریکارڈ</string>
+    <string name="settings_notifications_permission_title">نوٹیفکیشن کی اجازت</string>
+    <string name="settings_notifications_permission_sub">ادھار کی ادائیگی کی یاد دہانی اور بزنس رپورٹس کے لیے نوٹیفکیشنز آن کریں</string>
+    <string name="settings_btn_open_settings">سیٹنگز کھولیں</string>
     <string name="billing_error_generic">بلنگ میں خرابی پیش آئی۔ براہ کرم بعد میں دوبارہ کوشش کریں۔</string>
     <string name="billing_payment_pending">آپ کی ادائیگی زیر التواء ہے۔ ادائیگی مکمل ہونے پر رسائی انلاک ہو جائے گی۔</string>
     <string name="paywall_owner_only_notice">صرف دکان کا مالک ہی اس دکان کے لیے سبسکرپشن خرید یا بحال کر سکتا ہے۔</string>
@@ -439,7 +446,7 @@
     <string name="placeholder_owner_name">مثلاً ملک مشتاق</string>
     <string name="placeholder_shop_name">مثلاً مشتاق موبائل ٹریڈنگ</string>
     <string name="placeholder_shop_phone">03001234567</string>
-    <string name="placeholder_shop_address">دکان نمبر 12، حفیظ سینٹر، لاہور</string>
+    <string name="placeholder_shop_address">دکان نمبر 12، گراؤنڈ فلور، مین مارکیٹ</string>
     <string name="placeholder_staff_name">مثلاً عثمان احمد</string>
     <string name="placeholder_mobile_number">03129876543</string>
     <string name="placeholder_staff_code">مثلاً K7M2A9P4</string>

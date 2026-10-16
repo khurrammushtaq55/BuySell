@@ -2,6 +2,13 @@
 <resources>
     <string name="app_name">BuySell360</string>
     <string name="billing_error_network">Erreur réseau lors de l\'achat. Veuillez vérifier votre connexion internet.</string>
+    <string name="dashboard_today">Aujourd\'hui</string>
+    <string name="dashboard_this_month">Ce Mois</string>
+    <string name="dashboard_this_year">Cette Année</string>
+    <string name="dashboard_all_time">Tout le Temps</string>
+    <string name="settings_notifications_permission_title">Autorisation de Notification</string>
+    <string name="settings_notifications_permission_sub">Activez les notifications pour recevoir les rappels de paiement et rapports</string>
+    <string name="settings_btn_open_settings">Ouvrir les Paramètres</string>
     <string name="billing_error_generic">Une erreur de facturation est survenue. Veuillez réessayer plus tard.</string>
     <string name="billing_payment_pending">Le paiement est en attente. L\'accès sera débloqué une fois le paiement effectué.</string>
     <string name="paywall_owner_only_notice">Seul le propriétaire du magasin peut acheter ou restaurer des abonnements.</string>
@@ -439,7 +446,7 @@
     <string name="placeholder_owner_name">ex. Malik Mushtaq</string>
     <string name="placeholder_shop_name">ex. Mushtaq Mobile Trading</string>
     <string name="placeholder_shop_phone">03001234567</string>
-    <string name="placeholder_shop_address">Boutique #12, Rez-de-chaussée, Centre Hafeez</string>
+    <string name="placeholder_shop_address">Boutique #12, Rez-de-chaussée, Marché Principal</string>
     <string name="placeholder_staff_name">ex. Usman Ahmed</string>
     <string name="placeholder_mobile_number">03129876543</string>
     <string name="placeholder_staff_code">ex. K7M2A9P4</string>

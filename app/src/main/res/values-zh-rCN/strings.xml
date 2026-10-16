@@ -2,6 +2,13 @@
 <resources>
     <string name="app_name">BuySell360</string>
     <string name="billing_error_network">购买期间发生网络错误，请检查您的网络连接。</string>
+    <string name="dashboard_today">今天</string>
+    <string name="dashboard_this_month">本月</string>
+    <string name="dashboard_this_year">今年</string>
+    <string name="dashboard_all_time">全部记录</string>
+    <string name="settings_notifications_permission_title">通知权限</string>
+    <string name="settings_notifications_permission_sub">开启通知以接收赊账付款提醒和业务报告</string>
+    <string name="settings_btn_open_settings">打开设置</string>
     <string name="billing_error_generic">账单服务出错，请稍后重试。</string>
     <string name="billing_payment_pending">付款正在处理中，完成付款后将解锁访问权限。</string>
     <string name="paywall_owner_only_notice">只有店铺拥有者才能购买或恢复该店铺的订阅。</string>
@@ -439,7 +446,7 @@
     <string name="placeholder_owner_name">例如：马里克·穆斯塔克</string>
     <string name="placeholder_shop_name">例如：穆斯塔克数码通讯</string>
     <string name="placeholder_shop_phone">03001234567</string>
-    <string name="placeholder_shop_address">哈菲兹中心一楼12号铺</string>
+    <string name="placeholder_shop_address">主市场一楼12号铺</string>
     <string name="placeholder_staff_name">例如：奥斯曼·艾哈迈德</string>
     <string name="placeholder_mobile_number">03129876543</string>
     <string name="placeholder_staff_code">例如：K7M2A9P4</string>

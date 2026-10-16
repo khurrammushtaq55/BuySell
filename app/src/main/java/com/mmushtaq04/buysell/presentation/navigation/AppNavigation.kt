@@ -126,7 +126,7 @@ fun AppNavigation(
             var activeShopId = meta?.activeShopId
 
             if (activeShopId.isNullOrBlank() && userId != null) {
-                restorationMessage = msgParties
+                restorationMessage = msgSearching
                 val restoredId = FirestoreSyncManager(db).restoreUserDataFromFirestore(userId).getOrDefault("")
                 if (restoredId.isNotBlank()) {
                     activeShopId = restoredId

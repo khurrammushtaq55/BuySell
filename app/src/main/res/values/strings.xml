@@ -2,6 +2,13 @@
 <resources>
     <string name="app_name">BuySell360</string>
     <string name="billing_error_network">Network error during purchase. Please check your internet connection.</string>
+    <string name="dashboard_today">Today</string>
+    <string name="dashboard_this_month">This Month</string>
+    <string name="dashboard_this_year">This Year</string>
+    <string name="dashboard_all_time">All Time</string>
+    <string name="settings_notifications_permission_title">Notifications Permission</string>
+    <string name="settings_notifications_permission_sub">Enable notifications to receive Udhaar payment reminders &amp; business reports</string>
+    <string name="settings_btn_open_settings">Open Settings</string>
     <string name="billing_error_generic">Billing error occurred. Please try again later.</string>
     <string name="billing_payment_pending">Payment is pending. Access will be unlocked once payment completes.</string>
     <string name="paywall_owner_only_notice">Only the shop owner can purchase or restore subscription plans for this shop.</string>
@@ -439,7 +446,7 @@
     <string name="placeholder_owner_name">e.g. Malik Mushtaq</string>
     <string name="placeholder_shop_name">e.g. Mushtaq Mobile Trading</string>
     <string name="placeholder_shop_phone">03001234567</string>
-    <string name="placeholder_shop_address">Shop #12, Ground Floor, Hafeez Center</string>
+    <string name="placeholder_shop_address">Shop #12, Ground Floor, Main Market</string>
     <string name="placeholder_staff_name">e.g. Usman Ahmed</string>
     <string name="placeholder_mobile_number">03129876543</string>
     <string name="placeholder_staff_code">e.g. K7M2A9P4</string>

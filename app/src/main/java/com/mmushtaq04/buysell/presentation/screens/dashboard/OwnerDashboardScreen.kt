@@ -3,6 +3,7 @@ package com.mmushtaq04.buysell.presentation.screens.dashboard
 import android.content.Context
 import android.content.Intent
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -141,7 +142,7 @@ fun OwnerDashboardContent(
                 actions = {
                     // P8 TASK T6: Share Summary Button (Free)
                     IconButton(onClick = {
-                        shareDashboardSummary(context, "Hafeez Center Mobile", uiState)
+                        shareDashboardSummary(context, uiState.shopName, uiState)
                     }) {
                         Icon(Icons.Default.Share, contentDescription = stringResource(R.string.dashboard_btn_share))
                     }
@@ -154,13 +155,16 @@ fun OwnerDashboardContent(
                 .fillMaxSize()
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
-                .padding(16.dp),
+                .padding(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Time Range Switcher Chips
+            // Time Range Switcher Chips (Horizontally Scrollable for Small Screens)
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 TimeRange.entries.forEach { range ->
                     val isSelected = uiState.timeRangeSelection.preset != TimeRangePreset.CUSTOM && uiState.timeRange == range
@@ -170,10 +174,10 @@ fun OwnerDashboardContent(
                         label = {
                             Text(
                                 when (range) {
-                                    TimeRange.TODAY -> "Today"
-                                    TimeRange.THIS_MONTH -> "This Month"
-                                    TimeRange.THIS_YEAR -> "This Year"
-                                    TimeRange.ALL_TIME -> "All Time"
+                                    TimeRange.TODAY -> stringResource(R.string.dashboard_today)
+                                    TimeRange.THIS_MONTH -> stringResource(R.string.dashboard_this_month)
+                                    TimeRange.THIS_YEAR -> stringResource(R.string.dashboard_this_year)
+                                    TimeRange.ALL_TIME -> stringResource(R.string.dashboard_all_time)
                                 },
                                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
                             )
@@ -181,7 +185,7 @@ fun OwnerDashboardContent(
                     )
                 }
 
-                // P8 TASK T3: Custom Range Chip (Gated under DASHBOARD_ADVANCED)
+                // Custom Range Chip (Gated under DASHBOARD_ADVANCED)
                 val isCustomSelected = uiState.timeRangeSelection.preset == TimeRangePreset.CUSTOM
                 FilterChip(
                     selected = isCustomSelected,

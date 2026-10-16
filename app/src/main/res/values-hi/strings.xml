@@ -2,6 +2,13 @@
 <resources>
     <string name="app_name">BuySell360</string>
     <string name="billing_error_network">खरीद के दौरान नेटवर्क त्रुटि। कृपया इंटरनेट कनेक्शन जांचें।</string>
+    <string name="dashboard_today">आज</string>
+    <string name="dashboard_this_month">इस महीने</string>
+    <string name="dashboard_this_year">इस साल</string>
+    <string name="dashboard_all_time">कुल रिकॉर्ड</string>
+    <string name="settings_notifications_permission_title">नोटिफिकेशन अनुमति</string>
+    <string name="settings_notifications_permission_sub">उधार भुगतान रिमाइंडर्स और व्यापार रिपोर्ट प्राप्त करने के लिए नोटिफिकेशन चालू करें</string>
+    <string name="settings_btn_open_settings">सेटिंग्स खोलें</string>
     <string name="billing_error_generic">बिलिंग में त्रुटि हुई। कृपया बाद में पुनः प्रयास करें।</string>
     <string name="billing_payment_pending">आपका भुगतान लंबित है। भुगतान पूरा होने पर एक्सेस अनलॉक होगा।</string>
     <string name="paywall_owner_only_notice">केवल दुकान के मालिक ही इस दुकान के लिए सब्सक्रिप्शन खरीद या रीस्टोर कर सकते हैं।</string>
@@ -439,7 +446,7 @@
     <string name="placeholder_owner_name">जैसे: मालिक मुश्ताक</string>
     <string name="placeholder_shop_name">जैसे: मुश्ताक मोबाइल ट्रेडिंग</string>
     <string name="placeholder_shop_phone">03001234567</string>
-    <string name="placeholder_shop_address">दुकान नं. 12, ग्राउंड फ्लोर, हफीज सेंटर</string>
+    <string name="placeholder_shop_address">दुकान नं. 12, ग्राउंड फ्लोर, मेन मार्केट</string>
     <string name="placeholder_staff_name">जैसे: उस्मान अहमद</string>
     <string name="placeholder_mobile_number">03129876543</string>
     <string name="placeholder_staff_code">जैसे: K7M2A9P4</string>

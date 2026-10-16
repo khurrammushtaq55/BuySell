@@ -10,15 +10,20 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Badge
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.SwapHoriz
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -30,6 +35,8 @@ import com.mmushtaq04.buysell.R
 import com.mmushtaq04.buysell.presentation.components.ExpandableOptionalSection
 import com.mmushtaq04.buysell.presentation.screens.sell.SimpleStockItem
 import com.mmushtaq04.buysell.ui.theme.BuySellTheme
+import com.mmushtaq04.buysell.util.AppPreferencesManager
+import com.mmushtaq04.buysell.util.CurrencyFormatter
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -53,12 +60,14 @@ fun ExchangeWizardScreen(
         oldPhoneValueRs: Long,
         customerName: String,
         customerPhone: String,
+        customerCnic: String,
         recordedBy: String,
         cashPaidRs: Long,
         paymentMethodStr: String
-    ) -> Unit = { _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _ -> },
+    ) -> Unit = { _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _ -> },
     onSaveSuccess: () -> Unit = {}
 ) {
+    val context = LocalContext.current
     var step by remember { mutableIntStateOf(1) }
 
     val activeCategories = enabledCategories.ifEmpty {
@@ -85,9 +94,14 @@ fun ExchangeWizardScreen(
     // Step 3: Customer & Payment
     var customerName by remember { mutableStateOf("") }
     var customerPhone by remember { mutableStateOf("") }
+    var customerCnic by remember { mutableStateOf("") }
     var cashPaidText by remember { mutableStateOf("") }
     var paymentMethod by remember { mutableStateOf("Cash") }
     var isSaving by remember { mutableStateOf(false) }
+
+    // Preference for showing original bought price (purchase cost)
+    val isPrefEnabled = remember { AppPreferencesManager.isShowBuyCostInSellEnabled(context) }
+    var showBoughtCostInExchange by remember { mutableStateOf(false) }
 
     val methods = listOf("Cash", "Easypaisa", "JazzCash", "Bank Transfer", "Other")
 
@@ -102,7 +116,6 @@ fun ExchangeWizardScreen(
         it.title.contains(searchQuery, ignoreCase = true) || it.imei.contains(searchQuery, ignoreCase = true)
     }
 
-    // Automatically prefill cashPaidText with net cash difference in Step 3
     val newPriceVal = newPhonePriceText.toLongOrNull() ?: 0L
     val oldPriceVal = oldPhoneValueText.toLongOrNull() ?: 0L
     val netDiffVal = (newPriceVal - oldPriceVal).coerceAtLeast(0L)
@@ -138,7 +151,7 @@ fun ExchangeWizardScreen(
         ) {
             when (step) {
                 1 -> {
-                    // Step 1: Select new item from stock
+                    // Step 1: Select item from stock to give in exchange
                     Text(stringResource(R.string.exchange_step1_header), fontSize = 16.sp, fontWeight = FontWeight.Bold)
 
                     OutlinedTextField(
@@ -171,9 +184,17 @@ fun ExchangeWizardScreen(
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Column {
+                                    Column(modifier = Modifier.weight(1f)) {
                                         Text(item.title, fontWeight = FontWeight.Bold, fontSize = 16.sp)
                                         Text("IMEI: ${item.imei}", fontSize = 12.sp, color = Color.Gray)
+                                        if (isPrefEnabled && item.cost > 0) {
+                                            Text(
+                                                "Bought Price: ${CurrencyFormatter.formatAmount(context, item.cost)}",
+                                                fontSize = 12.sp,
+                                                color = MaterialTheme.colorScheme.primary,
+                                                fontWeight = FontWeight.SemiBold
+                                            )
+                                        }
                                     }
                                     if (isSelected) {
                                         Icon(Icons.Default.CheckCircle, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
@@ -184,6 +205,44 @@ fun ExchangeWizardScreen(
                     }
 
                     if (selectedItem != null) {
+                        // Bought Price Card with Eye Toggle
+                        if (isPrefEnabled && selectedItem!!.cost > 0) {
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 12.dp, vertical = 8.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(Icons.Default.ShoppingCart, contentDescription = null, modifier = Modifier.size(18.dp), tint = MaterialTheme.colorScheme.primary)
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text("Original Bought Price: ", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                        Text(
+                                            if (showBoughtCostInExchange) CurrencyFormatter.formatAmount(context, selectedItem!!.cost) else "••••••",
+                                            fontSize = 13.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = MaterialTheme.colorScheme.primary
+                                        )
+                                    }
+                                    IconButton(
+                                        onClick = { showBoughtCostInExchange = !showBoughtCostInExchange },
+                                        modifier = Modifier.size(24.dp)
+                                    ) {
+                                        Icon(
+                                            if (showBoughtCostInExchange) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                                            contentDescription = "Toggle Cost Visibility",
+                                            tint = MaterialTheme.colorScheme.primary
+                                        )
+                                    }
+                                }
+                            }
+                        }
+
                         OutlinedTextField(
                             value = newPhonePriceText,
                             onValueChange = { newValue -> newPhonePriceText = newValue.filter { it.isDigit() } },
@@ -203,7 +262,7 @@ fun ExchangeWizardScreen(
                 }
 
                 2 -> {
-                    // Step 2: Customer's old device details
+                    // Step 2: Customer's old trade-in device details
                     Column(
                         modifier = Modifier
                             .weight(1f)
@@ -388,7 +447,7 @@ fun ExchangeWizardScreen(
                 }
 
                 3 -> {
-                    // Step 3: Customer Info & Cash Difference
+                    // Step 3: Customer Info & Cash Difference Summary
                     val newPrice = newPhonePriceText.toLongOrNull() ?: 0L
                     val oldVal = oldPhoneValueText.toLongOrNull() ?: 0L
                     val diff = newPrice - oldVal
@@ -421,10 +480,49 @@ fun ExchangeWizardScreen(
                             }
                         }
 
+                        // Summary Bought Price Card
+                        if (isPrefEnabled && selectedItem != null && selectedItem!!.cost > 0) {
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 12.dp, vertical = 8.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(Icons.Default.ShoppingCart, contentDescription = null, modifier = Modifier.size(18.dp), tint = MaterialTheme.colorScheme.primary)
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text("Original Bought Price: ", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                        Text(
+                                            if (showBoughtCostInExchange) CurrencyFormatter.formatAmount(context, selectedItem!!.cost) else "••••••",
+                                            fontSize = 13.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = MaterialTheme.colorScheme.primary
+                                        )
+                                    }
+                                    IconButton(
+                                        onClick = { showBoughtCostInExchange = !showBoughtCostInExchange },
+                                        modifier = Modifier.size(24.dp)
+                                    ) {
+                                        Icon(
+                                            if (showBoughtCostInExchange) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                                            contentDescription = "Toggle Cost Visibility",
+                                            tint = MaterialTheme.colorScheme.primary
+                                        )
+                                    }
+                                }
+                            }
+                        }
+
                         OutlinedTextField(
                             value = customerName,
                             onValueChange = { customerName = it },
                             label = { Text(stringResource(R.string.exchange_customer_name_label)) },
+                            leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
                             keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words),
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -434,6 +532,15 @@ fun ExchangeWizardScreen(
                             onValueChange = { newValue -> customerPhone = newValue.filter { it.isDigit() || it == '+' } },
                             label = { Text(stringResource(R.string.exchange_customer_phone_label)) },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                            modifier = Modifier.fillMaxWidth()
+                        )
+
+                        OutlinedTextField(
+                            value = customerCnic,
+                            onValueChange = { newValue -> customerCnic = newValue.filter { it.isDigit() } },
+                            label = { Text(stringResource(R.string.label_cnic)) },
+                            leadingIcon = { Icon(Icons.Default.Badge, contentDescription = null) },
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             modifier = Modifier.fillMaxWidth()
                         )
 
@@ -495,6 +602,7 @@ fun ExchangeWizardScreen(
                                 oldVal,
                                 customerName,
                                 customerPhone,
+                                customerCnic,
                                 currentUserName,
                                 cashPaidText.toLongOrNull() ?: 0L,
                                 paymentMethod
@@ -517,8 +625,13 @@ fun ExchangeWizardScreen(
 
 @Preview(showBackground = true)
 @Composable
-fun ExchangeWizardPreview() {
+fun ExchangeWizardScreenPreview() {
     BuySellTheme {
-        ExchangeWizardScreen()
+        ExchangeWizardScreen(
+            stockList = listOf(
+                SimpleStockItem("1", "Apple iPhone 15 Pro", "358912345678901", 180000),
+                SimpleStockItem("2", "Samsung Galaxy S24 Ultra", "351234567890123", 210000)
+            )
+        )
     }
 }

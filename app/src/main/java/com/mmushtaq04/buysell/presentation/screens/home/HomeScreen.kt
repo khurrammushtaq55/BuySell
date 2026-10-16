@@ -140,21 +140,21 @@ fun HomeScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             if (isPartner) {
-                // Partner Banner
+                // Compact Partner Banner
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
+                    shape = RoundedCornerShape(8.dp),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer)
                 ) {
                     Row(
-                        modifier = Modifier.padding(14.dp),
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(Icons.Default.Visibility, contentDescription = null, modifier = Modifier.size(28.dp))
-                        Spacer(modifier = Modifier.width(10.dp))
+                        Icon(Icons.Default.Visibility, contentDescription = null, modifier = Modifier.size(20.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
                         Column {
-                            Text(stringResource(R.string.home_partner_banner_title), fontWeight = FontWeight.Bold, fontSize = 15.sp)
-                            Text(stringResource(R.string.home_partner_banner_sub), fontSize = 12.sp)
+                            Text(stringResource(R.string.home_partner_banner_title), fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                            Text(stringResource(R.string.home_partner_banner_sub), fontSize = 11.sp)
                         }
                     }
                 }
@@ -290,14 +290,14 @@ fun HomeScreen(
 
             HorizontalDivider()
 
-            // Exchange Option
+            // Exchange Option (Full width matching Buy/Sell card styling)
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable { if (!isPartner) onNavigateToExchange() },
                 shape = RoundedCornerShape(12.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = if (isPartner) Color.LightGray.copy(alpha = 0.3f) else MaterialTheme.colorScheme.secondaryContainer
+                    containerColor = if (isPartner) Color.LightGray.copy(alpha = 0.3f) else Color(0xFFEDE7F6)
                 )
             ) {
                 Row(
@@ -310,7 +310,7 @@ fun HomeScreen(
                         imageVector = Icons.Default.SwapHoriz,
                         contentDescription = null,
                         modifier = Modifier.size(32.dp),
-                        tint = if (isPartner) Color.Gray else MaterialTheme.colorScheme.onSecondaryContainer
+                        tint = if (isPartner) Color.Gray else Color(0xFF512DA8)
                     )
                     Spacer(modifier = Modifier.width(16.dp))
                     Column {
@@ -318,12 +318,12 @@ fun HomeScreen(
                             text = stringResource(R.string.action_exchange),
                             fontWeight = FontWeight.Bold,
                             fontSize = 16.sp,
-                            color = if (isPartner) Color.Gray else MaterialTheme.colorScheme.onSecondaryContainer
+                            color = if (isPartner) Color.Gray else Color(0xFF512DA8)
                         )
                         Text(
                             text = if (isPartner) stringResource(R.string.home_subtitle_partner_entry_disabled) else stringResource(R.string.home_subtitle_exchange_desc),
                             fontSize = 12.sp,
-                            color = if (isPartner) Color.Gray else MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f)
+                            color = if (isPartner) Color.Gray else Color(0xFF512DA8).copy(alpha = 0.8f)
                         )
                     }
                 }

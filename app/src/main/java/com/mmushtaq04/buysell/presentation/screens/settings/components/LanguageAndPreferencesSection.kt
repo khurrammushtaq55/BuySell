@@ -1,8 +1,14 @@
 package com.mmushtaq04.buysell.presentation.screens.settings.components
 
+import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
+import android.provider.Settings
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.core.content.ContextCompat
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -247,6 +253,52 @@ fun LanguageAndPreferencesSection(
             var showMonthlyDayDialog by remember { mutableStateOf(false) }
 
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    val hasNotifPermission = ContextCompat.checkSelfPermission(
+                        context,
+                        Manifest.permission.POST_NOTIFICATIONS
+                    ) == PackageManager.PERMISSION_GRANTED
+
+                    if (!hasNotifPermission) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+                                        putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+                                    }
+                                    context.startActivity(intent)
+                                },
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    stringResource(R.string.settings_notifications_permission_title),
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 14.sp
+                                )
+                                Text(
+                                    stringResource(R.string.settings_notifications_permission_sub),
+                                    fontSize = 12.sp,
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                            }
+                            TextButton(
+                                onClick = {
+                                    val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+                                        putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+                                    }
+                                    context.startActivity(intent)
+                                }
+                            ) {
+                                Text(stringResource(R.string.settings_btn_open_settings))
+                            }
+                        }
+                        HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+                    }
+                }
+
                 // Daily Summary Notification Row (FREE forever, unwrapped)
                 Row(
                     modifier = Modifier

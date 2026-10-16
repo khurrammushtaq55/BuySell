@@ -1,6 +1,7 @@
 package com.mmushtaq04.buysell.presentation.components
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
@@ -52,7 +53,7 @@ fun ShopProfileFields(
             ),
             modifier = Modifier.fillMaxWidth()
         )
-
+        Spacer(modifier = Modifier.padding(vertical = 5.dp))
         OutlinedTextField(
             value = shopName,
             onValueChange = onShopNameChange,
@@ -69,6 +70,8 @@ fun ShopProfileFields(
             modifier = Modifier.fillMaxWidth()
         )
 
+        Spacer(modifier = Modifier.padding(vertical = 5.dp))
+
         OutlinedTextField(
             value = shopPhone,
             onValueChange = { newValue ->
@@ -84,6 +87,8 @@ fun ShopProfileFields(
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             modifier = Modifier.fillMaxWidth()
         )
+
+        Spacer(modifier = Modifier.padding(vertical = 5.dp))
 
         OutlinedTextField(
             value = shopAddress,
@@ -113,7 +118,7 @@ fun ShopProfileFieldsPreview() {
             onShopNameChange = {},
             shopPhone = "03001234567",
             onShopPhoneChange = {},
-            shopAddress = "Shop #12, Ground Floor, Hafeez Center",
+            shopAddress = "Shop #12, Ground Floor, Main Market",
             onShopAddressChange = {},
             modifier = Modifier.padding(16.dp)
         )

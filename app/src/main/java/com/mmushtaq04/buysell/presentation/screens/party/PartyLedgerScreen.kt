@@ -428,7 +428,7 @@ fun PartyLedgerScreenOwedPreview() {
             uiState = PartyLedgerUiState(
                 partyName = "Ali Ahmed",
                 partyPhone = "03001234567",
-                shopName = "Hafeez Center Electronics",
+                shopName = "Mushtaq Mobile Store",
                 netBalanceRs = 15000L,
                 ledgerHistory = listOf(
                     LedgerItem("1", System.currentTimeMillis() - 86400000L, "Device Sale / Saman Becha", "iPhone 13 128GB", 85000L, false, PaymentDirection.IN),
@@ -447,7 +447,7 @@ fun PartyLedgerScreenSettledPreview() {
             uiState = PartyLedgerUiState(
                 partyName = "Bilal Khan",
                 partyPhone = "03335554433",
-                shopName = "Hafeez Center Electronics",
+                shopName = "Mushtaq Mobile Store",
                 netBalanceRs = 0L,
                 ledgerHistory = listOf(
                     LedgerItem("1", System.currentTimeMillis(), "Udhaar Wasooli / Cash Received (+)", "EasyPaisa", 15000L, true, PaymentDirection.IN)

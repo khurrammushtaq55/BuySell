@@ -96,7 +96,7 @@ fun NavGraphBuilder.wizardsNavGraph(
             currentUserName = registeredUserName,
             enabledCategories = enabledCategoryNames,
             onNavigateBack = { navController.popBackStack() },
-            onSaveExchange = { soldItemId, newPrice, oldCat, oldBrand, oldModel, oldImei, oldColor, oldIssue, oldRam, oldStorage, oldSpecs, oldPrice, name, phone, recordedBy, cash, method ->
+            onSaveExchange = { soldItemId, newPrice, oldCat, oldBrand, oldModel, oldImei, oldColor, oldIssue, oldRam, oldStorage, oldSpecs, oldPrice, name, phone, cnic, recordedBy, cash, method ->
                 exchangeViewModel.processExchange(
                     soldStockItemId = soldItemId,
                     oldPhoneBrand = oldBrand,
@@ -112,7 +112,7 @@ fun NavGraphBuilder.wizardsNavGraph(
                     cashPaidRs = cash,
                     customerName = name,
                     customerPhone = phone,
-                    customerCnic = "",
+                    customerCnic = cnic,
                     recordedBy = recordedBy,
                     paymentMethodStr = method,
                     onSuccess = {}

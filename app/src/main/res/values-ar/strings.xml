@@ -2,6 +2,13 @@
 <resources>
     <string name="app_name">BuySell360</string>
     <string name="billing_error_network">خطأ في الشبكة أثناء الشراء. يرجى التحقق من الاتصال بالإنترنت.</string>
+    <string name="dashboard_today">اليوم</string>
+    <string name="dashboard_this_month">هذا الشهر</string>
+    <string name="dashboard_this_year">هذه السنة</string>
+    <string name="dashboard_all_time">كل الأوقات</string>
+    <string name="settings_notifications_permission_title">إذن الإشعارات</string>
+    <string name="settings_notifications_permission_sub">قم بتمكين الإشعارات لتلقي تذكيرات دفع الديون والتقارير</string>
+    <string name="settings_btn_open_settings">فتح الإعدادات</string>
     <string name="billing_error_generic">حدث خطأ في خدمة الفوترة. يرجى المحاولة لاحقًا.</string>
     <string name="billing_payment_pending">الدفع معلق. سيتم إلغاء القفل بمجرد اكتمال الدفع.</string>
     <string name="paywall_owner_only_notice">يمكن لمالك المحل فقط شراء الاشتراكات أو استعادتها لهذا المحل.</string>
@@ -439,7 +446,7 @@
     <string name="placeholder_owner_name">مثلاً مالك مشتاق</string>
     <string name="placeholder_shop_name">مثلاً مشتاق لتجارة الجوالات</string>
     <string name="placeholder_shop_phone">03001234567</string>
-    <string name="placeholder_shop_address">المحل رقم 12، الدور الأرضي، مركز حفيظ</string>
+    <string name="placeholder_shop_address">المحل رقم 12، الدور الأرضي، السوق الرئيسي</string>
     <string name="placeholder_staff_name">مثلاً عثمان أحمد</string>
     <string name="placeholder_mobile_number">03129876543</string>
     <string name="placeholder_staff_code">مثلاً K7M2A9P4</string>
