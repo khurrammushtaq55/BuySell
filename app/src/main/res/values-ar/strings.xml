@@ -494,4 +494,33 @@
     <string name="cd_search">البحث في السجلات</string>
     <string name="cd_add">إضافة إدخال جديد</string>
     <string name="cd_share">مشاركة الكشف أو الملخص</string>
+    <string name="category_mobile">الهواتف المحمولة</string>
+    <string name="category_tablet">الأجهزة اللوحية / الآيباد</string>
+    <string name="category_laptop">الأجهزة المحمولة</string>
+    <string name="category_console">أجهزة ألعاب</string>
+    <string name="category_smartwatch">الساعات الذكية</string>
+    <string name="category_earbuds">سماعات الأذن / الصوتيات</string>
+    <string name="category_accessories">المستلزمات / الإكسسوارات</string>
+    <string name="category_parts">قطع الغيار</string>
+    <string name="category_camera">الكاميرات</string>
+    <string name="category_other">أخرى</string>
+    <string name="dashboard_help_net_profit_title">حساب صافي الربح</string>
+    <string name="dashboard_help_net_profit_msg">صافي الربح = صافي الإيرادات - تكلفة البضاعة المباعة - المصاريف التشغيلية.\n\nالمرتجعات والمبالغ المستردة معدلة بالفعل!</string>
+    <string name="dashboard_expenses_subtitle">انقر لعرض/إضافة المصاريف ←</string>
+    <string name="dashboard_no_method_txns">لم يتم تسجيل أي معاملات في هذه الفترة</string>
+    <string name="dashboard_sort_units">الوحدات</string>
+    <string name="dashboard_sort_profit">الربح</string>
+    <string name="dashboard_feature_inventory_insights">رؤى المخزون</string>
+    <string name="dashboard_capital_locked_title">رأس المال المحتجز بالمخزون</string>
+    <string name="dashboard_capital_locked_sub">قيمة تكلفة شراء المواد المتاحة</string>
+    <string name="dashboard_slow_stock_sub">%1$d عناصر بالمخزون لأكثر من 30 يومًا</string>
+    <string name="ledger_txn_sale">بيع جهاز</string>
+    <string name="ledger_txn_purchase">شراء جهاز</string>
+    <string name="ledger_txn_sale_return">إرجاع مبيعات</string>
+    <string name="ledger_txn_purchase_return">إرجاع مشتريات</string>
+    <string name="sell_selected_item">العنصر المحدد: %1$s</string>
+    <string name="placeholder_payment_ref">مثال: رقم معاملة HBL / Easypaisa / اسم الحساب</string>
+    <string name="exchange_bought_price_label">سعر الشراء الأصلي:</string>
+    <string name="label_qty_remaining">الكمية المتبقية:</string>
+    <string name="label_status">الحالة:</string>
 </resources>

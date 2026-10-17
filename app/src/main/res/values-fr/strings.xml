@@ -494,4 +494,33 @@
     <string name="cd_search">Rechercher des enregistrements</string>
     <string name="cd_add">Ajouter une nouvelle entrée</string>
     <string name="cd_share">Partager le relevé ou le résumé</string>
+    <string name="category_mobile">Téléphones Portables</string>
+    <string name="category_tablet">Tablette / iPad</string>
+    <string name="category_laptop">Ordinateur Portable</string>
+    <string name="category_console">Console de Jeu</string>
+    <string name="category_smartwatch">Montre Connectée</string>
+    <string name="category_earbuds">Écouteurs / Audio</string>
+    <string name="category_accessories">Accessoires</string>
+    <string name="category_parts">Pièces Détachées</string>
+    <string name="category_camera">Appareil Photo</string>
+    <string name="category_other">Autre</string>
+    <string name="dashboard_help_net_profit_title">Calcul du Bénéfice Net</string>
+    <string name="dashboard_help_net_profit_msg">Bénéfice Net = Revenu Net - Coût des Marchandises (COGS) - Dépenses d\'Exploitation.\n\nLes retours et remboursements sont déjà ajustés !</string>
+    <string name="dashboard_expenses_subtitle">Appuyez pour voir/ajouter des dépenses →</string>
+    <string name="dashboard_no_method_txns">Aucune transaction enregistrée au cours de cette période</string>
+    <string name="dashboard_sort_units">Unités</string>
+    <string name="dashboard_sort_profit">Bénéfice</string>
+    <string name="dashboard_feature_inventory_insights">Aperçu du Stock</string>
+    <string name="dashboard_capital_locked_title">Capital Immobilisé en Stock</string>
+    <string name="dashboard_capital_locked_sub">Valeur de coût d\'achat des articles en stock</string>
+    <string name="dashboard_slow_stock_sub">%1$d articles en stock depuis &gt; 30 jours</string>
+    <string name="ledger_txn_sale">Vente d\'Appareil</string>
+    <string name="ledger_txn_purchase">Achat d\'Appareil</string>
+    <string name="ledger_txn_sale_return">Retour de Vente</string>
+    <string name="ledger_txn_purchase_return">Retour d\'Achat</string>
+    <string name="sell_selected_item">Article Sélectionné : %1$s</string>
+    <string name="placeholder_payment_ref">ex. HBL / Réf Transaction Easypaisa #12345 / Nom du Compte</string>
+    <string name="exchange_bought_price_label">Prix d\'Achat d\'Origine :</string>
+    <string name="label_qty_remaining">Quantité Restante :</string>
+    <string name="label_status">Statut :</string>
 </resources>

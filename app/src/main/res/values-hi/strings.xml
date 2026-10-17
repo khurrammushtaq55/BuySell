@@ -494,4 +494,33 @@
     <string name="cd_search">रिकॉर्ड खोजें</string>
     <string name="cd_add">नई प्रविष्टि जोड़ें</string>
     <string name="cd_share">विवरण या सारांश साझा करें</string>
+    <string name="category_mobile">मोबाइल फोन</string>
+    <string name="category_tablet">टैबलेट / आईपैड</string>
+    <string name="category_laptop">लैपटॉप</string>
+    <string name="category_console">कंसोल</string>
+    <string name="category_smartwatch">स्मार्टवॉच</string>
+    <string name="category_earbuds">ईयरबड्स / ऑडियो</string>
+    <string name="category_accessories">एक्सेसरीज</string>
+    <string name="category_parts">पार्ट्स</string>
+    <string name="category_camera">कैमरा</string>
+    <string name="category_other">अन्य</string>
+    <string name="dashboard_help_net_profit_title">शुद्ध लाभ की गणना</string>
+    <string name="dashboard_help_net_profit_msg">शुद्ध लाभ = शुद्ध राजस्व - माल की लागत (COGS) - परिचालन खर्च।\n\nवापसी और रिफंड पहले से समायोजित हैं!</string>
+    <string name="dashboard_expenses_subtitle">खर्च देखने/जोड़ने के लिए टैप करें →</string>
+    <string name="dashboard_no_method_txns">इस अवधि में कोई लेनदेन दर्ज नहीं हुआ</string>
+    <string name="dashboard_sort_units">इकाइयां</string>
+    <string name="dashboard_sort_profit">लाभ</string>
+    <string name="dashboard_feature_inventory_insights">इन्वेंटरी अंतर्दृष्टि</string>
+    <string name="dashboard_capital_locked_title">स्टॉक में फंसा हुआ पूंजी</string>
+    <string name="dashboard_capital_locked_sub">उपलब्ध स्टॉक का खरीद मूल्य</string>
+    <string name="dashboard_slow_stock_sub">%1$d आइटम 30 दिनों से अधिक पुराने हैं</string>
+    <string name="ledger_txn_sale">डिवाइस बिक्री</string>
+    <string name="ledger_txn_purchase">डिवाइस खरीद</string>
+    <string name="ledger_txn_sale_return">बिक्री वापसी</string>
+    <string name="ledger_txn_purchase_return">खरीद वापसी</string>
+    <string name="sell_selected_item">चयनित आइटम: %1$s</string>
+    <string name="placeholder_payment_ref">जैसे HBL / Easypaisa ट्रांजैक्शन आईडी / खाता नाम</string>
+    <string name="exchange_bought_price_label">मूल खरीद मूल्य:</string>
+    <string name="label_qty_remaining">शेष मात्रा:</string>
+    <string name="label_status">स्थिति:</string>
 </resources>

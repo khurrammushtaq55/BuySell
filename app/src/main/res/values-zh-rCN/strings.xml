@@ -494,4 +494,33 @@
     <string name="cd_search">搜索记录</string>
     <string name="cd_add">添加新条目</string>
     <string name="cd_share">分享对账单或摘要</string>
+    <string name="category_mobile">移动手机</string>
+    <string name="category_tablet">平板电脑 / iPad</string>
+    <string name="category_laptop">笔记本电脑</string>
+    <string name="category_console">游戏主机</string>
+    <string name="category_smartwatch">智能手表</string>
+    <string name="category_earbuds">蓝牙耳机 / 音频</string>
+    <string name="category_accessories">配件 / 饰品</string>
+    <string name="category_parts">零部件</string>
+    <string name="category_camera">相机 / 摄像机</string>
+    <string name="category_other">其他</string>
+    <string name="dashboard_help_net_profit_title">净利润计算公式</string>
+    <string name="dashboard_help_net_profit_msg">净利润 = 净收入 - 销售成本 (COGS) - 运营费用。\n\n退货与退款已扣除！</string>
+    <string name="dashboard_expenses_subtitle">点击查看/添加费用 →</string>
+    <string name="dashboard_no_method_txns">在此期间未记录任何交易</string>
+    <string name="dashboard_sort_units">销量</string>
+    <string name="dashboard_sort_profit">利润</string>
+    <string name="dashboard_feature_inventory_insights">库存洞察</string>
+    <string name="dashboard_capital_locked_title">库存积压资金</string>
+    <string name="dashboard_capital_locked_sub">现货库存的进货成本价值</string>
+    <string name="dashboard_slow_stock_sub">%1$d 件商品库存超过 30 天</string>
+    <string name="ledger_txn_sale">设备销售</string>
+    <string name="ledger_txn_purchase">设备采购</string>
+    <string name="ledger_txn_sale_return">销售退货</string>
+    <string name="ledger_txn_purchase_return">采购退货</string>
+    <string name="sell_selected_item">已选商品：%1$s</string>
+    <string name="placeholder_payment_ref">例如：HBL / Easypaisa 交易号 #12345 / 账户名称</string>
+    <string name="exchange_bought_price_label">原采购价：</string>
+    <string name="label_qty_remaining">剩余数量：</string>
+    <string name="label_status">状态：</string>
 </resources>

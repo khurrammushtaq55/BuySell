@@ -494,4 +494,33 @@
     <string name="cd_search">Records search karein</string>
     <string name="cd_add">Naya entry add karein</string>
     <string name="cd_share">Statement ya summary share karein</string>
+    <string name="category_mobile">Mobile Phones</string>
+    <string name="category_tablet">Tablet / iPad</string>
+    <string name="category_laptop">Laptop</string>
+    <string name="category_console">Console</string>
+    <string name="category_smartwatch">Smartwatch</string>
+    <string name="category_earbuds">Earbuds / Audio</string>
+    <string name="category_accessories">Accessories</string>
+    <string name="category_parts">Parts</string>
+    <string name="category_camera">Camera</string>
+    <string name="category_other">Other</string>
+    <string name="dashboard_help_net_profit_title">Net Profit Hisaab</string>
+    <string name="dashboard_help_net_profit_msg">Net Profit = Net Revenue - COGS (Saman ki Lagat) - Dukan ke Akhrajat.\n\nReturns &amp; Refunds pehle se adjusted hain!</string>
+    <string name="dashboard_expenses_subtitle">Expenses dekhne/add karne ke liye tap karein →</string>
+    <string name="dashboard_no_method_txns">Is dauraan koi transaction record nahi hui</string>
+    <string name="dashboard_sort_units">Tadad</string>
+    <string name="dashboard_sort_profit">Munafa</string>
+    <string name="dashboard_feature_inventory_insights">Inventory Insights</string>
+    <string name="dashboard_capital_locked_title">Stock Mein Phansa Sarmaya</string>
+    <string name="dashboard_capital_locked_sub">Mawjood stock ki khareed rate value</string>
+    <string name="dashboard_slow_stock_sub">%1$d items stock mein 30 din se zyada purane hain</string>
+    <string name="ledger_txn_sale">Device Sale</string>
+    <string name="ledger_txn_purchase">Device Purchase</string>
+    <string name="ledger_txn_sale_return">Sale Return</string>
+    <string name="ledger_txn_purchase_return">Purchase Return</string>
+    <string name="sell_selected_item">Selected Item: %1$s</string>
+    <string name="placeholder_payment_ref">e.g. HBL / Easypaisa Txn #12345 / Account title</string>
+    <string name="exchange_bought_price_label">Asli Khareed Price:</string>
+    <string name="label_qty_remaining">Baqi Tadad:</string>
+    <string name="label_status">Status:</string>
 </resources>

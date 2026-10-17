@@ -494,4 +494,33 @@
     <string name="cd_search">Buscar registros</string>
     <string name="cd_add">Agregar nueva entrada</string>
     <string name="cd_share">Compartir extracto o resumen</string>
+    <string name="category_mobile">Teléfonos Móviles</string>
+    <string name="category_tablet">Tableta / iPad</string>
+    <string name="category_laptop">Portátil</string>
+    <string name="category_console">Consola</string>
+    <string name="category_smartwatch">Reloj Inteligente</string>
+    <string name="category_earbuds">Auriculares / Audio</string>
+    <string name="category_accessories">Accesorios</string>
+    <string name="category_parts">Repuestos</string>
+    <string name="category_camera">Cámara</string>
+    <string name="category_other">Otro</string>
+    <string name="dashboard_help_net_profit_title">Cálculo de Ganancia Neta</string>
+    <string name="dashboard_help_net_profit_msg">Ganancia Neta = Ingresos Netos - Costo de Bienes (COGS) - Gastos Operativos.\n\n¡Las devoluciones y reembolsos ya están ajustados!</string>
+    <string name="dashboard_expenses_subtitle">Toque para ver/agregar gastos →</string>
+    <string name="dashboard_no_method_txns">No hay transacciones registradas en este período</string>
+    <string name="dashboard_sort_units">Unidades</string>
+    <string name="dashboard_sort_profit">Ganancia</string>
+    <string name="dashboard_feature_inventory_insights">Información de Inventario</string>
+    <string name="dashboard_capital_locked_title">Capital Retenido en Stock</string>
+    <string name="dashboard_capital_locked_sub">Valor de costo de compra de artículos en stock</string>
+    <string name="dashboard_slow_stock_sub">%1$d artículos en stock &gt; 30 días</string>
+    <string name="ledger_txn_sale">Venta de Dispositivo</string>
+    <string name="ledger_txn_purchase">Compra de Dispositivo</string>
+    <string name="ledger_txn_sale_return">Devolución de Venta</string>
+    <string name="ledger_txn_purchase_return">Devolución de Compra</string>
+    <string name="sell_selected_item">Artículo Seleccionado: %1$s</string>
+    <string name="placeholder_payment_ref">ej. HBL / Transacción Easypaisa #12345 / Titular</string>
+    <string name="exchange_bought_price_label">Precio de Compra Original:</string>
+    <string name="label_qty_remaining">Cantidad Restante:</string>
+    <string name="label_status">Estado:</string>
 </resources>

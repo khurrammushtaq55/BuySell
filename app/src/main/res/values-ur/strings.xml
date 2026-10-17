@@ -494,4 +494,33 @@
     <string name="cd_search">ریکارڈز تلاش کریں</string>
     <string name="cd_add">نئی اندراج شامل کریں</string>
     <string name="cd_share">گوشوارہ یا خلاصہ شیئر کریں</string>
+    <string name="category_mobile">موبائل فونز</string>
+    <string name="category_tablet">ٹیبلیٹ / آئی پیڈ</string>
+    <string name="category_laptop">لیپ ٹاپ</string>
+    <string name="category_console">کنسول</string>
+    <string name="category_smartwatch">سمارٹ واچ</string>
+    <string name="category_earbuds">ایئر بڈز / آڈیو</string>
+    <string name="category_accessories">سامان / اسسریز</string>
+    <string name="category_parts">پرزے</string>
+    <string name="category_camera">کیمرہ</string>
+    <string name="category_other">دیگر</string>
+    <string name="dashboard_help_net_profit_title">خالص منافع کا حساب</string>
+    <string name="dashboard_help_net_profit_msg">خالص منافع = خالص آمدنی - سامان کی لاگت - دکان کے اخراجات۔\n\nواپسی اور ریفنڈ پہلے ہی ایڈجسٹ ہیں!</string>
+    <string name="dashboard_expenses_subtitle">اخراجات دیکھنے/شامل کرنے کے لیے ٹیپ کریں ←</string>
+    <string name="dashboard_no_method_txns">اس مدت میں کوئی لین دین درج نہیں ہوا</string>
+    <string name="dashboard_sort_units">تعداد</string>
+    <string name="dashboard_sort_profit">منافع</string>
+    <string name="dashboard_feature_inventory_insights">انوینٹری بصیرت</string>
+    <string name="dashboard_capital_locked_title">اسٹاک میں پھنسا سرمایاہ</string>
+    <string name="dashboard_capital_locked_sub">دستیاب اسٹاک کا خرید ریٹ</string>
+    <string name="dashboard_slow_stock_sub">%1$d آئٹمز 30 دن سے زیادہ پرانے ہیں</string>
+    <string name="ledger_txn_sale">ڈیوائس کی فروخت</string>
+    <string name="ledger_txn_purchase">ڈیوائس کی خریداری</string>
+    <string name="ledger_txn_sale_return">فروخت واپسی</string>
+    <string name="ledger_txn_purchase_return">خریداری واپسی</string>
+    <string name="sell_selected_item">منتخب کردہ آئٹم: %1$s</string>
+    <string name="placeholder_payment_ref">مثلاً HBL / Easypaisa ٹرانزیکشن نمبر / اکاؤنٹ عنوان</string>
+    <string name="exchange_bought_price_label">اصل خرید قیمت:</string>
+    <string name="label_qty_remaining">بقیہ تعداد:</string>
+    <string name="label_status">حالت:</string>
 </resources>
