@@ -1,7 +1,6 @@
 package com.mmushtaq04.buysell.presentation.screens.dashboard
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.mmushtaq04.buysell.R
@@ -13,9 +12,14 @@ import com.mmushtaq04.buysell.data.local.entity.TxnLineEntity
 import com.mmushtaq04.buysell.data.local.enums.PaymentMethod
 import com.mmushtaq04.buysell.data.local.enums.TxnType
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
-import java.util.*
+import java.util.Calendar
 
 enum class TimeRange {
     TODAY,
@@ -127,7 +131,6 @@ data class DashboardUiState(
 
 class OwnerDashboardViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val TAG = "OwnerDashboardVM"
     private val db = AppDatabase.getInstance(application)
 
     companion object {

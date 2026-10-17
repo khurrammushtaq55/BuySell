@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -66,11 +67,11 @@ fun SellWizardScreen(
     var buyerPhone by remember { mutableStateOf("") }
     var salePriceText by remember { mutableStateOf("") }
     var receivedAmountText by remember { mutableStateOf("") }
-    var paymentMethod by remember { mutableStateOf("Cash") }
+    val methods = stringArrayResource(R.array.payment_methods).toList()
+    val defaultPaymentMethod = methods.firstOrNull() ?: stringResource(R.string.payment_method_cash)
+    var paymentMethod by remember(defaultPaymentMethod) { mutableStateOf(defaultPaymentMethod) }
     var paymentDetails by remember { mutableStateOf("") }
     var promisedDateText by remember { mutableStateOf("") }
-
-    val methods = listOf("Cash", "Easypaisa", "JazzCash", "Bank Transfer", "Other")
 
     // Automatically prefill receivedAmountText with salePriceText
     LaunchedEffect(step, salePriceText) {
@@ -99,7 +100,7 @@ fun SellWizardScreen(
                     IconButton(onClick = {
                         if (step > 1) step-- else onNavigateBack()
                     }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.action_back))
                     }
                 }
             )

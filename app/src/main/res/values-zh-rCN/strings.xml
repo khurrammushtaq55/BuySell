@@ -326,7 +326,7 @@
     <string name="rating_toast_thank_you">非常感谢您的评分与反馈！</string>
     <string name="settings_invite_share_msg">您已收到加入 %1$s 应用程序 (%2$s) 的邀请码: %3$s。</string>
     <string name="export_backup_data_title">%1$s 导出备份数据</string>
-    <string name="settings_footer_version">%1$s v1.0 (Build 1) • 身份: %2$s</string>
+    <string name="settings_footer_version">%1$s v%2$s (Build %3$d) • 身份: %4$s</string>
     <string name="dashboard_filter_today">今天</string>
     <string name="dashboard_filter_week">本周</string>
     <string name="dashboard_filter_month">本月</string>

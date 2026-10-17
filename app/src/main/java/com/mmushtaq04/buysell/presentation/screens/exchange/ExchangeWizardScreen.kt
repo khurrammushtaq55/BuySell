@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -100,14 +101,14 @@ fun ExchangeWizardScreen(
     var customerPhone by remember { mutableStateOf("") }
     var customerCnic by remember { mutableStateOf("") }
     var cashPaidText by remember { mutableStateOf("") }
-    var paymentMethod by remember { mutableStateOf("Cash") }
+    val methods = stringArrayResource(R.array.payment_methods).toList()
+    val defaultPaymentMethod = methods.firstOrNull() ?: stringResource(R.string.payment_method_cash)
+    var paymentMethod by remember(defaultPaymentMethod) { mutableStateOf(defaultPaymentMethod) }
     var isSaving by remember { mutableStateOf(false) }
 
     // Preference for showing original bought price (purchase cost)
     val isPrefEnabled = remember { AppPreferencesManager.isShowBuyCostInSellEnabled(context) }
     var showBoughtCostInExchange by remember { mutableStateOf(false) }
-
-    val methods = listOf("Cash", "Easypaisa", "JazzCash", "Bank Transfer", "Other")
 
     val allPresetBrands = listOf("Apple", "Samsung", "Xiaomi", "Vivo", "Oppo", "Realme", "Infinix", "Techno")
     val showDefaultBrandChips = oldCategory.equals("Mobile", ignoreCase = true) || oldCategory.equals("Tablet / iPad", ignoreCase = true)
@@ -574,6 +575,7 @@ fun ExchangeWizardScreen(
                             label = { Text(stringResource(R.string.label_cnic)) },
                             leadingIcon = { Icon(Icons.Default.Badge, contentDescription = null) },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            isError = customerCnic.isBlank(),
                             modifier = Modifier.fillMaxWidth()
                         )
 
@@ -583,11 +585,6 @@ fun ExchangeWizardScreen(
                             label = { Text(stringResource(R.string.exchange_cash_paid_label) + " *") },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             isError = cashPaidText.isBlank(),
-                            supportingText = {
-                                if (cashPaidText.isBlank()) {
-                                    Text("Compulsory / Zaroori *", color = MaterialTheme.colorScheme.error, fontSize = 11.sp)
-                                }
-                            },
                             modifier = Modifier.fillMaxWidth()
                         )
 

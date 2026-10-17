@@ -53,8 +53,12 @@ fun HomeScreen(
     val context = LocalContext.current
     val isPartner = userRole.equals("Partner", ignoreCase = true)
 
-    var showRatingDialog by remember {
-        mutableStateOf(RatingManager.shouldShowRatingPrompt(context))
+    var showRatingDialog by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        if (RatingManager.shouldShowRatingPrompt(context)) {
+            showRatingDialog = true
+        }
     }
 
     if (showRatingDialog) {

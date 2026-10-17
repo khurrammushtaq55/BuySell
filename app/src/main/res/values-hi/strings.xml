@@ -326,7 +326,7 @@
     <string name="rating_toast_thank_you">आपकी रेटिंग और प्रतिक्रिया के लिए धन्यवाद!</string>
     <string name="settings_invite_share_msg">आपको %1$s ऐप पर %2$s के रूप में जुड़ने का कोड भेजा गया है: %3$s।</string>
     <string name="export_backup_data_title">%1$s ऐप बैकअप डेटा निर्यात</string>
-    <string name="settings_footer_version">%1$s v1.0 (Build 1) • भूमिका: %2$s</string>
+    <string name="settings_footer_version">%1$s v%2$s (Build %3$d) • भूमिका: %4$s</string>
     <string name="dashboard_filter_today">आज</string>
     <string name="dashboard_filter_week">इस सप्ताह</string>
     <string name="dashboard_filter_month">इस महीने</string>

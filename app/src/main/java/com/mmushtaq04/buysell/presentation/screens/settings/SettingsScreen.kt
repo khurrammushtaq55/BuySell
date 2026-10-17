@@ -122,7 +122,13 @@ fun SettingsScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = stringResource(R.string.settings_footer_version, stringResource(R.string.app_name), userRole),
+                    text = stringResource(
+                        R.string.settings_footer_version,
+                        stringResource(R.string.app_name),
+                        com.mmushtaq04.buysell.BuildConfig.VERSION_NAME,
+                        com.mmushtaq04.buysell.BuildConfig.VERSION_CODE,
+                        userRole
+                    ),
                     fontSize = 12.sp,
                     color = Color.Gray
                 )

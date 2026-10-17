@@ -326,7 +326,7 @@
     <string name="rating_toast_thank_you">¡Muchas gracias por su calificación!</string>
     <string name="settings_invite_share_msg">Se le ha enviado un código para unirse a %1$s como %2$s: %3$s.</string>
     <string name="export_backup_data_title">Datos de respaldo de exportación de %1$s</string>
-    <string name="settings_footer_version">%1$s v1.0 (Build 1) • Rol: %2$s</string>
+    <string name="settings_footer_version">%1$s v%2$s (Build %3$d) • Rol: %4$s</string>
     <string name="dashboard_filter_today">Hoy</string>
     <string name="dashboard_filter_week">Esta semana</string>
     <string name="dashboard_filter_month">Este mes</string>

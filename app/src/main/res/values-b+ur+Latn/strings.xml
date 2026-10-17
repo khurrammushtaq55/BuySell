@@ -326,7 +326,7 @@
     <string name="rating_toast_thank_you">Aap ki rating aur raye ka bohot shukriya!</string>
     <string name="settings_invite_share_msg">Aap ko %1$s App par %2$s join karne ka Code bheja gaya hai: %3$s.</string>
     <string name="export_backup_data_title">%1$s App Export Backup Data</string>
-    <string name="settings_footer_version">%1$s v1.0 (Build 1) • Role: %2$s</string>
+    <string name="settings_footer_version">%1$s v%2$s (Build %3$d) • Role: %4$s</string>
     <string name="dashboard_filter_today">Aaj</string>
     <string name="dashboard_filter_week">Iss Hafta</string>
     <string name="dashboard_filter_month">Iss Mahina</string>

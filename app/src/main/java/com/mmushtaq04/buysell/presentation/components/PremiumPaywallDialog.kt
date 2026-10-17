@@ -48,11 +48,13 @@ fun PremiumPaywallDialog(
     val annualDetails = productDetailsMap[PlayBillingManager.SKU_PRO_ANNUAL]
     val monthlyDetails = productDetailsMap[PlayBillingManager.SKU_PRO_MONTHLY]
 
-    val annualPriceText = annualDetails?.subscriptionOfferDetails?.firstOrNull()?.pricingPhases
-        ?.pricingPhaseList?.firstOrNull()?.formattedPrice ?: stringResource(R.string.paywall_plan_annual)
+    val annualPriceFormatted = annualDetails?.subscriptionOfferDetails?.firstOrNull()?.pricingPhases
+        ?.pricingPhaseList?.firstOrNull()?.formattedPrice ?: "$9.99"
+    val annualPriceText = stringResource(R.string.paywall_plan_annual, annualPriceFormatted)
 
-    val monthlyPriceText = monthlyDetails?.subscriptionOfferDetails?.firstOrNull()?.pricingPhases
-        ?.pricingPhaseList?.firstOrNull()?.formattedPrice ?: stringResource(R.string.paywall_plan_monthly)
+    val monthlyPriceFormatted = monthlyDetails?.subscriptionOfferDetails?.firstOrNull()?.pricingPhases
+        ?.pricingPhaseList?.firstOrNull()?.formattedPrice ?: "$0.99"
+    val monthlyPriceText = stringResource(R.string.paywall_plan_monthly, monthlyPriceFormatted)
 
     if (showPromoDialog) {
         AlertDialog(
@@ -85,7 +87,7 @@ fun PremiumPaywallDialog(
                                 },
                                 {
                                     isRedeeming = false
-                                    Toast.makeText(context, context.getString(R.string.paywall_toast_invalid_code), Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, context.getString(R.string.promo_error_invalid), Toast.LENGTH_SHORT).show()
                                 }
                             )
                         }
@@ -203,7 +205,7 @@ fun PremiumPaywallDialog(
                         ) {
                             Column {
                                 Text(
-                                    text = "Annual Plan",
+                                    text = stringResource(R.string.paywall_plan_annual_title),
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 13.sp
                                 )
@@ -238,7 +240,7 @@ fun PremiumPaywallDialog(
                         ) {
                             Column {
                                 Text(
-                                    text = "Monthly Plan",
+                                    text = stringResource(R.string.paywall_plan_monthly_title),
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 13.sp
                                 )

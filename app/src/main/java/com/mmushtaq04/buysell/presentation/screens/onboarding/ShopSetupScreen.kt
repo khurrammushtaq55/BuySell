@@ -78,7 +78,7 @@ fun ShopSetupScreen(
                     IconButton(onClick = onNavigateToHelp) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.HelpOutline,
-                            contentDescription = "Help & Support"
+                            contentDescription = stringResource(R.string.home_help_icon_desc)
                         )
                     }
                 }

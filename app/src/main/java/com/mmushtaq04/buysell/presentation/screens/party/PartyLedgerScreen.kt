@@ -28,6 +28,7 @@ import com.mmushtaq04.buysell.data.local.enums.PaymentDirection
 import com.mmushtaq04.buysell.ui.theme.BuySellTheme
 import java.text.SimpleDateFormat
 import java.util.*
+import androidx.core.net.toUri
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -64,7 +65,7 @@ fun PartyLedgerScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.action_back))
                     }
                 },
                 actions = {
@@ -74,7 +75,7 @@ fun PartyLedgerScreen(
                             val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:${uiState.partyPhone}"))
                             context.startActivity(intent)
                         }) {
-                            Icon(Icons.Default.Call, contentDescription = "Call Customer", tint = MaterialTheme.colorScheme.primary)
+                            Icon(Icons.Default.Call, contentDescription = stringResource(R.string.party_action_call), tint = MaterialTheme.colorScheme.primary)
                         }
 
                         // Direct WhatsApp Chat & Statement Share Action
@@ -111,7 +112,8 @@ fun PartyLedgerScreen(
                             }
 
                             val encodedMsg = Uri.encode(msg)
-                            val whatsappUri = Uri.parse("https://api.whatsapp.com/send?phone=$cleanPhone&text=$encodedMsg")
+                            val whatsappUri =
+                                "https://api.whatsapp.com/send?phone=$cleanPhone&text=$encodedMsg".toUri()
                             val intent = Intent(Intent.ACTION_VIEW, whatsappUri).apply {
                                 setPackage("com.whatsapp")
                             }
@@ -127,11 +129,11 @@ fun PartyLedgerScreen(
                                         type = "text/plain"
                                         putExtra(Intent.EXTRA_TEXT, msg)
                                     }
-                                    context.startActivity(Intent.createChooser(shareIntent, "Share Statement"))
+                                    context.startActivity(Intent.createChooser(shareIntent, context.getString(R.string.party_share_statement)))
                                 }
                             }
                         }) {
-                            Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Share Udhaar Reminder", tint = Color(0xFF25D366))
+                            Icon(Icons.AutoMirrored.Filled.Send, contentDescription = stringResource(R.string.party_action_share), tint = Color(0xFF25D366))
                         }
                     }
                 }
@@ -172,7 +174,7 @@ fun PartyLedgerScreen(
                     val balanceText = when {
                         isOwedToShop -> stringResource(R.string.party_ledger_lene_hain, uiState.netBalanceRs.toString())
                         isShopOwes -> stringResource(R.string.party_ledger_dene_hain, (-uiState.netBalanceRs).toString())
-                        else -> stringResource(R.string.party_ledger_settled_nil)
+                        else -> stringResource(R.string.party_settled)
                     }
 
                     Text(
@@ -346,17 +348,17 @@ private fun RecordWasooliDialog(
     var noteText by remember { mutableStateOf("") }
 
     val methods = listOf(
-        "CASH" to "Cash",
-        "BANK" to "Bank Transfer",
-        "WALLET" to "EasyPaisa / JazzCash",
-        "CHEQUE" to "Cheque",
-        "OTHER" to "Other"
+        "CASH" to stringResource(R.string.payment_method_cash),
+        "BANK" to stringResource(R.string.payment_method_bank),
+        "WALLET" to stringResource(R.string.payment_method_easypaisa),
+        "CHEQUE" to stringResource(R.string.payment_method_cheque),
+        "OTHER" to stringResource(R.string.payment_method_other)
     )
 
     val dialogTitle = if (direction == PaymentDirection.IN) {
-        stringResource(R.string.party_ledger_dialog_wasooli_title)
+        stringResource(R.string.party_ledger_btn_record_wasooli)
     } else {
-        stringResource(R.string.party_ledger_dialog_payment_given_title)
+        stringResource(R.string.party_ledger_btn_record_payment_given)
     }
 
     AlertDialog(

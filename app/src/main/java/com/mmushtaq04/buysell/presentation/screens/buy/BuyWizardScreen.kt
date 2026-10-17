@@ -12,6 +12,7 @@ import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -53,11 +54,15 @@ fun BuyWizardScreen(
 ) {
     var step by remember { mutableIntStateOf(1) }
 
-    val activeCategories = if (enabledCategories.isNotEmpty()) {
-        enabledCategories
-    } else {
+    val activeCategories = enabledCategories.ifEmpty {
         listOf(
-            "Mobile", "Tablet / iPad", "Laptop", "Console", "Smartwatch", "Earbuds / Audio", "Accessories"
+            "Mobile",
+            "Tablet / iPad",
+            "Laptop",
+            "Console",
+            "Smartwatch",
+            "Earbuds / Audio",
+            "Accessories"
         )
     }
 
@@ -78,12 +83,12 @@ fun BuyWizardScreen(
     var sellerCnic by remember { mutableStateOf("") }
 
     var paidAmountText by remember { mutableStateOf("") }
-    var paymentMethod by remember { mutableStateOf("Cash") }
+    val methods = stringArrayResource(R.array.payment_methods).toList()
+    val defaultPaymentMethod = methods.firstOrNull() ?: stringResource(R.string.payment_method_cash)
+    var paymentMethod by remember(defaultPaymentMethod) { mutableStateOf(defaultPaymentMethod) }
     var paymentDetailsText by remember { mutableStateOf("") }
     var promisedDateText by remember { mutableStateOf("") }
     var isSaving by remember { mutableStateOf(false) }
-
-    val methods = listOf("Cash", "Easypaisa", "JazzCash", "Bank Transfer", "Other")
 
     // Automatically prefill paidAmountText with full priceText
     LaunchedEffect(step, priceText) {
@@ -100,7 +105,7 @@ fun BuyWizardScreen(
                     IconButton(onClick = {
                         if (step > 1) step-- else onNavigateBack()
                     }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.action_back))
                     }
                 }
             )

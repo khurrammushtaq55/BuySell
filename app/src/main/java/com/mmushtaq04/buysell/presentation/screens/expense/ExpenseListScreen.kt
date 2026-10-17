@@ -56,7 +56,7 @@ fun ExpenseListScreen(
         AlertDialog(
             onDismissRequest = { deleteCandidateId = null },
             title = { Text(stringResource(R.string.action_confirm)) },
-            text = { Text("Are you sure you want to delete this expense record?") },
+            text = { Text(stringResource(R.string.expense_delete_confirm_msg)) },
             confirmButton = {
                 Button(
                     onClick = {
@@ -85,7 +85,7 @@ fun ExpenseListScreen(
                 title = { Text(stringResource(R.string.expense_title), fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.action_back))
                     }
                 }
             )
@@ -133,7 +133,7 @@ fun ExpenseListScreen(
 
             // Category Filter Chips
             val categories = listOf(
-                "ALL" to "All",
+                "ALL" to stringResource(R.string.expense_category_all),
                 "RENT" to stringResource(R.string.expense_category_rent),
                 "ELECTRICITY" to stringResource(R.string.expense_category_electricity),
                 "SALARY" to stringResource(R.string.expense_category_salary),
@@ -264,7 +264,7 @@ private fun ExpenseItemCard(
                 IconButton(onClick = onDelete) {
                     Icon(
                         imageVector = Icons.Default.DeleteOutline,
-                        contentDescription = "Delete",
+                        contentDescription = stringResource(R.string.action_delete),
                         tint = MaterialTheme.colorScheme.error,
                         modifier = Modifier.size(20.dp)
                     )

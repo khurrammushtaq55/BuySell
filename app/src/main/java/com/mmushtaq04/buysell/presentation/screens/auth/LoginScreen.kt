@@ -210,7 +210,7 @@ fun LoginScreen(
                         text = if (password.isNotEmpty() && password.length < 6) {
                             stringResource(R.string.login_pwd_char_count, password.length)
                         } else {
-                            stringResource(R.string.login_pwd_min_length)
+                            stringResource(R.string.login_err_pwd_short)
                         },
                         color = if (password.isNotEmpty() && password.length < 6) MaterialTheme.colorScheme.error else Color.Unspecified
                     )

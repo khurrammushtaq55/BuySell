@@ -468,7 +468,7 @@ fun LanguageAndPreferencesSection(
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(stringResource(R.string.settings_monthly_summary_time_label), fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(stringResource(R.string.settings_daily_summary_time_label), fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             Surface(
                                 shape = RoundedCornerShape(8.dp),
                                 color = MaterialTheme.colorScheme.primaryContainer

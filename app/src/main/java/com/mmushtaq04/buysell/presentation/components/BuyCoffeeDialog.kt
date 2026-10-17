@@ -21,6 +21,7 @@ import com.mmushtaq04.buysell.R
 
 @Composable
 fun BuyCoffeeDialog(
+    priceFormatted: String = "$0.99",
     onDismiss: () -> Unit,
     onBuyCoffeeClick: () -> Unit
 ) {
@@ -90,7 +91,7 @@ fun BuyCoffeeDialog(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = stringResource(R.string.coffee_btn_buy),
+                    text = stringResource(R.string.coffee_btn_buy, priceFormatted),
                     fontWeight = FontWeight.Bold,
                     fontSize = 14.sp
                 )

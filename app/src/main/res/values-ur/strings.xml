@@ -326,7 +326,7 @@
     <string name="rating_toast_thank_you">آپ کی ریٹنگ اور رائے کا بہت شکریہ!</string>
     <string name="settings_invite_share_msg">آپ کو %1$s ایپ پر %2$s جوائن کرنے کا کوڈ بھیجا گیا ہے: %3$s۔</string>
     <string name="export_backup_data_title">%1$s ایپ ایکسپورٹ بیک اپ ڈیٹا</string>
-    <string name="settings_footer_version">%1$s v1.0 (Build 1) • عہدہ: %2$s</string>
+    <string name="settings_footer_version">%1$s v%2$s (Build %3$d) • عہدہ: %4$s</string>
     <string name="dashboard_filter_today">آج</string>
     <string name="dashboard_filter_week">اس ہفتے</string>
     <string name="dashboard_filter_month">اس مہینے</string>

@@ -326,7 +326,7 @@
     <string name="rating_toast_thank_you">شكراً جزيلاً لتقييمك وملاحظاتك!</string>
     <string name="settings_invite_share_msg">تم إرسال رمز للانضمام إلى تطبيق %1$s كـ %2$s: %3$s.</string>
     <string name="export_backup_data_title">بيانات النسخ الاحتياطي للتصدير لتطبيق %1$s</string>
-    <string name="settings_footer_version">%1$s v1.0 (Build 1) • الصفة: %2$s</string>
+    <string name="settings_footer_version">%1$s v%2$s (Build %3$d) • الصفة: %4$s</string>
     <string name="dashboard_filter_today">اليوم</string>
     <string name="dashboard_filter_week">هذا الأسبوع</string>
     <string name="dashboard_filter_month">هذا الشهر</string>
