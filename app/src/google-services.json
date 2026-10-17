@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "880289197928",
+    "project_id": "buysell-cb85a",
+    "storage_bucket": "buysell-cb85a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:880289197928:android:1291282607a1c113b630dd",
+        "android_client_info": {
+          "package_name": "com.mmushtaq04.buysell"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "880289197928-3ut7hisb4im6jf7c3f9tcm0qbjeiehqq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mmushtaq04.buysell",
+            "certificate_hash": "4893e17404282a4c467137b2f6e6703ddf5f0f85"
+          }
+        },
+        {
+          "client_id": "880289197928-e1gmgdn0mko6k69o0l6surbmlj0caff6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mmushtaq04.buysell",
+            "certificate_hash": "cd0d4e1cae29e5cb13f9f27ddcac7c87bd44460c"
+          }
+        },
+        {
+          "client_id": "880289197928-h7tqhtv2u4bru48beoc6abejllugk9qn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAs1x21xOaym6RZ8avqMK3pPCkx1L7sLO8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "880289197928-h7tqhtv2u4bru48beoc6abejllugk9qn.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

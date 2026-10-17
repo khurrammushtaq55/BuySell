@@ -12,144 +12,167 @@ admin.initializeApp();
 const db = admin.firestore();
 
 const DEFAULT_PACKAGE_NAME = "com.mmushtaq04.buysell";
+const SUBSCRIPTION_IDS = ["buysell_pro_monthly", "buysell_pro_annual"];
+
+// Reusable Auth Client
+const auth = new google.auth.GoogleAuth({
+  scopes: ["https://www.googleapis.com/auth/androidpublisher"],
+});
+const androidPublisher = google.androidpublisher({ version: "v3", auth });
 
 /**
- * Helper to query Google Play AndroidPublisher v3 subscriptionsv2.get
+ * Helper: Safe Acknowledge
+ * Ignores 400 errors (meaning it was already acknowledged).
  */
-async function queryPlaySubscriptionV2(token, packageName = DEFAULT_PACKAGE_NAME) {
-  const auth = new google.auth.GoogleAuth({
-    scopes: ["https://www.googleapis.com/auth/androidpublisher"],
-  });
-  const androidPublisher = google.androidpublisher({ version: "v3", auth });
-
-  const response = await androidPublisher.purchases.subscriptionsv2.get({
-    packageName: packageName,
-    token: token,
-  });
-
-  return response.data;
+async function safelyAcknowledge(type, packageName, productId, token) {
+  try {
+    if (type === "subscription") {
+      await androidPublisher.purchases.subscriptions.acknowledge({
+        packageName,
+        subscriptionId: productId,
+        token,
+      });
+    } else {
+      await androidPublisher.purchases.products.acknowledge({
+        packageName,
+        productId,
+        token,
+      });
+    }
+    functions.logger.info(`✓ Acknowledged ${type} for token: ${token}`);
+  } catch (error) {
+    // 400 means it was already acknowledged, which is fine.
+    if (error.code !== 400) {
+      functions.logger.error(`Failed to acknowledge ${type} for token ${token}:`, error.message);
+      throw error; // Fail the function so the client knows to retry
+    }
+  }
 }
 
 /**
  * 1. verifyPlayPurchase (Callable Cloud Function)
- * T1-T6: Hardened Play Purchase Verification
+ * Handles both Subscriptions and One-Time Products.
  */
 exports.verifyPlayPurchase = functions.https.onCall(async (data, context) => {
   if (!context.auth) {
-    throw new functions.https.HttpsError(
-      "unauthenticated",
-      "The user must be authenticated to verify a purchase."
-    );
+    throw new functions.https.HttpsError("unauthenticated", "The user must be authenticated.");
   }
 
   const { purchaseToken, productId, shopId } = data;
   const targetPackageName = data.packageName || DEFAULT_PACKAGE_NAME;
 
   if (!purchaseToken || !productId || !shopId) {
-    throw new functions.https.HttpsError(
-      "invalid-argument",
-      "Missing required fields: purchaseToken, productId, or shopId."
-    );
+    throw new functions.https.HttpsError("invalid-argument", "Missing required fields.");
   }
 
   functions.logger.info(`Verifying purchase token for shop: ${shopId}, product: ${productId}`);
 
-  // T3: Authorization check - Caller must be shop owner
+  // 1. Authorization check - Caller must be shop owner
   const shopSnap = await db.collection("shops").doc(shopId).get();
   if (!shopSnap.exists) {
     throw new functions.https.HttpsError("not-found", `Shop '${shopId}' does not exist.`);
   }
 
-  const shopData = shopSnap.data();
-  if (!isOwnerAuthorized(context.auth.uid, shopData.owner_user_id)) {
-    throw new functions.https.HttpsError(
-      "permission-denied",
-      "Only the shop owner can verify purchases for this shop."
-    );
+  if (!isOwnerAuthorized(context.auth.uid, shopSnap.data().owner_user_id)) {
+    throw new functions.https.HttpsError("permission-denied", "Only the shop owner can verify purchases.");
   }
 
-  // T4: Token binding check - Verify purchase token is not bound to a different shop
-  const purchaseSnap = await db.collection("purchases").doc(purchaseToken).get();
-  const existingPurchase = purchaseSnap.exists ? purchaseSnap.data() : null;
-
+  // 2. Query Google Play API (Fail closed)
   let playData = null;
+  const isSubscription = SUBSCRIPTION_IDS.includes(productId);
 
-  // T2 & T5: Fail closed. Query Google Play subscriptionsv2 API
   try {
-    playData = await queryPlaySubscriptionV2(purchaseToken, targetPackageName);
+    if (isSubscription) {
+      const res = await androidPublisher.purchases.subscriptionsv2.get({
+        packageName: targetPackageName,
+        token: purchaseToken,
+      });
+      playData = res.data;
+    } else {
+      const res = await androidPublisher.purchases.products.get({
+        packageName: targetPackageName,
+        productId: productId,
+        token: purchaseToken,
+      });
+      playData = res.data;
+    }
   } catch (apiError) {
-    functions.logger.error(`Google Play API verification failed for token '${purchaseToken}': ${apiError.message}`);
-    throw new functions.https.HttpsError(
-      "failed-precondition",
-      `Google Play purchase verification failed: ${apiError.message}`
-    );
+    functions.logger.error(`Play API verification failed: ${apiError.message}`);
+    throw new functions.https.HttpsError("failed-precondition", `Verification failed: ${apiError.message}`);
   }
 
-  if (!playData) {
-    throw new functions.https.HttpsError(
-      "failed-precondition",
-      "Empty response received from Google Play purchase verification."
-    );
-  }
+  // 3. Handle One-Time Products (Coffee Tip)
+  if (!isSubscription) {
+    // purchaseState 0 means Purchased
+    if (playData.purchaseState !== 0) {
+      throw new functions.https.HttpsError("failed-precondition", "One-time product is not in a valid purchased state.");
+    }
 
-  // T4: Check obfuscatedExternalAccountId if present
-  const extAccounts = playData.externalAccountIdentifiers || null;
-  const bindingCheck = validateTokenBinding(existingPurchase, shopId, extAccounts);
-  if (!bindingCheck.valid) {
-    functions.logger.error(`Token binding failed: ${bindingCheck.reason}`);
-    throw new functions.https.HttpsError("permission-denied", bindingCheck.reason);
-  }
+    // Acknowledge immediately so it isn't refunded
+    await safelyAcknowledge("product", targetPackageName, productId, purchaseToken);
 
-  if (!extAccounts || !extAccounts.obfuscatedExternalAccountId) {
-    functions.logger.warn(`No obfuscatedExternalAccountId present in Play response for shop '${shopId}'`);
-  }
-
-  // T5: Map subscription state from Play response
-  const mapped = mapSubscriptionState(playData, productId);
-  const nowMs = Date.now();
-
-  const batch = db.batch();
-
-  // T6: Write trusted license document to shops/{shopId}/license/current
-  const licenseRef = db.collection("shops").doc(shopId).collection("license").doc("current");
-  batch.set(
-    licenseRef,
-    {
-      plan: mapped.productId || productId,
-      status: mapped.status,
-      valid_until: mapped.validUntilMs,
-      source: "PLAY",
-      auto_renewing: mapped.autoRenewing,
-      server_time_ms: nowMs,
-      updated_at: admin.firestore.FieldValue.serverTimestamp(),
-    },
-    { merge: true }
-  );
-
-  // T6: Audit log purchase record in purchases/{purchaseToken} (server-only)
-  const purchaseRef = db.collection("purchases").doc(purchaseToken);
-  batch.set(
-    purchaseRef,
-    {
+    // Note: You might want to log this to Firestore, but it doesn't grant Pro access.
+    await db.collection("purchases").doc(purchaseToken).set({
       shop_id: shopId,
       user_uid: context.auth.uid,
-      product_id: mapped.productId || productId,
+      product_id: productId,
       package_name: targetPackageName,
-      purchase_token: purchaseToken,
-      status: mapped.status,
-      valid_until: mapped.validUntilMs,
-      auto_renewing: mapped.autoRenewing,
+      status: "PURCHASED",
       verified_at: admin.firestore.FieldValue.serverTimestamp(),
-    },
-    { merge: true }
-  );
+    }, { merge: true });
+
+    return { success: true, type: "one-time", status: "PURCHASED" };
+  }
+
+  // 4. Handle Subscriptions
+  const extAccounts = playData.externalAccountIdentifiers || null;
+
+  // Optional: Verify the token belongs to this shop
+  if (extAccounts && extAccounts.obfuscatedExternalAccountId && extAccounts.obfuscatedExternalAccountId !== shopId) {
+    functions.logger.error(`Token binding failed. Expected ${shopId}, got ${extAccounts.obfuscatedExternalAccountId}`);
+    throw new functions.https.HttpsError("permission-denied", "Purchase token belongs to a different shop.");
+  }
+
+  // 5. Map State and Acknowledge
+  const mapped = mapSubscriptionState(playData, productId);
+
+  // Only acknowledge if it's active or in grace period
+  if (mapped.status === "ACTIVE" || mapped.status === "IN_GRACE_PERIOD") {
+    await safelyAcknowledge("subscription", targetPackageName, productId, purchaseToken);
+  }
+
+  // 6. Write to Firestore
+  const nowMs = Date.now();
+  const batch = db.batch();
+  const licenseRef = db.collection("shops").doc(shopId).collection("license").doc("current");
+  const purchaseRef = db.collection("purchases").doc(purchaseToken);
+
+  batch.set(licenseRef, {
+    plan: mapped.productId || productId,
+    status: mapped.status,
+    valid_until: mapped.validUntilMs,
+    source: "PLAY",
+    auto_renewing: mapped.autoRenewing,
+    server_time_ms: nowMs,
+    updated_at: admin.firestore.FieldValue.serverTimestamp(),
+  }, { merge: true });
+
+  batch.set(purchaseRef, {
+    shop_id: shopId,
+    user_uid: context.auth.uid,
+    product_id: mapped.productId || productId,
+    package_name: targetPackageName,
+    status: mapped.status,
+    valid_until: mapped.validUntilMs,
+    auto_renewing: mapped.autoRenewing,
+    verified_at: admin.firestore.FieldValue.serverTimestamp(),
+  }, { merge: true });
 
   await batch.commit();
 
-  functions.logger.info(`✓ Successfully verified purchase for shop ${shopId}. Status: ${mapped.status}, Valid until: ${new Date(mapped.validUntilMs).toISOString()}`);
-
   return {
     success: true,
+    type: "subscription",
     status: mapped.status,
     plan: mapped.productId || productId,
     validUntil: mapped.validUntilMs,
@@ -158,112 +181,149 @@ exports.verifyPlayPurchase = functions.https.onCall(async (data, context) => {
 });
 
 /**
- * 2. handlePlayRtdn (Pub/Sub Triggered / Authenticated Cloud Function)
- * T7: Handles Google Play RTDN lifecycle notifications securely.
+ * 2. handlePlayRtdn (Pub/Sub Triggered)
+ * Fixes the Race Condition: Can handle notifications even if the client never
+ * called verifyPlayPurchase (because it reads the shopId from the Play API).
  */
 exports.handlePlayRtdn = functions.pubsub.topic("play-rtdn").onPublish(async (message) => {
   try {
     const rawData = message.data ? Buffer.from(message.data, "base64").toString("utf-8") : null;
     if (!rawData) {
-      functions.logger.warn("Received empty Pub/Sub message data in RTDN handler");
+      functions.logger.warn("Empty Pub/Sub message.");
       return null;
     }
 
     const rtdnPayload = JSON.parse(rawData);
-    functions.logger.info("Received Google Play RTDN event via Pub/Sub:", rtdnPayload);
 
-    const { subscriptionNotification } = rtdnPayload;
-    if (!subscriptionNotification) {
-      functions.logger.info("Non-subscription RTDN notification received. Ignoring.");
+    // Ignore test notifications
+    if (rtdnPayload.testNotification) {
+      functions.logger.info("Test notification received successfully.");
       return null;
     }
 
-    const { notificationType, purchaseToken, subscriptionId } = subscriptionNotification;
-    functions.logger.info(`RTDN Event Type: ${notificationType} for token: ${purchaseToken}`);
+    const subNotif = rtdnPayload.subscriptionNotification;
+    const oneTimeNotif = rtdnPayload.oneTimeProductNotification;
 
-    // Lookup purchase record in purchases/{purchaseToken}
-    const purchaseSnap = await db.collection("purchases").doc(purchaseToken).get();
-    if (!purchaseSnap.exists) {
-      functions.logger.warn(`No purchase record found in purchases collection for token: ${purchaseToken}`);
+    if (!subNotif && !oneTimeNotif) {
+      functions.logger.info("Unknown notification type. Ignoring.");
       return null;
     }
 
-    const purchaseData = purchaseSnap.data();
-    const shopId = purchaseData.shop_id;
-    if (!shopId) {
-      functions.logger.warn(`No shop_id bound to purchase token: ${purchaseToken}`);
-      return null;
-    }
+    const purchaseToken = subNotif ? subNotif.purchaseToken : oneTimeNotif.purchaseToken;
+    const productId = subNotif ? subNotif.subscriptionId : oneTimeNotif.sku;
+    const isSubscription = !!subNotif;
 
-    // T7: Re-query Google Play API for authoritative status
+    functions.logger.info(`RTDN received for ${productId}, token: ${purchaseToken}`);
+
+    // 1. Fetch Authoritative Data from Play API
     let playData = null;
     try {
-      playData = await queryPlaySubscriptionV2(purchaseToken, DEFAULT_PACKAGE_NAME);
+      if (isSubscription) {
+        const res = await androidPublisher.purchases.subscriptionsv2.get({
+          packageName: DEFAULT_PACKAGE_NAME,
+          token: purchaseToken,
+        });
+        playData = res.data;
+      } else {
+        const res = await androidPublisher.purchases.products.get({
+          packageName: DEFAULT_PACKAGE_NAME,
+          productId: productId,
+          token: purchaseToken,
+        });
+        playData = res.data;
+      }
     } catch (apiErr) {
-      functions.logger.error(`Error re-querying Play API in RTDN handler for token '${purchaseToken}': ${apiErr.message}`);
-      return null;
+      functions.logger.error(`Play API failed in RTDN: ${apiErr.message}`);
+      throw new Error("Play API failed"); // Throw to trigger Pub/Sub retry
     }
 
-    const mapped = mapSubscriptionState(playData, subscriptionId || purchaseData.product_id);
-    const nowMs = Date.now();
+    // 2. Find the Shop ID
+    // Try the Firestore doc first (faster). If missing, use Play API's obfuscatedExternalAccountId.
+    const purchaseSnap = await db.collection("purchases").doc(purchaseToken).get();
+    let shopId = purchaseSnap.exists ? purchaseSnap.data().shop_id : null;
 
-    const licenseRef = db.collection("shops").doc(shopId).collection("license").doc("current");
-    await licenseRef.set(
-      {
-        plan: mapped.productId || subscriptionId || purchaseData.product_id,
+    if (!shopId && playData.externalAccountIdentifiers) {
+      shopId = playData.externalAccountIdentifiers.obfuscatedExternalAccountId;
+      functions.logger.info(`Race condition resolved. Found shopId ${shopId} from Play API.`);
+    }
+
+    if (!shopId) {
+      functions.logger.warn(`No shop_id found for token ${purchaseToken}. Cannot update license.`);
+      return null; // Can't do anything without a shopId
+    }
+
+    // 3. Update Firestore
+    const nowMs = Date.now();
+    const batch = db.batch();
+
+    const purchaseRef = db.collection("purchases").doc(purchaseToken);
+
+    if (isSubscription) {
+      const mapped = mapSubscriptionState(playData, productId);
+
+      const licenseRef = db.collection("shops").doc(shopId).collection("license").doc("current");
+      batch.set(licenseRef, {
+        plan: mapped.productId || productId,
         status: mapped.status,
         valid_until: mapped.validUntilMs,
         source: "PLAY",
         auto_renewing: mapped.autoRenewing,
         server_time_ms: nowMs,
         updated_at: admin.firestore.FieldValue.serverTimestamp(),
-      },
-      { merge: true }
-    );
+      }, { merge: true });
 
-    functions.logger.info(`✓ RTDN updated license for shop ${shopId}: status=${mapped.status}, valid_until=${new Date(mapped.validUntilMs).toISOString()}`);
+      batch.set(purchaseRef, {
+        shop_id: shopId,
+        product_id: productId,
+        status: mapped.status,
+        valid_until: mapped.validUntilMs,
+        auto_renewing: mapped.autoRenewing,
+        updated_at: admin.firestore.FieldValue.serverTimestamp(),
+      }, { merge: true });
+
+      functions.logger.info(`✓ RTDN updated license for shop ${shopId}: status=${mapped.status}`);
+    } else {
+      // One-time product (Coffee)
+      batch.set(purchaseRef, {
+        shop_id: shopId,
+        product_id: productId,
+        status: playData.purchaseState === 0 ? "PURCHASED" : "CANCELED",
+        updated_at: admin.firestore.FieldValue.serverTimestamp(),
+      }, { merge: true });
+    }
+
+    await batch.commit();
     return null;
+
   } catch (error) {
-    functions.logger.error("Error processing Google Play RTDN event:", error);
-    // Return null so function finishes gracefully and Pub/Sub does not retry endlessly for invalid payloads
-    return null;
+    functions.logger.error("Error processing RTDN:", error);
+    // THROWING HERE forces Pub/Sub to retry the message.
+    throw new Error("RTDN Processing Failed");
   }
 });
 
 /**
  * 3. redeemPromoCode (Callable Cloud Function)
- * T8: Secure Promo Code Redemption
+ * Kept as is - it was perfect.
  */
 exports.redeemPromoCode = functions.https.onCall(async (data, context) => {
   if (!context.auth) {
-    throw new functions.https.HttpsError(
-      "unauthenticated",
-      "The user must be authenticated to redeem a promo code."
-    );
+    throw new functions.https.HttpsError("unauthenticated", "User must be authenticated.");
   }
 
   const { code, shopId } = data;
   if (!code || !shopId) {
-    throw new functions.https.HttpsError(
-      "invalid-argument",
-      "Missing required fields: code or shopId."
-    );
+    throw new functions.https.HttpsError("invalid-argument", "Missing code or shopId.");
   }
 
   const promoCode = code.trim().toUpperCase();
-
-  // Authorization check - Caller must be shop owner
   const shopSnap = await db.collection("shops").doc(shopId).get();
-  if (!shopSnap.exists) {
-    throw new functions.https.HttpsError("not-found", `Shop '${shopId}' does not exist.`);
-  }
 
-  const shopData = shopSnap.data();
-  if (!isOwnerAuthorized(context.auth.uid, shopData.owner_user_id)) {
-    throw new functions.https.HttpsError(
-      "permission-denied",
-      "Only the shop owner can redeem promo codes for this shop."
-    );
+  if (!shopSnap.exists) {
+    throw new functions.https.HttpsError("not-found", `Shop does not exist.`);
+  }
+  if (!isOwnerAuthorized(context.auth.uid, shopSnap.data().owner_user_id)) {
+    throw new functions.https.HttpsError("permission-denied", "Only the shop owner can redeem codes.");
   }
 
   const nowMs = Date.now();
@@ -277,41 +337,26 @@ exports.redeemPromoCode = functions.https.onCall(async (data, context) => {
       const promoDoc = await transaction.get(promoRef);
       const redemptionDoc = await transaction.get(redemptionRef);
 
-      const validation = validatePromoCode(
-        promoDoc.exists ? promoDoc.data() : null,
-        redemptionDoc.exists,
-        nowMs
-      );
+      const validation = validatePromoCode(promoDoc.exists ? promoDoc.data() : null, redemptionDoc.exists, nowMs);
+      if (!validation.valid) throw new Error(validation.reason);
 
-      if (!validation.valid) {
-        throw new Error(validation.reason);
-      }
+      const validUntilMs = nowMs + (validation.grantDays * 24 * 60 * 60 * 1000);
 
-      const grantMs = validation.grantDays * 24 * 60 * 60 * 1000;
-      const validUntilMs = nowMs + grantMs;
+      transaction.set(licenseRef, {
+        plan: promoCode,
+        status: "ACTIVE",
+        valid_until: validUntilMs,
+        source: "PROMO",
+        auto_renewing: false,
+        server_time_ms: nowMs,
+        updated_at: admin.firestore.FieldValue.serverTimestamp(),
+      }, { merge: true });
 
-      // 1. Write license doc shops/{shopId}/license/current
-      transaction.set(
-        licenseRef,
-        {
-          plan: promoCode,
-          status: "ACTIVE",
-          valid_until: validUntilMs,
-          source: "PROMO",
-          auto_renewing: false,
-          server_time_ms: nowMs,
-          updated_at: admin.firestore.FieldValue.serverTimestamp(),
-        },
-        { merge: true }
-      );
-
-      // 2. Increment redeemed_count on promo code doc
       transaction.update(promoRef, {
         redeemed_count: validation.redeemedCount + 1,
         updated_at: admin.firestore.FieldValue.serverTimestamp(),
       });
 
-      // 3. Record redemption proof in promo_redemptions/{CODE}_{shopId}
       transaction.set(redemptionRef, {
         code: promoCode,
         shop_id: shopId,
@@ -319,20 +364,11 @@ exports.redeemPromoCode = functions.https.onCall(async (data, context) => {
         redeemed_at: admin.firestore.FieldValue.serverTimestamp(),
       });
 
-      return {
-        success: true,
-        plan: promoCode,
-        validUntil: validUntilMs,
-      };
+      return { success: true, plan: promoCode, validUntil: validUntilMs };
     });
 
-    functions.logger.info(`✓ Successfully redeemed promo code '${promoCode}' for shop '${shopId}' until ${new Date(result.validUntil).toISOString()}`);
     return result;
   } catch (err) {
-    functions.logger.error(`Error redeeming promo code '${promoCode}' for shop '${shopId}': ${err.message}`);
-    throw new functions.https.HttpsError(
-      "failed-precondition",
-      `Promo code redemption failed: ${err.message}`
-    );
+    throw new functions.https.HttpsError("failed-precondition", err.message);
   }
 });

@@ -72,11 +72,16 @@ fun WelcomeLandingScreen(
                     }
                     .build()
 
-                val request = GetCredentialRequest.Builder()
+                val requestBuilder = GetCredentialRequest.Builder()
                     .addCredentialOption(googleIdOption)
-                    .build()
 
-                val result = credentialManager.getCredential(context, request)
+                if (webClientId.isNotBlank()) {
+                    val signInWithGoogleOption = com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption.Builder(webClientId)
+                        .build()
+                    requestBuilder.addCredentialOption(signInWithGoogleOption)
+                }
+
+                val result = credentialManager.getCredential(context, requestBuilder.build())
                 val credential = result.credential
 
                 val googleIdTokenCredential = when (credential) {
