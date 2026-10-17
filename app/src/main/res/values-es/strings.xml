@@ -523,4 +523,7 @@
     <string name="exchange_bought_price_label">Precio de Compra Original:</string>
     <string name="label_qty_remaining">Cantidad Restante:</string>
     <string name="label_status">Estado:</string>
+    <string name="role_owner">Propietario</string>
+    <string name="role_staff">Personal</string>
+    <string name="role_partner">Socio</string>
 </resources>

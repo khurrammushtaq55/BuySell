@@ -117,8 +117,9 @@ fun HomeScreen(
                 title = {
                     Column {
                         Text(text = shopName, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                        val localizedRole = com.mmushtaq04.buysell.util.RoleLocalization.getLocalizedRoleName(userRole)
                         Text(
-                            text = stringResource(R.string.home_role_cloud_sync, userRole),
+                            text = stringResource(R.string.home_role_cloud_sync, localizedRole),
                             fontSize = 12.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )

@@ -523,4 +523,7 @@
     <string name="exchange_bought_price_label">मूल खरीद मूल्य:</string>
     <string name="label_qty_remaining">शेष मात्रा:</string>
     <string name="label_status">स्थिति:</string>
+    <string name="role_owner">मालिक</string>
+    <string name="role_staff">स्टाफ</string>
+    <string name="role_partner">साझेदार</string>
 </resources>

@@ -523,4 +523,7 @@
     <string name="exchange_bought_price_label">سعر الشراء الأصلي:</string>
     <string name="label_qty_remaining">الكمية المتبقية:</string>
     <string name="label_status">الحالة:</string>
+    <string name="role_owner">المالك</string>
+    <string name="role_staff">الموظف</string>
+    <string name="role_partner">الشريك</string>
 </resources>

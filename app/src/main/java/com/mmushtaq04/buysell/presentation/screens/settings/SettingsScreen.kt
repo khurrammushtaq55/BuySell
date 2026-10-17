@@ -121,13 +121,14 @@ fun SettingsScreen(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
+                val localizedRole = com.mmushtaq04.buysell.util.RoleLocalization.getLocalizedRoleName(userRole)
                 Text(
                     text = stringResource(
                         R.string.settings_footer_version,
                         stringResource(R.string.app_name),
                         com.mmushtaq04.buysell.BuildConfig.VERSION_NAME,
                         com.mmushtaq04.buysell.BuildConfig.VERSION_CODE,
-                        userRole
+                        localizedRole
                     ),
                     fontSize = 12.sp,
                     color = Color.Gray

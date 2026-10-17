@@ -523,4 +523,7 @@
     <string name="exchange_bought_price_label">Asli Khareed Price:</string>
     <string name="label_qty_remaining">Baqi Tadad:</string>
     <string name="label_status">Status:</string>
+    <string name="role_owner">Owner</string>
+    <string name="role_staff">Staff</string>
+    <string name="role_partner">Partner</string>
 </resources>

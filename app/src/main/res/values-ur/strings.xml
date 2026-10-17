@@ -523,4 +523,7 @@
     <string name="exchange_bought_price_label">اصل خرید قیمت:</string>
     <string name="label_qty_remaining">بقیہ تعداد:</string>
     <string name="label_status">حالت:</string>
+    <string name="role_owner">مالک</string>
+    <string name="role_staff">اسٹاف</string>
+    <string name="role_partner">پارٹنر</string>
 </resources>

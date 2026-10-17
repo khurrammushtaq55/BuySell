@@ -523,4 +523,7 @@
     <string name="exchange_bought_price_label">Prix d\'Achat d\'Origine :</string>
     <string name="label_qty_remaining">Quantité Restante :</string>
     <string name="label_status">Statut :</string>
+    <string name="role_owner">Propriétaire</string>
+    <string name="role_staff">Employé</string>
+    <string name="role_partner">Partenaire</string>
 </resources>

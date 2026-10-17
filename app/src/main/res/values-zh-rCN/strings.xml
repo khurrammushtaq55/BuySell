@@ -523,4 +523,7 @@
     <string name="exchange_bought_price_label">原采购价：</string>
     <string name="label_qty_remaining">剩余数量：</string>
     <string name="label_status">状态：</string>
+    <string name="role_owner">店主</string>
+    <string name="role_staff">员工</string>
+    <string name="role_partner">合伙人</string>
 </resources>
