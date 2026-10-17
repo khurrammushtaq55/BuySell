@@ -195,7 +195,7 @@ fun SellWizardScreen(
                             selectedItem?.let { item ->
                                 Card(modifier = Modifier.fillMaxWidth()) {
                                     Column(modifier = Modifier.padding(12.dp)) {
-                                        Text("Selected Item: ${item.title}", fontWeight = FontWeight.Bold)
+                                        Text(stringResource(R.string.sell_selected_item, item.title), fontWeight = FontWeight.Bold)
                                         Text("IMEI: ${item.imei}", fontSize = 12.sp)
                                     }
                                 }
@@ -353,13 +353,8 @@ fun SellWizardScreen(
                             OutlinedTextField(
                                 value = paymentDetails,
                                 onValueChange = { paymentDetails = it },
-                                label = {
-                                    Text(
-                                        if (paymentMethod == "Other") "Payment Method Detail / Name *"
-                                        else "Bank / Account / Ref Info (Optional)"
-                                    )
-                                },
-                                placeholder = { Text("e.g. HBL / Easypaisa Txn #12345 / Account title") },
+                                label = { Text(stringResource(R.string.label_payment_ref_no)) },
+                                placeholder = { Text(stringResource(R.string.placeholder_payment_ref)) },
                                 modifier = Modifier.fillMaxWidth()
                             )
 

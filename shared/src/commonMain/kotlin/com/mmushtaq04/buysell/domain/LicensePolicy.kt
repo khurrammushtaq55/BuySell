@@ -60,7 +60,7 @@ object LicensePolicy {
         }
 
         val normalizedStatus = license.status.uppercase().trim()
-        val isAllowedStatus = normalizedStatus in setOf("ACTIVE", "GRACE", "ON_HOLD", "CANCELED_ACTIVE")
+        val isAllowedStatus = normalizedStatus in setOf("ACTIVE", "GRACE", "CANCELED_ACTIVE")
 
         if (!isAllowedStatus) {
             return Entitlement(
@@ -72,7 +72,7 @@ object LicensePolicy {
             )
         }
 
-        val effectiveValidUntilMs = if (normalizedStatus == "GRACE" || normalizedStatus == "ON_HOLD") {
+        val effectiveValidUntilMs = if (normalizedStatus == "GRACE") {
             license.validUntilMs + GRACE_WINDOW_MS
         } else {
             license.validUntilMs

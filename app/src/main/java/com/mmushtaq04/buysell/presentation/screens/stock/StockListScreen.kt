@@ -64,14 +64,14 @@ fun StockListScreen(
             title = { Text("${detail.brand} ${detail.model}", fontWeight = FontWeight.Bold) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    DetailRow("IMEI / Serial:", detail.imei)
-                    if (detail.ram.isNotBlank()) DetailRow("RAM / Memory:", detail.ram)
-                    if (detail.storage.isNotBlank()) DetailRow("Storage / Capacity:", detail.storage)
-                    if (detail.specs.isNotBlank()) DetailRow("Specs / Variant:", detail.specs)
-                    if (detail.color.isNotBlank()) DetailRow("Color:", detail.color)
-                    if (detail.issue.isNotBlank()) DetailRow("Fault / Issue:", detail.issue)
-                    DetailRow("Quantity Remaining:", detail.remainingQty.toString())
-                    DetailRow("Status:", detail.status)
+                    DetailRow(stringResource(R.string.label_imei), detail.imei)
+                    if (detail.ram.isNotBlank()) DetailRow(stringResource(R.string.label_ram), detail.ram)
+                    if (detail.storage.isNotBlank()) DetailRow(stringResource(R.string.label_storage), detail.storage)
+                    if (detail.specs.isNotBlank()) DetailRow(stringResource(R.string.label_specs), detail.specs)
+                    if (detail.color.isNotBlank()) DetailRow(stringResource(R.string.label_color), detail.color)
+                    if (detail.issue.isNotBlank()) DetailRow(stringResource(R.string.label_fault_issue), detail.issue)
+                    DetailRow(stringResource(R.string.label_qty_remaining), detail.remainingQty.toString())
+                    DetailRow(stringResource(R.string.label_status), detail.status)
                 }
             },
             confirmButton = {

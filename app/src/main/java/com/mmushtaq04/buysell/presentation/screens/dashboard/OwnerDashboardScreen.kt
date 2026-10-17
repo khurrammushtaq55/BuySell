@@ -202,10 +202,10 @@ fun OwnerDashboardContent(
                         label = {
                             Text(
                                 when (range) {
-                                    TimeRange.TODAY -> stringResource(R.string.dashboard_today)
-                                    TimeRange.THIS_MONTH -> stringResource(R.string.dashboard_this_month)
-                                    TimeRange.THIS_YEAR -> stringResource(R.string.dashboard_this_year)
-                                    TimeRange.ALL_TIME -> stringResource(R.string.dashboard_all_time)
+                                    TimeRange.TODAY -> stringResource(R.string.dashboard_filter_today)
+                                    TimeRange.THIS_MONTH -> stringResource(R.string.dashboard_filter_month)
+                                    TimeRange.THIS_YEAR -> stringResource(R.string.dashboard_filter_year)
+                                    TimeRange.ALL_TIME -> stringResource(R.string.dashboard_filter_all)
                                 },
                                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
                             )
@@ -303,9 +303,11 @@ fun OwnerDashboardContent(
                             )
                         }
 
+                        val helpTitle = stringResource(R.string.dashboard_help_net_profit_title)
+                        val helpMsg = stringResource(R.string.dashboard_help_net_profit_msg)
                         IconButton(onClick = {
-                            showHelpDialogTitle = "Net Profit Calculation"
-                            showHelpDialogMsg = "Net Profit = Net Revenue (Aamdani) - COGS (Saman ki Lagat) - Expenses (Dukan ke Akhrajat).\n\nReturns & Refunds are already adjusted!"
+                            showHelpDialogTitle = helpTitle
+                            showHelpDialogMsg = helpMsg
                         }) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.HelpOutline,
@@ -524,7 +526,7 @@ fun OwnerDashboardContent(
                         value = com.mmushtaq04.buysell.util.CurrencyFormatter.formatAmount(context, uiState.expensesRs),
                         icon = Icons.AutoMirrored.Filled.ReceiptLong,
                         iconColor = MaterialTheme.colorScheme.error,
-                        subtitle = "Tap to view/add expenses →",
+                        subtitle = stringResource(R.string.dashboard_expenses_subtitle),
                         onClick = onNavigateToExpenses,
                         modifier = Modifier.weight(1f)
                     )
@@ -670,7 +672,7 @@ fun OwnerDashboardContent(
                         )
                         HorizontalDivider()
                         if (uiState.paymentMethodTotals.isEmpty()) {
-                            Text("No transactions recorded in this period", fontSize = 12.sp, color = Color.Gray)
+                            Text(stringResource(R.string.dashboard_no_method_txns), fontSize = 12.sp, color = Color.Gray)
                         } else {
                             uiState.paymentMethodTotals.forEach { (method, amountRs) ->
                                 Row(
@@ -724,12 +726,12 @@ fun OwnerDashboardContent(
                                     FilterChip(
                                         selected = uiState.topModelsSortOrder == TopModelsSortOrder.UNITS_SOLD,
                                         onClick = { onSortOrderChanged(TopModelsSortOrder.UNITS_SOLD) },
-                                        label = { Text("Units", fontSize = 10.sp) }
+                                        label = { Text(stringResource(R.string.dashboard_sort_units), fontSize = 10.sp) }
                                     )
                                     FilterChip(
                                         selected = uiState.topModelsSortOrder == TopModelsSortOrder.PROFIT,
                                         onClick = { onSortOrderChanged(TopModelsSortOrder.PROFIT) },
-                                        label = { Text("Profit", fontSize = 10.sp) }
+                                        label = { Text(stringResource(R.string.dashboard_sort_profit), fontSize = 10.sp) }
                                     )
                                 }
                             }
@@ -775,7 +777,7 @@ fun OwnerDashboardContent(
             // Inventory Insights Section (Capital Locked & Slow Moving Stock)
             PremiumFeatureGate(
                 isLocked = isInventoryInsightsLocked,
-                featureName = "Inventory Insights",
+                featureName = stringResource(R.string.dashboard_feature_inventory_insights),
                 onUnlockClick = onUnlockClick
             ) {
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -791,8 +793,8 @@ fun OwnerDashboardContent(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Column {
-                                Text("Capital Locked in Stock", fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                                Text("Purchase cost value of in-stock items", fontSize = 11.sp, color = Color.Gray)
+                                Text(stringResource(R.string.dashboard_capital_locked_title), fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                                Text(stringResource(R.string.dashboard_capital_locked_sub), fontSize = 11.sp, color = Color.Gray)
                             }
                             Text(
                                 text = com.mmushtaq04.buysell.util.CurrencyFormatter.formatAmount(context, uiState.capitalInStockRs),
@@ -815,8 +817,8 @@ fun OwnerDashboardContent(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Column {
-                                Text("Slow Moving Stock", fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                                Text("${uiState.slowStockCount} items in stock > 30 days", fontSize = 11.sp, color = Color.Gray)
+                                Text(stringResource(R.string.dashboard_slow_stock), fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                                Text(stringResource(R.string.dashboard_slow_stock_sub, uiState.slowStockCount), fontSize = 11.sp, color = Color.Gray)
                             }
                             Text(
                                 text = com.mmushtaq04.buysell.util.CurrencyFormatter.formatAmount(context, uiState.slowStockValueRs),
@@ -857,7 +859,7 @@ private fun CustomDateRangePickerDialog(
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(R.string.action_cancel))
             }
         }
     ) {
@@ -871,11 +873,11 @@ private fun CustomDateRangePickerDialog(
 
 private fun shareDashboardSummary(context: Context, shopName: String, uiState: DashboardUiState) {
     val rangeText = when (uiState.timeRangeSelection.preset) {
-        TimeRangePreset.TODAY -> "Today"
-        TimeRangePreset.THIS_MONTH -> "This Month"
-        TimeRangePreset.THIS_YEAR -> "This Year"
-        TimeRangePreset.ALL_TIME -> "All Time"
-        TimeRangePreset.CUSTOM -> "Custom Range"
+        TimeRangePreset.TODAY -> context.getString(R.string.dashboard_filter_today)
+        TimeRangePreset.THIS_MONTH -> context.getString(R.string.dashboard_filter_month)
+        TimeRangePreset.THIS_YEAR -> context.getString(R.string.dashboard_filter_year)
+        TimeRangePreset.ALL_TIME -> context.getString(R.string.dashboard_filter_all)
+        TimeRangePreset.CUSTOM -> context.getString(R.string.dashboard_custom_range)
     }
 
     val summaryText = """

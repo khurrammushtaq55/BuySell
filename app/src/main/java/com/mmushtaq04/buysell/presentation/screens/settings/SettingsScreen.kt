@@ -24,7 +24,7 @@ import com.mmushtaq04.buysell.ui.theme.BuySellTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
-    userRole: String = "Owner",
+    userRole: String = "Owner", // todo
     ownerName: String = "Malik / Staff",
     shopName: String = "Mera Buy/Sell Store",
     shopPhone: String = "",

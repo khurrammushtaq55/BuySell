@@ -312,7 +312,7 @@ fun ExchangeWizardScreen(
                                 FilterChip(
                                     selected = isSelected,
                                     onClick = { oldCategory = cat },
-                                    label = { Text(cat, fontSize = 13.sp) },
+                                    label = { Text(com.mmushtaq04.buysell.util.CategoryLocalization.getLocalizedCategoryName(cat), fontSize = 13.sp) },
                                     leadingIcon = if (isSelected) {
                                         { Icon(Icons.Default.CheckCircle, contentDescription = null, modifier = Modifier.size(16.dp)) }
                                     } else null
@@ -527,7 +527,7 @@ fun ExchangeWizardScreen(
                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                         Icon(Icons.Default.ShoppingCart, contentDescription = null, modifier = Modifier.size(18.dp), tint = MaterialTheme.colorScheme.primary)
                                         Spacer(modifier = Modifier.width(8.dp))
-                                        Text("Original Bought Price: ", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                        Text(stringResource(R.string.exchange_bought_price_label), fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                         Text(
                                             if (showBoughtCostInExchange) CurrencyFormatter.formatAmount(context, selectedItem!!.cost) else "••••••",
                                             fontSize = 13.sp,

@@ -1,5 +1,6 @@
 [versions]
 agp = "9.2.1"
+billingKtx = "9.1.0"
 coreKtx = "1.19.1"
 appcompat = "1.7.0"
 material = "1.12.0"
@@ -28,6 +29,8 @@ testCoreKtx = "1.6.1"
 
 [libraries]
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+billing-ktx = { module = "com.android.billingclient:billing-ktx", version.ref = "billingKtx" }
+firebase-functions-ktx = { module = "com.google.firebase:firebase-functions-ktx" }
 material-components = { group = "com.google.android.material", name = "material", version.ref = "material" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }

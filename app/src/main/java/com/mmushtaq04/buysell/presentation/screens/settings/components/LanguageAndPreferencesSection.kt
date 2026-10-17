@@ -497,7 +497,7 @@ fun LanguageAndPreferencesSection(
                                         Box(modifier = Modifier.fillMaxWidth().height(220.dp)) {
                                             LazyColumn {
                                                 items(daysList) { dayNum ->
-                                                    val labelText = if (dayNum == 31) stringResource(R.string.settings_monthly_last_day_label) else "$dayNum"
+                                                    val labelText = if (dayNum == 31) stringResource(R.string.settings_monthly_day_last_pill) else "$dayNum"
                                                     Row(
                                                         modifier = Modifier
                                                             .fillMaxWidth()

@@ -254,7 +254,7 @@ private fun StepCategorySelect(
                     FilterChip(
                         selected = isSelected,
                         onClick = { onSelectCategory(cat) },
-                        label = { Text(cat, fontSize = 14.sp) },
+                        label = { Text(com.mmushtaq04.buysell.util.CategoryLocalization.getLocalizedCategoryName(cat), fontSize = 14.sp) },
                         leadingIcon = if (isSelected) {
                             { Icon(Icons.Default.CheckCircle, contentDescription = null) }
                         } else null,

@@ -64,7 +64,7 @@ fun CategorySelectionChips(
                         onCategoriesChange(updated)
                     }
                 },
-                label = { Text(category, fontSize = 13.sp) },
+                label = { Text(com.mmushtaq04.buysell.util.CategoryLocalization.getLocalizedCategoryName(category), fontSize = 13.sp) },
                 leadingIcon = if (isSelected) {
                     { Icon(Icons.Default.CheckCircle, contentDescription = null, modifier = Modifier.size(16.dp)) }
                 } else null
@@ -107,7 +107,7 @@ fun EntityCategorySelectionChips(
                         onToggleCategory(categoryItem)
                     }
                 },
-                label = { Text(categoryItem.name, fontSize = 13.sp) },
+                label = { Text(com.mmushtaq04.buysell.util.CategoryLocalization.getLocalizedCategoryName(categoryItem.code.ifBlank { categoryItem.name }), fontSize = 13.sp) },
                 leadingIcon = if (categoryItem.enabled) {
                     { Icon(Icons.Default.CheckCircle, contentDescription = null, modifier = Modifier.size(16.dp)) }
                 } else null

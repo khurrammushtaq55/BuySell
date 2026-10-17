@@ -83,7 +83,7 @@ fun TeamAndCategoriesSection(
                                     val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                                     val clip = ClipData.newPlainText("Invite Code", activeInviteCode)
                                     clipboard.setPrimaryClip(clip)
-                                    Toast.makeText(context, "Code copied!", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, context.getString(R.string.settings_toast_code_copied), Toast.LENGTH_SHORT).show()
                                 },
                                 modifier = Modifier.weight(1f)
                             ) {

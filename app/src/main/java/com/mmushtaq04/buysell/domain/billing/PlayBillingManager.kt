@@ -134,9 +134,10 @@ class PlayBillingManager private constructor(context: Context) : PurchasesUpdate
             .setProductList(productList)
             .build()
 
-        billingClient.queryProductDetailsAsync(params) { billingResult, productDetailsList ->
+        billingClient.queryProductDetailsAsync(params) { billingResult, productDetailsResult ->
             if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
-                val map = productDetailsList.associateBy { it.productId }
+                val list = productDetailsResult.productDetailsList ?: emptyList()
+                val map = list.associateBy { it.productId }
                 _productDetailsMap.value = map
                 Log.i(TAG, "✓ Fetched ${map.size} product details from Google Play.")
             } else {

@@ -78,12 +78,11 @@ class LicensePolicyTest {
     }
 
     @Test
-    fun testOnHoldLicenseDeniesEntitlementAfterGraceWindow() {
-        // Expiry was 10 days ago (past 7-day grace window)
+    fun testOnHoldLicenseDeniesEntitlement() {
         val license = LicenseData(
             plan = "PRO_MONTHLY",
             status = "ON_HOLD",
-            validUntilMs = baseNowMs - 10L * 86400000L,
+            validUntilMs = baseNowMs + 5L * 86400000L,
             source = "PLAY",
             serverTimeMs = baseNowMs,
             lastFetchLocalMs = baseNowMs
@@ -91,6 +90,7 @@ class LicensePolicyTest {
         val result = LicensePolicy.computeEntitlement(license, nowMs = baseNowMs, lastSeenTimeMs = baseNowMs)
 
         assertFalse(result.isUnlocked)
+        assertEquals("ON_HOLD", result.status)
     }
 
     @Test

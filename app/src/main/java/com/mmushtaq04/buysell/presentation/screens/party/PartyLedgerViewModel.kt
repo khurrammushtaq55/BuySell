@@ -3,6 +3,7 @@ package com.mmushtaq04.buysell.presentation.screens.party
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
+import com.mmushtaq04.buysell.R
 import androidx.lifecycle.viewModelScope
 import androidx.room.withTransaction
 import com.google.gson.Gson
@@ -72,12 +73,13 @@ class PartyLedgerViewModel(application: Application) : AndroidViewModel(applicat
             ) { balanceDto, txns, payments ->
                 val ledgerList = mutableListOf<LedgerItem>()
 
+                val appCtx = getApplication<Application>()
                 for (txn in txns) {
                     val title = when (txn.type) {
-                        TxnType.SALE -> "Device Sale / Saman Becha"
-                        TxnType.PURCHASE -> "Device Purchase / Saman Khareeda"
-                        TxnType.SALE_RETURN -> "Sale Return / Saman Wapas Aaya"
-                        TxnType.PURCHASE_RETURN -> "Purchase Return / Saman Wapas Kiya"
+                        TxnType.SALE -> appCtx.getString(R.string.ledger_txn_sale)
+                        TxnType.PURCHASE -> appCtx.getString(R.string.ledger_txn_purchase)
+                        TxnType.SALE_RETURN -> appCtx.getString(R.string.ledger_txn_sale_return)
+                        TxnType.PURCHASE_RETURN -> appCtx.getString(R.string.ledger_txn_purchase_return)
                     }
                     val subtitle = txn.receiptNo ?: txn.note
 

@@ -4,6 +4,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
+import com.mmushtaq04.buysell.R
 
 object AppNotificationManager {
     const val CHANNEL_HIGH_PRIORITY = "channel_high_priority"
@@ -14,26 +15,26 @@ object AppNotificationManager {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val highChannel = NotificationChannel(
                 CHANNEL_HIGH_PRIORITY,
-                "Sync & Conflict Alerts",
+                context.getString(R.string.notif_channel_high_name),
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
-                description = "Critical session and conflict notifications"
+                description = context.getString(R.string.notif_channel_high_desc)
             }
 
             val reminderChannel = NotificationChannel(
                 CHANNEL_REMINDERS,
-                "Udhaar & Due Reminders",
+                context.getString(R.string.notif_channel_reminders_name),
                 NotificationManager.IMPORTANCE_DEFAULT
             ).apply {
-                description = "Business due dates and payment reminders"
+                description = context.getString(R.string.notif_channel_reminders_desc)
             }
 
             val summaryChannel = NotificationChannel(
                 CHANNEL_DAILY_SUMMARY,
-                "Daily Business Summaries",
+                context.getString(R.string.notif_channel_reports_name),
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
-                description = "Daily sales, expenses, and profit notifications"
+                description = context.getString(R.string.notif_channel_reports_desc)
             }
 
             val manager = context.getSystemService(NotificationManager::class.java)

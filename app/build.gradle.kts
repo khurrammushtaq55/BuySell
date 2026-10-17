@@ -76,7 +76,7 @@ dependencies {
     implementation(libs.firebase.storage.ktx)
     implementation(libs.firebase.messaging)
     implementation(libs.firebase.crashlytics.ktx)
-    implementation("com.google.firebase:firebase-functions-ktx")
+    implementation(libs.firebase.functions.ktx)
     implementation(libs.play.services.auth)
     implementation(libs.credentials.main)
     implementation(libs.credentials.play)
@@ -90,7 +90,7 @@ dependencies {
 
     // Play Review & Play Billing
     implementation(libs.play.review.ktx)
-    implementation("com.android.billingclient:billing-ktx:7.1.1")
+    implementation(libs.billing.ktx)
 
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)
