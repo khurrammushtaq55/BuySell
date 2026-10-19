@@ -354,3 +354,18 @@ fun PremiumPaywallDialogPreview() {
         )
     }
 }
+
+@Preview(showBackground = true)
+@Composable
+fun PremiumPaywallDialogNonOwnerPreview() {
+    com.mmushtaq04.buysell.ui.theme.BuySellTheme {
+        PremiumPaywallDialog(
+            isOwner = false,
+            isBillingReady = true,
+            onDismiss = {},
+            onUpgradeClick = {},
+            onRestoreClick = {},
+            onRedeemPromoCode = { _, _, _ -> }
+        )
+    }
+}

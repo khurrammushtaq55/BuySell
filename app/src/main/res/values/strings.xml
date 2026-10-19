@@ -67,6 +67,7 @@
     <string name="payment_method_cash">Cash</string>
     <string name="payment_method_easypaisa">Easypaisa/JazzCash</string>
     <string name="payment_method_bank">Bank Transfer</string>
+    <string name="payment_method_card">Credit/Debit Card</string>
     <string name="payment_method_cheque">Cheque</string>
     <string name="payment_method_other">Other</string>
     <string name="party_action_call">Call Customer</string>
@@ -77,6 +78,7 @@
         <item>Cash</item>
         <item>Easypaisa/JazzCash</item>
         <item>Bank Transfer</item>
+        <item>Credit/Debit Card</item>
         <item>Other</item>
     </string-array>
     <string name="shop_setup_title">Shop Setup</string>
@@ -521,7 +523,7 @@
     <string name="ledger_txn_sale_return">Sale Return</string>
     <string name="ledger_txn_purchase_return">Purchase Return</string>
     <string name="sell_selected_item">Selected Item: %1$s</string>
-    <string name="placeholder_payment_ref">e.g. HBL / Easypaisa Txn #12345 / Account title</string>
+    <string name="placeholder_payment_ref">e.g. HBL / Easypaisa / Account title</string>
     <string name="exchange_bought_price_label">Original Bought Price:</string>
     <string name="label_qty_remaining">Quantity Remaining:</string>
     <string name="label_status">Status:</string>

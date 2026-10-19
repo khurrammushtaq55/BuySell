@@ -67,6 +67,7 @@
     <string name="payment_method_cash">نقد</string>
     <string name="payment_method_easypaisa">Easypaisa/JazzCash</string>
     <string name="payment_method_bank">بینک ٹرانسفر</string>
+    <string name="payment_method_card">کریڈٹ/ڈیبٹ کارڈ</string>
     <string name="payment_method_cheque">چیک</string>
     <string name="payment_method_other">دیگر</string>
     <string name="party_action_call">گاہک کو کال کریں</string>
@@ -77,6 +78,7 @@
         <item>نقد</item>
         <item>Easypaisa/JazzCash</item>
         <item>بینک ٹرانسفر</item>
+        <item>کریڈٹ/ڈیبٹ کارڈ</item>
         <item>دیگر</item>
     </string-array>
     <string name="shop_setup_title">دکان کی سیٹ اپ</string>
@@ -420,6 +422,8 @@
     <string name="paywall_plan_annual">سالانہ Pro پلان — %1$s / سال (33%% بچت)</string>
     <string name="paywall_plan_annual_title">سالانہ پلان</string>
     <string name="paywall_plan_monthly_title">ماہانہ پلان</string>
+    <string name="paywall_plan_annual_sub">%1$s / سال (33%% بچت)</string>
+    <string name="paywall_plan_monthly_sub">%1$s / ماہ</string>
     <string name="paywall_btn_upgrade">Pro میں اپ گریڈ کریں ✓</string>
     <string name="paywall_btn_restore">خریداریاں بحال کریں</string>
     <string name="paywall_btn_promo">ایڈمن پرومو کوڈ ریڈیم کریں</string>

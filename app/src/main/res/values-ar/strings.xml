@@ -67,6 +67,7 @@
     <string name="payment_method_cash">نقدًا</string>
     <string name="payment_method_easypaisa">Easypaisa/JazzCash</string>
     <string name="payment_method_bank">تحويل بنكي</string>
+    <string name="payment_method_card">بطاقة ائتمان/خصم</string>
     <string name="payment_method_cheque">شيك</string>
     <string name="payment_method_other">أخرى</string>
     <string name="party_action_call">اتصل بالعميل</string>
@@ -77,6 +78,7 @@
         <item>نقدًا</item>
         <item>Easypaisa/JazzCash</item>
         <item>تحويل بنكي</item>
+        <item>بطاقة ائتمان/خصم</item>
         <item>أخرى</item>
     </string-array>
     <string name="shop_setup_title">إعداد المتجر</string>
@@ -420,6 +422,8 @@
     <string name="paywall_plan_annual">خطة Pro السنوية — %1$s / سنة (وفّر 33%%)</string>
     <string name="paywall_plan_annual_title">الخطة السنوية</string>
     <string name="paywall_plan_monthly_title">الخطة الشهرية</string>
+    <string name="paywall_plan_annual_sub">%1$s / سنوياً (توفير 33%%)</string>
+    <string name="paywall_plan_monthly_sub">%1$s / شهرياً</string>
     <string name="paywall_btn_upgrade">ترقية إلى Pro ✓</string>
     <string name="paywall_btn_restore">استعادة المشتريات</string>
     <string name="paywall_btn_promo">استرداد رمز ترويجي للمسؤول</string>

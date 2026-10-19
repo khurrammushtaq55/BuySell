@@ -17,7 +17,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.tooling.preview.Preview
 import com.mmushtaq04.buysell.R
+import com.mmushtaq04.buysell.ui.theme.BuySellTheme
 
 @Composable
 fun RedeemPromoDialog(
@@ -144,3 +146,15 @@ fun RedeemPromoDialog(
         }
     )
 }
+
+@Preview(showBackground = true)
+@Composable
+fun RedeemPromoDialogPreview() {
+    BuySellTheme {
+        RedeemPromoDialog(
+            onDismiss = {},
+            onRedeemCode = { _, _, _ -> }
+        )
+    }
+}
+

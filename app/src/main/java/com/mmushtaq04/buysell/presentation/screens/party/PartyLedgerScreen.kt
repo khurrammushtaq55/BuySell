@@ -42,7 +42,7 @@ fun PartyLedgerScreen(
     var paymentDirectionToRecord by remember { mutableStateOf(PaymentDirection.IN) }
 
     if (showWasooliDialog) {
-        RecordWasooliDialog(
+        RecordPaymentDialog(
             direction = paymentDirectionToRecord,
             onDismiss = { showWasooliDialog = false },
             onConfirm = { amountRs, methodStr, note ->
@@ -338,7 +338,7 @@ private fun LedgerItemCard(item: LedgerItem) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun RecordWasooliDialog(
+private fun RecordPaymentDialog(
     direction: PaymentDirection,
     onDismiss: () -> Unit,
     onConfirm: (amountRs: Long, methodStr: String, note: String) -> Unit
@@ -351,6 +351,7 @@ private fun RecordWasooliDialog(
         "CASH" to stringResource(R.string.payment_method_cash),
         "BANK" to stringResource(R.string.payment_method_bank),
         "WALLET" to stringResource(R.string.payment_method_easypaisa),
+        "CARD" to stringResource(R.string.payment_method_card),
         "CHEQUE" to stringResource(R.string.payment_method_cheque),
         "OTHER" to stringResource(R.string.payment_method_other)
     )

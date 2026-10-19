@@ -31,6 +31,7 @@ import com.mmushtaq04.buysell.presentation.screens.splash.AppSplashScreen
 import com.mmushtaq04.buysell.presentation.viewmodel.CategoryViewModel
 import com.mmushtaq04.buysell.util.AppPinManager
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -76,9 +77,10 @@ fun AppNavigation(
     var initialStartDestination by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(Unit) {
-        withContext(Dispatchers.IO) {
+        val startTime = System.currentTimeMillis()
+        val targetRoute = withContext(Dispatchers.IO) {
             if (!isUserLoggedIn) {
-                initialStartDestination = NavRoutes.Welcome.route
+                NavRoutes.Welcome.route
             } else {
                 val userId = authManager.currentUser?.uid
                 val localUser = db.userDao().getPrimaryUser()
@@ -100,14 +102,21 @@ fun AppNavigation(
                     }
                 }
 
-                val targetRoute = when {
+                when {
                     isPinSet -> NavRoutes.AppLock.route
                     activeShopId.isNullOrBlank() -> NavRoutes.ShopSetup.route
                     else -> NavRoutes.Home.route
                 }
-                initialStartDestination = targetRoute
             }
         }
+
+        val elapsedTime = System.currentTimeMillis() - startTime
+        val minSplashDurationMs = 1000L
+        if (elapsedTime < minSplashDurationMs) {
+            delay(minSplashDurationMs - elapsedTime)
+        }
+
+        initialStartDestination = targetRoute
     }
 
     fun navigateAfterLogin() {

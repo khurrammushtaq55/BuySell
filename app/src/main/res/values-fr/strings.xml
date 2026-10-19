@@ -67,6 +67,7 @@
     <string name="payment_method_cash">Espèces</string>
     <string name="payment_method_easypaisa">Easypaisa/JazzCash</string>
     <string name="payment_method_bank">Virement Bancaire</string>
+    <string name="payment_method_card">Carte Bancaire</string>
     <string name="payment_method_cheque">Chèque</string>
     <string name="payment_method_other">Autre</string>
     <string name="party_action_call">Appeler le Client</string>
@@ -77,6 +78,7 @@
         <item>Espèces</item>
         <item>Easypaisa/JazzCash</item>
         <item>Virement Bancaire</item>
+        <item>Carte Bancaire</item>
         <item>Autre</item>
     </string-array>
     <string name="shop_setup_title">Configuration de la Boutique</string>
@@ -420,6 +422,8 @@
     <string name="paywall_plan_annual">Plan Pro Annuel — %1$s / an (Économisez 33%%)</string>
     <string name="paywall_plan_annual_title">Plan Annuel</string>
     <string name="paywall_plan_monthly_title">Plan Mensuel</string>
+    <string name="paywall_plan_annual_sub">%1$s / an (Économisez 33%%)</string>
+    <string name="paywall_plan_monthly_sub">%1$s / mois</string>
     <string name="paywall_btn_upgrade">Passer à Pro ✓</string>
     <string name="paywall_btn_restore">Restaurer les Achats</string>
     <string name="paywall_btn_promo">Échanger un Code Promo Administrateur</string>

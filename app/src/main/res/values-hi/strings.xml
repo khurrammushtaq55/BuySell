@@ -67,6 +67,7 @@
     <string name="payment_method_cash">नकद</string>
     <string name="payment_method_easypaisa">Easypaisa/JazzCash</string>
     <string name="payment_method_bank">बैंक ट्रांसफर</string>
+    <string name="payment_method_card">क्रेडिट/डेबिट कार्ड</string>
     <string name="payment_method_cheque">चेक</string>
     <string name="payment_method_other">अन्य</string>
     <string name="party_action_call">ग्राहक को कॉल करें</string>
@@ -77,6 +78,7 @@
         <item>नकद</item>
         <item>Easypaisa/JazzCash</item>
         <item>बैंक ट्रांसफर</item>
+        <item>क्रेडिट/डेबिट कार्ड</item>
         <item>अन्य</item>
     </string-array>
     <string name="shop_setup_title">दुकान सेटअप</string>
@@ -420,6 +422,8 @@
     <string name="paywall_plan_annual">वार्षिक Pro प्लान — %1$s / वर्ष (33%% बचत)</string>
     <string name="paywall_plan_annual_title">वार्षिक प्लान</string>
     <string name="paywall_plan_monthly_title">मासिक प्लान</string>
+    <string name="paywall_plan_annual_sub">%1$s / वर्ष (33%% बचत)</string>
+    <string name="paywall_plan_monthly_sub">%1$s / माह</string>
     <string name="paywall_btn_upgrade">Pro में अपग्रेड करें ✓</string>
     <string name="paywall_btn_restore">खरीदारी पुनर्स्थापित करें</string>
     <string name="paywall_btn_promo">एडमिन प्रोमो कोड रिडीम करें</string>

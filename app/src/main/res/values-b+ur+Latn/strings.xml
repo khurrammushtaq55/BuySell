@@ -67,6 +67,7 @@
     <string name="payment_method_cash">Cash</string>
     <string name="payment_method_easypaisa">Easypaisa/JazzCash</string>
     <string name="payment_method_bank">Bank Transfer</string>
+    <string name="payment_method_card">Credit/Debit Card</string>
     <string name="payment_method_cheque">Cheque</string>
     <string name="payment_method_other">Other</string>
     <string name="party_action_call">Customer ko Call Karein</string>
@@ -77,6 +78,7 @@
         <item>Cash</item>
         <item>Easypaisa/JazzCash</item>
         <item>Bank Transfer</item>
+        <item>Credit/Debit Card</item>
         <item>Other</item>
     </string-array>
     <string name="shop_setup_title">Shop Setup</string>
@@ -420,6 +422,8 @@
     <string name="paywall_plan_annual">Annual Pro Plan — %1$s / yr (33%% bachat)</string>
     <string name="paywall_plan_annual_title">Annual Plan</string>
     <string name="paywall_plan_monthly_title">Monthly Plan</string>
+    <string name="paywall_plan_annual_sub">%1$s / saal (33%% Bachat)</string>
+    <string name="paywall_plan_monthly_sub">%1$s / mahina</string>
     <string name="paywall_btn_upgrade">Pro par Upgrade Karein ✓</string>
     <string name="paywall_btn_restore">Purchases Restore Karein</string>
     <string name="paywall_btn_promo">Admin Promo Code Redeem Karein</string>

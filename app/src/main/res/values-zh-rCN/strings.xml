@@ -67,6 +67,7 @@
     <string name="payment_method_cash">现金</string>
     <string name="payment_method_easypaisa">Easypaisa/JazzCash</string>
     <string name="payment_method_bank">银行转账</string>
+    <string name="payment_method_card">刷卡 / 银行卡</string>
     <string name="payment_method_cheque">支票</string>
     <string name="payment_method_other">其他</string>
     <string name="party_action_call">致电客户</string>
@@ -77,6 +78,7 @@
         <item>现金</item>
         <item>Easypaisa/JazzCash</item>
         <item>银行转账</item>
+        <item>刷卡 / 银行卡</item>
         <item>其他</item>
     </string-array>
     <string name="shop_setup_title">店铺设置</string>
@@ -420,6 +422,8 @@
     <string name="paywall_plan_annual">年度 Pro 套餐 — %1$s / 年（节省 33%%）</string>
     <string name="paywall_plan_annual_title">年度套餐</string>
     <string name="paywall_plan_monthly_title">月度套餐</string>
+    <string name="paywall_plan_annual_sub">%1$s / 年（省 33%%）</string>
+    <string name="paywall_plan_monthly_sub">%1$s / 月</string>
     <string name="paywall_btn_upgrade">升级到 Pro ✓</string>
     <string name="paywall_btn_restore">恢复购买</string>
     <string name="paywall_btn_promo">兑换管理员促销码</string>

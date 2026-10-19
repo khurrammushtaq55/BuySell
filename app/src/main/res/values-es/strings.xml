@@ -67,6 +67,7 @@
     <string name="payment_method_cash">Efectivo</string>
     <string name="payment_method_easypaisa">Easypaisa/JazzCash</string>
     <string name="payment_method_bank">Transferencia Bancaria</string>
+    <string name="payment_method_card">Tarjeta de Crédito/Débito</string>
     <string name="payment_method_cheque">Cheque</string>
     <string name="payment_method_other">Otro</string>
     <string name="party_action_call">Llamar al Cliente</string>
@@ -77,6 +78,7 @@
         <item>Efectivo</item>
         <item>Easypaisa/JazzCash</item>
         <item>Transferencia Bancaria</item>
+        <item>Tarjeta de Crédito/Débito</item>
         <item>Otro</item>
     </string-array>
     <string name="shop_setup_title">Configuración de la Tienda</string>
@@ -420,6 +422,8 @@
     <string name="paywall_plan_annual">Plan Pro Anual — %1$s / año (Ahorra 33%%)</string>
     <string name="paywall_plan_annual_title">Plan Anual</string>
     <string name="paywall_plan_monthly_title">Plan Mensual</string>
+    <string name="paywall_plan_annual_sub">%1$s / año (Ahorra 33%%)</string>
+    <string name="paywall_plan_monthly_sub">%1$s / mes</string>
     <string name="paywall_btn_upgrade">Actualizar a Pro ✓</string>
     <string name="paywall_btn_restore">Restaurar Compras</string>
     <string name="paywall_btn_promo">Canjear Código Promocional de Administrador</string>
