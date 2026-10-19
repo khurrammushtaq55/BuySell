@@ -435,12 +435,12 @@
     <string name="coffee_dialog_msg">Agar BuySell360 aapki shop efficiently manage karne mein madad karta hai to developer ke liye coffee khareedne par ghaur karein!</string>
     <string name="coffee_btn_buy">Buy Me a Coffee (%1$s) ☕</string>
     <string name="coffee_toast_thanks">Aapke support ka bohat shukriya!</string>
-    <string name="promo_option_title">Promo / Voucher Redeem Karein 🎟️</string>
+    <string name="promo_option_title">Promo / Voucher Redeem Karein</string>
     <string name="promo_option_sub">Pro features free mein unlock karne ke liye promotional code ya voucher enter karein</string>
-    <string name="promo_dialog_title">Voucher / Promo Code Redeem Karein 🎟️</string>
+    <string name="promo_dialog_title">Voucher / Promo Code Redeem Karein</string>
     <string name="promo_dialog_msg">Apni store ke saare Pro features unlock karne ke liye neeche apna promo code ya VIP voucher enter karein:</string>
     <string name="promo_hint">Promo code enter karein (e.g. VIP2026)</string>
-    <string name="promo_btn_redeem">Code Redeem Karein 🚀</string>
+    <string name="promo_btn_redeem">Code Redeem Karein</string>
     <string name="promo_success_toast">Promo code apply ho gaya! Pro features unlock. 🎉</string>
     <string name="promo_error_invalid">Invalid ya expired promo code. Dobara koshish karein.</string>
     <string name="placeholder_owner_name">e.g. Malik Mushtaq</string>

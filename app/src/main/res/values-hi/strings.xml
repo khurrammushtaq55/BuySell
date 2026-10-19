@@ -435,12 +435,12 @@
     <string name="coffee_dialog_msg">यदि BuySell360 आपकी दुकान को कुशलता से प्रबंधित करने में मदद करता है, तो डेवलपर को कॉफ़ी पिलाने पर विचार करें!</string>
     <string name="coffee_btn_buy">मुझे कॉफ़ी पिलाएं (%1$s) ☕</string>
     <string name="coffee_toast_thanks">आपके समर्थन के लिए बहुत धन्यवाद!</string>
-    <string name="promo_option_title">प्रोमो / वाउचर रिडीम करें 🎟️</string>
+    <string name="promo_option_title">प्रोमो / वाउचर रिडीम करें </string>
     <string name="promo_option_sub">Pro फ़ीचर मुफ्त में अनलॉक करने के लिए प्रोमोशनल कोड या वाउचर दर्ज करें</string>
-    <string name="promo_dialog_title">वाउचर / प्रोमो कोड रिडीम करें 🎟️</string>
+    <string name="promo_dialog_title">वाउचर / प्रोमो कोड रिडीम करें </string>
     <string name="promo_dialog_msg">अपनी दुकान के सभी Pro फ़ीचर अनलॉक करने के लिए नीचे अपना प्रोमो कोड या VIP वाउचर दर्ज करें:</string>
     <string name="promo_hint">प्रोमो कोड दर्ज करें (जैसे VIP2026)</string>
-    <string name="promo_btn_redeem">कोड रिडीम करें 🚀</string>
+    <string name="promo_btn_redeem">कोड रिडीम करें</string>
     <string name="promo_success_toast">प्रोमो कोड लागू हुआ! Pro फ़ीचर अनलॉक हो गए। 🎉</string>
     <string name="promo_error_invalid">अमान्य या समाप्त प्रोमो कोड। कृपया पुनः प्रयास करें।</string>
     <string name="placeholder_owner_name">जैसे मलिक मुश्ताक</string>

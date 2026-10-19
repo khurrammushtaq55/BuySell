@@ -23,6 +23,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.billingclient.api.ProductDetails
@@ -50,11 +51,11 @@ fun PremiumPaywallDialog(
 
     val annualPriceFormatted = annualDetails?.subscriptionOfferDetails?.firstOrNull()?.pricingPhases
         ?.pricingPhaseList?.firstOrNull()?.formattedPrice ?: "$9.99"
-    val annualPriceText = stringResource(R.string.paywall_plan_annual, annualPriceFormatted)
+    val annualPriceText = stringResource(R.string.paywall_plan_annual_sub, annualPriceFormatted)
 
     val monthlyPriceFormatted = monthlyDetails?.subscriptionOfferDetails?.firstOrNull()?.pricingPhases
         ?.pricingPhaseList?.firstOrNull()?.formattedPrice ?: "$0.99"
-    val monthlyPriceText = stringResource(R.string.paywall_plan_monthly, monthlyPriceFormatted)
+    val monthlyPriceText = stringResource(R.string.paywall_plan_monthly_sub, monthlyPriceFormatted)
 
     if (showPromoDialog) {
         AlertDialog(
@@ -115,12 +116,11 @@ fun PremiumPaywallDialog(
                 modifier = Modifier.size(56.dp)
             ) {
                 Box(contentAlignment = Alignment.Center) {
-                    Image(
-                        painter = painterResource(id = R.mipmap.ic_launcher_round),
+                    Icon(
+                        imageVector = Icons.Default.Key,
                         contentDescription = null,
-                        modifier = Modifier
-                            .size(50.dp)
-                            .clip(CircleShape)
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(32.dp)
                     )
                 }
             }
@@ -260,11 +260,11 @@ fun PremiumPaywallDialog(
             }
         },
         confirmButton = {
-            if (isOwner) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(6.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                if (isOwner) {
                     Button(
                         onClick = { onUpgradeClick(selectedPlan) },
                         enabled = isBillingReady,
@@ -281,12 +281,13 @@ fun PremiumPaywallDialog(
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
                         TextButton(onClick = onRestoreClick, enabled = isBillingReady) {
                             Text(
                                 text = stringResource(R.string.paywall_btn_restore),
-                                fontSize = 11.sp,
+                                fontSize = 12.sp,
                                 color = MaterialTheme.colorScheme.primary
                             )
                         }
@@ -294,26 +295,26 @@ fun PremiumPaywallDialog(
                         TextButton(onClick = { showPromoDialog = true }) {
                             Text(
                                 text = stringResource(R.string.paywall_btn_promo),
-                                fontSize = 11.sp,
+                                fontSize = 12.sp,
                                 color = MaterialTheme.colorScheme.secondary
                             )
                         }
                     }
                 }
+
+                TextButton(
+                    onClick = onDismiss,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = stringResource(R.string.action_cancel),
+                        fontSize = 13.sp,
+                        color = Color.Gray
+                    )
+                }
             }
         },
-        dismissButton = {
-            TextButton(
-                onClick = onDismiss,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = stringResource(R.string.action_cancel),
-                    fontSize = 13.sp,
-                    color = Color.Gray
-                )
-            }
-        }
+        dismissButton = null
     )
 }
 
@@ -335,6 +336,21 @@ private fun PaywallFeatureRow(text: String) {
             fontSize = 12.sp,
             fontWeight = FontWeight.Medium,
             color = MaterialTheme.colorScheme.onSurface
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PremiumPaywallDialogPreview() {
+    com.mmushtaq04.buysell.ui.theme.BuySellTheme {
+        PremiumPaywallDialog(
+            isOwner = true,
+            isBillingReady = true,
+            onDismiss = {},
+            onUpgradeClick = {},
+            onRestoreClick = {},
+            onRedeemPromoCode = { _, _, _ -> }
         )
     }
 }

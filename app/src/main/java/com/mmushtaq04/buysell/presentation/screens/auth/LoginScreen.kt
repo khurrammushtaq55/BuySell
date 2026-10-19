@@ -63,7 +63,6 @@ fun LoginScreen(
     val errInvalidEmail = stringResource(R.string.login_err_invalid_email)
     val errPwdShort = stringResource(R.string.login_err_pwd_short)
     val errGoogleFailed = stringResource(R.string.login_err_google_failed)
-    val errGoogleCred = stringResource(R.string.login_err_google_cred)
     val errGoogleCanceled = stringResource(R.string.login_err_google_canceled)
     val errAuthFailed = stringResource(R.string.login_err_auth_failed)
 
@@ -71,70 +70,20 @@ fun LoginScreen(
         isLoading = true
         errorMessage = null
         scope.launch {
-            runCatching {
-                Log.d("LoginScreen", "Starting Google Sign-In flow...")
-                val webClientIdResId = context.resources.getIdentifier("default_web_client_id", "string", context.packageName)
-                val webClientId = if (webClientIdResId != 0) {
-                    context.getString(webClientIdResId)
-                } else {
-                    runCatching { context.getString(R.string.default_web_client_id) }.getOrDefault("")
-                }
-
-                Log.i("LoginScreen", "Resolved Web Client ID: '$webClientId'")
-
-                val googleIdOption = GetGoogleIdOption.Builder()
-                    .setFilterByAuthorizedAccounts(false)
-                    .setAutoSelectEnabled(false)
-                    .apply {
-                        if (webClientId.isNotBlank()) setServerClientId(webClientId)
-                    }
-                    .build()
-
-                val requestBuilder = GetCredentialRequest.Builder()
-                    .addCredentialOption(googleIdOption)
-
-                if (webClientId.isNotBlank()) {
-                    val signInWithGoogleOption = com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption.Builder(webClientId)
-                        .build()
-                    requestBuilder.addCredentialOption(signInWithGoogleOption)
-                }
-
-                val result = credentialManager.getCredential(context, requestBuilder.build())
-                val credential = result.credential
-
-                val googleIdTokenCredential = when (credential) {
-                    is GoogleIdTokenCredential -> credential
-                    else -> runCatching { GoogleIdTokenCredential.createFrom(credential.data) }.getOrNull()
-                }
-
-                if (googleIdTokenCredential != null) {
-                    val idToken = googleIdTokenCredential.idToken
-                    val authResult = authManager.signInWithGoogleCredential(idToken)
+            com.mmushtaq04.buysell.util.GoogleSignInManager.launchGoogleSignIn(context, authManager)
+                .onSuccess {
                     isLoading = false
-                    if (authResult.isSuccess) {
-                        onGoogleSignInClick()
-                    } else {
-                        val exception = authResult.exceptionOrNull()
-                        val err = exception?.localizedMessage ?: errGoogleFailed
-                        errorMessage = err
-                        Toast.makeText(context, err, Toast.LENGTH_LONG).show()
-                    }
-                } else {
+                    onGoogleSignInClick()
+                }
+                .onFailure { e ->
                     isLoading = false
-                    val err = "$errGoogleCred (${credential.type})"
-                    errorMessage = err
-                    Toast.makeText(context, err, Toast.LENGTH_LONG).show()
+                    val msg = when {
+                        e is GetCredentialException && e.message?.contains("cancel", ignoreCase = true) == true -> errGoogleCanceled
+                        else -> "Google Sign-In Error: ${e.localizedMessage ?: errGoogleFailed}"
+                    }
+                    errorMessage = msg
+                    Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
                 }
-            }.onFailure { e ->
-                isLoading = false
-                val msg = if (e is GetCredentialException && e.message?.contains("cancel", ignoreCase = true) == true) {
-                    errGoogleCanceled
-                } else {
-                    "Google Sign-In Error: ${e.localizedMessage ?: errGoogleFailed}"
-                }
-                errorMessage = msg
-                Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
-            }
         }
     }
 

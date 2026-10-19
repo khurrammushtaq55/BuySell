@@ -111,3 +111,15 @@ fun BuyCoffeeDialog(
         }
     )
 }
+
+@androidx.compose.ui.tooling.preview.Preview(showBackground = true)
+@Composable
+fun BuyCoffeeDialogPreview() {
+    com.mmushtaq04.buysell.ui.theme.BuySellTheme {
+        BuyCoffeeDialog(
+            priceFormatted = "$0.99",
+            onDismiss = {},
+            onBuyCoffeeClick = {}
+        )
+    }
+}

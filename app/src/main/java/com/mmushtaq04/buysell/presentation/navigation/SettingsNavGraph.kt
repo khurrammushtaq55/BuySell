@@ -101,9 +101,22 @@ fun NavGraphBuilder.settingsNavGraph(
         }
 
         if (showCoffeeDialog) {
+            val coffeeDetails = productDetailsMap[com.mmushtaq04.buysell.domain.billing.PlayBillingManager.SKU_BUY_COFFEE]
+            val coffeePriceFormatted = coffeeDetails?.oneTimePurchaseOfferDetails?.formattedPrice ?: "$0.99"
+
             BuyCoffeeDialog(
+                priceFormatted = coffeePriceFormatted,
                 onDismiss = { showCoffeeDialog = false },
                 onBuyCoffeeClick = {
+                    val activity = context as? android.app.Activity
+                    if (activity != null && userEntity != null) {
+                        billingManager.launchBillingFlow(
+                            activity = activity,
+                            productId = com.mmushtaq04.buysell.domain.billing.PlayBillingManager.SKU_BUY_COFFEE,
+                            shopId = userEntity!!.shopId,
+                            userUid = userEntity!!.id
+                        )
+                    }
                     showCoffeeDialog = false
                 }
             )

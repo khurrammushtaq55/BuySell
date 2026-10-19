@@ -435,12 +435,12 @@
     <string name="coffee_dialog_msg">اگر BuySell360 آپ کی دکان کو مؤثر طریقے سے سنبھالنے میں مدد کرتا ہے تو ڈویلپر کو کافی پلانے پر غور کریں!</string>
     <string name="coffee_btn_buy">مجھے کافی پلائیں (%1$s) ☕</string>
     <string name="coffee_toast_thanks">آپ کی مدد کا بہت شکریہ!</string>
-    <string name="promo_option_title">پرومو / واؤچر ریڈیم کریں 🎟️</string>
+    <string name="promo_option_title">پرومو / واؤچر ریڈیم کریں </string>
     <string name="promo_option_sub">Pro فیچرز مفت میں کھولنے کے لیے پروموشنل کوڈ یا واؤچر درج کریں</string>
-    <string name="promo_dialog_title">واؤچر / پرومو کوڈ ریڈیم کریں 🎟️</string>
+    <string name="promo_dialog_title">واؤچر / پرومو کوڈ ریڈیم کریں </string>
     <string name="promo_dialog_msg">اپنی دکان کے تمام Pro فیچرز کھولنے کے لیے نیچے اپنا پرومو کوڈ یا VIP واؤچر درج کریں:</string>
     <string name="promo_hint">پرومو کوڈ درج کریں (مثلاً VIP2026)</string>
-    <string name="promo_btn_redeem">کوڈ ریڈیم کریں 🚀</string>
+    <string name="promo_btn_redeem">کوڈ ریڈیم کریں</string>
     <string name="promo_success_toast">پرومو کوڈ لاگو ہو گیا! Pro فیچرز کھل گئے۔ 🎉</string>
     <string name="promo_error_invalid">غلط یا میعاد ختم شدہ پرومو کوڈ۔ براہ کرم دوبارہ کوشش کریں۔</string>
     <string name="placeholder_owner_name">مثلاً ملک مشتاق</string>

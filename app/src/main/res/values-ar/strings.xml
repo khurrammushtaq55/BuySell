@@ -435,12 +435,12 @@
     <string name="coffee_dialog_msg">إذا كان BuySell360 يساعدك في إدارة متجرك بكفاءة، ففكر في شراء قهوة للمطور!</string>
     <string name="coffee_btn_buy">اشترِ لي قهوة (%1$s) ☕</string>
     <string name="coffee_toast_thanks">شكرًا جزيلاً على دعمك!</string>
-    <string name="promo_option_title">استرداد عرض ترويجي / قسيمة 🎟️</string>
+    <string name="promo_option_title">استرداد عرض ترويجي / قسيمة</string>
     <string name="promo_option_sub">أدخل رمزًا ترويجيًا أو قسيمة لفتح ميزات Pro مجانًا</string>
-    <string name="promo_dialog_title">استرداد قسيمة / رمز ترويجي 🎟️</string>
+    <string name="promo_dialog_title">استرداد قسيمة / رمز ترويجي</string>
     <string name="promo_dialog_msg">أدخل رمزك الترويجي أو قسيمة VIP أدناه لفتح جميع ميزات Pro لمتجرك:</string>
     <string name="promo_hint">أدخل الرمز الترويجي (مثل VIP2026)</string>
-    <string name="promo_btn_redeem">استرداد الرمز 🚀</string>
+    <string name="promo_btn_redeem">استرداد الرمز</string>
     <string name="promo_success_toast">تم تطبيق الرمز الترويجي! تم فتح ميزات Pro. 🎉</string>
     <string name="promo_error_invalid">رمز ترويجي غير صالح أو منتهي الصلاحية. يرجى المحاولة مرة أخرى.</string>
     <string name="placeholder_owner_name">مثل مالك مشتاق</string>

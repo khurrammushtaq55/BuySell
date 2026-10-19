@@ -435,12 +435,12 @@
     <string name="coffee_dialog_msg">Si BuySell360 vous aide à gérer efficacement votre boutique, envisagez d\'offrir un café au développeur !</string>
     <string name="coffee_btn_buy">Offrez-moi un Café (%1$s) ☕</string>
     <string name="coffee_toast_thanks">Merci beaucoup pour votre soutien !</string>
-    <string name="promo_option_title">Échanger un Code Promo / Bon 🎟️</string>
+    <string name="promo_option_title">Échanger un Code Promo / Bon️</string>
     <string name="promo_option_sub">Entrez un code promotionnel ou un bon pour débloquer gratuitement les fonctionnalités Pro</string>
-    <string name="promo_dialog_title">Échanger un Bon / Code Promo 🎟️</string>
+    <string name="promo_dialog_title">Échanger un Bon / Code Promo️</string>
     <string name="promo_dialog_msg">Entrez votre code promo ou bon VIP ci-dessous pour débloquer toutes les fonctionnalités Pro de votre boutique :</string>
     <string name="promo_hint">Entrez le code promo (ex. VIP2026)</string>
-    <string name="promo_btn_redeem">Échanger le Code 🚀</string>
+    <string name="promo_btn_redeem">Échanger le Code</string>
     <string name="promo_success_toast">Code promo appliqué ! Fonctionnalités Pro débloquées. 🎉</string>
     <string name="promo_error_invalid">Code promo invalide ou expiré. Veuillez réessayer.</string>
     <string name="placeholder_owner_name">ex. Malik Mushtaq</string>
