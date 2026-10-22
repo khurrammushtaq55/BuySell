@@ -103,14 +103,19 @@ function validateTokenBinding(existingPurchaseDoc, targetShopId, externalAccount
     };
   }
 
-  if (externalAccountIdentifiers && externalAccountIdentifiers.obfuscatedExternalAccountId) {
-    const obfId = externalAccountIdentifiers.obfuscatedExternalAccountId;
-    if (obfId !== targetShopId) {
-      return {
-        valid: false,
-        reason: `Obfuscated external account ID '${obfId}' does not match target shop '${targetShopId}'`,
-      };
-    }
+  if (!externalAccountIdentifiers || !externalAccountIdentifiers.obfuscatedExternalAccountId) {
+    return {
+      valid: false,
+      reason: "Purchase token is missing obfuscated external account ID.",
+    };
+  }
+
+  const obfId = externalAccountIdentifiers.obfuscatedExternalAccountId;
+  if (obfId !== targetShopId) {
+    return {
+      valid: false,
+      reason: `Obfuscated external account ID '${obfId}' does not match target shop '${targetShopId}'`,
+    };
   }
 
   return { valid: true };
@@ -170,7 +175,97 @@ function validatePromoCode(promoData, redemptionDocExists, nowMs) {
   };
 }
 
+const crypto = require("crypto");
+
+/**
+ * Computes a deterministic SHA-256 hash of a purchase token (or promo source).
+ * @param {string} token
+ * @returns {string}
+ */
+function hashToken(token) {
+  if (!token) return "";
+  return crypto.createHash("sha256").update(String(token).trim()).digest("hex");
+}
+
+/**
+ * Evaluates whether an incoming license update should be allowed to overwrite
+ * the current license document (`shops/{shopId}/license/current`).
+ *
+ * @param {object|null} currentLicense - Current document data from shops/{shopId}/license/current
+ * @param {string} incomingTokenHash - SHA-256 Hash of purchase token
+ * @param {number} incomingValidUntilMs - Expiration timestamp of incoming license
+ * @param {number} nowMs - Current time in ms
+ * @returns {boolean} true if update should be accepted, false if rejected
+ */
+function shouldUpdateLicense(currentLicense, incomingTokenHash, incomingValidUntilMs, nowMs) {
+  if (!currentLicense || !currentLicense.status) {
+    return true;
+  }
+
+  const currentValidUntil = typeof currentLicense.valid_until === "number" ? currentLicense.valid_until : 0;
+  const currentTokenHash = currentLicense.owning_token_hash || "";
+
+  // If current license is already expired as of now, accept any new valid update
+  if (currentValidUntil <= nowMs) {
+    return true;
+  }
+
+  // Same owning token -> Always allow update (renewal, status change, cancellation)
+  if (incomingTokenHash && currentTokenHash && incomingTokenHash === currentTokenHash) {
+    return true;
+  }
+
+  // Different token/source -> Allow ONLY IF incoming update grants a LATER expiration date
+  if (incomingValidUntilMs > currentValidUntil) {
+    return true;
+  }
+
+  return false;
+}
+
+/**
+ * Computes the new license fields when applying a promo code.
+ * Extends the existing license if currently active, and preserves paid PLAY attributes.
+ *
+ * @param {object|null} currentLicense - Current document data from shops/{shopId}/license/current
+ * @param {string} promoCode - Cleaned promo code string
+ * @param {string} shopId - Target shop ID
+ * @param {number} grantDays - Number of days to grant
+ * @param {number} nowMs - Current time in ms
+ * @returns {object} { plan, status, validUntilMs, source, owningTokenHash, autoRenewing }
+ */
+function computePromoExtension(currentLicense, promoCode, shopId, grantDays, nowMs) {
+  const currentValidUntil = (currentLicense && typeof currentLicense.valid_until === "number")
+    ? currentLicense.valid_until
+    : 0;
+
+  const isActiveInFuture = currentLicense && currentValidUntil > nowMs && currentLicense.status !== "EXPIRED";
+  const baseMs = isActiveInFuture ? currentValidUntil : nowMs;
+  const grantMs = grantDays * 24 * 60 * 60 * 1000;
+  const validUntilMs = baseMs + grantMs;
+
+  const isCurrentPlayActive = currentLicense &&
+    currentLicense.source === "PLAY" &&
+    isActiveInFuture;
+
+  const promoTokenHash = hashToken(`PROMO_${promoCode}_${shopId}`);
+
+  return {
+    plan: isCurrentPlayActive ? (currentLicense.plan || promoCode) : promoCode,
+    status: "ACTIVE",
+    validUntilMs,
+    source: isCurrentPlayActive ? "PLAY" : "PROMO",
+    owningTokenHash: isCurrentPlayActive
+      ? (currentLicense.owning_token_hash || promoTokenHash)
+      : promoTokenHash,
+    autoRenewing: isCurrentPlayActive ? Boolean(currentLicense.auto_renewing) : false,
+  };
+}
+
 module.exports = {
+  hashToken,
+  shouldUpdateLicense,
+  computePromoExtension,
   mapSubscriptionState,
   isOwnerAuthorized,
   validateTokenBinding,

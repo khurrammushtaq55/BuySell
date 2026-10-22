@@ -2,6 +2,9 @@ const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 const { google } = require("googleapis");
 const {
+  hashToken,
+  shouldUpdateLicense,
+  computePromoExtension,
   mapSubscriptionState,
   isOwnerAuthorized,
   validateTokenBinding,
@@ -124,13 +127,16 @@ exports.verifyPlayPurchase = functions.https.onCall(async (data, context) => {
     return { success: true, type: "one-time", status: "PURCHASED" };
   }
 
-  // 4. Handle Subscriptions
+  // 4. Handle Subscriptions & Token Binding Validation
   const extAccounts = playData.externalAccountIdentifiers || null;
 
-  // Optional: Verify the token belongs to this shop
-  if (extAccounts && extAccounts.obfuscatedExternalAccountId && extAccounts.obfuscatedExternalAccountId !== shopId) {
-    functions.logger.error(`Token binding failed. Expected ${shopId}, got ${extAccounts.obfuscatedExternalAccountId}`);
-    throw new functions.https.HttpsError("permission-denied", "Purchase token belongs to a different shop.");
+  const purchaseSnap = await db.collection("purchases").doc(purchaseToken).get();
+  const existingPurchaseDoc = purchaseSnap.exists ? purchaseSnap.data() : null;
+
+  const bindingResult = validateTokenBinding(existingPurchaseDoc, shopId, extAccounts);
+  if (!bindingResult.valid) {
+    functions.logger.error(`Token binding validation failed for shop '${shopId}': ${bindingResult.reason}`);
+    throw new functions.https.HttpsError("permission-denied", bindingResult.reason);
   }
 
   // 5. Map State and Acknowledge
@@ -143,19 +149,31 @@ exports.verifyPlayPurchase = functions.https.onCall(async (data, context) => {
 
   // 6. Write to Firestore
   const nowMs = Date.now();
-  const batch = db.batch();
+  const tokenHash = hashToken(purchaseToken);
   const licenseRef = db.collection("shops").doc(shopId).collection("license").doc("current");
   const purchaseRef = db.collection("purchases").doc(purchaseToken);
 
-  batch.set(licenseRef, {
-    plan: mapped.productId || productId,
-    status: mapped.status,
-    valid_until: mapped.validUntilMs,
-    source: "PLAY",
-    auto_renewing: mapped.autoRenewing,
-    server_time_ms: nowMs,
-    updated_at: admin.firestore.FieldValue.serverTimestamp(),
-  }, { merge: true });
+  const currentLicenseSnap = await licenseRef.get();
+  const currentLicenseData = currentLicenseSnap.exists ? currentLicenseSnap.data() : null;
+
+  const canUpdate = shouldUpdateLicense(currentLicenseData, tokenHash, mapped.validUntilMs, nowMs);
+
+  const batch = db.batch();
+
+  if (canUpdate) {
+    batch.set(licenseRef, {
+      plan: mapped.productId || productId,
+      status: mapped.status,
+      valid_until: mapped.validUntilMs,
+      source: "PLAY",
+      owning_token_hash: tokenHash,
+      auto_renewing: mapped.autoRenewing,
+      server_time_ms: nowMs,
+      updated_at: admin.firestore.FieldValue.serverTimestamp(),
+    }, { merge: true });
+  } else {
+    functions.logger.info(`verifyPlayPurchase: Skipped license update for shop '${shopId}' as current license is active and owned by a newer token.`);
+  }
 
   batch.set(purchaseRef, {
     shop_id: shopId,
@@ -260,17 +278,29 @@ exports.handlePlayRtdn = functions.pubsub.topic("play-rtdn").onPublish(async (me
 
     if (isSubscription) {
       const mapped = mapSubscriptionState(playData, productId);
+      const tokenHash = hashToken(purchaseToken);
 
       const licenseRef = db.collection("shops").doc(shopId).collection("license").doc("current");
-      batch.set(licenseRef, {
-        plan: mapped.productId || productId,
-        status: mapped.status,
-        valid_until: mapped.validUntilMs,
-        source: "PLAY",
-        auto_renewing: mapped.autoRenewing,
-        server_time_ms: nowMs,
-        updated_at: admin.firestore.FieldValue.serverTimestamp(),
-      }, { merge: true });
+      const currentLicenseSnap = await licenseRef.get();
+      const currentLicenseData = currentLicenseSnap.exists ? currentLicenseSnap.data() : null;
+
+      const canUpdate = shouldUpdateLicense(currentLicenseData, tokenHash, mapped.validUntilMs, nowMs);
+
+      if (canUpdate) {
+        batch.set(licenseRef, {
+          plan: mapped.productId || productId,
+          status: mapped.status,
+          valid_until: mapped.validUntilMs,
+          source: "PLAY",
+          owning_token_hash: tokenHash,
+          auto_renewing: mapped.autoRenewing,
+          server_time_ms: nowMs,
+          updated_at: admin.firestore.FieldValue.serverTimestamp(),
+        }, { merge: true });
+        functions.logger.info(`✓ RTDN updated license for shop ${shopId}: status=${mapped.status}`);
+      } else {
+        functions.logger.info(`RTDN ignored update for shop ${shopId}: token '${purchaseToken.slice(0, 10)}...' cannot overwrite active license owned by newer/other token.`);
+      }
 
       batch.set(purchaseRef, {
         shop_id: shopId,
@@ -336,18 +366,21 @@ exports.redeemPromoCode = functions.https.onCall(async (data, context) => {
 
       const promoDoc = await transaction.get(promoRef);
       const redemptionDoc = await transaction.get(redemptionRef);
+      const licenseDoc = await transaction.get(licenseRef);
 
       const validation = validatePromoCode(promoDoc.exists ? promoDoc.data() : null, redemptionDoc.exists, nowMs);
       if (!validation.valid) throw new Error(validation.reason);
 
-      const validUntilMs = nowMs + (validation.grantDays * 24 * 60 * 60 * 1000);
+      const currentLicenseData = licenseDoc.exists ? licenseDoc.data() : null;
+      const extension = computePromoExtension(currentLicenseData, promoCode, shopId, validation.grantDays, nowMs);
 
       transaction.set(licenseRef, {
-        plan: promoCode,
-        status: "ACTIVE",
-        valid_until: validUntilMs,
-        source: "PROMO",
-        auto_renewing: false,
+        plan: extension.plan,
+        status: extension.status,
+        valid_until: extension.validUntilMs,
+        source: extension.source,
+        owning_token_hash: extension.owningTokenHash,
+        auto_renewing: extension.autoRenewing,
         server_time_ms: nowMs,
         updated_at: admin.firestore.FieldValue.serverTimestamp(),
       }, { merge: true });
@@ -364,7 +397,7 @@ exports.redeemPromoCode = functions.https.onCall(async (data, context) => {
         redeemed_at: admin.firestore.FieldValue.serverTimestamp(),
       });
 
-      return { success: true, plan: promoCode, validUntil: validUntilMs };
+      return { success: true, plan: extension.plan, validUntil: extension.validUntilMs };
     });
 
     return result;

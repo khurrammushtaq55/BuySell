@@ -71,6 +71,20 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
                 if (existing.isEmpty()) {
                     val presets = CategoryPresets.getPresetCategories(shopId)
                     db.categoryDao().insertCategories(presets)
+                } else {
+                    val seenCodes = mutableSetOf<String>()
+                    val duplicatesToDelete = mutableListOf<String>()
+                    for (cat in existing) {
+                        val key = cat.code.lowercase().trim().ifBlank { cat.name.lowercase().trim() }
+                        if (seenCodes.contains(key)) {
+                            duplicatesToDelete.add(cat.id)
+                        } else {
+                            seenCodes.add(key)
+                        }
+                    }
+                    if (duplicatesToDelete.isNotEmpty()) {
+                        db.categoryDao().deleteCategoriesByIds(duplicatesToDelete)
+                    }
                 }
 
                 db.categoryDao().observeAllCategories(shopId).collect { list ->

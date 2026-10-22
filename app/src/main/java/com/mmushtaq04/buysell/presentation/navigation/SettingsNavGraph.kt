@@ -63,6 +63,12 @@ fun NavGraphBuilder.settingsNavGraph(
             }
         }
 
+        LaunchedEffect(showPaywallDialog) {
+            if (showPaywallDialog) {
+                billingManager.queryAvailableProducts()
+            }
+        }
+
         if (showPaywallDialog) {
             PremiumPaywallDialog(
                 isOwner = userEntity?.role == com.mmushtaq04.buysell.data.local.enums.Role.OWNER,
@@ -92,18 +98,18 @@ fun NavGraphBuilder.settingsNavGraph(
                 },
                 onRestoreClick = {
                     if (userEntity != null) {
-                        billingManager.restorePurchases(userEntity!!.shopId, featureRepo)
+                        billingManager.restorePurchases(userEntity!!.shopId, featureRepo) { isRestored ->
+                            val msgRes = if (isRestored) R.string.billing_restore_success else R.string.billing_restore_empty
+                            android.widget.Toast.makeText(context, context.getString(msgRes), android.widget.Toast.LENGTH_LONG).show()
+                        }
                     }
                     showPaywallDialog = false
                 },
                 onRedeemPromoCode = { code, onSuccess, onError ->
                     scope.launch {
-                        val success = featureRepo.redeemAdminPromoCode(code, shopEntity?.id ?: "")
-                        if (success) {
-                            onSuccess()
-                        } else {
-                            onError()
-                        }
+                        val res = featureRepo.redeemAdminPromoCodeResult(code, shopEntity?.id ?: userEntity?.shopId ?: "")
+                        res.onSuccess { onSuccess() }
+                           .onFailure { err -> onError(err.localizedMessage ?: "Invalid promo code.") }
                     }
                 }
             )
@@ -136,12 +142,9 @@ fun NavGraphBuilder.settingsNavGraph(
                 onDismiss = { showPromoDialog = false },
                 onRedeemCode = { code, onSuccess, onError ->
                     scope.launch {
-                        val success = featureRepo.redeemAdminPromoCode(code, shopEntity?.id ?: "")
-                        if (success) {
-                            onSuccess()
-                        } else {
-                            onError()
-                        }
+                        val res = featureRepo.redeemAdminPromoCodeResult(code, shopEntity?.id ?: userEntity?.shopId ?: "")
+                        res.onSuccess { onSuccess() }
+                           .onFailure { err -> onError(err.localizedMessage ?: "Invalid promo code.") }
                     }
                 }
             )

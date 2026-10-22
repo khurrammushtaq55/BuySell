@@ -24,7 +24,7 @@ import com.mmushtaq04.buysell.ui.theme.BuySellTheme
 @Composable
 fun RedeemPromoDialog(
     onDismiss: () -> Unit,
-    onRedeemCode: (code: String, onSuccess: () -> Unit, onError: () -> Unit) -> Unit
+    onRedeemCode: (code: String, onSuccess: () -> Unit, onError: (String) -> Unit) -> Unit
 ) {
     val context = LocalContext.current
     var codeText by remember { mutableStateOf("") }
@@ -32,7 +32,9 @@ fun RedeemPromoDialog(
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
     AlertDialog(
-        onDismissRequest = onDismiss,
+        onDismissRequest = {
+            if (!isLoading) onDismiss()
+        },
         shape = RoundedCornerShape(20.dp),
         icon = {
             Surface(
@@ -107,9 +109,9 @@ fun RedeemPromoDialog(
                             Toast.makeText(context, context.getString(R.string.promo_success_toast), Toast.LENGTH_LONG).show()
                             onDismiss()
                         },
-                        {
+                        { errReason ->
                             isLoading = false
-                            errorMessage = context.getString(R.string.promo_error_invalid)
+                            errorMessage = errReason.ifBlank { context.getString(R.string.promo_error_invalid) }
                         }
                     )
                 },

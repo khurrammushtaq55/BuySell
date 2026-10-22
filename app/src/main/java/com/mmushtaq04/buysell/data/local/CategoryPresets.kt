@@ -3,7 +3,6 @@ package com.mmushtaq04.buysell.data.local
 import com.mmushtaq04.buysell.data.local.entity.CategoryEntity
 import com.mmushtaq04.buysell.data.local.enums.IdentifierType
 import com.mmushtaq04.buysell.data.local.enums.TrackingMode
-import java.util.UUID
 
 object CategoryPresets {
     fun getPresetCategories(
@@ -33,7 +32,7 @@ object CategoryPresets {
             }
 
             CategoryEntity(
-                id = UUID.randomUUID().toString(),
+                id = "cat_${shopId}_$key",
                 shopId = shopId,
                 name = name,
                 code = key,

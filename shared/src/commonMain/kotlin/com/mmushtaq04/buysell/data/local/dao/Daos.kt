@@ -71,6 +71,9 @@ interface CategoryDao {
 
     @Query("SELECT * FROM categories WHERE shop_id = :shopId ORDER BY sort_order ASC")
     suspend fun getCategories(shopId: String): List<CategoryEntity>
+
+    @Query("DELETE FROM categories WHERE id IN (:ids)")
+    suspend fun deleteCategoriesByIds(ids: List<String>)
 }
 
 @Dao

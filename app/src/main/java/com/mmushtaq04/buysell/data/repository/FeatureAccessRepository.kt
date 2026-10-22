@@ -2,6 +2,7 @@ package com.mmushtaq04.buysell.data.repository
 
 import android.content.Context
 import android.util.Log
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.functions.FirebaseFunctions
 import com.mmushtaq04.buysell.data.local.AppDatabase
@@ -70,6 +71,7 @@ interface FeatureAccessRepository {
     fun clearCacheOnSignOut()
     suspend fun syncEntitlementAndConfig(shopId: String)
     suspend fun redeemAdminPromoCode(code: String, shopId: String): Boolean
+    suspend fun redeemAdminPromoCodeResult(code: String, shopId: String): Result<Boolean>
     suspend fun verifyPurchaseWithServer(purchaseToken: String, productId: String, shopId: String): Boolean
 }
 
@@ -232,11 +234,20 @@ class FeatureAccessRepositoryImpl(
         }
     }
 
-    override suspend fun redeemAdminPromoCode(code: String, shopId: String): Boolean = withContext(Dispatchers.IO) {
-        runCatching {
-            val cleanCode = code.trim().uppercase()
-            if (cleanCode.isBlank() || shopId.isBlank()) return@runCatching false
+    override suspend fun redeemAdminPromoCode(code: String, shopId: String): Boolean {
+        return redeemAdminPromoCodeResult(code, shopId).getOrDefault(false)
+    }
 
+    override suspend fun redeemAdminPromoCodeResult(code: String, shopId: String): Result<Boolean> = withContext(Dispatchers.IO) {
+        val cleanCode = code.trim().uppercase()
+        if (cleanCode.isBlank()) {
+            return@withContext Result.failure(IllegalArgumentException("Promo code cannot be empty."))
+        }
+        if (shopId.isBlank()) {
+            return@withContext Result.failure(IllegalArgumentException("Shop ID missing. Please setup your shop first."))
+        }
+
+        runCatching {
             val payload = hashMapOf(
                 "code" to cleanCode,
                 "shopId" to shopId
@@ -265,7 +276,6 @@ class FeatureAccessRepositoryImpl(
                 _entitlementState.value = computed
                 _isPremiumUnlocked.value = computed.isUnlocked
 
-                // Trigger remote sync asynchronously in background without blocking caller UI
                 scope.launch {
                     runCatching { syncEntitlementAndConfig(shopId) }
                 }
@@ -273,12 +283,12 @@ class FeatureAccessRepositoryImpl(
                 if (com.mmushtaq04.buysell.BuildConfig.DEBUG) {
                     Log.i(TAG, "✓ Successfully redeemed promo code '$cleanCode' for shop '$shopId'")
                 }
-                return@runCatching true
+                true
+            } else {
+                throw IllegalStateException("Failed to redeem promo code. Please verify code details.")
             }
-            false
-        }.getOrElse { err ->
-            Log.w(TAG, "Redeem promo code failed: ${err.message}")
-            false
+        }.onFailure { err ->
+            Log.w(TAG, "Redeem promo code failed: ${err.message}", err)
         }
     }
 

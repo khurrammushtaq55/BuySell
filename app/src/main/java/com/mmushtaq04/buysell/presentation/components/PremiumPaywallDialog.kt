@@ -38,7 +38,7 @@ fun PremiumPaywallDialog(
     onDismiss: () -> Unit,
     onUpgradeClick: (plan: String) -> Unit,
     onRestoreClick: () -> Unit,
-    onRedeemPromoCode: (code: String, onSuccess: () -> Unit, onError: () -> Unit) -> Unit
+    onRedeemPromoCode: (code: String, onSuccess: () -> Unit, onError: (String) -> Unit) -> Unit
 ) {
     val context = LocalContext.current
     var selectedPlan by remember { mutableStateOf(PlayBillingManager.SKU_PRO_ANNUAL) }
@@ -59,7 +59,9 @@ fun PremiumPaywallDialog(
 
     if (showPromoDialog) {
         AlertDialog(
-            onDismissRequest = { showPromoDialog = false },
+            onDismissRequest = {
+                if (!isRedeeming) showPromoDialog = false
+            },
             icon = { Icon(Icons.Default.Key, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
             title = { Text(stringResource(R.string.paywall_promo_dialog_title), fontWeight = FontWeight.Bold) },
             text = {
@@ -87,9 +89,9 @@ fun PremiumPaywallDialog(
                                     Toast.makeText(context, context.getString(R.string.paywall_toast_unlocked), Toast.LENGTH_SHORT).show()
                                     onDismiss()
                                 },
-                                {
+                                { errReason ->
                                     isRedeeming = false
-                                    Toast.makeText(context, context.getString(R.string.promo_error_invalid), Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, errReason.ifBlank { context.getString(R.string.promo_error_invalid) }, Toast.LENGTH_LONG).show()
                                 }
                             )
                         }
@@ -119,7 +121,9 @@ fun PremiumPaywallDialog(
     }
 
     AlertDialog(
-        onDismissRequest = onDismiss,
+        onDismissRequest = {
+            if (!isRedeeming) onDismiss()
+        },
         shape = RoundedCornerShape(20.dp),
         icon = {
             Surface(

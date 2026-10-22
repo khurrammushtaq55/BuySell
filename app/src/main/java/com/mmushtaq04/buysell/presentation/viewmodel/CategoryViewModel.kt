@@ -36,6 +36,8 @@ class CategoryViewModel(application: Application) : AndroidViewModel(application
                     if (existing.isEmpty()) {
                         val presets = CategoryPresets.getPresetCategories(activeShopId)
                         db.categoryDao().insertCategories(presets)
+                    } else {
+                        cleanupDuplicateCategories(activeShopId)
                     }
 
                     db.categoryDao().observeCategories(activeShopId).collect { enabledList ->
@@ -56,6 +58,27 @@ class CategoryViewModel(application: Application) : AndroidViewModel(application
                     }
                 }
             }
+        }
+    }
+
+    private suspend fun cleanupDuplicateCategories(shopId: String) {
+        val categories = db.categoryDao().getCategories(shopId)
+        if (categories.isEmpty()) return
+
+        val seenCodes = mutableSetOf<String>()
+        val duplicatesToDelete = mutableListOf<String>()
+
+        for (cat in categories) {
+            val key = cat.code.lowercase().trim().ifBlank { cat.name.lowercase().trim() }
+            if (seenCodes.contains(key)) {
+                duplicatesToDelete.add(cat.id)
+            } else {
+                seenCodes.add(key)
+            }
+        }
+
+        if (duplicatesToDelete.isNotEmpty()) {
+            db.categoryDao().deleteCategoriesByIds(duplicatesToDelete)
         }
     }
 
