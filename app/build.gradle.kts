@@ -15,8 +15,8 @@ android {
         applicationId = "com.mmushtaq04.buysell"
         minSdk = 24
         targetSdk = 36
-        versionCode = 5          // <--- Increment this integer!
-        versionName = "1.0.4"
+        versionCode = 8        // <--- Increment this integer!
+        versionName = "1.0.7"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

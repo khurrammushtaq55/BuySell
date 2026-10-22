@@ -9,7 +9,8 @@ service cloud.firestore {
     }
 
     function getShopOwner(shopId) {
-      return get(/databases/$(database)/documents/shops/$(shopId)).data.owner_user_id;
+      let shopData = get(/databases/$(database)/documents/shops/$(shopId)).data;
+      return shopData.owner_user_id != null ? shopData.owner_user_id : shopData.ownerUserId;
     }
 
     function getMemberRole(shopId) {
@@ -91,16 +92,19 @@ service cloud.firestore {
       allow read: if isAuthenticated();
 
       allow create: if isAuthenticated() && (
-        request.resource.data.owner_user_id == request.auth.uid
+        request.resource.data.owner_user_id == request.auth.uid ||
+        request.resource.data.ownerUserId == request.auth.uid
       ) && !request.resource.data.keys().hasAny(['is_premium', 'premium_plan', 'premium_until', 'purchase_token', 'auto_renewing']);
 
       allow update: if isAuthenticated() && (
         resource.data.owner_user_id == request.auth.uid ||
+        resource.data.ownerUserId == request.auth.uid ||
         getMemberRole(shopId) == 'OWNER'
       ) && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['is_premium', 'premium_plan', 'premium_until', 'purchase_token', 'auto_renewing']);
 
       allow delete: if isAuthenticated() && (
         resource.data.owner_user_id == request.auth.uid ||
+        resource.data.ownerUserId == request.auth.uid ||
         getMemberRole(shopId) == 'OWNER'
       );
 
@@ -120,7 +124,7 @@ service cloud.firestore {
         allow create: if isAuthenticated() && (
           isShopOwner(shopId) ||
           (request.auth.uid == uid &&
-           get(/databases/$(database)/documents/shops/$(shopId)).data.owner_user_id == request.auth.uid &&
+           getShopOwner(shopId) == request.auth.uid &&
            request.resource.data.role == 'OWNER') ||
           (
             request.auth.uid == uid &&

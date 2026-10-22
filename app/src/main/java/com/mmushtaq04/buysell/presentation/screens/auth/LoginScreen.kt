@@ -45,7 +45,8 @@ fun LoginScreen(
     initialRegisterMode: Boolean = false,
     onNavigateBackToWelcome: () -> Unit = {},
     onGoogleSignInClick: () -> Unit = {},
-    onEmailAuthSuccess: () -> Unit = {}
+    onSignInSuccess: () -> Unit = {},
+    onSignUpSuccess: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -213,7 +214,11 @@ fun LoginScreen(
                         }
                         isLoading = false
                         if (result.isSuccess) {
-                            onEmailAuthSuccess()
+                            if (isRegisterMode) {
+                                onSignUpSuccess()
+                            } else {
+                                onSignInSuccess()
+                            }
                         } else {
                             val err = result.exceptionOrNull()?.localizedMessage ?: errAuthFailed
                             errorMessage = err
@@ -238,37 +243,7 @@ fun LoginScreen(
                 }
             }
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                HorizontalDivider(modifier = Modifier.weight(1f))
-                Text(
-                    text = "  ${stringResource(R.string.login_or_email)}  ",
-                    fontSize = 12.sp,
-                    color = Color.Gray
-                )
-                HorizontalDivider(modifier = Modifier.weight(1f))
-            }
 
-            // Google Sign-In Option
-            OutlinedButton(
-                onClick = { launchGoogleSignIn() },
-                enabled = !isLoading,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp),
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.onSurface)
-            ) {
-                Text(
-                    text = "G  ${stringResource(R.string.login_btn_google)}",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 15.sp
-                )
-            }
 
             // Toggle Mode Link
             Text(

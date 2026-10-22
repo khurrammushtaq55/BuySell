@@ -50,7 +50,7 @@ object GoogleSignInManager {
                 if (e.message?.contains("cancel", ignoreCase = true) == true) {
                     throw e
                 }
-                Log.w(TAG, "GetGoogleIdOption failed (${e.message}), trying GetSignInWithGoogleOption fallback...")
+                Log.w(TAG, "GetGoogleIdOption failed (type=${e.type}, msg=${e.message}), trying GetSignInWithGoogleOption fallback...")
                 val signInWithGoogleOption = GetSignInWithGoogleOption.Builder(webClientId).build()
                 val fallbackRequest = GetCredentialRequest.Builder()
                     .addCredentialOption(signInWithGoogleOption)

@@ -10,7 +10,11 @@ import com.mmushtaq04.buysell.data.auth.FirebaseAuthManager
 import com.mmushtaq04.buysell.data.local.AppDatabase
 import com.mmushtaq04.buysell.data.local.entity.*
 import com.mmushtaq04.buysell.data.local.enums.*
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
@@ -60,7 +64,37 @@ class FirestoreSyncManager(private val db: AppDatabase) {
                     )
 
                     // Attach session info
-                    payloadMap["active_session_id"] = activeSessionId
+                    if (activeSessionId.isNotBlank()) {
+                        payloadMap["active_session_id"] = activeSessionId
+                    }
+
+                    // Field name normalization: Ensure Firestore snake_case field names
+                    if (!payloadMap.containsKey("owner_user_id") && payloadMap.containsKey("ownerUserId")) {
+                        payloadMap["owner_user_id"] = payloadMap["ownerUserId"]
+                    }
+                    if (!payloadMap.containsKey("shop_id") && payloadMap.containsKey("shopId")) {
+                        payloadMap["shop_id"] = payloadMap["shopId"]
+                    }
+                    if (!payloadMap.containsKey("created_at") && payloadMap.containsKey("createdAt")) {
+                        payloadMap["created_at"] = payloadMap["createdAt"]
+                    }
+                    if (!payloadMap.containsKey("updated_at") && payloadMap.containsKey("updatedAt")) {
+                        payloadMap["updated_at"] = payloadMap["updatedAt"]
+                    }
+
+                    // Remove server-only or billing fields that client isn't allowed to write in shops
+                    if (item.entityType.lowercase().trim() in listOf("shops", "shop")) {
+                        payloadMap.remove("is_premium")
+                        payloadMap.remove("isPremium")
+                        payloadMap.remove("premium_plan")
+                        payloadMap.remove("premiumPlan")
+                        payloadMap.remove("premium_until")
+                        payloadMap.remove("premiumUntil")
+                        payloadMap.remove("purchase_token")
+                        payloadMap.remove("purchaseToken")
+                        payloadMap.remove("auto_renewing")
+                        payloadMap.remove("autoRenewing")
+                    }
 
                     val rawScope = payloadMap["scope"] as? String
                     val scope = scopeFor(item.entityType, rawScope)
@@ -108,9 +142,19 @@ class FirestoreSyncManager(private val db: AppDatabase) {
                         purgeLocalVaultRow(item.entityType, item.entityId)
                     }
                 } catch (e: Exception) {
-                    Log.e(TAG, "✗ [SYNC TIMEOUT/ERROR] Failed to push '${item.entityType}' ID: '${item.entityId}' to Firestore: ${e.message}")
-                    // Timeout or network error -> Stop loop and return current pushed count so unsynced item remains in outbox
-                    break
+                    val errMsg = e.message ?: e.toString()
+                    Log.e(TAG, "✗ [SYNC ERROR] Failed to push '${item.entityType}' ID: '${item.entityId}' -> $errMsg")
+
+                    if (errMsg.contains("PERMISSION_DENIED", ignoreCase = true) || errMsg.contains("Missing or insufficient permissions", ignoreCase = true)) {
+                        Log.w(TAG, "⚠ [DISCARD UNPUSHABLE ITEM] Permission denied for outbox ID '${item.id}' (${item.entityType} '${item.entityId}'). Removing item from outbox queue to unblock sync.")
+                        syncDao.deleteOutbox(item.id)
+                    } else if (errMsg.contains("TIMEOUT", ignoreCase = true) || errMsg.contains("UNAVAILABLE", ignoreCase = true) || e is kotlinx.coroutines.TimeoutCancellationException) {
+                        Log.w(TAG, "Network timeout / offline status detected. Stopping pushOutbox loop to retry later when connected.")
+                        break
+                    } else {
+                        Log.w(TAG, "⚠ Discarding invalid/failing outbox item '${item.id}' (${item.entityType}): $errMsg")
+                        syncDao.deleteOutbox(item.id)
+                    }
                 }
             }
 
@@ -125,47 +169,55 @@ class FirestoreSyncManager(private val db: AppDatabase) {
     ): Result<Int> = withContext(Dispatchers.IO) {
         runCatching {
             Log.d(TAG, "--> Starting pullChanges for shopId: '$shopId' (Role: $userRole)")
-            var pulledCount = 0
             val scopesToPull = if (userRole == Role.STAFF) listOf("public") else listOf("public", "vault")
             val collections = listOf("parties", "categories", "stock_items", "txns", "txn_lines", "payments", "payment_promises", "expenses", "attachments", "payment_accounts")
 
-            for (scopeFolder in scopesToPull) {
-                for (colName in collections) {
-                    val path6Segment = "shops/$shopId/scopes/$scopeFolder/$colName"
-                    val cursor = syncDao.getCursor(path6Segment)
-                    val lastPulled = cursor?.lastPulledAt ?: 0L
+            val pulledCount = coroutineScope {
+                val deferreds = mutableListOf<Deferred<Int>>()
 
-                    // Fetch ALL documents if lastPulled == 0L, or filter by updated_at > lastPulled
-                    val query = if (lastPulled > 0L) {
-                        firestore.collection(path6Segment).whereGreaterThan("updated_at", lastPulled)
-                    } else {
-                        firestore.collection(path6Segment)
-                    }
+                for (scopeFolder in scopesToPull) {
+                    for (colName in collections) {
+                        deferreds.add(async {
+                            var count = 0
+                            val path6Segment = "shops/$shopId/scopes/$scopeFolder/$colName"
+                            val cursor = syncDao.getCursor(path6Segment)
+                            val lastPulled = cursor?.lastPulledAt ?: 0L
 
-                    val snapshot = runCatching {
-                        withTimeout(NETWORK_TIMEOUT_MS) {
-                            query.get().await()
-                        }
-                    }.getOrNull()
+                            val query = if (lastPulled > 0L) {
+                                firestore.collection(path6Segment).whereGreaterThan("updated_at", lastPulled)
+                            } else {
+                                firestore.collection(path6Segment)
+                            }
 
-                    if (snapshot != null && !snapshot.isEmpty) {
-                        val firstPath = snapshot.documents.firstOrNull()?.reference?.path ?: path6Segment
-                        Log.i(TAG, "Fetched ${snapshot.documents.size} documents from Firestore path: '$firstPath'")
+                            val snapshot = runCatching {
+                                withTimeout(NETWORK_TIMEOUT_MS) {
+                                    query.get().await()
+                                }
+                            }.getOrNull()
 
-                        var maxDocUpdatedAt = lastPulled
-                        for (doc in snapshot.documents) {
-                            pulledCount++
-                            val data = doc.data ?: continue
-                            val docUpdatedAt = parseLongTimestamp(data["updated_at"])
-                            if (docUpdatedAt > maxDocUpdatedAt) maxDocUpdatedAt = docUpdatedAt
-                            applyFirestoreDocToRoom(colName, data)
-                        }
+                            if (snapshot != null && !snapshot.isEmpty) {
+                                val firstPath = snapshot.documents.firstOrNull()?.reference?.path ?: path6Segment
+                                Log.i(TAG, "Fetched ${snapshot.documents.size} documents from Firestore path: '$firstPath'")
 
-                        if (maxDocUpdatedAt > lastPulled) {
-                            syncDao.saveCursor(SyncCursorEntity(collectionPath = path6Segment, lastPulledAt = maxDocUpdatedAt))
-                        }
+                                var maxDocUpdatedAt = lastPulled
+                                for (doc in snapshot.documents) {
+                                    count++
+                                    val data = doc.data ?: continue
+                                    val docUpdatedAt = parseLongTimestamp(data["updated_at"])
+                                    if (docUpdatedAt > maxDocUpdatedAt) maxDocUpdatedAt = docUpdatedAt
+                                    applyFirestoreDocToRoom(colName, data)
+                                }
+
+                                if (maxDocUpdatedAt > lastPulled) {
+                                    syncDao.saveCursor(SyncCursorEntity(collectionPath = path6Segment, lastPulledAt = maxDocUpdatedAt))
+                                }
+                            }
+                            count
+                        })
                     }
                 }
+
+                deferreds.awaitAll().sum()
             }
 
             Log.i(TAG, "<-- Finished pullChanges. Pulled total $pulledCount changes from Firestore for shop '$shopId'.")

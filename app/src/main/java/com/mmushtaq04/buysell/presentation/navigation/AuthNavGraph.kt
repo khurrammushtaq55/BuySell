@@ -14,7 +14,8 @@ import com.mmushtaq04.buysell.presentation.screens.onboarding.ShopSetupViewModel
 
 fun NavGraphBuilder.authNavGraph(
     navController: NavHostController,
-    onNavigateAfterLogin: () -> Unit
+    onNavigateAfterLogin: () -> Unit,
+    onNavigateAfterSignUp: () -> Unit
 ) {
     composable(NavRoutes.Welcome.route) {
         WelcomeLandingScreen(
@@ -45,7 +46,8 @@ fun NavGraphBuilder.authNavGraph(
                 navController.popBackStack()
             },
             onGoogleSignInClick = onNavigateAfterLogin,
-            onEmailAuthSuccess = onNavigateAfterLogin
+            onSignInSuccess = onNavigateAfterLogin,
+            onSignUpSuccess = onNavigateAfterSignUp
         )
     }
 

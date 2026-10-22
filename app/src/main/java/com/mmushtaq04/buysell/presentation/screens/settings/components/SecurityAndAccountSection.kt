@@ -1,5 +1,6 @@
 package com.mmushtaq04.buysell.presentation.screens.settings.components
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -46,6 +47,7 @@ fun SecurityAndAccountSection(
     var showSignOutDialog by remember { mutableStateOf(false) }
     var showUnsyncedWarningDialog by remember { mutableStateOf(false) }
     var unsyncedCount by remember { mutableIntStateOf(0) }
+    var isSyncingInDialog by remember { mutableStateOf(false) }
 
     var pinInputText by remember { mutableStateOf("") }
     var isPinActive by remember { mutableStateOf(runCatching { AppPinManager.isPinSet(context) }.getOrDefault(false)) }
@@ -137,7 +139,7 @@ fun SecurityAndAccountSection(
 
     if (showUnsyncedWarningDialog) {
         AlertDialog(
-            onDismissRequest = { showUnsyncedWarningDialog = false },
+            onDismissRequest = { if (!isSyncingInDialog) showUnsyncedWarningDialog = false },
             title = {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
@@ -167,6 +169,7 @@ fun SecurityAndAccountSection(
                             // Force sign-out completed
                         }
                     },
+                    enabled = !isSyncingInDialog,
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                 ) {
                     Text(stringResource(R.string.settings_btn_discard_signout))
@@ -174,24 +177,39 @@ fun SecurityAndAccountSection(
             },
             dismissButton = {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    TextButton(onClick = { showUnsyncedWarningDialog = false }) {
+                    TextButton(
+                        onClick = { showUnsyncedWarningDialog = false },
+                        enabled = !isSyncingInDialog
+                    ) {
                         Text(stringResource(R.string.action_cancel))
                     }
                     Button(
                         onClick = {
-                            showUnsyncedWarningDialog = false
+                            isSyncingInDialog = true
                             onAttemptSignOut(
                                 { count ->
+                                    isSyncingInDialog = false
                                     unsyncedCount = count
                                     showUnsyncedWarningDialog = true
+                                    Toast.makeText(context, "Sync attempt finished. $count unsynced record(s) remaining.", Toast.LENGTH_LONG).show()
                                 },
                                 {
-                                    // Clean sign-out completed
+                                    isSyncingInDialog = false
+                                    showUnsyncedWarningDialog = false
                                 }
                             )
-                        }
+                        },
+                        enabled = !isSyncingInDialog
                     ) {
-                        Text(stringResource(R.string.settings_btn_try_sync))
+                        if (isSyncingInDialog) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(18.dp),
+                                color = MaterialTheme.colorScheme.onPrimary,
+                                strokeWidth = 2.dp
+                            )
+                        } else {
+                            Text(stringResource(R.string.settings_btn_try_sync))
+                        }
                     }
                 }
             }

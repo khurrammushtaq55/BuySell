@@ -164,27 +164,6 @@ fun WelcomeLandingScreen(
                     fontSize = 15.sp
                 )
             }
-
-            // Google Sign-In Direct Option
-            OutlinedButton(
-                onClick = { launchGoogleSignIn() },
-                enabled = !isLoading,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(52.dp),
-                shape = RoundedCornerShape(14.dp),
-                colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.onSurface)
-            ) {
-                if (isLoading) {
-                    CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
-                } else {
-                    Text(
-                        text = "G  ${stringResource(R.string.login_btn_google)}",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 15.sp
-                    )
-                }
-            }
         }
     }
 }
