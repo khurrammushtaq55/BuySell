@@ -482,6 +482,8 @@
     <string name="settings_pin_mismatch">Les PIN ne correspondent pas. Veuillez réessayer.</string>
     <string name="billing_restore_success">Abonnement Pro restauré avec succès !</string>
     <string name="billing_restore_empty">Aucun abonnement Pro actif trouvé pour ce compte.</string>
+    <string name="billing_product_not_active">Le plan d\'abonnement (%1$s) n\'est pas encore actif dans Google Play Console.</string>
+    <string name="settings_sync_attempt_finished">Tentative de synchronisation terminée. %1$d enregistrement(s) non synchronisé(s) restant(s).</string>
     <string name="settings_toast_code_copied">Code d\'invitation copié dans le presse-papiers</string>
     <string name="staff_code_invalid">Code d\'invitation employé invalide. Vérifiez et réessayez.</string>
     <string name="staff_code_expired">Ce code d\'invitation employé a expiré. Demandez un nouveau code au propriétaire de la boutique.</string>

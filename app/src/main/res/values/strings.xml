@@ -482,6 +482,8 @@
     <string name="settings_pin_mismatch">PINs do not match. Please try again.</string>
     <string name="billing_restore_success">Pro subscription restored successfully!</string>
     <string name="billing_restore_empty">No active Pro subscriptions found for this account.</string>
+    <string name="billing_product_not_active">Subscription plan (%1$s) is not yet active in Google Play Console.</string>
+    <string name="settings_sync_attempt_finished">Sync attempt finished. %1$d unsynced record(s) remaining.</string>
     <string name="settings_toast_code_copied">Invite code copied to clipboard</string>
     <string name="staff_code_invalid">Invalid staff invite code. Please check and try again.</string>
     <string name="staff_code_expired">This staff invite code has expired. Ask shop owner for a new code.</string>

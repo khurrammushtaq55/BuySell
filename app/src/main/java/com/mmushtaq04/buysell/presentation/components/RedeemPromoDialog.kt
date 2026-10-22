@@ -78,6 +78,7 @@ fun RedeemPromoDialog(
                         errorMessage = null
                     },
                     label = { Text(stringResource(R.string.promo_hint)) },
+                    enabled = !isLoading,
                     singleLine = true,
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.fillMaxWidth(),
@@ -135,6 +136,7 @@ fun RedeemPromoDialog(
         dismissButton = {
             TextButton(
                 onClick = onDismiss,
+                enabled = !isLoading,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(

@@ -482,6 +482,8 @@
     <string name="settings_pin_mismatch">PINs مطابقت نہیں رکھتے۔ براہ کرم دوبارہ کوشش کریں۔</string>
     <string name="billing_restore_success">Pro سبسکرپشن کامیابی سے بحال ہو گئی!</string>
     <string name="billing_restore_empty">اس اکاؤنٹ کے لیے کوئی فعال Pro سبسکرپشن نہیں ملی۔</string>
+    <string name="billing_product_not_active">سبسکرپشن پلان (%1$s) ابھی گوگل پلے کنسول میں فعال نہیں ہے۔</string>
+    <string name="settings_sync_attempt_finished">سنک کی کوشش مکمل ہوئی۔ %1$d غیر سنک شدہ ریکارڈز باقی ہیں۔</string>
     <string name="settings_toast_code_copied">انوائٹ کوڈ کلپ بورڈ پر کاپی ہو گیا</string>
     <string name="staff_code_invalid">غلط اسٹاف انوائٹ کوڈ۔ چیک کریں اور دوبارہ کوشش کریں۔</string>
     <string name="staff_code_expired">یہ اسٹاف انوائٹ کوڈ میعاد ختم ہو گیا ہے۔ دکان کے مالک سے نیا کوڈ طلب کریں۔</string>

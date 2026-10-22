@@ -69,6 +69,7 @@ fun PremiumPaywallDialog(
                         value = promoCodeInput,
                         onValueChange = { promoCodeInput = it.uppercase() },
                         label = { Text(stringResource(R.string.paywall_promo_label)) },
+                        enabled = !isRedeeming,
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
@@ -95,11 +96,22 @@ fun PremiumPaywallDialog(
                     },
                     enabled = promoCodeInput.isNotBlank() && !isRedeeming
                 ) {
-                    Text(stringResource(R.string.action_ok))
+                    if (isRedeeming) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(18.dp),
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Text(stringResource(R.string.action_ok))
+                    }
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showPromoDialog = false }) {
+                TextButton(
+                    onClick = { showPromoDialog = false },
+                    enabled = !isRedeeming
+                ) {
                     Text(stringResource(R.string.action_cancel))
                 }
             }

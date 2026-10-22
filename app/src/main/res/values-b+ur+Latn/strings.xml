@@ -482,6 +482,8 @@
     <string name="settings_pin_mismatch">PINs match nahi kar rahe. Dobara koshish karein.</string>
     <string name="billing_restore_success">Pro subscription kamyabi se restore ho gayi!</string>
     <string name="billing_restore_empty">Is account ke liye koi active Pro subscription nahi mili.</string>
+    <string name="billing_product_not_active">Subscription plan (%1$s) abhi Google Play Console mein active nahi hai.</string>
+    <string name="settings_sync_attempt_finished">Sync koshish mukammal hui. %1$d unsynced record(s) baqi hain.</string>
     <string name="settings_toast_code_copied">Invite code clipboard mein copy ho gaya</string>
     <string name="staff_code_invalid">Invalid staff invite code. Check karke dobara koshish karein.</string>
     <string name="staff_code_expired">Yeh staff invite code expire ho chuka hai. Shop owner se naya code mangein.</string>

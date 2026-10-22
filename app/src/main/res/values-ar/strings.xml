@@ -482,6 +482,8 @@
     <string name="settings_pin_mismatch">رموز PIN غير متطابقة. يرجى المحاولة مرة أخرى.</string>
     <string name="billing_restore_success">تمت استعادة اشتراك Pro بنجاح!</string>
     <string name="billing_restore_empty">لم يتم العثور على اشتراكات Pro نشطة لهذا الحساب.</string>
+    <string name="billing_product_not_active">خطة الاشتراك (%1$s) ليست نشطة بعد في Google Play Console.</string>
+    <string name="settings_sync_attempt_finished">اكتملت محاولة المزامنة. يتبقى %1$d سجل غير متزامن.</string>
     <string name="settings_toast_code_copied">تم نسخ رمز الدعوة إلى الحافظة</string>
     <string name="staff_code_invalid">رمز دعوة الموظف غير صالح. يرجى التحقق والمحاولة مرة أخرى.</string>
     <string name="staff_code_expired">انتهت صلاحية رمز دعوة الموظف هذا. اطلب رمزًا جديدًا من مالك المتجر.</string>

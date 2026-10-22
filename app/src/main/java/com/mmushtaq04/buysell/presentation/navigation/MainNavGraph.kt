@@ -1,5 +1,6 @@
 package com.mmushtaq04.buysell.presentation.navigation
 
+import com.mmushtaq04.buysell.R
 import androidx.compose.runtime.*
 import kotlinx.coroutines.launch
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -131,14 +132,23 @@ fun NavGraphBuilder.mainNavGraph(
                 onUpgradeClick = { selectedProductId ->
                     val activity = context as? android.app.Activity
                     if (activity != null && userEntity != null) {
-                        billingManager.launchBillingFlow(
-                            activity = activity,
-                            productId = selectedProductId,
-                            shopId = userEntity!!.shopId,
-                            userUid = userEntity!!.id
-                        )
+                        val details = productDetailsMap[selectedProductId]
+                        if (details == null) {
+                            android.widget.Toast.makeText(
+                                context,
+                                context.getString(R.string.billing_product_not_active, selectedProductId),
+                                android.widget.Toast.LENGTH_LONG
+                            ).show()
+                        } else {
+                            billingManager.launchBillingFlow(
+                                activity = activity,
+                                productId = selectedProductId,
+                                shopId = userEntity!!.shopId,
+                                userUid = userEntity!!.id
+                            )
+                            showPaywallDialog = false
+                        }
                     }
-                    showPaywallDialog = false
                 },
                 onRestoreClick = {
                     if (userEntity != null) {

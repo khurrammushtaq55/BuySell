@@ -1,7 +1,5 @@
 package com.mmushtaq04.buysell.presentation.screens.auth
 
-import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -16,57 +14,20 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.credentials.CredentialManager
-import androidx.credentials.GetCredentialRequest
-import androidx.credentials.exceptions.GetCredentialException
-import com.google.android.libraries.identity.googleid.GetGoogleIdOption
-import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.mmushtaq04.buysell.R
-import com.mmushtaq04.buysell.data.auth.FirebaseAuthManager
 import com.mmushtaq04.buysell.ui.theme.BuySellTheme
-import kotlinx.coroutines.launch
 
 @Composable
 fun WelcomeLandingScreen(
     onNavigateToRegister: () -> Unit = {},
-    onNavigateToLogin: () -> Unit = {},
-    onGoogleSignInClick: () -> Unit = {}
+    onNavigateToLogin: () -> Unit = {}
 ) {
-    val context = LocalContext.current
-    val scope = rememberCoroutineScope()
-    val authManager = remember { FirebaseAuthManager() }
-
-    var isLoading by remember { mutableStateOf(false) }
-
-    val errGoogleFailed = stringResource(R.string.login_err_google_failed)
-    val errGoogleCanceled = stringResource(R.string.login_err_google_canceled)
-
-    fun launchGoogleSignIn() {
-        isLoading = true
-        scope.launch {
-            com.mmushtaq04.buysell.util.GoogleSignInManager.launchGoogleSignIn(context, authManager)
-                .onSuccess {
-                    isLoading = false
-                    onGoogleSignInClick()
-                }
-                .onFailure { e ->
-                    isLoading = false
-                    val msg = when {
-                        e is GetCredentialException && e.message?.contains("cancel", ignoreCase = true) == true -> errGoogleCanceled
-                        else -> "Google Sign-In Error: ${e.localizedMessage ?: errGoogleFailed}"
-                    }
-                    Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
-                }
-        }
-    }
-
     Scaffold { padding ->
         Column(
             modifier = Modifier
@@ -135,7 +96,6 @@ fun WelcomeLandingScreen(
             // Primary Big Green Button: Create New Shop
             Button(
                 onClick = onNavigateToRegister,
-                enabled = !isLoading,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(54.dp),
@@ -152,7 +112,6 @@ fun WelcomeLandingScreen(
             // Secondary Outlined Button: Log In to Existing Shop
             OutlinedButton(
                 onClick = onNavigateToLogin,
-                enabled = !isLoading,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(52.dp),

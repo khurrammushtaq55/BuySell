@@ -482,6 +482,8 @@
     <string name="settings_pin_mismatch">PIN मेल नहीं खाते। कृपया पुनः प्रयास करें।</string>
     <string name="billing_restore_success">Pro सदस्यता सफलतापूर्वक पुनर्स्थापित हुई!</string>
     <string name="billing_restore_empty">इस खाते के लिए कोई सक्रिय Pro सदस्यता नहीं मिली।</string>
+    <string name="billing_product_not_active">सदस्यता योजना (%1$s) अभी Google Play Console में सक्रिय नहीं है।</string>
+    <string name="settings_sync_attempt_finished">सिंक प्रयास समाप्त हुआ। %1$d असिंक्ड रिकॉर्ड शेष हैं।</string>
     <string name="settings_toast_code_copied">आमंत्रण कोड क्लिपबोर्ड पर कॉपी हुआ</string>
     <string name="staff_code_invalid">अमान्य स्टाफ आमंत्रण कोड। जांचें और पुनः प्रयास करें।</string>
     <string name="staff_code_expired">यह स्टाफ आमंत्रण कोड समाप्त हो गया है। दुकान मालिक से नया कोड मांगें।</string>

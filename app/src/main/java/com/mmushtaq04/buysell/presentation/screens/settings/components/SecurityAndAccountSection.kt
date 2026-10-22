@@ -191,7 +191,7 @@ fun SecurityAndAccountSection(
                                     isSyncingInDialog = false
                                     unsyncedCount = count
                                     showUnsyncedWarningDialog = true
-                                    Toast.makeText(context, "Sync attempt finished. $count unsynced record(s) remaining.", Toast.LENGTH_LONG).show()
+                                    Toast.makeText(context, context.getString(R.string.settings_sync_attempt_finished, count), Toast.LENGTH_LONG).show()
                                 },
                                 {
                                     isSyncingInDialog = false

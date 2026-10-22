@@ -10,10 +10,13 @@ import com.mmushtaq04.buysell.domain.LicenseData
 import com.mmushtaq04.buysell.domain.LicensePolicy
 import com.mmushtaq04.buysell.domain.RemoteConfigParser
 import com.mmushtaq04.buysell.util.LicenseCache
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 
@@ -76,6 +79,7 @@ class FeatureAccessRepositoryImpl(
 ) : FeatureAccessRepository {
 
     private val TAG = "FeatureAccessRepo"
+    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val firestore by lazy { FirebaseFirestore.getInstance() }
     private val functions by lazy { FirebaseFunctions.getInstance() }
     private val licenseCache by lazy { LicenseCache(context) }
@@ -246,12 +250,30 @@ class FeatureAccessRepositoryImpl(
             val resultMap = result.getData() as? Map<*, *>
             val isSuccess = resultMap?.get("success") as? Boolean ?: false
 
-            if (isSuccess) {
-                syncEntitlementAndConfig(shopId)
-                if (com.mmushtaq04.buysell.BuildConfig.DEBUG) {
-                    Log.i(TAG, "✓ Successfully redeemed promo code for shop '$shopId'")
+            if (isSuccess && resultMap != null) {
+                val validUntilMs = (resultMap["validUntil"] as? Number)?.toLong()
+                    ?: (System.currentTimeMillis() + 30 * 86400000L)
+
+                val newLicense = LicenseData(status = "ACTIVE", validUntilMs = validUntilMs)
+                licenseCache.save(newLicense, shopId)
+
+                val computed = LicensePolicy.computeEntitlement(
+                    license = newLicense,
+                    nowMs = System.currentTimeMillis(),
+                    lastSeenTimeMs = licenseCache.lastSeenTimeMs
+                )
+                _entitlementState.value = computed
+                _isPremiumUnlocked.value = computed.isUnlocked
+
+                // Trigger remote sync asynchronously in background without blocking caller UI
+                scope.launch {
+                    runCatching { syncEntitlementAndConfig(shopId) }
                 }
-                return@runCatching _entitlementState.value.isUnlocked
+
+                if (com.mmushtaq04.buysell.BuildConfig.DEBUG) {
+                    Log.i(TAG, "✓ Successfully redeemed promo code '$cleanCode' for shop '$shopId'")
+                }
+                return@runCatching true
             }
             false
         }.getOrElse { err ->

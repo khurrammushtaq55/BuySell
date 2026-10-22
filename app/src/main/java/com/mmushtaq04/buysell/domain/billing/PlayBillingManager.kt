@@ -139,9 +139,12 @@ class PlayBillingManager private constructor(context: Context) : PurchasesUpdate
                 val list = productDetailsResult.productDetailsList ?: emptyList()
                 val map = list.associateBy { it.productId }
                 _productDetailsMap.value = map
-                Log.i(TAG, "✓ Fetched ${map.size} product details from Google Play.")
+                Log.i(TAG, "✓ Fetched ${map.size} product details from Google Play: ${map.keys}")
+                if (list.isEmpty()) {
+                    Log.w(TAG, "queryProductDetailsAsync returned 0 items. Ensure base plans are Activated in Play Console and 1-2 hours have passed for propagation.")
+                }
             } else {
-                Log.e(TAG, "Failed to query product details: ${billingResult.responseCode}")
+                Log.e(TAG, "Failed to query product details: code=${billingResult.responseCode}, msg='${billingResult.debugMessage}'")
             }
         }
     }
@@ -154,8 +157,9 @@ class PlayBillingManager private constructor(context: Context) : PurchasesUpdate
     ) {
         val details = _productDetailsMap.value[productId]
         if (details == null) {
+            val availableKeys = _productDetailsMap.value.keys.joinToString()
+            Log.w(TAG, "Product details not loaded for '$productId'. Available in map: [$availableKeys], isBillingReady=${_isBillingReady.value}")
             _billingEventMessage.value = applicationContext.getString(R.string.billing_btn_loading)
-            Log.w(TAG, "Product details not loaded for '$productId'")
             return
         }
 

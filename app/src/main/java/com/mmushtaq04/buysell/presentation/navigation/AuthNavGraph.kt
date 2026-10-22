@@ -24,8 +24,7 @@ fun NavGraphBuilder.authNavGraph(
             },
             onNavigateToLogin = {
                 navController.navigate(NavRoutes.Login.createRoute(isRegister = false))
-            },
-            onGoogleSignInClick = onNavigateAfterLogin
+            }
         )
     }
 
@@ -45,7 +44,6 @@ fun NavGraphBuilder.authNavGraph(
             onNavigateBackToWelcome = {
                 navController.popBackStack()
             },
-            onGoogleSignInClick = onNavigateAfterLogin,
             onSignInSuccess = onNavigateAfterLogin,
             onSignUpSuccess = onNavigateAfterSignUp
         )

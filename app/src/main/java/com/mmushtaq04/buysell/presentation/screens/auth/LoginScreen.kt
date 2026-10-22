@@ -29,11 +29,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.credentials.CredentialManager
-import androidx.credentials.GetCredentialRequest
-import androidx.credentials.exceptions.GetCredentialException
-import com.google.android.libraries.identity.googleid.GetGoogleIdOption
-import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.mmushtaq04.buysell.R
 import com.mmushtaq04.buysell.data.auth.FirebaseAuthManager
 import com.mmushtaq04.buysell.ui.theme.BuySellTheme
@@ -44,7 +39,6 @@ import kotlinx.coroutines.launch
 fun LoginScreen(
     initialRegisterMode: Boolean = false,
     onNavigateBackToWelcome: () -> Unit = {},
-    onGoogleSignInClick: () -> Unit = {},
     onSignInSuccess: () -> Unit = {},
     onSignUpSuccess: () -> Unit = {}
 ) {
@@ -59,34 +53,9 @@ fun LoginScreen(
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
-    val credentialManager = remember { CredentialManager.create(context) }
-
     val errInvalidEmail = stringResource(R.string.login_err_invalid_email)
     val errPwdShort = stringResource(R.string.login_err_pwd_short)
-    val errGoogleFailed = stringResource(R.string.login_err_google_failed)
-    val errGoogleCanceled = stringResource(R.string.login_err_google_canceled)
     val errAuthFailed = stringResource(R.string.login_err_auth_failed)
-
-    fun launchGoogleSignIn() {
-        isLoading = true
-        errorMessage = null
-        scope.launch {
-            com.mmushtaq04.buysell.util.GoogleSignInManager.launchGoogleSignIn(context, authManager)
-                .onSuccess {
-                    isLoading = false
-                    onGoogleSignInClick()
-                }
-                .onFailure { e ->
-                    isLoading = false
-                    val msg = when {
-                        e is GetCredentialException && e.message?.contains("cancel", ignoreCase = true) == true -> errGoogleCanceled
-                        else -> "Google Sign-In Error: ${e.localizedMessage ?: errGoogleFailed}"
-                    }
-                    errorMessage = msg
-                    Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
-                }
-        }
-    }
 
     Scaffold(
         topBar = {

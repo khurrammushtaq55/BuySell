@@ -114,20 +114,7 @@ fun OwnerDashboardContent(
 
     var showHelpDialogTitle by remember { mutableStateOf<String?>(null) }
     var showHelpDialogMsg by remember { mutableStateOf<String?>(null) }
-    var showPaywallDialog by remember { mutableStateOf(false) }
     var showDateRangePicker by remember { mutableStateOf(false) }
-
-    if (showPaywallDialog) {
-        PremiumPaywallDialog(
-            onDismiss = { showPaywallDialog = false },
-            onUpgradeClick = { showPaywallDialog = false },
-            onRestoreClick = { showPaywallDialog = false },
-            onRedeemPromoCode = { _, onSuccess, _ ->
-                showPaywallDialog = false
-                onSuccess()
-            }
-        )
-    }
 
     if (showDateRangePicker) {
         CustomDateRangePickerDialog(
