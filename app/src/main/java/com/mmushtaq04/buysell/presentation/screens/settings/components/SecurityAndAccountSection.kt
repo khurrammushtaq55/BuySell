@@ -24,7 +24,6 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mmushtaq04.buysell.R
-import com.mmushtaq04.buysell.presentation.components.PremiumFeatureGate
 import com.mmushtaq04.buysell.util.AppPinManager
 import com.mmushtaq04.buysell.util.DataExporter
 import kotlinx.coroutines.launch

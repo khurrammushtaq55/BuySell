@@ -52,6 +52,14 @@ fun NavGraphBuilder.settingsNavGraph(
         val billingManager = remember { com.mmushtaq04.buysell.domain.billing.PlayBillingManager.getInstance(context) }
         val productDetailsMap by billingManager.productDetailsMap.collectAsState()
         val isBillingReady by billingManager.isBillingReady.collectAsState()
+        val billingEventMsg by billingManager.billingEventMessage.collectAsState()
+
+        LaunchedEffect(billingEventMsg) {
+            billingEventMsg?.let { msg ->
+                android.widget.Toast.makeText(context, msg, android.widget.Toast.LENGTH_LONG).show()
+                billingManager.clearEventMessage()
+            }
+        }
 
         var userEntity by remember { mutableStateOf<com.mmushtaq04.buysell.data.local.entity.UserEntity?>(null) }
         LaunchedEffect(Unit) {

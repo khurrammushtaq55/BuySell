@@ -13,6 +13,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.HelpOutline
+import androidx.compose.material.icons.automirrored.filled.MenuBook
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -192,7 +194,7 @@ fun HomeScreen(
                         )
                     }
                     Icon(
-                        imageVector = Icons.Default.TrendingUp,
+                        imageVector = Icons.AutoMirrored.Filled.TrendingUp,
                         contentDescription = null,
                         tint = if (todaySalesCount > 0) Color(0xFF2E7D32) else Color.Gray,
                         modifier = Modifier.size(32.dp)
@@ -276,7 +278,7 @@ fun HomeScreen(
                 ActionCard(
                     title = stringResource(R.string.action_khata),
                     subtitle = stringResource(R.string.home_subtitle_baqi_paisay),
-                    icon = Icons.Default.MenuBook,
+                    icon = Icons.AutoMirrored.Filled.MenuBook,
                     backgroundColor = Color(0xFFFFF8E1),
                     contentColor = Color(0xFFF57F17),
                     modifier = Modifier.weight(1f),
