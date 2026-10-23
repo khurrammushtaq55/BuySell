@@ -15,7 +15,7 @@ admin.initializeApp();
 const db = admin.firestore();
 
 const DEFAULT_PACKAGE_NAME = "com.mmushtaq04.buysell";
-const SUBSCRIPTION_IDS = ["buysell_pro_monthly", "buysell_pro_annual"];
+const SUBSCRIPTION_IDS = ["buysell-pro-monthly", "buysell-pro-annual"];
 
 // Reusable Auth Client
 const auth = new google.auth.GoogleAuth({

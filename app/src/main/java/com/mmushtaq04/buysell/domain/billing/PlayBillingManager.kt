@@ -12,6 +12,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.coroutines.resume
 
@@ -23,8 +24,8 @@ class PlayBillingManager private constructor(context: Context) : PurchasesUpdate
     private val TAG = "PlayBillingManager"
 
     companion object {
-        const val SKU_PRO_MONTHLY = "buysell_pro_monthly"
-        const val SKU_PRO_ANNUAL = "buysell_pro_annual"
+        const val SKU_PRO_MONTHLY = "buysell-pro-monthly"
+        const val SKU_PRO_ANNUAL = "buysell-pro-annual"
         const val SKU_BUY_COFFEE = "buysell_coffee_tip"
 
         @Volatile
@@ -115,7 +116,7 @@ class PlayBillingManager private constructor(context: Context) : PurchasesUpdate
     fun queryAvailableProducts() {
         if (!_isBillingReady.value) return
 
-        val productList = listOf(
+        val subProducts = listOf(
             QueryProductDetailsParams.Product.newBuilder()
                 .setProductId(SKU_PRO_MONTHLY)
                 .setProductType(BillingClient.ProductType.SUBS)
@@ -123,28 +124,49 @@ class PlayBillingManager private constructor(context: Context) : PurchasesUpdate
             QueryProductDetailsParams.Product.newBuilder()
                 .setProductId(SKU_PRO_ANNUAL)
                 .setProductType(BillingClient.ProductType.SUBS)
-                .build(),
+                .build()
+        )
+
+        val inAppProducts = listOf(
             QueryProductDetailsParams.Product.newBuilder()
                 .setProductId(SKU_BUY_COFFEE)
                 .setProductType(BillingClient.ProductType.INAPP)
                 .build()
         )
 
-        val params = QueryProductDetailsParams.newBuilder()
-            .setProductList(productList)
+        val subParams = QueryProductDetailsParams.newBuilder()
+            .setProductList(subProducts)
             .build()
 
-        billingClient.queryProductDetailsAsync(params) { billingResult, productDetailsResult ->
+        val inAppParams = QueryProductDetailsParams.newBuilder()
+            .setProductList(inAppProducts)
+            .build()
+
+        billingClient.queryProductDetailsAsync(subParams) { billingResult, productDetailsResult ->
             if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
                 val list = productDetailsResult.productDetailsList ?: emptyList()
                 val map = list.associateBy { it.productId }
-                _productDetailsMap.value = map
-                Log.i(TAG, "✓ Fetched ${map.size} product details from Google Play: ${map.keys}")
+                _productDetailsMap.update { it + map }
+                Log.i(TAG, "✓ Fetched ${map.size} SUBS product details from Google Play: ${map.keys}")
                 if (list.isEmpty()) {
-                    Log.w(TAG, "queryProductDetailsAsync returned 0 items. Ensure base plans are Activated in Play Console and 1-2 hours have passed for propagation.")
+                    Log.w(TAG, "queryProductDetailsAsync (SUBS) returned 0 items. Ensure base plans are Activated in Play Console and 1-2 hours have passed for propagation.")
                 }
             } else {
-                Log.e(TAG, "Failed to query product details: code=${billingResult.responseCode}, msg='${billingResult.debugMessage}'")
+                Log.e(TAG, "Failed to query SUBS product details: code=${billingResult.responseCode}, msg='${billingResult.debugMessage}'")
+            }
+        }
+
+        billingClient.queryProductDetailsAsync(inAppParams) { billingResult, productDetailsResult ->
+            if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
+                val list = productDetailsResult.productDetailsList ?: emptyList()
+                val map = list.associateBy { it.productId }
+                _productDetailsMap.update { it + map }
+                Log.i(TAG, "✓ Fetched ${map.size} INAPP product details from Google Play: ${map.keys}")
+                if (list.isEmpty()) {
+                    Log.w(TAG, "queryProductDetailsAsync (INAPP) returned 0 items. Ensure products are active in Play Console.")
+                }
+            } else {
+                Log.e(TAG, "Failed to query INAPP product details: code=${billingResult.responseCode}, msg='${billingResult.debugMessage}'")
             }
         }
     }

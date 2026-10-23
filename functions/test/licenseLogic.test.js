@@ -248,7 +248,7 @@ describe("computePromoExtension", () => {
 
   test("stacks promo days on top of an active paid PLAY subscription without losing PLAY attributes", () => {
     const currentPlayLicense = {
-      plan: "buysell_pro_annual",
+      plan: "buysell-pro-annual",
       status: "ACTIVE",
       valid_until: nowMs + 300 * dayMs,
       source: "PLAY",
@@ -260,7 +260,7 @@ describe("computePromoExtension", () => {
 
     assert.equal(res.status, "ACTIVE");
     assert.equal(res.source, "PLAY");
-    assert.equal(res.plan, "buysell_pro_annual");
+    assert.equal(res.plan, "buysell-pro-annual");
     assert.equal(res.owningTokenHash, "hash_annual_token");
     assert.equal(res.autoRenewing, true);
     assert.equal(res.validUntilMs, nowMs + 330 * dayMs); // 300 + 30 days = 330 days!
@@ -284,7 +284,7 @@ describe("computePromoExtension", () => {
 
   test("grants promo days from nowMs when current license is expired", () => {
     const expiredLicense = {
-      plan: "buysell_pro_monthly",
+      plan: "buysell-pro-monthly",
       status: "EXPIRED",
       valid_until: nowMs - 5 * dayMs,
       source: "PLAY",

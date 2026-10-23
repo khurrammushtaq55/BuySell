@@ -40,6 +40,7 @@ class PurchaseProcessorTest {
         override fun clearCacheOnSignOut() {}
         override suspend fun syncEntitlementAndConfig(shopId: String) {}
         override suspend fun redeemAdminPromoCode(code: String, shopId: String): Boolean = shouldVerify
+        override suspend fun redeemAdminPromoCodeResult(code: String, shopId: String): Result<Boolean> = Result.success(shouldVerify)
         override suspend fun verifyPurchaseWithServer(purchaseToken: String, productId: String, shopId: String): Boolean = shouldVerify
     }
 
@@ -143,5 +144,38 @@ class PurchaseProcessorTest {
 
         assertEquals(PurchaseResult.CoffeeConsumed, result)
         assertTrue(coffeeConsumed)
+    }
+
+    @Test
+    fun testQueryProductDetailsParamsSeparation() {
+        val subProducts = listOf(
+            com.android.billingclient.api.QueryProductDetailsParams.Product.newBuilder()
+                .setProductId(PlayBillingManager.SKU_PRO_MONTHLY)
+                .setProductType(com.android.billingclient.api.BillingClient.ProductType.SUBS)
+                .build(),
+            com.android.billingclient.api.QueryProductDetailsParams.Product.newBuilder()
+                .setProductId(PlayBillingManager.SKU_PRO_ANNUAL)
+                .setProductType(com.android.billingclient.api.BillingClient.ProductType.SUBS)
+                .build()
+        )
+
+        val inAppProducts = listOf(
+            com.android.billingclient.api.QueryProductDetailsParams.Product.newBuilder()
+                .setProductId(PlayBillingManager.SKU_BUY_COFFEE)
+                .setProductType(com.android.billingclient.api.BillingClient.ProductType.INAPP)
+                .build()
+        )
+
+        // Building separate params for SUBS and INAPP succeeds without IllegalArgumentException
+        val subParams = com.android.billingclient.api.QueryProductDetailsParams.newBuilder()
+            .setProductList(subProducts)
+            .build()
+
+        val inAppParams = com.android.billingclient.api.QueryProductDetailsParams.newBuilder()
+            .setProductList(inAppProducts)
+            .build()
+
+        org.junit.Assert.assertNotNull(subParams)
+        org.junit.Assert.assertNotNull(inAppParams)
     }
 }
